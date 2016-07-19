@@ -1,0 +1,9 @@
+R/model_data/**
+**/*.Rhistory
+**/*.RData
+**/*.docx
+**/*.html
+**/*.md
+**/*.png
+**/*.wmf
+**/*.emf

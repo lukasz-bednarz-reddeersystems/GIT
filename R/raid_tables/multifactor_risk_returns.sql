@@ -1,0 +1,25 @@
+BEGIN TRANSACTION
+SET QUOTED_IDENTIFIER ON
+SET ARITHABORT ON
+SET NUMERIC_ROUNDABORT OFF
+SET CONCAT_NULL_YIELDS_NULL ON
+SET ANSI_NULLS ON
+SET ANSI_PADDING ON
+SET ANSI_WARNINGS ON
+COMMIT
+BEGIN TRANSACTION
+GO
+CREATE TABLE dbo.tMultiFactorRiskImpliedReturns
+	(
+	lModelTypeID bigint NOT NULL,
+	dtDate datetime NOT NULL,
+	lFactorID bigint NOT NULL,
+	dblLogReturn float NULL DEFAULT NULL,
+	CONSTRAINT AK_ModelDateFactor UNIQUE(lModelTypeID,dtDate,lFactorID),
+	CONSTRAINT FK_ModelTypeID_ImpliedReturns_ModelType FOREIGN KEY (lModelTypeID) REFERENCES dbo.tMultiFactorRiskModelTypes (lModelTypeID),
+	CONSTRAINT FK_FactorID_ImpliedReturns_Factor FOREIGN KEY (lFactorID) REFERENCES dbo.tMultiFactorRiskFactors (lFactorID)
+	)
+GO
+ALTER TABLE dbo.tMultiFactorRiskImpliedReturns SET (LOCK_ESCALATION = TABLE)
+GO
+COMMIT

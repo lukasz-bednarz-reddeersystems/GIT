@@ -1,0 +1,1 @@
+SC stop ShinyRiskModelUpdater

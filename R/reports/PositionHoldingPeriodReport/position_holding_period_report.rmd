@@ -1,0 +1,56 @@
+---
+title: "Position Holding Period Report"
+author: "Lukasz Bednarz"
+date: "06 July 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Development/AllRaid/branches/dev_lukasz.bednarz/Services/Raid.Services.TradingEnhancementEngine/R/reports")
+setOption("modifiedOnlySource", FALSE)
+source("../analysis_modules/positions_holding_period_report/positions_holding_period_report.r")
+source("../models/key_library.r")
+library(devEMF)
+
+library(lubridate)
+
+```
+
+
+## Input Data Range
+
+```{r data_range}
+
+trader   <- 11
+query <- dated_three_monthly_lookback(trader, today())
+colnames(query) <- c("TraderID", "start", "end")
+
+```
+
+
+## Define and Trigger Extended Trades computation
+
+```{r extended_trades, results="hide", message=FALSE, warning=FALSE}
+pos.hold.per.report <- new("PositionsHoldingPeriodReport")
+pos.hold.per.report <- dataRequest(pos.hold.per.report, query)
+pos.hold.per.report <- Process(pos.hold.per.report)
+
+```
+
+
+## Plot results
+```{r plot_results, dev ='emf', fig.ext = 'emf'}
+
+
+plt_list <- getOutputGGPlotList(pos.hold.per.report)
+
+for (plt in plt_list) {
+  plot(plt)
+}
+
+```
+
+
+
+# 

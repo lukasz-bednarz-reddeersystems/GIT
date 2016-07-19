@@ -1,0 +1,112 @@
+---
+title: "VELOX Trading Review Report 16'Q2"
+author: "Lukasz Bednarz"
+date: "13 July 2016"
+output: 
+  word_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Development/AllRaid/branches/dev_lukasz.bednarz/Services/Raid.Services.TradingEnhancementEngine/R/reports")
+setOption("modifiedOnlySource", TRUE)
+source("../analysis_modules/trading_review_report/trading_review_2016.2_report.r")
+source("../models/key_library.r")
+library(devEMF)
+
+library(lubridate)
+
+fig_type <- 'png'
+
+```
+
+
+## Define Queries
+
+```{r data_range, results='hide', warning=FALSE, message=FALSE}
+
+trader   <- 11
+query.js <- dated_twelve_monthly_lookback(trader, '2016-07-01')
+colnames(query.js) <- c("TraderID", "start", "end")
+
+trader   <- 70
+query.ba <- dated_twelve_monthly_lookback(trader, '2016-07-01')
+colnames(query.ba) <- c("TraderID", "start", "end")
+
+
+trader   <- 101
+query.dk <- dated_twelve_monthly_lookback(trader, '2016-07-01')
+colnames(query.dk) <- c("TraderID", "start", "end")
+
+```
+
+
+## Trigger Report Computation
+
+```{r extended_trades, results="hide", message=FALSE, warning=FALSE}
+report.js <- new("TradingReview2016.2Report")
+report.js <- dataRequest(report.js, query.js)
+report.js <- Process(report.js)
+
+report.ba <- new("TradingReview2016.2Report")
+report.ba <- dataRequest(report.ba, query.ba)
+report.ba <- Process(report.ba)
+
+report.dk <- new("TradingReview2016.2Report")
+report.dk <- dataRequest(report.dk, query.dk)
+report.dk <- Process(report.dk)
+
+```
+
+
+## PM focus points
+#BA
+```{r plot_focus_ba, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=6.5, fig.height=3}
+plt_list <- getOutputGGPlotList(report.ba)
+
+plot(plt_list$OffsidePositionsBpsPerMonth)
+
+```
+
+#DK
+```{r plot_focus_dk, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=6.5, fig.height=3}
+plt_list <- getOutputGGPlotList(report.dk)
+
+plot(plt_list$AverageDownTradesFocus)
+
+```
+
+#JS
+```{r plot_focus_js, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=6.5, fig.height=2.5}
+plt_list <- getOutputGGPlotList(report.js)
+
+plot(plt_list$PositionsHoldingDayZeroPnL)
+
+```
+
+
+
+## Style Focus
+
+# Barry Anten
+```{r plot_summary_ba, dev=fig_type, fig.ext=fig_type, fig.width=13, dpi = 300, fig.height= 13, out.width='6.5in', out.height= '6.5in'}
+
+plt_list <- getOutputGGPlotList(report.ba)
+grid.arrange(plt_list$Summary)
+```
+
+
+# Dimitri Kern
+```{r plot_summary_dk, dev=fig_type, fig.ext=fig_type, fig.width=13, dpi = 300, fig.height= 13, out.width='6.5in', out.height= '6.5in'}
+
+plt_list <- getOutputGGPlotList(report.dk)
+grid.arrange(plt_list$Summary)
+```
+
+# Jeremy Stone
+```{r plot_summary_js, dev=fig_type, fig.ext=fig_type, fig.width=13, dpi = 300, fig.height= 13, out.width='6.5in', out.height= '6.5in'}
+
+plt_list <- getOutputGGPlotList(report.js)
+grid.arrange(plt_list$Summary)
+```
