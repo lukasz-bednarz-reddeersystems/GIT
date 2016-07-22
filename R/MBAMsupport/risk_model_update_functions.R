@@ -4,7 +4,7 @@ sourceTo("risk_model_load.r", modifiedOnly = getOption("modifiedOnlySource"), lo
 library(lubridate)
 library(quantmod)
 library(ggplot2)
-library(useful)
+#library(useful)
 library(grid)
 
 
@@ -12,8 +12,8 @@ update_risk_model_on_date <- function(model_prefix,date,lookback=150, force = FA
   
   name  <- paste(model_prefix,format(as.Date(date),'%Y-%m'),sep="_") 
   rmstr_current <- risk_model_objectstore_factory(name,lookback)
-  rmstr_curr_last_rm_date <- getMostRecentRiskModelDate(rmstr_current,getID(rmstr_current),lookback)
-  rmstr_curr_last_betas_date<- getMostRecentRiskModelBetasDate(rmstr_current,getID(rmstr_current),lookback)
+  rmstr_curr_last_rm_date <- getMostRecentRiskModelDate(rmstr_current,getID(rmstr_current),lookback, date)
+  rmstr_curr_last_betas_date<- getMostRecentRiskModelBetasDate(rmstr_current,getID(rmstr_current),lookback, date)
 
   if (force & copy_history) {
     # object store exists for given month, possibly has betas and other calculations in it and
@@ -144,7 +144,7 @@ compute_risk_model_on_dates <- function(rm_store, rm_date_start, date =  today()
   
   rm_name       <- getID(rm_store)
   
-  last_model_date <- getMostRecentRiskModelDate(rm_store, rm_name,lookback)
+  last_model_date <- getMostRecentRiskModelDate(rm_store, rm_name,lookback, date)
   last_implied_fct_rtns <- getData(queryDailyRiskModelObjectStore(rm_store,rm_name,lookback, 'ImpliedFactorReturns')) 
   
   if (date > (today()-1)) {
@@ -167,9 +167,11 @@ compute_risk_model_on_dates <- function(rm_store, rm_date_start, date =  today()
   }
   
   
-  betas_last_date <- getMostRecentRiskModelDate(rm_store,rm_name,lookback)
+  betas_last_date <- getMostRecentRiskModelDate(rm_store,rm_name,lookback, date)
   
   historical_betas <- getData(queryDailyRiskModelObjectStore(rm_store, rm_name, lookback, 'Betas'))
+  
+  historical_betas <- historical_betas[historical_betas$Date <= rm_date_end,]
   
   historical_betas_dates <- unique(historical_betas$Date)
   
