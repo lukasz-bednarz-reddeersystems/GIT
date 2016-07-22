@@ -8,7 +8,7 @@ library(RColorBrewer)
 
 ################################################################################
 #
-# MarketStyleAnalysisBlock Class
+# MarketStyleFactorStatisticAnalysisBlock Class
 # 
 # Computation block class to pull data required data for Market Style 
 # Pulls data required for computation and adds required columns.
@@ -16,7 +16,7 @@ library(RColorBrewer)
 
 
 setClass(
-  Class             = "MarketStyleAnalysisBlock",
+  Class             = "MarketStyleFactorStatisticAnalysisBlock",
   slots             = c(
     market_style       = "MarketStyleData"
   ),
@@ -36,7 +36,7 @@ setClass(
 
 
 setMethod("dataRequest",
-          signature(object = "MarketStyleAnalysisBlock", key_values = "data.frame"),
+          signature(object = "MarketStyleFactorStatisticAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
             
             object <- .setDataSourceQueryKeyValues(object,key_values)
@@ -67,7 +67,7 @@ setMethod("dataRequest",
 
 
 setMethod("Process",  
-          signature(object = "MarketStyleAnalysisBlock"),
+          signature(object = "MarketStyleFactorStatisticAnalysisBlock"),
           function(object){
             
             # retrieve data
@@ -92,6 +92,10 @@ setMethod("Process",
                 
                 plot_data <- data.frame(Date = rm_date, plot_data)
                 
+                plot_data$RiskGroup <- plot_data$RiskType
+                levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
+                plot_data <- data.frame(Date = rm_date, plot_data)
+                
                 if(first){
                   mrkt_plot_data <- plot_data
                   first <- FALSE
@@ -104,10 +108,22 @@ setMethod("Process",
               }
             }
 
-            #Create plot
+            #order of factors
+            browser()
             
-            plt_risk <- ggplot(data=mrkt_plot_data,aes(x=Date,y=RiskType,color=RiskType)) +
-                        geom_line() +
+            ord_frm <- unique(mrkt_plot_data[c("RiskType", "RiskGroup")])
+            ord_frm <- ord_frm[order(ord_frm$RiskGroup, ord_frm$RiskType, decreasing = TRUE),]
+            
+            mrkt_plot_data$RiskType <- factor(as.character(mrkt_plot_data$RiskType), 
+                                                 levels = as.character(ord_frm$RiskType))
+                   
+            #Create plot
+            plt_risk <- ggplot(data=mrkt_plot_data,aes(x=RiskType,y=Value,
+                                                       color=RiskType
+                                                       )
+                               ) +
+                        geom_boxplot() +
+                        coord_flip() +
                         guides(color = FALSE)
                         
 
