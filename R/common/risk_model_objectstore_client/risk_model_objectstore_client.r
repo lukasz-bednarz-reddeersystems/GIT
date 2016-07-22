@@ -96,6 +96,8 @@ setMethod("dataRequest",
               
               rm_str       <- get_most_recent_model_objectstore(model_prefix, end, lookback)
               
+              if (is.null(rm_str)) next()
+              
               name         <- getID(rm_str)
               
               query_data   <- queryDailyRiskModelObjectStore(rm_str,name,lookback,component)
@@ -109,7 +111,8 @@ setMethod("dataRequest",
                 first <- FALSE
               } 
               else {
-                ret_data <- rbind(ret_data, query_data)
+                
+                ret_data <- rbind(ret_data, query_data[!(query_data$Date %in% unique(ret_data$Date)), ])
               }
               
             }
