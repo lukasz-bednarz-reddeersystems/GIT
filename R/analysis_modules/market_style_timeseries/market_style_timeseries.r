@@ -21,12 +21,11 @@ setClass(
     market_style       = "MarketStyleData"
   ),
   prototype         = list(
-    key_cols        = c("TraderID", "start", "end"),
-    key_values      = data.frame(TraderID = character(),
-                                 start    = as.Date(character()),
+    key_cols        = c("start", "end"),
+    key_values      = data.frame(start    = as.Date(character()),
                                  end    = as.Date(character())),
-    column_name_map = hash(c("TraderID", "start", "end"), 
-                           c("id", "start", "end")),
+    column_name_map = hash(c("start", "end"), 
+                           c("start", "end")),
     market_style       = new("MarketStyleData")
   ),
   contains          = c("VirtualAnalysisBlock",
@@ -46,7 +45,9 @@ setMethod("dataRequest",
             
             # getting marketStyle data 
 
-            query_keys <- unique(query_keys["Date"])
+            query_keys <- data.frame(Date = seq(from = as.Date(min(key_values$start)),
+                                                to   = as.Date(min(key_values$end)),
+                                                by = 1))
             
             market_style <- tryCatch({
               dataRequest(market_style, query_keys)
@@ -74,6 +75,10 @@ setMethod("Process",
             
             all_market_st <- getReferenceData(market_style)
             
+            browser()
+            
+            first <- TRUE
+            
             # stack market data
             for(rm_date in sort(unique(all_market_st$Date))){
               
@@ -81,9 +86,13 @@ setMethod("Process",
               
               if(wday(rm_date)!=7&wday(rm_date)!=1){
                 
-                plot_data <- stack(rd.tot, select = c(portfolio_decomposition_all_factors))
+                market_st <- all_market_st[all_market_st$Date==rm_date,setdiff(colnames(all_market_st),'Date')]
+                
+                plot_data <- stack(market_st, select = c(portfolio_decomposition_all_factors))
                 
                 colnames(plot_data) <- c("Value", "Factor")
+                
+                plot_data <- data.frame(Date = rm_date, plot_data)
                 
                 if(first){
                   mrkt_plot_data <- plot_data
@@ -100,7 +109,9 @@ setMethod("Process",
             #Create plot
             
             plt_risk <- ggplot(data=mrkt_plot_data,aes(x=Date,y=Value,color=Factor)) +
-                        geom_boxplot()
+                        geom_line() +
+                        guides(color = FALSE)
+                        
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)

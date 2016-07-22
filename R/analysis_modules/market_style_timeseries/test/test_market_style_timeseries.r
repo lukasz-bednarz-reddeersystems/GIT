@@ -10,9 +10,8 @@ library(testthat)
 
 # test vectors
 tested.class          <-  "MarketStyleAnalysisBlock"
-valid.column_name_map <- hash(c("TraderID", "start", "end"), c("id", "start", "end"))
-init.key_values       <- data.frame(TraderID = character(),
-                                    start    = as.Date(character()),
+valid.column_name_map <- hash(c("start", "end"), c("start", "end"))
+init.key_values       <- data.frame(start    = as.Date(character()),
                                     end    = as.Date(character()))
 
 test_that(paste("Can create", tested.class, "object"), {
@@ -71,7 +70,7 @@ test_that("Can dataRequest() with valid key_values and no previous data set", {
   object <- dataRequest(object, valid.key_values)
   
   
-  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values)
+  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values[,-1])
   
   # market style data verification
   market_data <- getMarketStyleDataObject(object)
@@ -94,7 +93,7 @@ test_that(paste("Can Process() on", tested.class), {
   object <- dataRequest(object, valid.key_values)
   
   
-  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values)
+  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values[,-1])
   
   # market style data verification
   market_data <- getMarketStyleDataObject(object)
@@ -109,10 +108,6 @@ test_that(paste("Can Process() on", tested.class), {
   
   expect_is(getOutputGGPlot(object), "ggplot")
   expect_is(getOutputGGPlotData(object), "data.frame")
-  
-  output <- getOutputObject(object) 
-  expect_is(output, "PortfolioVarianceFactorDecompositionData")
-  expect_gt(getStoredNRows(output), 0)
 
 })
 
