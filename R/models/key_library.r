@@ -70,6 +70,17 @@ dated_twelve_monthly_lookback <- function(trader,date){
   return(key_generator(trader,end,1,12))
 }
 
+dated_eighteen_monthly_lookback <- function(trader,date){
+  tryCatch({
+    rdate <- as.Date(date)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_twelve_monthly_lookback module key function for date value",date,":",cond))
+  })
+  days_this_month <- as.numeric(format(rdate,'%d'))	
+  end <- rdate - days_this_month 
+  return(key_generator(trader,end,1,18))
+}
+
 dated_three_day_lookback <- function(trader,date){
   tryCatch({
     rdate <- as.Date(date)
