@@ -141,28 +141,42 @@ setMethod("getRiskModelComponentOnDate","DailyRiskModelObjectStore",
 )
 
 
-setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelDate")})
+setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150, ...){standardGeneric("getMostRecentRiskModelDate")})
 setMethod("getMostRecentRiskModelDate","DailyRiskModelObjectStore",
-		  function(object,name,lookback=150){
+		  function(object,name,lookback=150, date = NULL){
 		  	comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
 		  	if(nrow(comp@data)>0){
-		  		date <- max(comp@data$Date)	
-		  	}
-		  	else{
+		  	  dates <- unique(comp@data$Date)
+		  	  if (!is.null(date)) {
+		  	    dates <- dates[dates<=date]
+		  	  }
+		  	  if (length(dates) > 0) {
+		  		date <- max(dates)	
+		  	  } else {
+		  	    date <- NULL
+		  	  }
+		  	} else {
 		  		date <- NULL
 		  	}
 		  	return(date)
 		  }
 )
 
-setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelBetasDate")})
+setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150, ...){standardGeneric("getMostRecentRiskModelBetasDate")})
 setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
-          function(object,name,lookback=150){
+          function(object,name,lookback=150, date = NULL){
             comp <- queryDailyRiskModelObjectStore(object,name,lookback,'Betas')
             if(nrow(comp@data)>0){
-              date <- max(comp@data$Date)	
-            }
-            else{
+              dates <- unique(comp@data$Date)
+              if (!is.null(date)) {
+                dates <- dates[dates<=date]
+              }
+              if (length(dates) > 0) {
+                date <- max(dates)	
+              } else {
+                date <- NULL
+              }
+            } else {
               date <- NULL
             }
             return(date)
