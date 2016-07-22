@@ -16,18 +16,6 @@ library(RColorBrewer)
 # Pulls data required for computation and adds required columns.
 ###############################################################################
 
-portfolio_decomposition_composition_factors <- c('TotalSystematic', 
-                                                 'MarketFactor',
-                                                 'Currency',
-                                                 'Commodity',
-                                                 'Sector')
-
-portfolio_decomposition_factor_groups <- list(Composition = portfolio_decomposition_composition_factors,
-                                              Market = portfolio_decomposition_market_factors,
-                                              Currency = portfolio_decomposition_currency_factors,
-                                              Commodity = portfolio_decomposition_commodity_factors,
-                                              Sector= portfolio_decomposition_sector_factors)
-
 setClass(
   Class             = "PortfolioFactorReturnsData",
   prototype         = list(
@@ -268,7 +256,6 @@ setMethod("Process",
               ret_plot_data$Colour[ret_plot_data$RiskGroup == group] <- as.integer(as.factor(as.character(ret_plot_data$RiskType[ret_plot_data$RiskGroup == group] )))
             }
             
-            browser()
             
             #Create a custom color scale
             myColors <- brewer.pal(brewer.pal.info["Set1", "maxcolors"],"Set1")
