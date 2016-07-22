@@ -4,6 +4,8 @@ sourceTo("../analysis_modules/analysis_block/portfolio_data_handler.r", modified
 sourceTo("../analysis_modules/analysis_block/instrument_betas_data_handler.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../analysis_modules/analysis_block/factor_correlation_data_handler.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../analysis_modules/analysis_block/factor_variance_data_handler.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../MBAMsupport/risk_model_functions.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+
 
 
 ################################################################################
@@ -24,6 +26,20 @@ portfolio_decomposition_all_factors <- c(portfolio_decomposition_market_factors,
                                          portfolio_decomposition_currency_factors,
                                          portfolio_decomposition_commodity_factors,
                                          portfolio_decomposition_sector_factors)
+
+
+portfolio_decomposition_composition_factors <- c('TotalSystematic', 
+                                                 'MarketFactor',
+                                                 'Currency',
+                                                 'Commodity',
+                                                 'Sector')
+
+portfolio_decomposition_factor_groups <- list(Composition = portfolio_decomposition_composition_factors,
+                                              Market = portfolio_decomposition_market_factors,
+                                              Currency = portfolio_decomposition_currency_factors,
+                                              Commodity = portfolio_decomposition_commodity_factors,
+                                              Sector= portfolio_decomposition_sector_factors)
+
 
 setClass(
   Class             = "PortfolioVarianceFactorDecompositionData",
@@ -120,6 +136,8 @@ setMethod("dataRequest",
               end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(betas_data), cond))
             })
             
+            browser()
+            
             object <- .setInstrumentBetasDataObject(object, betas_data)
             
             
@@ -185,7 +203,6 @@ setMethod("Process",
             
             # compute output
             
-            
             first <- TRUE
             for(rm_date in sort(unique(port$Date))){
               
@@ -201,7 +218,13 @@ setMethod("Process",
                 if(nrow(fct_cor)>0 && nrow(fct_sd)>0){
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
-                  fct_cov <- 365*3/5*factor_covariance(fct_cor,fct_sd)/150
+                  fct_cov <- tryCatch({
+                    365*3/5*factor_covariance(fct_cor,fct_sd)
+                  }, error = function(cond){
+                    message(paste("I have encountered an error in cov_matrix on", rm_date, ". Skipping this date."))
+                    NULL
+                  })
+                  if (is.null(fct_cov)) next()
                   #fct_cov <- 365*3/5*factor_covariance(fct_cor, sqrt(fct_sd))/150
                   market_risk <- portfolio_variance_decomposition(wt,bt,fct_cov)
                   total_sys_var <- sum(market_risk)
