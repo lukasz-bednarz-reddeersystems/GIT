@@ -8,5 +8,10 @@
 #'
 #' @docType package
 #' @name foo
+#'
+#' @import lubridate
+#' @importFrom methods setClass setGeneric setMethod
+#' @importFrom XML xmlTreeParse
+#'
 NULL
 ## NULL
