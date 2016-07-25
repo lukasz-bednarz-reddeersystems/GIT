@@ -1,13 +1,14 @@
 #' An S4 class to represent generic data set.
 #'
-#' @slot key_cols      "character",
-#' @slot data_cols     "character",
-#' @slot data          "data.frame",
-#' @slot indexed       "logical",
-#' @slot last_result   "data.frame",
-#' @slot pad           "data.frame",
+#' @slot key_cols      "character"
+#' @slot data_cols     "character"
+#' @slot data          "data.frame"
+#' @slot indexed       "logical"
+#' @slot last_result   "data.frame"
+#' @slot pad           "data.frame"
 #' @slot unique_rows   "logical"
 #' @export
+
 setClass(
   Class          = "DataSet",
   representation = representation(
@@ -31,7 +32,7 @@ setClass(
 #' @param data  data.frame.
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
-#' \code{checkUnique(object,data)}
+#' checkUnique(object,data)
 
 setGeneric("checkUnique", function(object,data){standardGeneric("checkUnique")})
 setMethod("checkUnique", "DataSet",
