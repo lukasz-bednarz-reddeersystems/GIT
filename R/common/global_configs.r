@@ -1,7 +1,7 @@
 #This could be an enivronment variable that is automatically set according
 #to the host name.
 ENV <- 'prod'
-DATA<- 'prod'
+DATA<- 'dev'
 
 #It was necessary to use the live version of the trading analysis
 #middleware URL so ConfigSwitcher was added to permit this.

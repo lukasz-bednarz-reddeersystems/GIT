@@ -1,3 +1,4 @@
+setwd("C:/Development/AllRaid/Services/Raid.Services.TradingEnhancementEngine/R/te_dashboard_app")
 library(shiny)
 library(ggplot2)
 library(plotly)
@@ -10,12 +11,16 @@ strategies <- unique(position_data$Strategy)
 min_date <- min(position_data$TradeDate,na.rm=TRUE)
 max_date <- max(position_data$TradeDate,na.rm=TRUE)
 column_group <- list('TodayPL','ActiveTodayPL','PassiveTodayPL','MarketRelPL')
-feature_group <- list('CompoundReturnOutof')
+feature_group <- list('CompoundReturnOutof','CompoundReturnInto','ValueUSD','VolInto','VolOutof','SkewInto','SkewOutof','RSI14','TodayPL','MarketRelPL','PnLOutof','PsnAge','Hit','StockHit','DaysOffRel','DaysOffAbs','StockLoss','StockWin')
 row_groups <- list(Strategy=list(JS=strategies[grep('JS_',strategies)],
                                  BA=strategies[grep('BA_',strategies)],
                                  DK=strategies[grep('DK_',strategies)],
+                                 
                                  All=strategies),
-                   TradeType=list(Increase=c('Increase')))
+                   TradeType=list(Increase=c('Increase'),
+                                  Decrease=c('Decrease'),
+                                  OpenLong=c('OpenLong'),
+                                  OpenShort=c('OpenShort')))
 
 compute_pl_cumulant <- function(all_pnl,raw_pnl,pltype,strat,first,colname,offtype=NULL){
   if(length(offtype)==0){
@@ -24,7 +29,7 @@ compute_pl_cumulant <- function(all_pnl,raw_pnl,pltype,strat,first,colname,offty
     strat_pnl <- raw_pnl[raw_pnl$Strategy==strat&raw_pnl$PLType==pltype&raw_pnl$OffType==offtype,]  
   }
   strat_pnl <- strat_pnl[order(strat_pnl$TradeDate),]
-  strat_pnl$CumulativePL <- cumsum(strat_pnl[[colname]])
+  strat_pnl$CumulativePL <- cumsum(strat_pnl[colname])
   if(first){
     all_pnl <- strat_pnl
   } else {
@@ -51,6 +56,8 @@ multi_aggregate <- function(data,aggregate_columns,over_columns,with_fn,generic_
         }
       }
     } else {
+      colnames(agg)[colnames(agg)==aggregate_columns] <- generic_column
+      agg <- cbind(PLType=aggregate_columns,agg)
       unrolled <- agg
     }
   } else {
@@ -62,66 +69,68 @@ multi_aggregate <- function(data,aggregate_columns,over_columns,with_fn,generic_
 ui <- dashboardPage(
         dashboardHeader(title="Trading Enhancement"),
         dashboardSidebar( 
-                          sidebarMenu(menuItem("Position management",tabName="position_management",icon=icon("bar-chart-o"))),
-                          sidebarMenu(menuItem("Trade sizing",tabName="trade_sizing",icon=icon("balance-scale")))
+                          sidebarMenu(menuItem("Position management",tabName="position_management",icon=icon("bar-chart-o")),
+                                      menuItem("Trade sizing",tabName="trade_sizing",icon=icon("balance-scale")))
                         ),
         dashboardBody(
           tabItems(
             tabItem(tabName="position_management",
-              fluidRow(
+              fluidRow(tags$style(type="text/css",
+                                  ".shiny-output-error { visibility: hidden; }",
+                                  ".shiny-output-error:before { visibility: hidden; }"
+                   ),
                    box(plotOutput("timeseries"),width=12)
                    ),
               fluidRow(
                       box(
-                        title="PnL Breakdown",
+                        
                         sliderInput("dateInput", "Date", min_date, max_date, c(min_date,max_date)),
-                        checkboxGroupInput("columnSelector","PnL Breakdown",column_group,inline=TRUE)
+                        checkboxGroupInput("columnSelector","PnL Breakdown",column_group,inline=TRUE),
+                        width = 5
                       ),
                       box(
-                        title="Offside limits",
+                        title="Offside bucket",
                         numericInput("offsAbs", "Days Abs. offside", 0,min = 1, max = 100),
-                        numericInput("offsRel", "Days Rel. offside", 0,min = 1, max = 100)
-                      )   
+                        numericInput("offsRel", "Days Rel. offside", 0,min = 1, max = 100),
+                        width = 5
+                      ),
+                      box(
+                        checkboxGroupInput("groupSelector","Strategy groups",names(row_groups[['Strategy']])),
+                        width=2
+                      )
                      ),
               fluidRow(
                       box(
-                        title="Strategy group",
-                        checkboxGroupInput("groupSelector","Display groups",names(row_groups[['Strategy']])),
-                        width=2
-                      ),
-                      box(
-                        title="Strategies",
+                        title="All strategies",
                         checkboxGroupInput("strategySelector","Display strategies",strategies,inline=TRUE),
-                      width=10
+                      width=12
                       )
                      )
             ),
             tabItem(tabName="trade_sizing",
-              fluidRow(
+              fluidRow(tags$style(type="text/css",
+                                  ".shiny-output-error { visibility: hidden; }",
+                                  ".shiny-output-error:before { visibility: hidden; }"
+                   ),
                    box(plotOutput("trade_histograms"),width=12)
                    ),
               fluidRow(
                       box(
-                        title="Trade perfomance",
                         sliderInput("tradeDateInput", "Date", min_date, max_date, c(min_date,max_date)),
-                        checkboxGroupInput("tradeFeatureSelector","Metrics",feature_group,inline=TRUE)#pnl
+                        checkboxGroupInput("tradeFeatureSelector","Trade metrics",feature_group,inline=TRUE),
+                        width=5
                       ),
                       box(
-                        title="Trade group",
-                        checkboxGroupInput("tradeTypeSelector","Trade is",names(row_groups[['TradeType']]))#like strat grp
+                        title="Trade selector",
+                        checkboxGroupInput("tradeTypeSelector","Trade category",names(row_groups[['TradeType']])),
+                        numericInput("tradeVisit", "Visit to stock", 0,min = 1, max = 10),
+                        width=5
                       ),
                       box(
-                        title="Visit number",
-                        numericInput("tradeVisit", "Visit", 0,min = 1, max = 10))#like offside
-                      ),
-              fluidRow(
-                      box(
-                        title="Strategy group",
-                        checkboxGroupInput("tradeGroupSelector","Display groups",names(row_groups[['Strategy']])),
+                        checkboxGroupInput("tradeGroupSelector","Strategy groups",names(row_groups[['Strategy']])),
                         width=2
                       )
                      )
-            
             )
           )
     )
@@ -178,10 +187,11 @@ server <- function(input, output) {
                               }
                              })
   
+  trade_group_strategies <- reactive({unique(unlist(row_groups[['Strategy']][input$tradeGroupSelector]))})
   trade_group_filtered <- reactive({
     if(length(input$tradeGroupSelector)>0){
       trade_date_filtered() %>%
-        filter(Strategy%in%group_strategies())
+        filter(Strategy%in%trade_group_strategies())
     } else {
       trade_date_filtered() %>%
         filter(Strategy%in%c('returnanemptyframe'))
@@ -227,7 +237,7 @@ server <- function(input, output) {
       for(type in input$tradeTypeSelector){
         group_name <- paste(group,"Group",sep="")
         type_name <- paste(type,"Type",sep="")
-        group_data <- all_data[all_data[['Strategy']]%in%row_groups[['Strategy']][[group]]&all_data[['TradeType']]%in%row_groups[['TradeType']][[type]],]
+        group_data <- all_data[(all_data[['Strategy']]%in%row_groups[['Strategy']][[group]])&(all_data[['TradeType']]%in%row_groups[['TradeType']][[type]]),]
         group_data['Strategy'] <- group_name
         group_data['TradeType'] <- type_name
         if(first){
@@ -242,12 +252,12 @@ server <- function(input, output) {
       multi_aggregate(grouped_data,input$tradeFeatureSelector,list(Strategy=grouped_data$Strategy,TradeType=grouped_data$TradeType),function(x)mean(x,na.rm=TRUE),'Metric')
     } else {
       v_agg  <- multi_aggregate(grouped_data,input$tradeFeatureSelector,list(Strategy=grouped_data$Strategy,
-                                                                               TradeType=grouped_data$TradeType,
-                                                                         Visit=unlist(Map(function(x)ifelse(x,'ThisVisit','OtherVisits'),grouped_data$Visit==input$tradeVisit))),
-                                  function(x)mean(x,na.rm=TRUE),'Metric')
-      v_data <- cbind(Visit='Total',multi_aggregate(grouped_data,input$columnSelector,list(Strategy=grouped_data$Strategy,
-                                                                                             TradeType=grouped_data$TradeType,
-                                                        function(x)mean(x,na.rm=TRUE),'Metric')))
+                                                                             TradeType=grouped_data$TradeType,
+                                                                             Visit=unlist(Map(function(x)ifelse(x,'ThisVisit','OtherVisits'),grouped_data$Visit==input$tradeVisit))),
+                                                                             function(x)mean(x,na.rm=TRUE),'Metric')
+      v_data <- cbind(Visit='Total',multi_aggregate(grouped_data,input$tradeFeatureSelector,list(Strategy=grouped_data$Strategy,
+                                                                                                 TradeType=grouped_data$TradeType),
+                                                                                                 function(x)mean(x,na.rm=TRUE),'Metric'))
       rbind(v_data,v_agg)   
     }  
     
@@ -288,19 +298,23 @@ server <- function(input, output) {
                                     if(length(input$columnSelector)==1){
                                       if(input$offsAbs==0&&input$offsRel==0){
                                         ggplot(plot_pnl(), aes(x=TradeDate,y=CumulativePL,group=Strategy,colour=Strategy)) +
+                                          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
                                           geom_line(size=1)
                                       } else {
                                         ggplot(plot_pnl(), aes(x=TradeDate,y=CumulativePL,group=Strategy,colour=Strategy)) +
+                                          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
                                           geom_line(size=1) +
                                           facet_grid(~OffType)
                                       }  
                                     } else if(length(input$columnSelector)>1){
                                       if(input$offsAbs==0&&input$offsRel==0){
                                         ggplot(plot_pnl(), aes(x=TradeDate,y=CumulativePL,group=Strategy,colour=Strategy)) +
+                                          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
                                           geom_line(size=1) +
                                           facet_grid(PLType~.)
                                       } else {
                                         ggplot(plot_pnl(), aes(x=TradeDate,y=CumulativePL,group=Strategy,colour=Strategy)) +
+                                          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
                                           geom_line(size=1) +
                                           facet_grid(PLType~OffType)
                                       }
@@ -308,29 +322,30 @@ server <- function(input, output) {
                                   }
                        })
   
-  output$tradeHistograms <- renderPlot({if(!is.na(grouped_trades())){
+  output$trade_histograms <- renderPlot({if(!is.na(grouped_trades())){
     if(length(input$tradeFeatureSelector)==1){
       if(input$tradeVisit==0){
-        ggplot(grouped_trades(), aes(x=Strategy,group=TradeType,colour=TradeType)) +
-          geom_bar(aes(weight=Metric),position="dodge")
+        ggplot(grouped_trades(), aes(x=Strategy,fill=TradeType)) +
+          geom_bar(aes(weight=Metric),position="dodge") 
       } else {
-        ggplot(grouped_trades(), aes(x=Strategy,group=TradeType,colour=TradeType)) +
+        ggplot(grouped_trades(), aes(x=Strategy,fill=TradeType)) +
           geom_bar(aes(weight=Metric),position="dodge") +
-          facet_grid(~Visit)
+          facet_grid(~Visit,scales="free_y")
       }  
     } else if(length(input$tradeFeatureSelector)>1){
       if(input$tradeVisit==0){
-        ggplot(grouped_trades(), aes(x=Strategy,group=TradeType,colour=TradeType)) +
+        ggplot(grouped_trades(), aes(x=Strategy,fill=TradeType)) +
           geom_bar(aes(weight=Metric),position="dodge") +
-          facet_grid(PLType~.)
+          facet_grid(PLType~.,scales="free_y")
       } else {
-        ggplot(grouped_trades(), aes(x=Strategy,group=TradeType,colour=TradeType)) +
+        ggplot(grouped_trades(), aes(x=Strategy,fill=TradeType)) +
           geom_bar(aes(weight=Metric),position="dodge") +
-          facet_grid(PLType~Visit)
+          facet_grid(PLType~Visit,scales="free_y")
       }
     }
   }
   })
 }
+
 
 shinyApp(ui = ui, server = server)

@@ -8,7 +8,7 @@ library(GGally)
 
 traders   <- c(101,11,70)
 dates <- c("2016-05-01")
-#exclude <- c("DK_SHDG","DK_LHDG","BA_SHEDGE","BA_LHEDGE","JS_SHEDGE","JS_LHEDGE")
+exclude <- c("DK_SHDG","DK_LHDG","BA_SHEDGE","BA_LHEDGE","JS_SHEDGE","JS_LHEDGE")
 
 first <- TRUE
 for(t in traders){
@@ -23,7 +23,6 @@ for(t in traders){
     history_data <- rbind.fill(history_data,cbind(Trader=t,trader_data))  
   }
 }
-
 history_data <- history_data[!history_data$Strategy%in%exclude,]
 history_data <- market_rel_pl(history_data,trade_rel=FALSE)
 scale_data <- c('ValueUSD','VolInto','VolOutof','SkewInto','SkewOutof','CompoundReturnInto','CompoundReturnOutof')
@@ -33,19 +32,7 @@ history_data <- position_age_from_flats(history_data,cols)
 #history_data=readRDS("C:/Development/AllRaid/Services/Raid.Services.TradingEnhancementEngine/R/model_data/history_data.rds")
 #PnlOutof is missing on some trades for some reason... replace it in this case with TodayPL
 history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$PnLOutof <- history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$TodayPL
-history_data$TradeType <- 'NA'
-history_data$TradeType[history_data$Long==1&history_data$MarketValue>0&history_data$PsnAge!=0] <- 'Increase'
-history_data$TradeType[(history_data$Long==0)&history_data$MarketValue>0&history_data$PsnAge!=0] <- 'Decrease'
-history_data$TradeType[history_data$Long==1&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Decrease'
-history_data$TradeType[(history_data$Long==0)&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Increase'
-psn_increased <- aggregate(history_data$TradeType,list(Strategy=history_data$Strategy,Visit=history_data$Visit,Instrument=history_data$Instrument),function(x)sum(x=='Increase',na.rm=TRUE)>0)
-colnames(psn_increased) <- c('Strategy','Visit','Instrument','PsnIncreased')
-history_data <- merge(history_data,psn_increased,by=c('Strategy','Visit','Instrument'),all.x=TRUE)
-
-switch_direction <- function(history_data,column){
-  history_data[column] <- -1^(1+history_data$PsnLong)*history_data[column]
-  return(history_data)
-}
+history_data <- trade_typer(history_data)
 
 history_data$PsnLong <- history_data$MarketValue>0
 history_data <- switch_direction(history_data,'SkewInto')
@@ -53,36 +40,31 @@ history_data <- switch_direction(history_data,'SkewOutof')
 history_data <- switch_direction(history_data,'CompoundReturnInto')
 history_data <- switch_direction(history_data,'CompoundReturnOutof')
 
-initial_trades <- unique(history_data[!is.na(history_data$TradeID)&history_data$PsnAge==0,c(cols,'PsnIncreased')])
-increases <- unique(history_data[!is.na(history_data$TradeID)&history_data$TradeType=='Increase',c(cols,'PsnIncreased')])
-scale_and_clip <- function(data,bound=5){
-  na_idx <- is.na(data) 
-  data[na_idx] <- mean(data,na.rm=TRUE)
-  data <- as.numeric(scale(data))
-  data[abs(data)>bound] <- NA
-  data[na_idx] <- NA
-  return(data)
-}
+initial_trades <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='New Long'|history_data$TradeType=='New Short'),c(cols,'PsnIncreased','TradeType')])
+increases <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='Add Long'|history_data$TradeType=='Add Short'),c(cols,'PsnIncreased','TradeType')])
+
+initial_trades <- rbind(initial_trades,increases)
 for(scale_col in scale_data){
-  initial_trades[[scale_col]] <- scale_and_clip(initial_trades[[scale_col]])
-  increases[[scale_col]] <- scale_and_clip(increases[[scale_col]])
+  initial_trades[paste(scale_col,"Zscore",sep="")] <- scale_and_clip(initial_trades[[scale_col]])
+  increases[paste(scale_col,"Zscore",sep="")] <- scale_and_clip(increases[[scale_col]])
 }
-initial_plot_data <- rbind(cbind(Quantity='Skewness',Timeframe="Pre-trade",data.frame(Value=initial_trades$SkewInto),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Skewness',Timeframe="Post-trade",data.frame(Value=initial_trades$SkewOutof),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Volatility',Timeframe="Pre-trade",data.frame(Value=initial_trades$VolInto),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Volatility',Timeframe="Post-trade",data.frame(Value=initial_trades$VolOutof),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return',Timeframe="Pre-trade",data.frame(Value=initial_trades$CompoundReturnInto),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return',Timeframe="Post-trade",data.frame(Value=initial_trades$CompoundReturnOutof),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return/Volatility',Timeframe="Pre-trade",data.frame(Value=scale_and_clip(initial_trades$CompoundReturnInto/initial_trades$VolInto)),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return/Volatility',Timeframe="Post-trade",data.frame(Value=scale_and_clip(initial_trades$CompoundReturnOutof/initial_trades$VolOutof)),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]))
-increases_plot_data<- rbind(cbind(Quantity='Skewness',Timeframe="Pre-trade",data.frame(Value=increases$SkewInto),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Skewness',Timeframe="Post-trade",data.frame(Value=increases$SkewOutof),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Volatility',Timeframe="Pre-trade",data.frame(Value=increases$VolInto),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Volatility',Timeframe="Post-trade",data.frame(Value=increases$VolOutof),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return',Timeframe="Pre-trade",data.frame(Value=increases$CompoundReturnInto),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return',Timeframe="Post-trade",data.frame(Value=increases$CompoundReturnOutof),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return/Volatility',Timeframe="Pre-trade",data.frame(Value=scale_and_clip(increases$CompoundReturnInto/increases$VolInto)),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]),
-                           cbind(Quantity='Return/Volatility',Timeframe="Post-trade",data.frame(Value=scale_and_clip(increases$CompoundReturnOutof/increases$VolOutof)),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSD','RSI14')]))
+
+initial_plot_data <- rbind(cbind(Quantity='Skewness',Timeframe="Pre-trade",data.frame(Value=initial_trades$SkewIntoZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Skewness',Timeframe="Post-trade",data.frame(Value=initial_trades$SkewOutofZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Volatility',Timeframe="Pre-trade",data.frame(Value=initial_trades$VolIntoZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Volatility',Timeframe="Post-trade",data.frame(Value=initial_trades$VolOutofZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return',Timeframe="Pre-trade",data.frame(Value=initial_trades$CompoundReturnIntoZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return',Timeframe="Post-trade",data.frame(Value=initial_trades$CompoundReturnOutofZscore),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return/Volatility',Timeframe="Pre-trade",data.frame(Value=scale_and_clip(initial_trades$CompoundReturnIntoZscore/initial_trades$VolIntoZscore)),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return/Volatility',Timeframe="Post-trade",data.frame(Value=scale_and_clip(initial_trades$CompoundReturnOutofZscore/initial_trades$VolOutofZscore)),initial_trades[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]))
+increases_plot_data<- rbind(cbind(Quantity='Skewness',Timeframe="Pre-trade",data.frame(Value=increases$SkewIntoZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Skewness',Timeframe="Post-trade",data.frame(Value=increases$SkewOutofZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Volatility',Timeframe="Pre-trade",data.frame(Value=increases$VolIntoZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Volatility',Timeframe="Post-trade",data.frame(Value=increases$VolOutofZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return',Timeframe="Pre-trade",data.frame(Value=increases$CompoundReturnIntoZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return',Timeframe="Post-trade",data.frame(Value=increases$CompoundReturnOutofZscore),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return/Volatility',Timeframe="Pre-trade",data.frame(Value=scale_and_clip(increases$CompoundReturnIntoZscore/increases$VolIntoZscore)),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]),
+                           cbind(Quantity='Return/Volatility',Timeframe="Post-trade",data.frame(Value=scale_and_clip(increases$CompoundReturnOutofZscore/increases$VolOutofZscore)),increases[c('Trader','TradeDate','Strategy','Instrument','ValueUSDZscore','RSI14')]))
 
 scatter_plot_kernel <- function(data, mapping, method="lm", ...){
   p <- ggplot(data = data, mapping = mapping) + 
@@ -103,14 +85,14 @@ density_plot_kernel <- function(data, mapping, ...){
   return(p)
 }
 
-pcols <- c('VolInto','VolOutof','SkewInto','SkewOutof','CompoundReturnInto','CompoundReturnOutof','ValueUSD')
+pcols <- c('VolIntoZscore','VolOutofZscore','SkewIntoZscore','SkewOutofZscore','CompoundReturnIntoZscore','CompoundReturnOutofZscore','ValueUSDZscore')
 trader <- 11
-ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("JS opening trades") +
   facet_grid(Quantity~Timeframe,scales="free_y")
-ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("JS position increases") +
@@ -122,12 +104,12 @@ ggpairs(increases[increases$Trader==trader,], lower=list(continuous=scatter_plot
         diag=list(continuous=density_plot_kernel), axisLabels="show", title="JS position increases")
 
 trader <- 101
-ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("DK opening trades") +
   facet_grid(Quantity~Timeframe,scales="free_y")
-ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("DK position increases") +
@@ -139,12 +121,12 @@ ggpairs(increases[increases$Trader==trader,], lower=list(continuous=scatter_plot
         diag=list(continuous=density_plot_kernel), axisLabels="show", title="DK position increases")
 
 trader <- 70
-ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(initial_plot_data[initial_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("BA opening trades") +
   facet_grid(Quantity~Timeframe,scales="free_y")
-ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSD, y=Value,colour=RSI14)) +
+ggplot(increases_plot_data[increases_plot_data$Trader==trader,], aes(x=ValueUSDZscore, y=Value,colour=RSI14)) +
   geom_point(shape=1) +    
   geom_smooth(method=lm) +
   ggtitle("BA position increases") +
@@ -155,18 +137,100 @@ ggpairs(initial_trades[initial_trades$Trader==trader,], lower=list(continuous=sc
 ggpairs(increases[increases$Trader==trader,], lower=list(continuous=scatter_plot_kernel), columns=pcols,
         diag=list(continuous=density_plot_kernel), axisLabels="show", title="BA position increases")
 
-#Compute hit rate and asymetry for:
-#Initial trades where subsequently was increased
-#Initial trades where subsequently was not increased
-#Initial trades overall
-#Trades that increased the position
+#Examine specific trade group performance
+initial_trades <- rbind(initial_trades,increases)
+initial_trades$Month <- format(initial_trades$TradeDate,"%Y-%m")
+initial_trades$Trader <- substr(initial_trades$Strategy,1,2)
+initial_trades$TraderTradeType <- paste(initial_trades$Trader,initial_trades$TradeType,sep=" ") 
 
-#Presumably the question is whether the positions that
-#were increased should have been larger in the first place
-#(The ones that are not increased, presumably were loosers)
-#And/or possibly that the position could have been increased more aggressively
+trade_stats <- data_fractile(initial_trades,'ValueUSD',10,'Decile',c('TraderTradeType','Month'))
+trade_stats$StockHit <- trade_stats$CompoundReturnOutof > 0
+trade_stats$PsnHit <- trade_stats$CompoundReturnOutof > 0
+ext <- trade_stats$PnLOutof/abs((trade_stats$CompoundReturnOutof/10000)*trade_stats$ValueUSD)
+trade_stats$Extraction <- sign(ext)*log(abs(ext))
+trade_stats$PsnWin <- NA
+trade_stats$PsnWin[trade_stats$PnLOutof>0] <- trade_stats$PnLOutof[trade_stats$PnLOutof>0]
+trade_stats$PsnLoss <- NA
+trade_stats$PsnLoss[trade_stats$PnLOutof<0] <- trade_stats$PnLOutof[trade_stats$PnLOutof<0]
 
-#Condition regression on the first trades only in the positions 
-#that were increased. And/or on whether the position was profitable, 
-#post trade and or on a longer timescale.
-#Plot displaying this on the diagonal of the regression plot?
+#1. Overall
+
+trade_stat_package <- c('VolInto','SkewInto','VolOutof','SkewOutof','ValueUSD','CompoundReturnOutof','PnLOutof','RSI14','StockHit','PsnHit','Extraction','ValueUSDDecile_N')
+agg_stats <- aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType),function(x)mean(x,na.rm=TRUE))
+first <- TRUE
+for(clm in trade_stat_package){
+  sub_data <- agg_stats[c('TradeDate','TraderTradeType',clm)]
+  colnames(sub_data) <- c('TradeDate','TraderTradeType','Value')
+  if(first){
+    plot_data <- cbind(Metric=clm,sub_data)
+    first <- FALSE
+  } else{
+    plot_data <- rbind(plot_data,cbind(Metric=clm,sub_data))
+  }
+}
+size_smmry <- ggplot(plot_data,aes(x=TradeDate,y=Value,group=Metric,colour=Metric)) +
+              geom_point() +
+              geom_smooth() +
+              facet_grid(Metric~TraderTradeType,scales="free_y")
+
+#2. Examine stats of top and bottom size quartile trades (compared to others)
+
+trade_stat_package <- c('VolInto','SkewInto','VolOutof','ValueUSD','CompoundReturnOutof','PsnWin','PsnLoss','RSI14','PsnHit','Extraction','ValueUSDDecile_N','PnLOutof')
+agg_stats <- aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType,Decile=ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N==1,'Bottom',ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N==10,'Top','2-9'))),function(x)mean(x,na.rm=TRUE))
+agg_stats$PayOff <- agg_stats$PsnWin/agg_stats$PsnLoss
+first <- TRUE
+for(clm in c(trade_stat_package,'PayOff')){
+  sub_data <- agg_stats[c('TradeDate','TraderTradeType','Decile',clm)]
+  colnames(sub_data) <- c('TradeDate','TraderTradeType','Decile','Value')
+  if(first){
+    plot_data <- cbind(Metric=clm,sub_data)
+    first <- FALSE
+  } else{
+    plot_data <- rbind(plot_data,cbind(Metric=clm,sub_data))
+  }
+}
+plot_data$Value[is.infinite(plot_data$Value)] <- NA
+plot_data$Value[is.nan(plot_data$Value)] <- NA
+
+maxday <- plot_data[c('TradeDate')]
+maxday$Month <- paste(format(maxday$TradeDate,"%Y-Q"),quarter(maxday$TradeDate),sep="")
+maxday <- aggregate(maxday['TradeDate'],list(Month=maxday$Month),function(x)max(x,na.rm=TRUE))
+
+monthly_agg <- aggregate(plot_data['Value'],list(Month=paste(format(plot_data$TradeDate,"%Y-Q"),quarter(plot_data$TradeDate),sep=""),Metric=plot_data$Metric,TraderTradeType=plot_data$TraderTradeType),function(x)mean(x,na.rm=TRUE))
+colnames(monthly_agg)[colnames(monthly_agg)=='Value'] <- 'AggValue'
+monthly_agg <- merge(monthly_agg,maxday,by='Month')
+monthly_agg <- merge(monthly_agg[c('Month','TraderTradeType','Metric','AggValue','TradeDate')],plot_data,by=c('TradeDate','TraderTradeType','Metric'))
+monthly_agg <- aggregate(monthly_agg[c('Value','AggValue')],list(Month=monthly_agg$Month,TraderTradeType=monthly_agg$TraderTradeType,Metric=monthly_agg$Metric,TradeDate=monthly_agg$TradeDate),function(x)mean(x,na.rm=TRUE))
+monthly_agg$Value <- 1.5*monthly_agg$AggValue
+
+trader='BA'
+vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','PnLOutof')
+qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+  geom_smooth() +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~TraderTradeType,scales="free_y")
+
+trader='JS'
+vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','PnLOutof')
+qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+  geom_smooth() +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~TraderTradeType,scales="free_y")
+
+trader='DK'
+vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','PnLOutof')
+qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+  geom_smooth() +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~TraderTradeType,scales="free_y")
+
+#Relative trade-type stats long/short
+
+#3. Examine position characteristics over time for positions opened with top and bottom quartile trades compared to others
+
+#4. Proposed sizing adjustment
+
+#5. Reduced PM/recent time market/stock colour view
