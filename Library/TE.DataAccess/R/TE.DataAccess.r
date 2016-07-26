@@ -7,11 +7,12 @@
 #' DataSet
 #'
 #' @docType package
-#' @name foo
+#' @name TE.DataAccess
 #'
 #' @import lubridate
-#' @importFrom methods setClass setGeneric setMethod
+#' @import XML
+#' @importFrom methods setClass setGeneric setMethod setClassUnion
 #' @importFrom XML xmlTreeParse
-#'
+#' @importFrom R.methodsS3 isGenericS4
 NULL
 ## NULL

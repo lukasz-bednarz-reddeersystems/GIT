@@ -32,7 +32,9 @@ setMethod("buildURL","URLQuery",
           }
 )
 
-suppressWarnings(setClassUnion("NullableDoc",c("XMLDocument","NULL")))
+setClass("MyXMLDocument", contains = "XMLDocument")
+setClassUnion("NullableDoc",c("MyXMLDocument","NULL"))
+
 setClass(
     Class          = "URLDataReader",
     representation = representation(
@@ -66,7 +68,9 @@ setMethod("clearData","URLDataReader",
           }
 )
 
-suppressWarnings(setClassUnion("NullableNode",c("XMLNode","NULL")))
+
+setClass("MyXMLNode", contains = "XMLNode")
+suppressWarnings(setClassUnion("NullableNode",c("MyXMLNode","NULL")))
 
 #' class wraping xml string and its parameters
 #'

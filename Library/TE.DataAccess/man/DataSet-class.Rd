@@ -10,17 +10,17 @@ An S4 class to represent generic data set.
 \section{Slots}{
 
 \describe{
-\item{\code{key_cols}}{"character",}
+\item{\code{key_cols}}{"character"}
 
-\item{\code{data_cols}}{"character",}
+\item{\code{data_cols}}{"character"}
 
-\item{\code{data}}{"data.frame",}
+\item{\code{data}}{"data.frame"}
 
-\item{\code{indexed}}{"logical",}
+\item{\code{indexed}}{"logical"}
 
-\item{\code{last_result}}{"data.frame",}
+\item{\code{last_result}}{"data.frame"}
 
-\item{\code{pad}}{"data.frame",}
+\item{\code{pad}}{"data.frame"}
 
 \item{\code{unique_rows}}{"logical"}
 }}

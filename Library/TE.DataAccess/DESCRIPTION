@@ -17,9 +17,20 @@ Imports:
     RODBC,
     hashFunction,
     XML,
-    plyr
+    plyr,
+    R.methodsS3,
 Collate:
-    "TE.DataAccess.r"
-    "dataset.r"
+    'TE.DataAccess.r'
+    'dataset.r'
+    'urldatareader_functions.r'
+    'urldatareader.r'
+    'keymap.r'
+    'datastore.r'
+    'frame_to_xml.r'
+    'functions.r'
+    'global_configs.r'
+    'objectstore.r'
+    'sockets.r'
 RoxygenNote: 5.0.1
-Suggests: testthat
+Suggests:
+    testthat

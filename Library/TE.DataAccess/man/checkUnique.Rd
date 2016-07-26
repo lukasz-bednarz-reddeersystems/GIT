@@ -18,6 +18,6 @@ checkUnique(object, data)
 Check if new incoming data has unique row
 }
 \examples{
-\\code{checkUnique(object,data)}
+checkUnique(object,data)
 }
 
