@@ -42,6 +42,7 @@ Collate:
     'common_instrument_history_datastore.r'
     'common_instrument_price.r'
     'common_instrument_sector.r'
+    'common_ppmodel_objectstore.r'
     'common_risk_factor_returns_datastore.r'
     'common_risk_instrument_exposure_datastore.r'
     'common_trade_levels_datastore.r'
