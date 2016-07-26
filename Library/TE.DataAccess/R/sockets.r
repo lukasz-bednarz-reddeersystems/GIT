@@ -10,6 +10,7 @@ setClassUnion("NullableSocket",c("NULL","socket"))
 #' @slot socket      "NullableSocket"
 #' @slot data        "character"
 #' @slot read_limit  "numeric"
+#' @export
 
 setClass(
   Class          = "ProcessSocket",
@@ -28,6 +29,13 @@ setClass(
     read_limit   = socket_defaults@read_lim
   )
 )
+
+#' open socket connection
+#'
+#' @param object object of class 'ProcessSocket'.
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @examples
+#' openConnection(object)
 
 setGeneric("openConnection",function(object){standardGeneric("openConnection")})
 setMethod("openConnection","ProcessSocket",
@@ -56,6 +64,14 @@ setMethod("openConnection","ProcessSocket",
           }
 )
 
+#' Read data from socket
+#'
+#' @param object object of class 'ProcessSocket'.
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @examples
+#' readConnection(object)
+#' @export
+
 setGeneric("readConnection",function(object){standardGeneric("readConnection")})
 setMethod("readConnection","ProcessSocket",
           function(object){
@@ -73,6 +89,15 @@ setMethod("readConnection","ProcessSocket",
             return(object)
           }
 )
+
+#' Write data to socket
+#'
+#' @param object object of class 'ProcessSocket'.
+#' @param data character, data to write to socket.
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @examples
+#' writeToConnection(object,data)
+#' @export
 
 setGeneric("writeToConnection",function(object,data){standardGeneric("writeToConnection")})
 setMethod("writeToConnection","ProcessSocket",
@@ -97,11 +122,31 @@ setMethod("writeToConnection","ProcessSocket",
 if (!R.methodsS3::isGenericS4("getData")) {
   setGeneric("getData",function(object){standardGeneric("getData")})
 }
+
+#' Get data read from socket
+#'
+#' Retrieve data previously read from socket using
+#' \code{readConnection(object)}
+#'
+#' @param object object of class 'ProcessSocket'.
+#' @return \code{data} character, data read from socket..
+#' @examples
+#' getData(object)
+#' @export
+
 setMethod("getData","ProcessSocket",
           function(object){
             return(object@data)
           }
 )
+
+#' Close socket connection
+#'
+#' @param object object of class 'ProcessSocket'.
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @examples
+#' closeConnection(object)
+#' @export
 
 setGeneric("closeConnection",function(object){standardGeneric("closeConnection")})
 setMethod("closeConnection","ProcessSocket",
