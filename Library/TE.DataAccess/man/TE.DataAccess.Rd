@@ -11,6 +11,6 @@ caching  and manipulation for Trading Enhancement R engine
 }
 \section{TE.DataAccess classes}{
 
-DataSet
+\link{DataSet-class}
 }
 

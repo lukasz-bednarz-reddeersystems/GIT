@@ -68,6 +68,9 @@ Collate:
     'features_trade_aggregate_feature_library.r'
     'features_trade_feature_library.r'
     'frame_to_xml.r'
+    'models_key_library.r'
+    'models_ppmodel.r'
+    'models_ppmodel_library.r'
     'sockets.r'
 RoxygenNote: 5.0.1
 Suggests:

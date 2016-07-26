@@ -19,6 +19,5 @@ Update index based on new incoming data
 }
 \examples{
 updateIndex(object,new_data)
-
 }
 

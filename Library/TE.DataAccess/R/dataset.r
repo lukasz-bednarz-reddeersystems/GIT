@@ -34,6 +34,7 @@ setClass(
 #' @examples
 #' checkUnique(object,data)
 
+
 setGeneric("checkUnique", function(object,data){standardGeneric("checkUnique")})
 setMethod("checkUnique", "DataSet",
           function(object,data){
@@ -70,6 +71,7 @@ setMethod("checkUnique", "DataSet",
 #' @examples
 #' getData(object)
 #' @export
+
 
 setGeneric("getData", function(object){standardGeneric("getData")})
 setMethod("getData", "DataSet",
@@ -113,6 +115,7 @@ setMethod("setData", "DataSet",
 #' @examples
 #' resetData(object,data)
 
+
 setGeneric("resetData", function(object,data){standardGeneric("resetData")})
 setMethod("resetData", "DataSet",
           function(object,data){
@@ -138,6 +141,7 @@ setMethod("resetData", "DataSet",
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
 #' initialiseOrSetData(object,data)
+
 
 setGeneric("initialiseOrSetData", function(object,data){standardGeneric("initialiseOrSetData")})
 setMethod("initialiseOrSetData", "DataSet",
@@ -176,6 +180,7 @@ setMethod("initialiseOrSetData", "DataSet",
 #' @examples
 #' initialiseOrAppendData(object,data)
 
+
 setGeneric("initialiseOrAppendData", function(object,data){standardGeneric("initialiseOrAppendData")})
 setMethod("initialiseOrAppendData", "DataSet",
           function(object,data){
@@ -200,6 +205,7 @@ setMethod("initialiseOrAppendData", "DataSet",
 #' @examples
 #' aggregateGroup(object,target_cols,group_by,fn,agg_unique=FALSE)
 
+
 setGeneric("aggregateGroup", function(object,target_cols,group_by,fn,agg_unique=FALSE){standardGeneric("aggregateGroup")})
 setMethod("aggregateGroup", "DataSet",
           function(object,target_cols,group_by,fn,agg_unique=FALSE){
@@ -221,6 +227,7 @@ setMethod("aggregateGroup", "DataSet",
 #' @return \code{agg} object of class 'data.frame'.
 #' @examples
 #' aggregateGroupCompound(object,target_cols,group_by_lst,fn_lst,agg_unique=FALSE)
+
 
 setGeneric("aggregateGroupCompound", function(object,target_cols,group_by_lst,fn_lst,agg_unique=FALSE){standardGeneric("aggregateGroupCompound")})
 setMethod("aggregateGroupCompound", "DataSet",
@@ -249,6 +256,7 @@ setMethod("aggregateGroupCompound", "DataSet",
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
 #' aggregate_kernel(data,group_by,all_cols,target_cols,fn,agg_unique,na="na.omit")
+
 
 aggregate_kernel <- function(data,group_by,all_cols,target_cols,fn,agg_unique,na="na.omit"){
   if(length(group_by) != length(intersect(all_cols,group_by))){
@@ -280,6 +288,7 @@ aggregate_kernel <- function(data,group_by,all_cols,target_cols,fn,agg_unique,na
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
 #' innerJoin(object,incoming_dataset,on_columns,aliases=NULL,joinmode='inner')
+
 
 setGeneric("innerJoin", function(object,incoming_dataset,on_columns,aliases=NULL,joinmode='inner'){standardGeneric("innerJoin")})
 setMethod("innerJoin", "DataSet",
@@ -363,6 +372,7 @@ setMethod("innerJoin", "DataSet",
 #' @examples
 #' innerJoinFrame(object,frame,key_cols,aliases=NULL,joinmode='inner')
 
+
 setGeneric("innerJoinFrame", function(object,frame,key_cols,aliases=NULL,joinmode='inner'){standardGeneric("innerJoinFrame")})
 setMethod("innerJoinFrame", "DataSet",
           function(object,frame,key_cols,aliases=NULL,joinmode='inner'){
@@ -380,6 +390,7 @@ setMethod("innerJoinFrame", "DataSet",
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
 #' keyDiff(object,key_values)
+
 
 setGeneric("keyDiff",function(object,key_values){standardGeneric("keyDiff")})
 setMethod("keyDiff","DataSet",
@@ -406,6 +417,7 @@ setMethod("keyDiff","DataSet",
 #' @examples
 #' createIndex(object)
 
+
 setGeneric("createIndex",function(object){standardGeneric("createIndex")})
 setMethod("createIndex","DataSet",
           function(object){
@@ -431,7 +443,8 @@ setMethod("createIndex","DataSet",
 #' @return \code{object} object of class 'DataSet'.
 #' @examples
 #' updateIndex(object,new_data)
-#'
+
+
 setGeneric("updateIndex",function(object,new_data){standardGeneric("updateIndex")})
 setMethod("updateIndex","DataSet",
           function(object,new_data){
@@ -470,6 +483,7 @@ setMethod("updateIndex","DataSet",
 #' @examples
 #' hashRows(object,rows,keys,type='local')
 
+
 setGeneric("hashRows",function(object,rows,keys,type='local'){standardGeneric("hashRows")})
 setMethod("hashRows","DataSet",
           function(object,rows,keys,type='local'){
@@ -498,6 +512,7 @@ setMethod("hashRows","DataSet",
 #' @return \code{new_data} data.frame with incoming_data without duplicated values
 #' @examples
 #' compareUnique(object,new_data)
+
 
 setGeneric("compareUnique", function(object,new_data){standardGeneric("compareUnique")})
 setMethod("compareUnique", "DataSet",
@@ -529,6 +544,7 @@ setMethod("compareUnique", "DataSet",
 #' @examples
 #' appendData(object,new_data)
 
+
 setGeneric("appendData",function(object,new_data){standardGeneric("appendData")})
 setMethod("appendData","DataSet",
           function(object,new_data){
@@ -554,6 +570,7 @@ setMethod("appendData","DataSet",
 #' @examples
 #' aggregateData(object,new_data)
 
+
 setGeneric("aggregateData", function(object,new_data){standardGeneric("aggregateData")})
 setMethod("aggregateData", "DataSet",
           function(object,new_data){
@@ -575,6 +592,7 @@ setMethod("aggregateData", "DataSet",
 #' @return \code{object} object of class 'DataSet'
 #' @examples
 #' attemptUpdate(object,data,new_data)
+
 
 setGeneric("attemptUpdate", function(object,data,new_data){standardGeneric("attemptUpdate")})
 setMethod("attemptUpdate", "DataSet",
@@ -628,6 +646,7 @@ first <- function(x){
 #' @examples
 #' rowCoalesceOn(object,by=NULL,fn=first)
 
+
 setGeneric("rowCoalesceOn", function(object,by=NULL,fn=first){standardGeneric("rowCoalesceOn")})
 
 setMethod("rowCoalesceOn", "DataSet",
@@ -654,6 +673,7 @@ setMethod("rowCoalesceOn", "DataSet",
 #' @examples
 #' rowCoalesceOn(object,by=NULL,fn=first)
 #' @export
+
 
 dataset_factory <- function(key_cols,data){
   all_cols <- colnames(data)
