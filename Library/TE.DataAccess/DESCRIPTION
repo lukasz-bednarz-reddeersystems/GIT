@@ -37,6 +37,7 @@ Collate:
     'functions.r'
     'common_trade_factory.r'
     'common_composite_warehouse.r'
+    'common_daily_riskmodel_objectstore.r'
     'common_watchlist_datastore.r'
     'common_risk_factor_returns_datastore.r'
     'common_risk_instrument_exposure_datastore.r'
