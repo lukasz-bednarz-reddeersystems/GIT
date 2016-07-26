@@ -21,15 +21,20 @@ Imports:
     R.methodsS3,
 Collate:
     'TE.DataAccess.r'
-    'dataset.r'
+    'global_configs.r'
     'urldatareader_functions.r'
     'urldatareader.r'
+    'common_RAIDdata.r'
     'keymap.r'
+    'dataset.r'
     'datastore.r'
+    'common_allocation_datastore.r'
+    'objectstore.r'
+    'common_analysis_objectstore.r'
+    'common_composite_datasets.r'
+    'common_dataset.r'
     'frame_to_xml.r'
     'functions.r'
-    'global_configs.r'
-    'objectstore.r'
     'sockets.r'
 RoxygenNote: 5.0.1
 Suggests:

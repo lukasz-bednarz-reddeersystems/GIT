@@ -14,5 +14,6 @@
 #' @importFrom methods setClass setGeneric setMethod setClassUnion
 #' @importFrom XML xmlTreeParse
 #' @importFrom R.methodsS3 isGenericS4
+#' @importFrom RODBC odbcConnect sqlQuery
 NULL
 ## NULL

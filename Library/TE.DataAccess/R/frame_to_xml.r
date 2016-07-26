@@ -6,7 +6,6 @@
 #' @return \code{xml} character xml string
 #' @examples
 #' rowCoalesceOn(object,by=NULL,fn=first)
-#' @export
 FrameToXML <- function(df,name,tree_name="Root")
 {
   name <- gsub(' ','_',name)
