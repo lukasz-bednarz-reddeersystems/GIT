@@ -1,2 +1,0 @@
-sourceTo("../analysis_modules_legacy/visualisation_frequencyplot.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules_legacy/visualisation_snapshot.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
