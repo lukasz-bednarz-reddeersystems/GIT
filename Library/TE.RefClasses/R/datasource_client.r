@@ -49,9 +49,7 @@ setClass(
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-if (!R.methodsS3::isGenericS4(".PostProcessResultsData")){
-  setGeneric(".PostProcessResultsData", function(object,...){standardGeneric(".PostProcessResultsData")})
-}
+setGeneric(".PostProcessResultsData", function(object,...){standardGeneric(".PostProcessResultsData")})
 setMethod(".PostProcessResultsData",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -68,9 +66,8 @@ setMethod(".PostProcessResultsData",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-if (!R.methodsS3::isGenericS4(".generateDataFilledWithNA")) {
- setGeneric(".generateDataFilledWithNA", function(object, trader, start, end,...){standardGeneric(".generateDataFilledWithNA")})
-}
+setGeneric(".generateDataFilledWithNA", function(object, trader, start, end,...){standardGeneric(".generateDataFilledWithNA")})
+
 
 
 #' Get query key column names
@@ -286,9 +283,7 @@ setMethod(".removeNAReferenceData",
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-if (!R.methodsS3::isGenericS4("dataRequest")) {
-  setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
-}
+setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
 
 
 #' Get factorized columns names
@@ -304,9 +299,7 @@ if (!R.methodsS3::isGenericS4("dataRequest")) {
 #' @return \code{factorized_cols} character vector with list of factorized column names
 #' @export
 
-if (!R.methodsS3::isGenericS4("getFactorColumnNames")){
-  setGeneric("getFactorColumnNames", function(object,...){standardGeneric("getFactorColumnNames")})
-}
+setGeneric("getFactorColumnNames", function(object,...){standardGeneric("getFactorColumnNames")})
 setMethod("getFactorColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -322,9 +315,7 @@ setMethod("getFactorColumnNames",
 #' @return \code{has_factorized_cols} logical
 #' @export
 
-if (!R.methodsS3::isGenericS4("hasFactorColumnNames")){
-  setGeneric("hasFactorColumnNames", function(object,...){standardGeneric("hasFactorColumnNames")})
-}
+setGeneric("hasFactorColumnNames", function(object,...){standardGeneric("hasFactorColumnNames")})
 setMethod("hasFactorColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -346,9 +337,7 @@ setMethod("hasFactorColumnNames",
 #' @return \code{factorization_keys} character vector with list of key columns used in factorization
 #' @export
 
-if (!R.methodsS3::isGenericS4("getFactorizationKeyColumnNames")){
-  setGeneric("getFactorizationKeyColumnNames", function(object,...){standardGeneric("getFactorizationKeyColumnNames")})
-}
+setGeneric("getFactorizationKeyColumnNames", function(object,...){standardGeneric("getFactorizationKeyColumnNames")})
 setMethod("getFactorizationKeyColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -366,9 +355,7 @@ setMethod("getFactorizationKeyColumnNames",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-if (!R.methodsS3::isGenericS4(".transformReferenceData")){
-  setGeneric(".transformReferenceData", function(object,...){standardGeneric(".transformReferenceData")})
-}
+setGeneric(".transformReferenceData", function(object,...){standardGeneric(".transformReferenceData")})
 setMethod(".transformReferenceData",
           signature(object = "VirtualDataSourceClient"),
           function(object){

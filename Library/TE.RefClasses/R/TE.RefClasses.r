@@ -9,7 +9,8 @@
 #'
 #' @import lubridate
 #' @import plyr
-#' @import hash
+#' @importfrom hash hash
+#' @importClassesFrom hash
 #' @importFrom methods setClass setGeneric setMethod setClassUnion
 #' @importFrom R.methodsS3 isGenericS4
 #' @importFrom RODBC odbcConnect sqlQuery

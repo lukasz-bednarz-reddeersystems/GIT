@@ -34,11 +34,12 @@ setClass(
                                     start    = as.Date(character()),
                                     end    = as.Date(character())),
     values             = c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue', 'TodayPL'), # columns that neeed to be returned from datastore
-    column_name_map    = hash(c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue', 'TodayPL'),
+    column_name_map    = hash::hash(c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue', 'TodayPL'),
                               c('Strategy','Trader','TraderID','Direction','InstrumentID','Date','MarketValue', 'TodayPL')),
     required_colnms = c('Strategy','TraderID','InstrumentID','Date','Weight')
   ),
-  contains = c("PortfolioWithTransformations",
+  contains = c("Portfolio",
+               "VirtualTransformationsHandler",
                "VirtualDataSourceClient")
 )
 
@@ -48,14 +49,14 @@ setClass(
 #
 # })
 
-setGeneric("getTraderID", function(object,...){standardGeneric("getTraderID")})
-# Returns TraderID slot value.
-#
-# Args:
-#   object : object of type Portfolio
-# Returns:
-#   TraderID
 
+#' Returns TraderID
+#'
+#' @param object object of class 'StrategyPortfolio'.
+#' @return \code{trader_id} integer.
+#' @export
+
+setGeneric("getTraderID", function(object,...){standardGeneric("getTraderID")})
 setMethod("getTraderID",
           signature(object = "StrategyPortfolio"),
           function(object){
@@ -135,6 +136,7 @@ setMethod("dataRequest",
             return(object)
           }
 )
+
 
 setMethod("buildPortfolioHistory",
           signature(object = "StrategyPortfolio"),
