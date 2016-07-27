@@ -4,6 +4,7 @@ library(R.utils)
 source("../analysis_modules_legacy/analysis_module_position_holding_period.r")
 source("../scripts/coaching_review_functions.r")
 source("../reporting/raid_data_import.r")
+source('../scripts/excel_analysis_functions.R')
 library(ggplot2)
 library(plotly)
 library(GGally)
@@ -27,10 +28,11 @@ for(t in traders){
 }
 history_data <- history_data[!history_data$Strategy%in%exclude,]
 history_data <- market_rel_pl(history_data,trade_rel=FALSE)
+
 scale_data <- c('ValueUSD','VolInto','VolOutof','SkewInto','SkewOutof','CompoundReturnInto','CompoundReturnOutof')
 cols <- c('Trader','TradeDate','Strategy','Instrument',scale_data,'RSI14','TodayPL','Long','MarketValue','EarliestMarketValue','MarketRelPL','MinDate','PnLOutof')
 history_data <- position_age_from_flats(history_data,cols)
-#history_data=readRDS("C:/Development/TradingEnhancementEngine/R/model_data/history_data.rds")
+#history_data=readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data.rds")
 #PnlOutof is missing on some trades for some reason... replace it in this case with TodayPL
 history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$PnLOutof <- history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$TodayPL
 history_data <- trade_typer(history_data)
@@ -41,8 +43,41 @@ history_data <- switch_direction(history_data,'SkewOutof')
 history_data <- switch_direction(history_data,'CompoundReturnInto')
 history_data <- switch_direction(history_data,'CompoundReturnOutof')
 
-initial_trades <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='New Long'|history_data$TradeType=='New Short'),c(cols,'PsnIncreased','TradeType')])
-increases <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='Add Long'|history_data$TradeType=='Add Short'),c(cols,'PsnIncreased','TradeType')])
+#Basic segment PL 
+history_data$SegmentPL <- NA
+history_data$SegmentUSD<- NA
+for(strategy in unique(history_data$Strategy)){
+  for(instrument in unique(history_data[history_data$Strategy==strategy,]$Instrument)){
+    for(visit in unique(history_data[history_data$Strategy==strategy&history_data$Instrument==instrument,]$Visit)){
+      df <- history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit,]
+      min_date <- min(df[grepl('New',df$TradeType),]$TradeDate,na.rm=TRUE)
+      add_date <- min(df[grepl('Add',df$TradeType),]$TradeDate,na.rm=TRUE)
+      if(!is.na(as.character(min_date))){
+        if(!is.na(as.character(add_date))){
+          pl <- sum(df[df$TradeDate<add_date,]$TodayPL,na.rm=TRUE)
+          usd<- sum(df[df$TradeDate<add_date,]$ValueUSD,na.rm=TRUE)
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentPL <- pl
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentUSD <- usd
+          pl <- sum(df[df$TradeDate>=add_date,]$TodayPL,na.rm=TRUE)
+          usd<- sum(df[df$TradeDate<add_date,]$ValueUSD,na.rm=TRUE)
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==add_date,]$SegmentPL <- pl
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==add_date,]$SegmentUSD <- usd
+        } else {
+          pl <- sum(df[df$TradeDate>=min_date,]$TodayPL,na.rm=TRUE)
+          usd<- sum(df[df$TradeDate>=min_date,]$ValueUSD,na.rm=TRUE)
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentPL <- pl
+          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentUSD <- usd
+        } 
+      }
+    }
+  }
+}
+history_data$TraderTradeType <- paste(history_data$Trader,history_data$TradeType,sep=" ") 
+#saveRDS(history_data,"//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
+history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
+
+initial_trades <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='New Long'|history_data$TradeType=='New Short'),c(cols,'PsnIncreased','TradeType','SegmentPL')])
+increases <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='Add Long'|history_data$TradeType=='Add Short'),c(cols,'PsnIncreased','TradeType','SegmentPL')])
 
 for(scale_col in scale_data){
   initial_trades[paste(scale_col,"Zscore",sep="")] <- scale_and_clip(initial_trades[[scale_col]])
@@ -84,6 +119,9 @@ density_plot_kernel <- function(data, mapping, ...){
        annotate("text",x=2.5,y=0.3,label=paste("Loss:",round(losers),sep=""))
   return(p)
 }
+
+#----------------------------------------------------
+#Plot pairwise regressions and correlations
 
 pcols <- c('VolIntoZscore','VolOutofZscore','SkewIntoZscore','SkewOutofZscore','CompoundReturnIntoZscore','CompoundReturnOutofZscore','ValueUSDZscore')
 trader <- 11
@@ -137,7 +175,9 @@ ggpairs(initial_trades[initial_trades$Trader==trader,], lower=list(continuous=sc
 ggpairs(increases[increases$Trader==trader,], lower=list(continuous=scatter_plot_kernel), columns=pcols,
         diag=list(continuous=density_plot_kernel), axisLabels="show", title="BA position increases")
 
+#----------------------------------------------------
 #Examine specific trade group performance
+
 initial_trades <- rbind(initial_trades,increases)
 initial_trades$Month <- format(initial_trades$TradeDate,"%Y-%m")
 initial_trades$Trader <- substr(initial_trades$Strategy,1,2)
@@ -145,6 +185,10 @@ initial_trades$TraderTradeType <- paste(initial_trades$Trader,initial_trades$Tra
 
 trade_stats <- data_fractile(initial_trades,'ValueUSD',10,'Decile',c('TraderTradeType','Month'))
 trade_stats$StockHit <- trade_stats$CompoundReturnOutof > 0
+trade_stats$StockWin <- NA
+trade_stats$StockWin[!is.na(trade_stats$CompoundReturnOutof)&trade_stats$CompoundReturnOutof > 0] <- trade_stats$CompoundReturnOutof[!is.na(trade_stats$CompoundReturnOutof)&trade_stats$CompoundReturnOutof > 0]
+trade_stats$StockLoss <- NA
+trade_stats$StockLoss[!is.na(trade_stats$CompoundReturnOutof)&trade_stats$CompoundReturnOutof < 0] <- trade_stats$CompoundReturnOutof[!is.na(trade_stats$CompoundReturnOutof)&trade_stats$CompoundReturnOutof < 0]
 trade_stats$PsnHit <- trade_stats$CompoundReturnOutof > 0
 ext <- trade_stats$PnLOutof/abs((trade_stats$CompoundReturnOutof/10000)*trade_stats$ValueUSD)
 trade_stats$Extraction <- sign(ext)*log(abs(ext))
@@ -152,10 +196,11 @@ trade_stats$PsnWin <- NA
 trade_stats$PsnWin[trade_stats$PnLOutof>0] <- trade_stats$PnLOutof[trade_stats$PnLOutof>0]
 trade_stats$PsnLoss <- NA
 trade_stats$PsnLoss[trade_stats$PnLOutof<0] <- trade_stats$PnLOutof[trade_stats$PnLOutof<0]
+#saveRDS(trade_stats,"//MBAM/main/MBAM/Trading Enhancements/data/sizing_trade_stats.rds")
 
 #1. Overall
 
-trade_stat_package <- c('VolInto','SkewInto','VolOutof','SkewOutof','ValueUSD','CompoundReturnOutof','PnLOutof','RSI14','StockHit','PsnHit','Extraction','ValueUSDDecile_N')
+trade_stat_package <- c('VolInto','SkewInto','VolOutof','SkewOutof','SegmentPL','ValueUSD','CompoundReturnOutof','PnLOutof','RSI14','StockHit','PsnHit','Extraction','ValueUSDDecile_N')
 agg_stats <- aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType),function(x)mean(x,na.rm=TRUE))
 first <- TRUE
 for(clm in trade_stat_package){
@@ -175,9 +220,11 @@ size_smmry <- ggplot(plot_data,aes(x=TradeDate,y=Value,group=Metric,colour=Metri
 
 #2. Examine stats of top and bottom size quartile trades (compared to others)
 
-trade_stat_package <- c('VolInto','SkewInto','VolOutof','ValueUSD','CompoundReturnOutof','PsnWin','PsnLoss','RSI14','PsnHit','Extraction','ValueUSDDecile_N','PnLOutof')
-agg_stats <- aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType,Decile=ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N==1,'Bottom',ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N==10,'Top','2-9'))),function(x)mean(x,na.rm=TRUE))
-agg_stats$PayOff <- agg_stats$PsnWin/agg_stats$PsnLoss
+trade_stat_package <- c('VolInto','SkewInto','VolOutof','ValueUSD','CompoundReturnOutof','PsnWin','StockLoss','StockWin','PsnLoss','RSI14','PsnHit','Extraction','ValueUSDDecile_N','PnLOutof','SegmentPL')
+agg_stats <- aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType,Decile=ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N<3,'1-2',ifelse(trade_stats$TraderTradeTypeMonthGroupDecile_N>8,'9-10','3-8'))),function(x)mean(x,na.rm=TRUE))
+agg_stats_ovr <- cbind(Decile='All',aggregate(trade_stats[trade_stat_package],list(TradeDate=trade_stats$TradeDate,TraderTradeType=trade_stats$TraderTradeType),function(x)mean(x,na.rm=TRUE)))
+agg_stats <- rbind(agg_stats,agg_stats_ovr)
+agg_stats$PayOff <- agg_stats$StockWin*agg_stats$PsnHit+(1-agg_stats$PsnHit)*agg_stats$StockLoss
 oncols <- c(trade_stat_package,'PayOff')
 withcols <- c('TradeDate','TraderTradeType','Decile')
 
@@ -199,42 +246,82 @@ unroll <- function(agg_stats,oncols,withcols){
 }
 
 plot_data <- unroll(agg_stats,oncols,withcols)
-maxday <- plot_data[c('TradeDate')]
-maxday$Month <- paste(format(maxday$TradeDate,"%Y-Q"),quarter(maxday$TradeDate),sep="")
+plot_data$Month <- as.Date(paste(format(plot_data$TradeDate,"%Y-%m"),"-01",sep=""))
+maxday <- plot_data[c('Month','TradeDate')]
 maxday <- aggregate(maxday['TradeDate'],list(Month=maxday$Month),function(x)max(x,na.rm=TRUE))
 
-monthly_agg <- aggregate(plot_data['Value'],list(Month=paste(format(plot_data$TradeDate,"%Y-Q"),quarter(plot_data$TradeDate),sep=""),Metric=plot_data$Metric,TraderTradeType=plot_data$TraderTradeType),function(x)mean(x,na.rm=TRUE))
-colnames(monthly_agg)[colnames(monthly_agg)=='Value'] <- 'AggValue'
-monthly_agg <- merge(monthly_agg,maxday,by='Month')
-monthly_agg <- merge(monthly_agg[c('Month','TraderTradeType','Metric','AggValue','TradeDate')],plot_data,by=c('TradeDate','TraderTradeType','Metric'))
-monthly_agg <- aggregate(monthly_agg[c('Value','AggValue')],list(Month=monthly_agg$Month,TraderTradeType=monthly_agg$TraderTradeType,Metric=monthly_agg$Metric,TradeDate=monthly_agg$TradeDate),function(x)mean(x,na.rm=TRUE))
-monthly_agg$Value <- 1.5*monthly_agg$AggValue
+monthly_agg <- aggregate(plot_data['Value'],list(Month=plot_data$Month,Metric=plot_data$Metric,TraderTradeType=plot_data$TraderTradeType,Decile=plot_data$Decile),function(x)mean(x,na.rm=TRUE))
+monthly_agg$Value[is.nan(monthly_agg$Value)] <- NA
+monthly_agg$Side <- substr(monthly_agg$TraderTradeType,8,12)
+#colnames(monthly_agg)[colnames(monthly_agg)=='Value'] <- 'AggValue'
+#monthly_agg <- merge(monthly_agg,maxday,by='Month')
+#monthly_agg <- merge(monthly_agg[c('Month','TraderTradeType','Metric','AggValue','TradeDate')],plot_data,by=c('TradeDate','TraderTradeType','Metric'))
+#monthly_agg <- aggregate(monthly_agg[c('Value','AggValue')],list(Month=monthly_agg$Month,TraderTradeType=monthly_agg$TraderTradeType,Metric=monthly_agg$Metric,TradeDate=monthly_agg$TradeDate),function(x)mean(x,na.rm=TRUE))
+#monthly_agg$Value <- 1.5*monthly_agg$AggValue
 
 trader='BA'
-vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','PnLOutof')
-qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+vars <- c('VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','SegmentPL','PayOff')
+qtile_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Side=='Long'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
   geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
   #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
-  facet_grid(Metric~TraderTradeType,scales="free_y")
+  facet_grid(Metric~Decile,scales="free_y")
+all_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Decile=='All'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric','Side')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
+  geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~Side,scales="free_y")
 
 trader='JS'
-vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','PnLOutof')
-qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+vars <- c('VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','SegmentPL','PayOff')
+qtile_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Side=='Long'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
   geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
   #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
-  facet_grid(Metric~TraderTradeType,scales="free_y")
+  facet_grid(Metric~Decile,scales="free_y")
+all_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Decile=='All'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric','Side')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
+  geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~Side,scales="free_y")
 
 trader='DK'
-vars <- c('VolInto','VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','PnLOutof')
-qtile_smmry <- ggplot(plot_data[substr(plot_data$TraderTradeType,1,2)==trader&substr(plot_data$TraderTradeType,8,11)=='Long'&plot_data$Metric%in%vars,c('TradeDate','Decile','Value','TraderTradeType','Metric')],aes(x=TradeDate,y=Value,group=Decile,colour=Decile)) +
+vars <- c('VolOutof','ValueUSD','PsnWin','PsnLoss','PsnHit','SkewInto','SegmentPL','PayOff')
+qtile_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Side=='Long'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
   geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
   #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
-  facet_grid(Metric~TraderTradeType,scales="free_y")
+  facet_grid(Metric~Decile,scales="free_y")
+all_smmry <- ggplot(monthly_agg[substr(monthly_agg$TraderTradeType,1,2)==trader&monthly_agg$Decile=='All'&monthly_agg$Metric%in%vars,c('Month','Decile','Value','TraderTradeType','Metric','Side')],aes(x=Month,y=Value,group=TraderTradeType,colour=TraderTradeType)) +
+  geom_smooth() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  #geom_text(data=monthly_agg, aes(x=TradeDate, y=Value, label=paste(Month,sprintf("%.1f",monthly_agg$AggValue))), 
+  #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
+  facet_grid(Metric~Side,scales="free_y")
 
-#3. Reduced PM/recent time market/stock colour view
+#----------------------------------------------------
+#Reduced PM/recent time market/stock colour view
+
+segment_pl_plot <- aggregate(history_data['SegmentPL'],list(Trader=history_data$Trader,TradeType=history_data$TradeType),function(x)sum(x,na.rm=TRUE))
+df <- history_data[year(history_data$TradeDate)=='2016',]
+segment_2016_pl_plot <- aggregate(df['SegmentPL'],list(Trader=df$Trader,TradeType=df$TradeType),function(x)sum(x,na.rm=TRUE))
+#plot for whole data set and just for 2016
+types <- c('New Long','New Short','Add Long','Add Short')
+segment_pl_plot <- segment_pl_plot[segment_pl_plot$TradeType%in%types,]
+segment_2016_pl_plot <- segment_2016_pl_plot[segment_2016_pl_plot$TradeType%in%types,]
+segment_pl_plot <- rbind(cbind(Start=paste('Since',min(history_data$TradeDate)),segment_pl_plot),
+                         cbind(Start='Since 2016-01-01',segment_2016_pl_plot))
+seg_plot <- ggplot(segment_pl_plot,aes(x=TradeType,fill=TradeType)) +
+            geom_bar(aes(weight=SegmentPL),position="dodge") +
+            ylab("PL $") +
+            facet_grid(Start~Trader,scales="free_y")
+
+#Monthly comparison of trade quantities
 compare_frame <- merge(agg_stats[agg_stats$TraderTradeType=='BA New Long',],agg_stats[agg_stats$TraderTradeType=='BA Add Long',],by=c('TradeDate','Decile'))
 compare_frame$ValueRatio <- compare_frame$ValueUSD.x/compare_frame$ValueUSD.y
 compare_frame$WinRatio <- compare_frame$PsnWin.x/compare_frame$PsnWin.y
@@ -280,54 +367,76 @@ compare_smmry <- ggplot(plot_data[plot_data$Metric%in%vars,c('TradeDate','Value'
   #          colour="black", inherit.aes=FALSE, parse=FALSE, angle=30)  +
   facet_grid(Metric~.,scales="free_y")
 
-history_data$SegmentPL <- NA
-for(strategy in unique(history_data$Strategy)){
-  for(instrument in unique(history_data[history_data$Strategy==strategy,]$Instrument)){
-    for(visit in unique(history_data[history_data$Strategy==strategy&history_data$Instrument==instrument,]$Visit)){
-      df <- history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit,]
-      min_date <- min(df[grepl('New',df$TradeType),]$TradeDate,na.rm=TRUE)
-      add_date <- min(df[grepl('Add',df$TradeType),]$TradeDate,na.rm=TRUE)
-      if(!is.na(as.character(min_date))){
-        if(!is.na(as.character(add_date))){
-          pl <- sum(df[df$TradeDate<add_date,]$TodayPL,na.rm=TRUE)
-          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentPL <- pl
-          pl <- sum(df[df$TradeDate>=add_date,]$TodayPL,na.rm=TRUE)
-          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==add_date,]$SegmentPL <- pl
-        } else {
-          pl <- sum(df[df$TradeDate>=min_date,]$TodayPL,na.rm=TRUE)
-          history_data[history_data$Strategy==strategy&history_data$Instrument==instrument&history_data$Visit==visit&history_data$TradeDate==min_date,]$SegmentPL <- pl
-        } 
-      }
+#----------------------------------------------------
+#How trading could be adjusted? (trade level bucket risk/return)
+
+history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
+#history_data$CompoundReturnOutof <- history_data$CompoundReturnOutof*(-1)^(1+grepl('Long',history_data$TradeType))
+#history_data$SkewInto <- history_data$SkewInto*(-1)^(1+grepl('Long',history_data$TradeType))
+history_data$StockHit <- history_data$CompoundReturnOutof > 0
+history_data$SegmentRtn <- history_data$SegmentPL/history_data$SegmentUSD
+history_data$SegmentRtn[is.infinite(history_data$SegmentRtn)] <- NA
+history_data <- history_data[grepl('New|Add',history_data$TradeType),]
+#Compute rolling Bayes estimiation of open/increase weights
+window = 40
+segment_sharpe <- compute_rolling_fn(history_data[history_data$TradeType!='NA',c('Trader','TradeType','TradeDate','SegmentRtn')],'SegmentSharpe','SegmentRtn',window,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))
+segment_sharpe <- merge(segment_sharpe,
+                        aggregate(segment_sharpe['SegmentSharpe'],list(Trader=segment_sharpe$Trader,TradeDate=segment_sharpe$TradeDate),function(x)max(x,na.rm=TRUE)),
+                        by=c('Trader','TradeDate'))
+segment_sharpe$Max <- 0
+segment_sharpe$Max[segment_sharpe$SegmentSharpe.x==segment_sharpe$SegmentSharpe.y] <- 1
+segment_sharpe$PreviousValue <- NA
+segment_sharpe <- segment_sharpe[order(segment_sharpe$TradeDate),]
+for(trader in unique(segment_sharpe$Trader)){
+  for(tradet in unique(segment_sharpe$TradeType)){
+    segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$PreviousValue <- c(NA,segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x[2:length(segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x)]) 
+  }
+}
+colnames(segment_sharpe) <- c('Trader','TradeDate','TradeType','SegmentRtn','SegmentSharpe','MaxSegmentSharpe','IsMax','PreviousSegSharpe')
+history_data <- merge(history_data,segment_sharpe[c('Trader','TradeDate','TradeType','SegmentSharpe','MaxSegmentSharpe','IsMax','PreviousSegSharpe')],by=c('Trader','TradeDate','TradeType'),all.x=TRUE)
+
+bayes_window = 90
+first <- TRUE
+for(trader in unique(history_data$Trader)){
+  sub_data <- history_data[history_data$Trader==trader,]
+  dates <- unique(sub_data$TradeDate)[unique(sub_data$TradeDate)>(min(sub_data$TradeDate,na.rm=TRUE)+bayes_window+window)]
+  for(d in dates){
+    dte <- as.Date(d)
+    df <- sub_data[sub_data$TradeDate>dte&sub_data$TradeDate>=(dte-bayes_window),]
+    df$PPrevGvnHighest <- NA
+    df$PHighest <- NA
+    df$PHigestSharpeGvnPrevious <- NA
+    prev <- 0 
+    p_highest_sharpe <- aggregate(unique(df[c('TradeDate','TradeType','IsMax')])['IsMax'],list(TradeType=unique(df[c('TradeDate','TradeType','IsMax')])$TradeType),function(x)sum(x,na.rm=TRUE))
+    p_highest_sharpe$IsMax <- p_highest_sharpe$IsMax/sum(p_highest_sharpe$IsMax)
+    sd <- sd(df$PreviousSegSharpe,na.rm=TRUE)
+    p_previoussharpe <- density(as.numeric(df$PreviousSegSharpe[!is.na(df$PreviousSegSharpe)]),bw=sd)
+    p_previoussharpe$y <- p_previoussharpe$y/sum(p_previoussharpe$y)
+    df$PPrev <- p_previoussharpe$y[unlist(Map(function(x)ifelse(is.na(x),NA,which(abs(p_previoussharpe$x-x)==min(abs(p_previoussharpe$x-x)))),df$PreviousSegSharpe))]
+    for(tt in unique(df$TradeType)){
+      sd <- sd(df[df$TradeType==tt,]$PreviousSegSharpe,na.rm=TRUE)
+      p_previoussharpe_gvn_highestsharpe <- density(as.numeric(df[df$TradeType==tt&df$IsMax==1,]$PreviousSegSharpe),bw=sd)
+      p_previoussharpe_gvn_highestsharpe$y <- p_previoussharpe_gvn_highestsharpe$y/sum(p_previoussharpe_gvn_highestsharpe$y)
+      df[df$TradeType==tt,]$PPrevGvnHighest <- p_previoussharpe_gvn_highestsharpe$y[unlist(Map(function(x)ifelse(is.na(x),NA,which(abs(p_previoussharpe_gvn_highestsharpe$x-x)==min(abs(p_previoussharpe_gvn_highestsharpe$x-x)))),df[df$TradeType==tt,]$PreviousSegSharpe))]
+      df[df$TradeType==tt,]$PHighest <- p_highest_sharpe[p_highest_sharpe$TradeType==tt,]$IsMax
+      df[df$TradeType==tt,]$PHigestSharpeGvnPrevious <- df[df$TradeType==tt,]$PPrevGvnHighest*df[df$TradeType==tt,]$PHighest/df[df$TradeType==tt,]$PPrev
+    } 
+    if(first){
+      bayes_data <- df[df$TradeDate==dte,]
+      first <- FALSE
+    } else {
+      bayes_data <- rbind(bayes_data,df[df$TradeDate==dte,])
     }
   }
 }
-saveRDS(history_data,"C:/Development/TradingEnhancementEngine/R/model_data/history_data_segmentPL.rds")
-segment_pl_plot <- aggregate(history_data['SegmentPL'],list(Trader=history_data$Trader,TradeType=history_data$TradeType),function(x)sum(x,na.rm=TRUE))
-df <- history_data[year(history_data$TradeDate)=='2016',]
-segment_2016_pl_plot <- aggregate(df['SegmentPL'],list(Trader=df$Trader,TradeType=df$TradeType),function(x)sum(x,na.rm=TRUE))
-#plot for whole data set and just for 2016
-types <- c('New Long','New Short','Add Long','Add Short')
-segment_pl_plot <- segment_pl_plot[segment_pl_plot$TradeType%in%types,]
-segment_2016_pl_plot <- segment_2016_pl_plot[segment_2016_pl_plot$TradeType%in%types,]
-segment_pl_plot <- rbind(cbind(Start=paste('Since',min(history_data$TradeDate)),segment_pl_plot),
-                         cbind(Start='Since 2016-01-01',segment_2016_pl_plot))
-seg_plot <- ggplot(segment_pl_plot,aes(x=TradeType,fill=TradeType)) +
-            geom_bar(aes(weight=SegmentPL),position="dodge") +
-            ylab("PL $") +
-            facet_grid(Start~Trader,scales="free_y")
 
-#4. How trading could be adjusted? (trade level bucket risk/return)
-history_data <- readRDS("C:/Development/TradingEnhancementEngine/R/model_data/history_data_segmentPL.rds")
-history_data$CompoundReturnOutof <- history_data$CompoundReturnOutof*(-1)^(1+grepl('Long',history_data$TradeType))
-history_data$SkewInto <- history_data$SkewInto*(-1)^(1+grepl('Long',history_data$TradeType))
-history_data$StockHit <- history_data$CompoundReturnOutof > 0
 #swing_level <- 20000
 history_data$skew_coeff <- 0
 history_data$rebal <- 1
 history_data[history_data$Trader==11,]$rebal <- 0.9
-history_data[history_data$Trader==11,]$skew_coeff <- -5
+history_data[history_data$Trader==11,]$skew_coeff <- sign(history_data[history_data$Trader==11,]$SkewInto)*5 #effectively abs on the skew
 history_data[history_data$Trader==70,]$rebal <- 0.75
-history_data[history_data$Trader==70,]$skew_coeff <- 5
+history_data[history_data$Trader==70,]$skew_coeff <- sign(history_data[history_data$Trader==70,]$SkewInto)*5
 history_data$SwingSize <- history_data$ValueUSD#swing_level/(history_data$VolInto/10000)
 #history_data$SkewSize <- swing_level*(1+sign(history_data$SkewInto)*(abs(history_data$SkewInto)^0.3)*(history_data$VolInto/10000))/(history_data$VolInto/10000)
 history_data$Rebal <- history_data$ValueUSD 
