@@ -158,7 +158,7 @@ setClass(
   )
 )
 
-model_data_switch  <- new("ConfigSwitcher",prod_value="T:/data",dev_value="C:/Development/AllRaid/Services/Raid.Services.TradingEnhancementEngine/R/model_data")
+model_data_switch  <- new("ConfigSwitcher",prod_value="T:/data",dev_value="C:/Development/TradingEnhancementEngine/R/model_data")
 setClass(
   Class = "ModelDefaults",
   representation  = representation(
@@ -167,7 +167,7 @@ setClass(
   ),
   prototype    = prototype(
     data_path  = getConfigSwitch(model_data_switch,DATA),
-    risk_models= 'C:/Development/AllRaid/Services/Raid.Services.TradingEnhancementEngine/R/model_data/risk_data'
+    risk_models= 'C:/Development/TradingEnhancementEngine/R/model_data/risk_data'
   )
 )
 
