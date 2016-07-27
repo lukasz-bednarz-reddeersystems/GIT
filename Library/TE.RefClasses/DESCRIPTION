@@ -8,7 +8,10 @@ License: What license is it under?
 LazyData: TRUE
 Imports:
     TE.DataAccess
+    methods
     lubridate
+    plyr
+    hash
 Suggests:
     testthat
 Collate:
