@@ -43,7 +43,7 @@ history_data <- switch_direction(history_data,'SkewOutof')
 history_data <- switch_direction(history_data,'CompoundReturnInto')
 history_data <- switch_direction(history_data,'CompoundReturnOutof')
 
-#Basic segment PL 
+#Basic segment PL
 history_data$SegmentPL <- NA
 history_data$SegmentUSD<- NA
 for(strategy in unique(history_data$Strategy)){
@@ -376,7 +376,23 @@ history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data
 history_data$StockHit <- history_data$CompoundReturnOutof > 0
 history_data$SegmentRtn <- history_data$SegmentPL/history_data$SegmentUSD
 history_data$SegmentRtn[is.infinite(history_data$SegmentRtn)] <- NA
+history_data$SegmentRtn[is.nan(history_data$SegmentRtn)] <- NA
+history_data <- history_data[order(history_data$TradeDate),]
+for(strat in unique(history_data$Strategy)){
+  for(ins in unique(history_data[history_data$Strategy==strat,]$Instrument)){
+    for(tradet in unique(history_data[history_data$Strategy==strat&history_data$Instrument==ins,]$TradeType)){
+    if(nrow(history_data[!is.na(history_data$TradeID)&history_data$Trader==trader&history_data$TradeType==tradet,])>1){
+      history_data[!is.na(history_data$TradeID)&history_data$Strategy==strat&history_data$Instrument==ins&history_data$TradeType==tradet,]$NextSegmentRtn <- c(history_data[!is.na(history_data$TradeID)&history_data$Strategy==strat&history_data$Instrument==ins&history_data$TradeType==tradet,]$SegmentRtn[2:length(history_data[!is.na(history_data$TradeID)&history_data$Strategy==strat&history_data$Instrument==ins&history_data$TradeType==tradet,]$SegmentRtn)],NA)   
+    } else {
+      history_data[!is.na(history_data$TradeID)&history_data$Strategy==strat&history_data$Instrument==ins&history_data$TradeType==tradet,]$NextSegmentRtn <- NA
+    }
+   }
+  }
+}
+history_data$SegmentRtn <- #remove future segment return for adding trades
 history_data <- history_data[grepl('New|Add',history_data$TradeType),]
+history_data <- aggregate(history_data[c('StockHit','SegmentRtn')],list(Trader=history_data$Trader,TradeDate=history_data$TradeDate,TradeType=history_data$TradeType,TraderTradeType=history_data$TraderTradeType),function(x)mean(x,na.rm=TRUE))
+history_data$SegmentRtn[is.nan(history_data$SegmentRtn)] <- NA
 #Compute rolling Bayes estimiation of open/increase weights
 window = 40
 segment_sharpe <- compute_rolling_fn(history_data[history_data$TradeType!='NA',c('Trader','TradeType','TradeDate','SegmentRtn')],'SegmentSharpe','SegmentRtn',window,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))
@@ -389,20 +405,20 @@ segment_sharpe$PreviousValue <- NA
 segment_sharpe <- segment_sharpe[order(segment_sharpe$TradeDate),]
 for(trader in unique(segment_sharpe$Trader)){
   for(tradet in unique(segment_sharpe$TradeType)){
-    segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$PreviousValue <- c(NA,segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x[2:length(segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x)]) 
+    segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$PreviousValue <- c(NA,segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x[1:(length(segment_sharpe[segment_sharpe$Trader==trader&segment_sharpe$TradeType==tradet,]$SegmentSharpe.x)-1)]) 
   }
 }
 colnames(segment_sharpe) <- c('Trader','TradeDate','TradeType','SegmentRtn','SegmentSharpe','MaxSegmentSharpe','IsMax','PreviousSegSharpe')
-history_data <- merge(history_data,segment_sharpe[c('Trader','TradeDate','TradeType','SegmentSharpe','MaxSegmentSharpe','IsMax','PreviousSegSharpe')],by=c('Trader','TradeDate','TradeType'),all.x=TRUE)
+segment_sharpe <- segment_sharpe[c('Trader','TradeDate','TradeType','SegmentSharpe','MaxSegmentSharpe','IsMax','PreviousSegSharpe')]
 
 bayes_window = 90
 first <- TRUE
-for(trader in unique(history_data$Trader)){
-  sub_data <- history_data[history_data$Trader==trader,]
+for(trader in unique(segment_sharpe$Trader)){
+  sub_data <- segment_sharpe[segment_sharpe$Trader==trader,]
   dates <- unique(sub_data$TradeDate)[unique(sub_data$TradeDate)>(min(sub_data$TradeDate,na.rm=TRUE)+bayes_window+window)]
   for(d in dates){
     dte <- as.Date(d)
-    df <- sub_data[sub_data$TradeDate>dte&sub_data$TradeDate>=(dte-bayes_window),]
+    df <- sub_data[sub_data$TradeDate<=dte&sub_data$TradeDate>(dte-bayes_window),]
     df$PPrevGvnHighest <- NA
     df$PHighest <- NA
     df$PHigestSharpeGvnPrevious <- NA
@@ -415,11 +431,17 @@ for(trader in unique(history_data$Trader)){
     df$PPrev <- p_previoussharpe$y[unlist(Map(function(x)ifelse(is.na(x),NA,which(abs(p_previoussharpe$x-x)==min(abs(p_previoussharpe$x-x)))),df$PreviousSegSharpe))]
     for(tt in unique(df$TradeType)){
       sd <- sd(df[df$TradeType==tt,]$PreviousSegSharpe,na.rm=TRUE)
-      p_previoussharpe_gvn_highestsharpe <- density(as.numeric(df[df$TradeType==tt&df$IsMax==1,]$PreviousSegSharpe),bw=sd)
-      p_previoussharpe_gvn_highestsharpe$y <- p_previoussharpe_gvn_highestsharpe$y/sum(p_previoussharpe_gvn_highestsharpe$y)
-      df[df$TradeType==tt,]$PPrevGvnHighest <- p_previoussharpe_gvn_highestsharpe$y[unlist(Map(function(x)ifelse(is.na(x),NA,which(abs(p_previoussharpe_gvn_highestsharpe$x-x)==min(abs(p_previoussharpe_gvn_highestsharpe$x-x)))),df[df$TradeType==tt,]$PreviousSegSharpe))]
-      df[df$TradeType==tt,]$PHighest <- p_highest_sharpe[p_highest_sharpe$TradeType==tt,]$IsMax
-      df[df$TradeType==tt,]$PHigestSharpeGvnPrevious <- df[df$TradeType==tt,]$PPrevGvnHighest*df[df$TradeType==tt,]$PHighest/df[df$TradeType==tt,]$PPrev
+      if(nrow(df[!is.na(df$PreviousSegSharpe)&df$TradeType==tt&df$IsMax==1,])>0){
+        p_previoussharpe_gvn_highestsharpe <- density(as.numeric(df[!is.na(df$PreviousSegSharpe)&df$TradeType==tt&df$IsMax==1,]$PreviousSegSharpe),bw=sd)
+        p_previoussharpe_gvn_highestsharpe$y <- p_previoussharpe_gvn_highestsharpe$y/sum(p_previoussharpe_gvn_highestsharpe$y)
+        df[df$TradeType==tt,]$PPrevGvnHighest <- p_previoussharpe_gvn_highestsharpe$y[unlist(Map(function(x)ifelse(is.na(x),NA,which(abs(p_previoussharpe_gvn_highestsharpe$x-x)==min(abs(p_previoussharpe_gvn_highestsharpe$x-x)))),df[df$TradeType==tt,]$PreviousSegSharpe))]
+        df[df$TradeType==tt,]$PHighest <- p_highest_sharpe[p_highest_sharpe$TradeType==tt,]$IsMax
+        df[df$TradeType==tt,]$PHigestSharpeGvnPrevious <- df[df$TradeType==tt,]$PPrevGvnHighest*df[df$TradeType==tt,]$PHighest/df[df$TradeType==tt,]$PPrev 
+      } else {
+        df[df$TradeType==tt,]$PPrevGvnHighest <- 0
+        df[df$TradeType==tt,]$PHighest <- 0
+        df[df$TradeType==tt,]$PHigestSharpeGvnPrevious <- 0
+      }
     } 
     if(first){
       bayes_data <- df[df$TradeDate==dte,]
@@ -429,6 +451,7 @@ for(trader in unique(history_data$Trader)){
     }
   }
 }
+#saveRDS(bayes_data,"//MBAM/main/MBAM/Trading Enhancements/data/bayes_data.rds")
 
 #swing_level <- 20000
 history_data$skew_coeff <- 0
