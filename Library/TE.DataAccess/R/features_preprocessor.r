@@ -4,9 +4,14 @@
 #' @include features_preprocessor_functions.r
 NULL
 
+
+# @exportClass PreprocessorOutput
 setClassUnion("PreprocessorOutput",c("DataSet","NULL"))
+
 #Preprocessors should return a DataSet.
+# @exportClass PreprocessorOutput
 setClassUnion("PreprocessorInput",c("data.frame"))
+
 setClass(
   Class      = "PreprocessorComputation",
   representation = representation(
@@ -33,6 +38,8 @@ setClass(
   ),
   contains = c("VirtualAggregateFeature")
 )
+
+# @exportClass FeatureComputations
 setClassUnion("FeatureComputations",c("FeatureComputation","PreprocessorComputation"))
 
 # FeatureGatherer

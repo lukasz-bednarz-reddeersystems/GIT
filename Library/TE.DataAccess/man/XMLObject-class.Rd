@@ -10,9 +10,9 @@ Default schema based on output of C# DataTable serialisation with CreateXML meth
 \section{Slots}{
 
 \describe{
-\item{\code{xml_schema}}{"NullableNode"}
+\item{\code{xml_schema}}{"ANY"}
 
-\item{\code{xml_body}}{"NullableNode"}
+\item{\code{xml_body}}{"ANY"}
 
 \item{\code{schema_tag}}{"character"}
 

@@ -13,6 +13,15 @@ setClass(
   )
 )
 
+#' Create and fill PositionComposite object
+#'
+#' @param user integer, trader ID.
+#' @param start Date start date
+#' @param end Date end date
+#' @param use_db logical, pool data from Database or via Middleware
+#' @return \code{posn_comp_obj} object of class 'PositionComposite'.
+#' @export
+
 position_composite_factory <- function(user,start,end,use_db=TRUE){
 
   if(use_db){

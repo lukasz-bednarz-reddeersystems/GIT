@@ -1,5 +1,6 @@
 #' @include global_configs.r
 
+# @exportClass NullableSocket
 setClassUnion("NullableSocket",c("NULL","socket"))
 
 #' An S4 class handling connections to R process socket.

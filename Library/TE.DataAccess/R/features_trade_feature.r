@@ -3,6 +3,7 @@
 #' @include features_virtual_feature.r
 NULL
 
+# @exportClass TradeFeatureData
 setClassUnion("TradeFeatureData",c("DataSet","NULL"))
 setClass(
   Class          = "TradeFeature",

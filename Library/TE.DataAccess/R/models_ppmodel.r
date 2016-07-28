@@ -6,7 +6,9 @@ NULL
 
 #Apply model computation to the data aggregated from
 #all preprocessors
+# @exportClass NullableTradeWarehouse
 setClassUnion("NullableTradeWarehouse",c("NULL","TradeWarehouse"))
+# @exportClass NullableDataSet
 setClassUnion("NullableDataSet",c("NULL","DataSet"))
 setClass(
 	Class = "PPModelComputation",

@@ -24,6 +24,7 @@ setClass(
 #type to bind.
 #Only primary key is DateTime field.
 
+# @exportClass NullableDate
 setClassUnion("NullableDate",c('NULL','Date'))
 setClass(
   Class          = "Trade",
