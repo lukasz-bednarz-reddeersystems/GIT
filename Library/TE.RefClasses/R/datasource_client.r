@@ -224,6 +224,7 @@ setGeneric(".translateDataSourceColumnNames", function(object, colnames, ...){st
 setMethod(".translateDataSourceColumnNames",
           signature(object = "VirtualDataSourceClient", colnames = "character"),
           function(object, colnames){
+
             colnames_map <- getDataSourceClientColumnNameMap(object)
 
             names_to_translate <- intersect(colnames, names(colnames_map))

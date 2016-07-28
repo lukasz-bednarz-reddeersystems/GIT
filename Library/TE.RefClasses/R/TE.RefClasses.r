@@ -7,10 +7,9 @@
 #' @docType package
 #' @name TE.RefClasses
 #'
-#' @import lubridate
-#' @import plyr
-#' @importfrom hash hash
-#' @importClassesFrom hash
+#' @import TE.DataAccess
+#' @importFrom hash hash values names.hash keys
+#' @importClassesFrom hash hash
 #' @importFrom methods setClass setGeneric setMethod setClassUnion
 #' @importFrom R.methodsS3 isGenericS4
 #' @importFrom RODBC odbcConnect sqlQuery

@@ -40,7 +40,7 @@ setMethod("initialize",
             stop("Invalid Class initialize() argument \"ref_data\"")
           }
           if (is(ref_data, "VirtualReferenceData")) {
-            .Object <- setReferenceData(.Object, ref_data)
+            .Object <- setReferenceDataObject(.Object, ref_data)
           }
 
           return(.Object)
@@ -53,9 +53,10 @@ setMethod("initialize",
 #'
 #' @param object object of class 'VirtualReferenceDataTransformation'.
 #' @return \code{ref_data} object of class 'VirtualReferenceData'.
+#' @export
 
-setGeneric("getReferenceData",function(object,...){standardGeneric("getReferenceData")})
-setMethod("getReferenceData",
+setGeneric("getReferenceDataObject",function(object,...){standardGeneric("getReferenceDataObject")})
+setMethod("getReferenceDataObject",
           signature(object = "VirtualReferenceDataTransformation"),
           function(object){
 
@@ -71,18 +72,19 @@ setMethod("getReferenceData",
 #' @param object object of class 'VirtualReferenceDataTransformation'.
 #' @param ref_data object of class 'VirtualReferenceData'.
 #' @return \code{ref_data} object of class 'VirtualReferenceDataTransformation'.
+#' @export
 
-setGeneric("setReferenceData",function(object, ref_data, ...){standardGeneric("setReferenceData")})
-setMethod("setReferenceData",
+setGeneric("setReferenceDataObject",function(object, ref_data, ...){standardGeneric("setReferenceDataObject")})
+setMethod("setReferenceDataObject",
           signature(object = "VirtualReferenceDataTransformation",
                     ref_data = "VirtualReferenceData"),
           function(object, ref_data){
             if (!is(ref_data, "VirtualReferenceData")){
-              message(paste("Error when calling setReferenceData() on ", class(object)[[1]], "class."))
+              message(paste("Error when calling setReferenceDataObject() on ", class(object)[[1]], "class."))
               message(paste("Missing or invalid ref_data argument."))
               message(paste("VirtualReferenceDataTransformation and derived classes only accept \"ref_data\""))
               message(paste("argument of class extending VirtualReferenceData class."))
-              stop("Invalid setReferenceData(object, ref_data) argument \"ref_data\"")
+              stop("Invalid setReferenceDataObject(object, ref_data) argument \"ref_data\"")
             }
 
             object <- setComputationInput(object, ref_data)

@@ -7,6 +7,15 @@ NULL
 #
 ####################################
 
+
+referencedata_validity <- function(.Object){
+  if (has_required_columns(getReferenceData(.Object), getRequiredVariablesNames(.Object))) {
+    return(TRUE)
+  } else {
+    paste("Operation resulted in invalid columns beeing set on the Object.")
+  }
+}
+
 #' Virtual S4 class implementing handling of reference data.
 #'
 #' Implements handling of reference data column names
@@ -30,7 +39,8 @@ setClass(
     unique_rows  = TRUE,
     stored_rows = 0
     ),
-  contains = c("VirtualReferenceObject","VIRTUAL")
+  contains = c("VirtualReferenceObject","VIRTUAL"),
+  validity = referencedata_validity
 )
 
 
@@ -99,17 +109,6 @@ setMethod(".setStoredNRows",
             object@stored_rows <- nrows
             return(object)
           }
-)
-
-setValidity("VirtualReferenceData",
-            function(object){
-              if (has_required_columns(getReferenceData(object), getRequiredVariablesNames(object))) {
-                return(TRUE)
-              } else {
-                paste("Operation resulted in invalid columns beeing set on the Object.")
-              }
-            }
-
 )
 
 #' Set stored variable names
@@ -349,3 +348,22 @@ setMethod("appendVariables",
           }
 )
 
+####################################
+#
+# TestReferenceData Class
+#
+####################################
+setClass(
+  Class          = "VirtualReferenceData",
+  slots = c(
+    column_names    = "character",
+    data         = "data.frame",
+    unique_rows  = "logical",
+    stored_rows = "numeric"
+  ),
+  prototype      = list(
+    unique_rows  = TRUE,
+    stored_rows = 0
+  ),
+  contains = c("VirtualReferenceObject","VIRTUAL")
+)

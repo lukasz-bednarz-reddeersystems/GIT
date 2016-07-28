@@ -13,8 +13,6 @@ LazyData: TRUE
 Imports:
     TE.DataAccess,
     methods,
-    lubridate,
-    plyr,
     hash,
 Suggests:
     testthat

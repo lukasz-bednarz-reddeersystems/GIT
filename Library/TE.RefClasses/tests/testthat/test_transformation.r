@@ -112,7 +112,7 @@ test_that("Can setOutputData with valid input", {
                            B = 2,
                            C = 3)
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
   valid.data <- data.frame(A = 1,
@@ -120,12 +120,13 @@ test_that("Can setOutputData with valid input", {
                            C = 3,
                            D = 4)
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
 })
 
 test_that("Cannot setOutputData with invalid input TestTransformationComputation", {
+  #skip("Skipping setOutputData as it is not exported")
   comp <- (new("TestTransformationComputation"))
   expect_is(comp, "TestTransformationComputation")
 
@@ -133,14 +134,14 @@ test_that("Cannot setOutputData with invalid input TestTransformationComputation
                            B = 2,
                            C = 3)
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
   invalid.data <- data.frame(B = 2,
                              C = 3,
                              D = 4)
 
-  expect_error(setOutputData(comp, invalid.data))
+  expect_error(TE.RefClasses:::.setOutputData(comp, invalid.data))
   expect_equal(getOutputData(comp), valid.data)
 
   invalid.data <- data.frame(B = numeric(),
@@ -184,7 +185,7 @@ test_that("Can computeTransformation on TestTransformationComputation", {
   expect_equal(getInputData(comp), valid.data)
 
   comp <- computeTransformation(comp)
-  expect_equal(getOutputData(comp), row_mean_computation(valid.data))
+  expect_equal(getOutputData(comp), TE.RefClasses:::row_mean_computation(valid.data))
 
 })
 
@@ -373,7 +374,7 @@ test_that("Can triggerComputation on TestTransformation", {
   trans <- triggerComputation(trans)
   comp <- getComputation(trans)
   expect_is(comp, "RowMeansTransformationComputation")
-  expect_equal(getComputationOutput(trans), row_mean_computation(valid.data))
+  expect_equal(getComputationOutput(trans), TE.RefClasses:::row_mean_computation(valid.data))
 
 })
 
@@ -429,7 +430,7 @@ test_that("Can setComputation on TestTransformation with valid input", {
 
   trans <- setComputationInput(trans, valid.data)
   trans <- triggerComputation(trans)
-  expect_equal(getComputationOutput(trans), row_mean_computation(valid.data))
+  expect_equal(getComputationOutput(trans), TE.RefClasses:::row_mean_computation(valid.data))
 
 
 
@@ -471,8 +472,8 @@ test_that("Cannot setComputation on TestTransformation with invalid input", {
 #
 #############################################################
 
-portf <- new("StrategyPortfolio", trader = 11)
-portf2 <- new("StrategyPortfolio", trader = 11)
+portf <- new("StrategyPortfolio", trader_id = 11)
+portf2 <- new("StrategyPortfolio", trader_id = 11)
 
 test_that("Can buildPortfolioHistory", {
   expect_is(portf, "StrategyPortfolio")
@@ -511,7 +512,7 @@ tested.class <- "DaysSinceLastFlatTransformationComputation"
 req.vars <- c('Date','InstrumentID','Weight')
 comp.vars <- c('DaysSinceLastFlat')
 outp.vars <- c(req.vars,comp.vars)
-tested.function <- days_since_last_flat
+tested.function <- TE.RefClasses:::days_since_last_flat
 
 test_that(paste("Can create", tested.class ,"object"), {
 
@@ -583,18 +584,19 @@ test_that(paste("Cannot setInputData with invalid input on", tested.class,"class
 
 })
 
-test_that(paste("Can setOutputData with valid data on", tested.class,"class"), {
+test_that(paste("Can .setOutputData with valid data on", tested.class,"class"), {
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
   valid.data <- cbind(portf.data, tested.function(portf.data))
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
   valid.data <- cbind(portf.data, tested.function(portf.data), data.frame(Ones = 1))
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
 })
@@ -605,17 +607,17 @@ test_that(paste("Cannot setOutputData with invalid input on", tested.class,"clas
 
   valid.data <- tested.function(portf.data)
 
-  comp <- setOutputData(comp, valid.data)
+  comp <- TE.RefClasses:::.setOutputData(comp, valid.data)
   expect_equal(getOutputData(comp), valid.data)
 
   invalid.data <- portf.data
 
-  expect_error(setOutputData(comp, invalid.data))
+  expect_error(TE.RefClasses:::.setOutputData(comp, invalid.data))
   expect_equal(getOutputData(comp), valid.data)
 
   invalid.data <- valid.data[0,]
 
-  expect_error(setOutputData(comp, invalid.data))
+  expect_error(TE.RefClasses:::.setOutputData(comp, invalid.data))
   expect_equal(getOutputData(comp), valid.data)
 
 })
@@ -651,7 +653,7 @@ tested.class.2 <- "DaysSinceLastFlatTransformationComputation"
 req.vars <- c('Date','InstrumentID','Weight')
 comp.vars <- c('DaysSinceLastFlat')
 outp.vars <- c(req.vars,comp.vars)
-tested.function <- days_since_last_flat
+tested.function <- TE.RefClasses:::days_since_last_flat
 
 
 test_that(paste("Canot create", tested.class ,"object with invalid argument"), {
@@ -671,7 +673,7 @@ test_that(paste("Can create", tested.class ,"object with valid argument"), {
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
 
-  expect_equal(getPortfolio(transf), portf)
+  expect_equal(getReferenceDataObject(transf), portf)
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf))
 
 })
@@ -763,10 +765,10 @@ test_that(paste("Can setPortfolio on", tested.class ,"object with valid argument
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
 
-  expect_equal(getPortfolio(transf), portf)
+  expect_equal(getReferenceDataObject(transf), portf)
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf))
 
-  transf <- setPortfolio(transf,portf2)
+  transf <- setReferenceDataObject(transf,portf2)
 
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf2))
 
@@ -779,10 +781,10 @@ test_that(paste("Cannot setPortfolio on", tested.class ,"object with invalid arg
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
 
-  expect_equal(getPortfolio(transf), portf)
+  expect_equal(getReferenceDataObject(transf), portf)
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf))
 
-  expect_error(setPortfolio(transf,new("StrategyPortfolio",11)))
+  expect_error(setReferenceDataObject(transf,new("StrategyPortfolio",11)))
 
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf))
 
@@ -796,7 +798,7 @@ test_that(paste("Can triggerComputation on", tested.class ), {
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
 
-  expect_equal(getPortfolio(transf), portf)
+  expect_equal(getReferenceDataObject(transf), portf)
   expect_equal(getInputData(getComputation(transf)), getReferenceData(portf))
 
   expect_message(triggerComputation(transf), "Triggering Transformation")

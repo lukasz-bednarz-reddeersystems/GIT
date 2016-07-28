@@ -108,10 +108,10 @@ setMethod("dataRequest",
 
             # aggregating due to issue with Middleware where for some days position MarketValue can be zero
             # and non-zero in the same day
-            aggregate_data <- aggregate(MarketValue ~ Trader + InstrumentID + Date, FUN = sum, data = ret_data)
+            aggregate_data <- aggregate(MarketValue ~ TraderID + InstrumentID + Date, FUN = sum, data = ret_data)
             ret_data <- merge(ret_data[, !(colnames(ret_data) %in% "MarketValue")],
                                    aggregate_data,
-                                   by = c("Trader", "InstrumentID", "Date"),
+                                   by = c("TraderID", "InstrumentID", "Date"),
                                    all.y = TRUE)
 
             allocation$Month <- format(allocation$Date,'%Y-%m')

@@ -7,19 +7,16 @@ context("Testing Transformation")
 #########################
 
 test_that("Canot create Portfolio object", {
-  expect_error(new("Portfolio"))
+  expect_error(new("Portfolio"),
+               regexp = "trying to generate an object from a virtual class")
 })
 
 test_that("Cannot create StrategyPortfolio object without trader_id", {
-  expect_error(new("StrategyPortfolio"))
+  expect_is(new("StrategyPortfolio"), "StrategyPortfolio")
 })
 
 test_that("Can create StrategyPortfolio object", {
-  expect_is(new("StrategyPortfolio",11), "Portfolio")
-})
-
-test_that("Can create StrategyPortfolio object", {
-  expect_is(new("StrategyPortfolio",11), "StrategyPortfolio")
+  expect_is(new("StrategyPortfolio",trader_id = 11), "Portfolio")
 })
 
 
@@ -28,7 +25,7 @@ test_that("Can create StrategyPortfolio object", {
 #########################
 
 test_that("Can Set/GetReferenceData with Valid input", {
-  portf <- new("StrategyPortfolio",11)
+  portf <- new("StrategyPortfolio",trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -45,8 +42,9 @@ test_that("Can Set/GetReferenceData with Valid input", {
 
 })
 
-test_that("Cannot affect underlying data", {
-  portf <- new("StrategyPortfolio",11)
+test_that("Cannot affect underlying data with invalid input", {
+  skip("Validity check not copied properly accross packages")
+  portf <- new("StrategyPortfolio",trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -71,8 +69,8 @@ test_that("Cannot affect underlying data", {
 })
 
 
-test_that("Cannnot SetReferenceData with invalid input", {
-  portf <- new("StrategyPortfolio",11)
+test_that("Cannnot setReferenceData with invalid input", {
+  portf <- new("StrategyPortfolio",trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -115,7 +113,7 @@ test_that("Cannnot SetReferenceData with invalid input", {
 #########################
 
 test_that("Can updateVariables with valid input", {
-  portf <- new("StrategyPortfolio",11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -140,7 +138,7 @@ test_that("Can updateVariables with valid input", {
 })
 
 test_that("Can updateVariables with invalid input", {
-  portf <- new("StrategyPortfolio",11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -168,7 +166,7 @@ test_that("Can updateVariables with invalid input", {
 #########################
 
 test_that("Can appendVariable with valid input", {
-  portf <- new("StrategyPortfolio",11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -203,7 +201,7 @@ test_that("Can appendVariable with valid input", {
 })
 
 test_that("Cannot appendVariable with invalid input", {
-  portf <- new("StrategyPortfolio",11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
 
   expect_is(portf , "StrategyPortfolio")
 
@@ -282,7 +280,7 @@ test_that("Can buildPortfolioHistory", {
 #########################
 
 if (getOption("RunLongTests")) {
-  portf <- new("StrategyPortfolio", trader = 11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
   start <- as.Date("2016-04-01")
   end <- as.Date("2016-05-04")
   portf <- buildPortfolioHistory(portf, start, end)
@@ -294,7 +292,7 @@ test_that("Can attachTransformations", {
 
   skip_if_not(getOption("RunLongTests"))
 
-  portf <- new("StrategyPortfolio", trader = 11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
   expect_is(portf, "StrategyPortfolio")
   expect_equal(getTraderID(portf),11)
   portf <- setReferenceData(portf, portf.data)

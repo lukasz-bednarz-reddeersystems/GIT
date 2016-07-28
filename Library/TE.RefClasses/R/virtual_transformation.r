@@ -138,6 +138,7 @@ setClass(
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @param data data to store in.
 #' @return \code{object} object of class 'VirtualTransformationComputation'
+#' @export
 
 setGeneric("setInputData", function(object,data, ...){standardGeneric("setInputData")})
 setMethod("setInputData",
@@ -176,6 +177,7 @@ setMethod("setInputData",
 #'
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @return \code{data} data.frame data stored in input
+#' @export
 
 setGeneric("getInputData", function(object, ...){standardGeneric("getInputData")})
 setMethod("getInputData",
@@ -229,6 +231,7 @@ setMethod(".setOutputData",
 #'
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @return \code{data} data.frame data stored in output
+#' @export
 
 setGeneric("getOutputData", function(object, ...){standardGeneric("getOutputData")})
 setMethod("getOutputData",
@@ -261,6 +264,7 @@ setMethod("getComputationFunction",
 #'
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @return \code{object} object object of class 'VirtualTransformationComputation'.
+#' @export
 
 setGeneric("computeTransformation",function(object, ...){standardGeneric("computeTransformation")})
 setMethod("computeTransformation",
@@ -310,7 +314,7 @@ setMethod("computeTransformation",
 ################################################
 
 #'class for test purposes only do not use
-#'@export
+#' @export
 
 setClass(
   Class = "TestTransformationComputation",
@@ -322,7 +326,7 @@ setClass(
 
 #'class for test purposes only do not use
 
-#'@export
+#' @export
 setClass(
   Class = "RowMeansTransformationComputation",
   prototype      = list(
@@ -334,7 +338,7 @@ setClass(
 )
 
 #'class for test purposes only do not use
-#'@export
+#' @export
 
 setClass(
   Class = "InvalidRowMeansTransformationComputation",
@@ -376,6 +380,7 @@ setClass(
 #'
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @return \code{compute} function used for computation of specific transformation
+#' @export
 
 setGeneric("getComputation",function(object, ...){standardGeneric("getComputation")})
 setMethod("getComputation",
@@ -412,6 +417,7 @@ setMethod(".setComputation",
 #' @param object object of class 'VirtualTransformation'.
 #' @param computation object of type VirtualTransformationComputation
 #' @return \code{object} object of class 'VirtualTransformation'
+#' @export
 
 setGeneric("setComputation",function(object, computation, ...){standardGeneric("setComputation")})
 setMethod("setComputation",
@@ -480,6 +486,7 @@ setMethod("setComputation",
 #'
 #' @param object object of class 'VirtualTransformation'.
 #' @return \code{data} data.frame with transformation computation input
+#' @export
 
 setGeneric("getComputationInput", function(object, ...){standardGeneric("getComputationInput")})
 setMethod("getComputationInput",
@@ -497,15 +504,14 @@ setMethod("getComputationInput",
 #' @param object object of class 'VirtualTransformation'.
 #' @param data object of class 'VirtualReferenceData'.
 #' @return \code{object} object of class 'VirtualTransformation'
+#' @export
 
 setGeneric("setComputationInput", function(object,data, ...){standardGeneric("setComputationInput")})
 setMethod("setComputationInput",
-          signature(object = "VirtualTransformation", data = "VirtualReferenceData"),
+          signature(object = "VirtualTransformation", data = "data.frame"),
           function(object,data){
             required_colnms <- getRequiredVariablesNames(object)
             message(paste("Updating", class(object), "object."))
-
-            data <- getReferenceData(data)
 
             if(!has_required_columns(data, required_colnms))
             {
@@ -535,6 +541,20 @@ setMethod("setComputationInput",
           }
 )
 
+setMethod("setComputationInput",
+          signature(object = "VirtualTransformation", data = "VirtualReferenceData"),
+          function(object,data){
+            required_colnms <- getRequiredVariablesNames(object)
+            message(paste("Updating", class(object), "object."))
+
+            data <- getReferenceData(data)
+
+            object <- setComputationInput(object, data)
+
+            return(object)
+          }
+)
+
 
 #' Trigger transformation Computation
 #'
@@ -544,6 +564,7 @@ setMethod("setComputationInput",
 #' @param force logical value indicating if new computation has to be forced if it has been
 #' computed before.
 #' @return \code{object} object of class 'VirtualTransformation'
+#' @export
 
 setGeneric("triggerComputation",function(object, force = FALSE, ...){standardGeneric("triggerComputation")})
 setMethod("triggerComputation",
@@ -586,6 +607,7 @@ setMethod("triggerComputation",
 #'
 #' @param object object of class 'VirtualTransformation'.
 #' @return \code{data} data.frame with transformation computation output
+#' @export
 
 setGeneric("getComputationOutput",function(object){standardGeneric("getComputationOutput")})
 setMethod("getComputationOutput",
