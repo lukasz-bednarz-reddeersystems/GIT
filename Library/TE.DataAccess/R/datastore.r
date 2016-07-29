@@ -1,7 +1,7 @@
 #' @include dataset.r keymap.r urldatareader.r
 NULL
 
-
+# @exportClass NullableResult
 setClassUnion("NullableResult",c("NULL","DataSet"))
 
 #' An S4 class to represent generic data set.
@@ -131,6 +131,7 @@ setMethod("queryStore", "DataStore",
           }
 )
 
+# @exportClass DataClass
 setClassUnion("DataClass",c("DataStore","DataSet"))
 setGeneric("getLastResult", function(object){standardGeneric("getLastResult")})
 setMethod("getLastResult", "DataClass",

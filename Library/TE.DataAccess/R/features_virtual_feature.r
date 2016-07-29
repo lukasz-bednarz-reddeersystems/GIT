@@ -1,9 +1,11 @@
 #Define the standard interface for trading analysis
-#features. 
+#features.
 #Should ensure all features contain this.
 
+# @exportClass FeatureOutput
 setClassUnion("FeatureOutput",c("data.frame","NULL"))
 #Features should return a frame of scalars for each trade indexed with trade date.
+# @exportClass FeatureInput
 setClassUnion("FeatureInput",c("data.frame","NULL"))
 setClass(
   Class      = "FeatureComputation",
@@ -23,12 +25,13 @@ setMethod("setComputationData", "FeatureComputation",
           }
 )
 
+# @exportClass FeatureComputations
 setClassUnion("FeatureComputations",c("FeatureComputation"))
 setClass(
   Class      = "VirtualFeature",
   representation = representation(
     computation  = "FeatureComputations"
-  ),
+  )
 )
 
 setGeneric("tearDown",function(object){standardGeneric("tearDown")})
@@ -59,7 +62,7 @@ setMethod("updateCompute","VirtualFeature",
               if(length(object@computation@output_colnms)>0 && class(cmpt@output)[[1]]=="data.frame"){
                 colnames(object@computation@output)<-object@computation@output_colnms
               }
-            } 
+            }
             else{
               object@computation@output <- NULL
             }
@@ -70,7 +73,7 @@ setMethod("updateCompute","VirtualFeature",
 setGeneric("getOutPut",function(object){standardGeneric("getOutPut")})
 setMethod("getOutPut","VirtualFeature",
           function(object){
-            return(object@computation@output)           
+            return(object@computation@output)
           }
 )
 

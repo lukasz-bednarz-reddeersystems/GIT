@@ -16,81 +16,105 @@
 #' @include common_watchlist_datastore.r
 NULL
 
+
+
+
+setClass(
+  Class          = "DataPlex",
+  slots = c(
+    warehouse    = "environment"
+  ),
+  prototype = list(
+    datastore    = new.env()
+  )
+)
+
+setGeneric("getDataPlexWarehouse",function(object){standardGeneric("getDataPlexWarehouse")})
+setMethod("getDataPlexWarehouse","DataPlex",
+          function(object){
+            return(object@warehouse)
+          }
+)
+
+setGeneric("getDataPlexStore",function(object, store){standardGeneric("getDataPlexStore")})
+setMethod("getDataPlexStore","DataPlex",
+          function(object, store){
+            wh <- getDataPlexWarehouse(object)
+
+            return(wh[[store]])
+          }
+)
+
+setGeneric("setDataPlexStoreValue",function(object, store, value){standardGeneric("setDataPlexStoreValue")})
+setMethod("setDataPlexStoreValue","DataPlex",
+          function(object, store, value){
+            wh <- getDataPlexWarehouse(object)
+            wh[[store]] <- value
+            return(object)
+          }
+)
+
+
 #Global singleton datastores
 if(exists("dataplex_created")==FALSE){
   initialise_data_store <- function(){
 
-    data_map <<- list()
+    dataplex <- new("DataPlex")
 
-    static_factors_1 <<- new("StaticFactorDataStore")
-    data_map[[1]] <<- "static_factors_1"
+    data_map <- getDataPlexWarehouse(dataplex)
 
-    dynamic <<- new("DynamicFactorDataStore")
-    data_map[[2]] <<- "dynamic"
+    data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
 
-    events <<- new("EventDataStore")
-    data_map[[3]] <<- "events"
+    data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
 
-    ext_pos <<- new("ExtPosDataStore")
-    data_map[[4]] <<- "ext_pos"
+    data_map[["event_datastore"]] <- new("EventDataStore")
 
-    dealing <<- new("DealingDataStore")
-    data_map[[5]] <<- "dealing"
+    data_map[["ext_pos_datastore"]] <- new("ExtPosDataStore")
 
-    trade_levels <<- new("TradeLevelsDataStore")
-    data_map[[6]] <<- "trade_levels"
+    data_map[["dealing_datastore"]] <- new("DealingDataStore")
 
-    instrument_details <<- new("InstrumentDataStore")
-    data_map[[7]] <<- "instrument_details"
+    data_map[["trade_levels"]] <- new("TradeLevelsDataStore")
 
-    instrument_history <<- new("InstrumentHistoryDataStore")
-    data_map[[8]] <<- "instrument_history"
+    data_map[["instrument_details"]] <- new("InstrumentDataStore")
 
-    instrument_country <<- new("InstrumentCountryDataStore")
-    data_map[[9]] <<- "instrument_country"
+    data_map[["instrument_history"]] <- new("InstrumentHistoryDataStore")
 
-    instrument_price <<- new("InstrumentPriceDataStore")
-    data_map[[10]] <<- "instrument_price"
+    data_map[["instrument_country"]] <- new("InstrumentCountryDataStore")
 
-    instrument_sector <<- new("InstrumentSectorDataStore")
-    data_map[[11]] <<- "instrument_sector"
+    data_map[["instrument_price"]] <- new("InstrumentPriceDataStore")
 
-    risk_instrument_exposure <<- new("RiskInstrumentExposuresDataStore")
-    data_map[[12]] <<- "risk_instrument_exposure"
+    data_map[["instrument_sector"]] <- new("InstrumentSectorDataStore")
 
-    risk_factor_returns <<- new("RiskFactorReturnsDataStore")
-    data_map[[13]] <<- "risk_factor_returns"
+    data_map[["risk_instrument_exposure"]] <- new("RiskInstrumentExposuresDataStore")
 
-    trader_allocation <<- new("TraderAllocationDataStore")
-    data_map[[14]] <<- "trader_allocation"
+    data_map[["risk_factor_returns"]] <- new("RiskFactorReturnsDataStore")
 
-    watchlist <<- new("WatchListDataStore")
-    data_map[[15]] <<- "watchlist"
+    data_map[["trader_allocation"]] <- new("TraderAllocationDataStore")
 
-    names(data_map) <<-  c("factor_datastore","dynamic_factor_datastore",
-                           "event_datastore",
-                           "ext_pos_datastore",
-                           "dealing_datastore",
-                           "trade_levels",
-                           "instrument_details","instrument_history","instrument_country","instrument_price","instrument_sector",
-                           "risk_instrument_exposure","risk_factor_returns",
-                           "trader_allocation",
-                           "watchlist")
+    watchlist <- new("WatchListDataStore")
+    data_map[["watchlist"]] <- "watchlist"
   }
   initialise_data_store()
   #ToDo: Put datastore operations/acces into singleton class
 
-  #Global data access function
-  data_request <- function(store,keys,variables){
-    rval <- NULL
-    eval_str <- paste(data_map[[store]],"<<-queryStore(",data_map[[store]],",keys,variables)",sep="")
-    rtn_str  <- paste("getLastResult(",data_map[[store]],")",sep="")
-    eval(parse(text=eval_str))
-    rval <- eval(parse(text=rtn_str))
-    return (rval)
-  }
   dataplex_created <- TRUE
+  devtools::use_data(dataplex_created, overwrite = TRUE)
+
 }
+
+
+#Global data access function
+data_request <- function(store,keys,variables){
+  rval <- NULL
+  dataplex <- new("DataPlex")
+  str_obj <- getDataPlexStore(dataplex, store)
+
+  str_obj <- queryStore(str_obj,keys,variables)
+  rval  <- getLastResult(str_obj)
+
+  return (rval)
+}
+
 
 if(exists("warehouse_store_created")==FALSE){
 
@@ -184,6 +208,19 @@ if(exists("analysis_store_created")==FALSE){
   }
 }
 
+#' Load and bind analysis output from multiple stores
+#'
+#' Queries analysis store objects for requested dates.
+#' Retrieves or updates analysis and binds results together.
+#'
+#' @param traders integer, trader ID's.
+#' @param dates Date vector of dates
+#' @param name_or_builder function or function name of builder used
+#' to generate analysis module
+#' @param key_fn function, key generator
+#' @return \code{posn_comp_obj} object of class 'PositionComposite'.
+#' @export
+
 analysis_module_load_multiple <- function(traders,dates,name_or_builder,key_fn){
   first <- TRUE
   for(trader in traders){
@@ -220,6 +257,16 @@ report_memory_object <- function(object_name){
   return(sort(sapply(paste(object_name,"@",slts,sep=""),function(x){eval(parse(text=paste("object.size(",x,")")))})))
 }
 
+#' Get trader allocation value
+#'
+#' Returns trader allocation value in USD.
+#' Reads from "trader_allocation" datastore
+#'
+#' @param trader integer, trader ID.
+#' @param start Date start date
+#' @param end Date end date
+#' @return \code{allocation} numeric, allocation value.
+#' @export
 
 get_trader_allocation <- function(trader,start,end){
   dts <- unique(format(seq(as.Date(start),as.Date(end),by='1 day'),'%Y-%m'))

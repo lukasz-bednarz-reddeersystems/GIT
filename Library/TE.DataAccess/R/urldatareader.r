@@ -32,13 +32,12 @@ setMethod("buildURL","URLQuery",
           }
 )
 
-setClass("MyXMLDocument", contains = "XMLDocument")
-setClassUnion("NullableDoc",c("MyXMLDocument","NULL"))
+#setClassUnion("NullableDoc",c("XMLDocument","NULL")))
 
 setClass(
     Class          = "URLDataReader",
     representation = representation(
-      data         = "NullableDoc"
+      data         = "ANY"
     )
 )
 
@@ -69,15 +68,15 @@ setMethod("clearData","URLDataReader",
 )
 
 
-setClass("MyXMLNode", contains = "XMLNode")
-suppressWarnings(setClassUnion("NullableNode",c("MyXMLNode","NULL")))
+#setClass("MyXMLNode", contains = "XMLNode"
+#suppressWarnings(setClassUnion("NullableNode",c("XMLNode","NULL")))
 
 #' class wraping xml string and its parameters
 #'
 #' Default schema based on output of C# DataTable serialisation with CreateXML method
 #'
-#' @slot xml_schema     "NullableNode"
-#' @slot xml_body       "NullableNode"
+#' @slot xml_schema     "ANY"
+#' @slot xml_body       "ANY"
 #' @slot schema_tag     "character"
 #' @slot schema_element "character"
 #' @slot body_tag       "character"
@@ -85,8 +84,8 @@ suppressWarnings(setClassUnion("NullableNode",c("MyXMLNode","NULL")))
 setClass(
   Class            = "XMLObject",
   representation   = representation(
-    xml_schema     = "NullableNode",
-    xml_body       = "NullableNode",
+    xml_schema     = "ANY",
+    xml_body       = "ANY",
     schema_tag     = "character",
     schema_element = "character",
     body_tag       = "character"
@@ -98,6 +97,7 @@ setClass(
   )
 )
 
+# @exportClass RObject
 setClassUnion("RObject",c("data.frame","matrix"))
 
 setClass(
@@ -188,6 +188,7 @@ setClass(
 # convertXML outputing the relevant R object having slot
 # named 'data object' containing the R data item
 
+# @exportClass XMLConverter
 setClassUnion("XMLConverter",c("XMLToMatrix","XMLToFrame"))
 
 

@@ -1,0 +1,32 @@
+Package: TE.RefClasses
+Type: Package
+Title: Reference Classes for RedDeer Trading Enhancement Engine
+Version: 0.1.0
+Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
+                  role = c("aut", "cre"))
+Description: Pakckage is implementing Reference Classes for handling,
+    of various data needed for Trading Analytics Engine
+Depends:
+    R (>= 3.3.0)
+License: file LICENSE
+LazyData: TRUE
+Imports:
+    TE.DataAccess,
+    methods,
+    hash,
+Suggests:
+    testthat
+Collate:
+    'TE.RefClasses.r'
+    'datasource_client_functions.r'
+    'referenceobject.r'
+    'referencedata.r'
+    'datasource_client.r'
+    'portfolio.r'
+    'transformation_functions.r'
+    'virtual_transformation.r'
+    'referencedata_transformation.r'
+    'transformations_handler.r'
+    'strategy_portfolio.r'
+    'strategy_portfolio_transformations.r'
+RoxygenNote: 5.0.1
