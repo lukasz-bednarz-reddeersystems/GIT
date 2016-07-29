@@ -283,6 +283,7 @@ setMethod(".removeNAReferenceData",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
+#' @export
 
 setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
 

@@ -1,6 +1,6 @@
 library(testthat)
 library(lubridate)
+library(hash)
 library(TE.RefClasses)
 
-options("RunLongTests" =  TRUE)
 test_check("TE.RefClasses")

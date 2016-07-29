@@ -1,9 +1,6 @@
-sourceTo("../common/datasource_client/datasource_client.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../lib/datastore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../common/dataplex.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-library(hash)
-library(plyr)
+#' @include datasource_client.r
+#' @include datastore_client_functions.r
+NULL
 
 
 ####################################
@@ -11,6 +8,14 @@ library(plyr)
 # VirtualDataStoreClient Class
 #
 ####################################
+
+#' Virtual S4 class implementing handling of data access.
+#'
+#' Implements handling of access to data via DataStore class.
+#' Inherits from "VirtualDataSourceClient"
+#'
+#' @slot datastore_name           = "character",  name of datastore
+#' @export
 
 setClass(
   Class                = "VirtualDataStoreClient",
@@ -20,62 +25,61 @@ setClass(
   contains = c("VirtualDataSourceClient", "VIRTUAL")
 )
 
-
+#' Get source datastore name
+#'
+#' Returns name of the datastore which will be querried when asked to fill data.
+#'
+#' @param object object of class 'VirtualDataStoreClient'.
+#' @return \code{datastore_name} character
+#' @export
 
 setGeneric("getDataStoreName", function(object,...){standardGeneric("getDataStoreName")})
-# Returns name of the datastore which will be querried when asked to fill data.
-#
-# Args:
-#   object : object of type "VirtualDataStoreClient"
-# Returns:
-#   datastore_name
-
-setMethod("getDataStoreName", 
+setMethod("getDataStoreName",
           signature(object = "VirtualDataStoreClient"),
           function(object){
             return(object@datastore_name)
           }
 )
 
-setMethod("dataRequest",  
+setMethod("dataRequest",
           signature(object = "VirtualDataStoreClient", key_values = "data.frame"),
           function(object, key_values){
-            non_na_cols <- getNonNAColumnNames(object)
+
             colnames_map <- getDataSourceClientColumnNameMap(object)
             object <- .setDataSourceQueryKeyValues(object,key_values)
             datastore <- getDataStoreName(object)
             values <- getDataSourceReturnColumnNames(object)
             factor_cols <- getFactorColumnNames(object)
-            
-            
+
+
             # data request sent to dataplex
             query_data <- data_request(datastore ,key_values,values)
             query_data <- getData(query_data)
             query_data <- query_data[values]
-            
+
             if (0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
               message(paste("Query sent to", datastore, "returned zero row data.frame"))
               stop(paste("Query sent to", datastore, "returned zero row data.frame"))
             }
-            
+
             # translating column names
             colnames(query_data) <- values(colnames_map[values])[values]
-            
+
             # storing Reference data internaly
             object <- setReferenceData(object, query_data)
-            
-            
-            if(length(non_na_cols) > 0){
+
+
+            if(hasNonNAColumnNames(object)){
               object <- .removeNAReferenceData(object)
-              
+
             }
-            
-            if(length(factor_cols) > 0){
+
+            if(hasFactorColumnNames(object)){
               object <- .transformReferenceData(object)
-              
-            } 
-            
+
+            }
+
             return(object)
           }
 )

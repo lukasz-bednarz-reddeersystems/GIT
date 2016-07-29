@@ -8,6 +8,7 @@
 #' @name TE.RefClasses
 #'
 #' @import TE.DataAccess
+#' @import lubridate
 #' @importFrom hash hash values names.hash keys
 #' @importClassesFrom hash hash
 #' @importFrom methods setClass setGeneric setMethod setClassUnion
