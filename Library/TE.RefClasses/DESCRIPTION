@@ -13,6 +13,8 @@ LazyData: TRUE
 Imports:
     TE.DataAccess,
     methods,
+    lubridate,
+    RODBC,
     hash,
 Suggests:
     testthat
@@ -26,6 +28,9 @@ Collate:
     'datastore_client.r'
     'datastore_client_test_class.r'
     'dealer_data.r'
+    'rodbc_client_functions.r'
+    'rodbc_client.r'
+    'event_data.r'
     'portfolio.r'
     'transformation_functions.r'
     'virtual_transformation.r'
