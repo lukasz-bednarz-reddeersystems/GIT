@@ -279,16 +279,15 @@ test_that("Can buildPortfolioHistory", {
 # attachTransformations
 #########################
 
-if (getOption("RunLongTests")) {
+
+test_that("Can attachTransformations", {
+
   portf <- new("StrategyPortfolio", trader_id = 11)
   start <- as.Date("2016-04-01")
   end <- as.Date("2016-05-04")
   portf <- buildPortfolioHistory(portf, start, end)
   portf.data <- getReferenceData(portf)
   tested.transf <- "DaysSinceLastFlatTransformation"
-}
-
-test_that("Can attachTransformations", {
 
   skip_if_not(getOption("RunLongTests"))
 
@@ -312,7 +311,7 @@ test_that("Can attachTransformations", {
   expect_length(intersect(stored.vars,transf.vars), length(transf.vars) )
   expect_equal(getStoredNRows(portf), nrow(portf.data))
   expect_equal(getReferenceData(portf), days_since_last_flat(prev.data))
-  expect_equal(colnames(getReferenceData(portf)), colnames(days_since_last_flat(prev.data)))
+  expect_equal(colnames(getReferenceData(portf)), colnames(TE.RefClasses:::days_since_last_flat(prev.data)))
 
 })
 

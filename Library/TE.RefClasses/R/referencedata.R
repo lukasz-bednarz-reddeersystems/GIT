@@ -8,8 +8,8 @@ NULL
 ####################################
 
 
-referencedata_validity <- function(.Object){
-  if (has_required_columns(getReferenceData(.Object), getRequiredVariablesNames(.Object))) {
+referencedata_validity <- function(object){
+  if (has_required_columns(getReferenceData(object), getRequiredVariablesNames(object))) {
     return(TRUE)
   } else {
     paste("Operation resulted in invalid columns beeing set on the Object.")

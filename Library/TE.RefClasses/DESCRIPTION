@@ -28,4 +28,5 @@ Collate:
     'referencedata_transformation.r'
     'transformations_handler.r'
     'strategy_portfolio.r'
+    'strategy_portfolio_transformations.r'
 RoxygenNote: 5.0.1

@@ -127,7 +127,7 @@ setMethod("attachTransformation",
             } else {
 
               transformation <- tryCatch({
-                setVirtualTransformationHandler(transformation, object)
+                setReferenceDataObject(transformation, object)
               }, error = function(cond){
                 message(paste("Failed to attach", class(transformation)[[1]], "to", class(object)[[1]]))
                 message(paste("In call to setVirtualTransformationHandler()"))
