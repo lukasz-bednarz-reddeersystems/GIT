@@ -11,6 +11,7 @@
 #'
 #' @import lubridate
 #' @import XML
+#' @importFrom hashFunction cityhash.64
 #' @importFrom methods setClass setGeneric setMethod setClassUnion
 #' @importFrom plyr rbind.fill
 #' @importFrom XML xmlTreeParse

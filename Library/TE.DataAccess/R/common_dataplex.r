@@ -103,7 +103,17 @@ if(exists("dataplex_created")==FALSE){
 }
 
 
-#Global data access function
+
+#' Request data from datastore
+#'
+#' Global data access function
+#'
+#' @param store character, store name.
+#' @param keys data.frame store query keys
+#' @param variables character vector of variables to pull from store
+#' @return \code{rval} data.frame, result of query
+#' @export
+
 data_request <- function(store,keys,variables){
   rval <- NULL
   dataplex <- new("DataPlex")
@@ -111,6 +121,8 @@ data_request <- function(store,keys,variables){
 
   str_obj <- queryStore(str_obj,keys,variables)
   rval  <- getLastResult(str_obj)
+
+  dataplex <- setDataPlexStoreValue(dataplex, store, str_obj)
 
   return (rval)
 }

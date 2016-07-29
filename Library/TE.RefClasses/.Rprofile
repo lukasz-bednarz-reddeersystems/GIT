@@ -1,4 +1,7 @@
 library(devtools)
 library(roxygen2)
 library(testthat)
-setOption("RunLongTests", FALSE)
+library(hash)
+library(plyr)
+library(TE.DataAccess)
+

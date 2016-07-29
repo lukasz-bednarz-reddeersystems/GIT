@@ -125,7 +125,6 @@ test_that("Can dataRequest() with valid key_values", {
   expect_equal(getReferenceData(dsc), res_data)
 
 
-
   dsc <- new("TestDataStoreClient")
   key_vals <- data.frame(lA = 1:10,
                          dtB = seq(from = as.Date("2016-05-01"), to = as.Date("2016-05-10"), by = "1 day"))

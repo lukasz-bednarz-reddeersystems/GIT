@@ -41,7 +41,6 @@ test_that("Can getComputedVariablesNames", {
   req.vars <- c("A", "B", "C")
 
   expect_equal(getComputedVariablesNames(comp), character())
-
 })
 
 

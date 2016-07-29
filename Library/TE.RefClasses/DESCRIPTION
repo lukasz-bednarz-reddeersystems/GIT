@@ -25,6 +25,7 @@ Collate:
     'datastore_client_functions.r'
     'datastore_client.r'
     'datastore_client_test_class.r'
+    'dealer_data.r'
     'portfolio.r'
     'transformation_functions.r'
     'virtual_transformation.r'
