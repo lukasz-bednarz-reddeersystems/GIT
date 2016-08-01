@@ -265,6 +265,7 @@ market_rel_pl <- function(history_data,trade_rel=FALSE,index="^SX5E"){
     history_data$PriorClosePrice[history_data$Instrument==ins] <- c(history_data$ClosePrice[history_data$Instrument==ins][1],history_data$ClosePrice[history_data$Instrument==ins][1:(length(history_data$ClosePrice[history_data$Instrument==ins])-1)])
   }
   getSymbols(index)
+  index <- ifelse(substr(index,1,1)=='^',substr(index,2,nchar(index)),index)
   idata <- as.data.frame(get(index))
   cname <- paste(index,".Close",sep="")
   index <- data.frame(TradeDate=as.Date(rownames(as.data.frame(idata))),idata[cname])

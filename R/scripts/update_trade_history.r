@@ -1,9 +1,11 @@
-setwd("C:/Development/AllRaid/branches/dev_lukasz.bednarz/Services/Raid.Services.TradingEnhancementEngine/R/scripts")
+library(R.utils)
+options(modifiedOnlySource=TRUE)
+setwd("C:/Development/TradingEnhancementEngine/R/scripts")
 sourceTo("../analysis_modules_legacy/analysis_module_position_holding_period.r", modifiedOnly = TRUE, local = FALSE)
 
 m <- history_analysis_module_builder
 traders  <- c(11,70,101)
-date     <- '2016-07-01'
+date     <- '2016-08-01'
 for(trader in traders){
   key_func <- function(){dated_twelve_monthly_lookback(trader,date)}
   analysis <- createAnalysisModule(m,key_func)
