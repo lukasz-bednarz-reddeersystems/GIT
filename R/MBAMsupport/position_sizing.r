@@ -31,9 +31,9 @@ history_data <- history_data[!history_data$Strategy%in%exclude,]
 history_data <- market_rel_pl(history_data,trade_rel=FALSE)
 
 scale_data <- c('ValueUSD','VolInto','VolOutof','SkewInto','SkewOutof','CompoundReturnInto','CompoundReturnOutof')
-cols <- c('Trader','TradeDate','Strategy','Instrument',scale_data,'RSI14','TodayPL','Long','MarketValue','EarliestMarketValue','MarketRelPL','MinDate','PnLOutof','ActiveTodayPL','PassiveTodayPL')
+cols <- c('Trader','TradeDate','Strategy','Instrument',scale_data,'RSI14','TodayPL','Long','MarketValue','EarliestMarketValue','MarketRelPL','MinDate','PnLOutof')
 history_data <- position_age_from_flats(history_data,cols)
-#history_data=readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data.rds")
+history_data=readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data.rds")
 #PnlOutof is missing on some trades for some reason... replace it in this case with TodayPL
 history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$PnLOutof <- history_data[!is.na(history_data$TradeID)&is.na(history_data$PnLOutof),]$TodayPL
 history_data <- trade_typer(history_data)
@@ -109,8 +109,8 @@ for(strategy in unique(history_data$Strategy)){
   }
 }
 #saveRDS(history_data,"//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")
+history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
 #history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")
-history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")
 history_data$TraderTradeType <- paste(history_data$Trader,history_data$TradeType,sep=" ") 
 
 initial_trades <- unique(history_data[!is.na(history_data$TradeID)&(history_data$TradeType=='New Long'|history_data$TradeType=='New Short'),c(cols,'PsnIncreased','TradeType','SegmentPL')])
@@ -141,7 +141,8 @@ increases_plot_data<- rbind(cbind(Quantity='Skewness',Timeframe="Pre-trade",data
 scatter_plot_kernel <- function(data, mapping, method="lm", ...){
   p <- ggplot(data = data, mapping = mapping) + 
        geom_point() + 
-       geom_smooth(method=method,mapping = aes_string(colour="TradeType"), ...)
+       geom_smooth(method=method,mapping = aes_string(colour="TradeType"), ...) +
+       scale_colour_manual(values=c("green","red"))
   return(p)
 }
 density_plot_kernel <- function(data, mapping, ...){
@@ -151,18 +152,36 @@ density_plot_kernel <- function(data, mapping, ...){
   shthitrate <- mean(data[grepl("Short",data$TradeType),]$PnLOutof>0,na.rm=TRUE)*100
   shtlosers  <- mean(data[grepl("Short",data$TradeType)&data$PnLOutof<0,]$PnLOutof,na.rm=TRUE)
   shtwinners <- mean(data[grepl("Short",data$TradeType)&data$PnLOutof>0,]$PnLOutof,na.rm=TRUE)
+  mnsize_lng <- mean(data[grepl("Long",data$TradeType),]$ValueUSD,na.rm=TRUE)
+  mnsize_sht <- mean(data[grepl("Short",data$TradeType),]$ValueUSD,na.rm=TRUE)
+  mnskew_lng <- mean(data[grepl("Long",data$TradeType),]$SkewInto,na.rm=TRUE)
+  mnskew_sht <- mean(data[grepl("Short",data$TradeType),]$SkewInto,na.rm=TRUE)
   if(mapping$x=='CompoundReturnOutofZscore'){
     p <- ggplot(data = data, mapping = mapping) + 
       geom_density(mapping = aes_string(colour="TradeType"), fill=NA) +
-      annotate("text",x=2,y=0.5,label=paste("Long:",round(lnghitrate),"%",sep=""),colour="red",size=6) +
+      annotate("text",x=2,y=0.5,label=paste("Long:",round(lnghitrate),"%",sep=""),colour="green",size=6) +
       annotate("text",x=2,y=0.4,label=paste("Win:",round(lngwinners),sep=""),size=6) +
       annotate("text",x=2,y=0.3,label=paste("Loss:",round(lnglosers),sep=""),size=6) +
-      annotate("text",x=-2.5,y=0.3,label=paste("Short:",round(shthitrate),"%",sep=""),colour="green",size=6) +
+      annotate("text",x=-2.5,y=0.3,label=paste("Short:",round(shthitrate),"%",sep=""),colour="red",size=6) +
       annotate("text",x=-2.5,y=0.2,label=paste("Win:",round(shtwinners),sep=""),size=6) +
-      annotate("text",x=-2.5,y=0.1,label=paste("Loss:",round(shtlosers),sep=""),size=6) 
+      annotate("text",x=-2.5,y=0.1,label=paste("Loss:",round(shtlosers),sep=""),size=6) +
+      scale_colour_manual(values=c("green","red"))
+  } else if(mapping$x=='ValueUSDZscore') {
+      p <- ggplot(data = data, mapping = mapping) + 
+        geom_density(mapping = aes_string(colour="TradeType"), fill=NA) +
+        annotate("text",x=2,y=1.5,label=paste("Long: $",round(mnsize_lng/1000),"k",sep=""),colour="green",size=6) +
+        annotate("text",x=2,y=0.5,label=paste("Short: $",round(mnsize_sht/1000),"k",sep=""),colour="red",size=6) +
+        scale_colour_manual(values=c("green","red"))
+  } else if(mapping$x=='SkewIntoZscore') {
+      p <- ggplot(data = data, mapping = mapping) + 
+        geom_density(mapping = aes_string(colour="TradeType"), fill=NA) +
+        annotate("text",x=2,y=0.6,label=paste("Long: ",round(mnskew_lng,digits=2),sep=""),colour="green",size=6) +
+        annotate("text",x=2,y=0.5,label=paste("Short: ",round(mnskew_sht,digits=2),sep=""),colour="red",size=6) +
+        scale_colour_manual(values=c("green","red"))
   } else {
     p <- ggplot(data = data, mapping = mapping) + 
-      geom_density(mapping = aes_string(colour="TradeType"), fill=NA) 
+      geom_density(mapping = aes_string(colour="TradeType"), fill=NA) +
+      scale_colour_manual(values=c("green","red"))
   }
   return(p)
 }
@@ -437,7 +456,7 @@ compare_smmry <- ggplot(plot_data[plot_data$Metric%in%vars,c('TradeDate','Value'
 #----------------------------------------------------
 #How trading could be adjusted? (trade level bucket risk/return)
 
-history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
+history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")
 history_data <- history_data[grepl('New|Add',history_data$TradeType),]
 history_data$TradeRtn <- history_data$CumSegmentPL/(history_data$CumSegmentUSD+history_data$PriorMktVal)
 history_data$TradeRtn[is.infinite(history_data$TradeRtn)] <- NA
@@ -520,7 +539,17 @@ for(trader in unique(Trade_sharpe$Trader)){
   }
 }
 #saveRDS(bayes_data,"//MBAM/main/MBAM/Trading Enhancements/data/bayes_data_Q2_2016.rds")
-bayes_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/bayes_data_Q2_2016.rds")
+
+#----------------------------------------------------
+#Asses impact on performance
+
+q2_only <- TRUE
+if(q2_only){
+  bayes_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/bayes_data_Q2_2016.rds")  
+} else {
+  bayes_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/bayes_data.rds")  
+}
+
 trade_weight <- compute_rolling_fn(bayes_data[c('Trader','TradeType','TradeDate','PHigestSharpeGvnPrevious')],'Weight','PHigestSharpeGvnPrevious',3,function(x)mean(x,na.rm=TRUE))
 trade_weight$Weight[is.na(trade_weight$Weight)] <- 0.25
 weight_norm <- aggregate(trade_weight$Weight,list(Trader=trade_weight$Trader,TradeDate=trade_weight$TradeDate),function(x)sum(x,na.rm=TRUE))
@@ -531,42 +560,124 @@ trade_weight <- merge(trade_weight,weight_num,by=c('Trader','TradeDate'))
 trade_weight$Weight <- 0.25+0.25*(((trade_weight$Weight/trade_weight$x.x)*trade_weight$x.y)-1)
 trade_weight <- trade_weight[c('Trader','TradeDate','TradeType','Weight')]
                                        
-#history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")
-history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds")
+skew_const <- 30 #non zero to modify by skew
+variable_alloc <- 0 #non zero to apply Bayesian reweighting
+if(q2_only){
+  history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")  
+} else {
+  history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL.rds") 
+}
+history_data <- history_data[history_data$TradeType!='NA',]
 history_data$TraderTradeType <- paste(history_data$Trader,history_data$TradeType,sep=" ") 
 history_data <- merge(history_data,trade_weight[c('Trader','TradeType','TradeDate','Weight')],by=c('Trader','TradeType','TradeDate'),all.x=TRUE)
 history_data$Weight[is.na(history_data$Weight)] <- 0.25
 history_data$skew_coeff <- 0
-history_data[history_data$Trader==11&grepl("Add Long",history_data$TradeType),]$skew_coeff <- 5 
-history_data[history_data$Trader==11&grepl("Add Short",history_data$TradeType),]$skew_coeff <- -5
-history_data[history_data$Trader==11&grepl("New Long",history_data$TradeType),]$skew_coeff <- -5 
-history_data[history_data$Trader==11&grepl("New Short",history_data$TradeType),]$skew_coeff <- 5
-history_data[history_data$Trader==101,]$skew_coeff <- sign(history_data[history_data$Trader==101,]$SkewInto)*5
-#history_data[history_data$Trader==70,]$skew_coeff <- sign(history_data[history_data$Trader==70,]$SkewInto)*5
-history_data[history_data$Trader==70&grepl("New Long",history_data$TradeType),]$skew_coeff <- 5
-history_data[history_data$Trader==70&grepl("New Short",history_data$TradeType),]$skew_coeff <- -5
-history_data[history_data$Trader==70&grepl("Add Long",history_data$TradeType),]$skew_coeff <- -5
-history_data[history_data$Trader==70&grepl("Add Short",history_data$TradeType),]$skew_coeff <- 5
+history_data[history_data$Trader==11&grepl("Add Long",history_data$TradeType),]$skew_coeff <- skew_const
+history_data[history_data$Trader==11&grepl("Add Short",history_data$TradeType),]$skew_coeff <- -skew_const
+history_data[history_data$Trader==11&grepl("New Long",history_data$TradeType),]$skew_coeff <- -skew_const 
+history_data[history_data$Trader==11&grepl("New Short",history_data$TradeType),]$skew_coeff <- skew_const
+history_data[history_data$Trader==101,]$skew_coeff <- sign(history_data[history_data$Trader==101,]$SkewInto)*skew_const
+history_data[history_data$Trader==70&grepl("New Long",history_data$TradeType),]$skew_coeff <- skew_const
+history_data[history_data$Trader==70&grepl("New Short",history_data$TradeType),]$skew_coeff <- -skew_const
+history_data[history_data$Trader==70&grepl("Add Long",history_data$TradeType),]$skew_coeff <- -skew_const
+history_data[history_data$Trader==70&grepl("Add Short",history_data$TradeType),]$skew_coeff <- skew_const
+history_data$skew_coeff[is.na(history_data$skew_coeff)] <- 0
 history_data$SwingSize <- history_data$ValueUSD
-variable_alloc <- 1
-#history_data$Rebal <- (1-variable_alloc)*history_data$ValueUSD+((variable_alloc*history_data$ValueUSD)*(1+4*(history_data$Weight-0.25)))
-history_data$Rebal <- history_data$ValueUSD
+history_data$Rebal <- (1-variable_alloc)*history_data$ValueUSD+((variable_alloc*history_data$ValueUSD)*(1+4*(history_data$Weight-0.25)))
 history_data$skew_rb <- history_data$skew_coeff*sign(history_data$SkewInto)*(abs(history_data$SkewInto)^0.3)*(history_data$VolInto/10000)
-history_data$skew_rb[is.na(history_data$skew_rb)]<-0
-grp_means <- aggregate(history_data[c('skew_rb')],list(Trader=history_data$Trader,TradeType=history_data$TradeType,TradeDate=history_data$TradeDate),function(x)mean(x,na.rm=TRUE))
-colnames(grp_means) <- c('Trader','TradeType','TradeDate','skew_mean')
-history_data <- merge(history_data,grp_means[!is.na(grp_means$TradeType),],by=c('Trader','TradeType','TradeDate'))
-history_data$Rebal <- history_data$Rebal*(1 - history_data$skew_mean)
+history_data$skew_rb[history_data$skew_rb < -0.9] <- -0.9
+history_data$skew_rb[history_data$skew_rb > 0.9] <- 0.9
+history_data$skew_rb[is.na(history_data$skew_rb)] <- 0
 history_data$SkewSize <- history_data$Rebal*(1+history_data$skew_rb)
-if(length(is.infinite(history_data$SkewSize))>0)history_data$SkewSize[is.infinite(history_data$SkewSize)] <- NA
-if(length(is.infinite(history_data$SwingSize))>0)history_data$SwingSize[is.infinite(history_data$SwingSize)] <- NA
+total_trd_capital <- aggregate(history_data[c('SkewSize','SwingSize')],list(TradeType=history_data$TradeType,TradeDate=history_data$TradeDate,Trader=history_data$Trader),function(x)sum(x,na.rm=TRUE))
+global_trd_capital <- aggregate(history_data[c('SkewSize','SwingSize')],list(TradeDate=history_data$TradeDate,Trader=history_data$Trader),function(x)sum(x,na.rm=TRUE))
+colnames(total_trd_capital) <- c('TradeType','TradeDate','Trader','TotalSkewSize','TotalSwingSize')
+colnames(global_trd_capital) <- c('TradeDate','Trader','GlobalSkewSize','GlobalSwingSize')
+history_data <- merge(history_data,total_trd_capital,by=c('TradeType','TradeDate','Trader'))
+history_data <- merge(history_data,global_trd_capital,by=c('TradeDate','Trader'))
+if(variable_alloc==0){
+  history_data$SkewSize <- history_data$TotalSwingSize*(history_data$SkewSize/history_data$TotalSkewSize)  
+}
 history_data$SwingSizePL <- history_data$SwingSize*(history_data$CompoundReturnOutof/10000)
 history_data$SkewSizePL <- history_data$SkewSize*(history_data$CompoundReturnOutof/10000)
-total_trd_capital <- aggregate(history_data[c('SkewSize','SwingSize')],list(TradeDate=history_data$TradeDate,Trader=history_data$Trader),function(x)sum(x,na.rm=TRUE))
-colnames(total_trd_capital) <- c('TradeDate','Trader','TotalSkewSize','TotalSwingSize')
-history_data <- merge(history_data,total_trd_capital,by=c('TradeDate','Trader'))
-history_data$SwingRtn <- history_data$SwingSizePL/history_data$TotalSwingSize
-history_data$SkewRtn <- history_data$SkewSizePL/history_data$TotalSkewSize
+if(variable_alloc==0){
+  history_data$SwingRtn <- history_data$SwingSizePL/history_data$TotalSwingSize
+  history_data$SkewRtn <- history_data$SkewSizePL/history_data$TotalSwingSize  
+} else {
+  history_data$SwingRtn <- history_data$SwingSizePL/history_data$GlobalSwingSize
+  history_data$SkewRtn <- history_data$SkewSizePL/history_data$GlobalSkewSize
+}
+history_data$SwingSize[history_data$SwingSize==0] <- NA
+history_data$SkewSize[history_data$SkewSize==0] <- NA
+history_data$SwingSize[is.nan(history_data$SwingSize)] <- NA
+history_data$SkewSize[is.nan(history_data$SkewSize)] <- NA
+history_data$SkewRtn[history_data$SkewRtn==0] <- NA
+history_data$SwingRtn[is.nan(history_data$SwingRtn)] <- NA
+history_data$SwingRtn[history_data$SwingRtn==0] <- NA
+history_data$SkewRtn[is.nan(history_data$SkewRtn)] <- NA
+
+if(variable_alloc>0){
+  sharpe_str <- "Av.Sharpe (fund)"
+  type_str <- "Bayes"
+} else {
+  sharpe_str <- "Av.Sharpe (bucket)"
+  type_str <- "skew"
+}
+
+rtn_stats <- aggregate(history_data[c('SkewSize','SwingSize')],list(Trader=history_data$Trader,TradeDate=history_data$TradeDate,TradeType=history_data$TradeType),function(x)mean(x,na.rm=TRUE))
+rtn_stats <- rbind(cbind(data.frame(Adjusted='Not adjusted',Quantity='Av.Size',Value=rtn_stats$SwingSize),rtn_stats[c('Trader','TradeDate','TradeType')]),
+                   cbind(data.frame(Adjusted='Adjusted',Quantity='Av.Size',Value=rtn_stats$SkewSize),rtn_stats[c('Trader','TradeDate','TradeType')]))
+
+daily_rtn <- aggregate(history_data[c('SkewRtn','SwingRtn')],list(TradeDate=history_data$TradeDate,Trader=history_data$Trader,TradeType=history_data$TradeType),function(x)mean(x,na.rm=TRUE))
+rtn_stats <- rbind(rtn_stats,
+                   cbind(Adjusted='Adjusted',Quantity=sharpe_str,compute_rolling_fn(daily_rtn[c('Trader','TradeType','TradeDate','SkewRtn')],'Value','SkewRtn',20,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))[c('Trader','TradeType','TradeDate','Value')]),
+                   cbind(Adjusted='Not adjusted',Quantity=sharpe_str,compute_rolling_fn(daily_rtn[c('Trader','TradeType','TradeDate','SwingRtn')],'Value','SwingRtn',20,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))[c('Trader','TradeType','TradeDate','Value')]))
+
+if(nrow(rtn_stats[rtn_stats$Quantity==sharpe_str&!is.na(rtn_stats$Value)&abs(rtn_stats$Value)>30,])>0){
+  rtn_stats[rtn_stats$Quantity==sharpe_str&!is.na(rtn_stats$Value)&abs(rtn_stats$Value)>30,]$Value <- NA  
+} 
+if(q2_only){
+  rtn_stats <- rtn_stats[rtn_stats$TradeDate>='2016-04-01',]
+}
+
+sp <- 60/length(unique(rtn_stats[rtn_stats$Trader==11&grepl("Add|New",rtn_stats$TradeType),]$TradeDate))
+size_plot_js <- ggplot(rtn_stats[rtn_stats$Trader==11&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
+                geom_smooth(method="loess",span=sp) +
+                geom_smooth(method="gam",se=FALSE) +
+                #geom_point() +
+                ylab("") +
+                ggtitle(paste("JS adjusted trades - ",type_str,sep="")) +
+                scale_y_continuous(labels=comma) +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
+                facet_grid(Quantity~TradeType,scales="free_y")
+
+sp <- 60/length(unique(rtn_stats[rtn_stats$Trader==70&grepl("Add|New",rtn_stats$TradeType),]$TradeDate))
+size_plot_ba <- ggplot(rtn_stats[rtn_stats$Trader==70&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
+                geom_smooth(method="loess",span=sp) +
+                geom_smooth(method="gam",se=FALSE) +
+                ylab("") +
+                ggtitle(paste("BA adjusted trades - ",type_str,sep="")) +
+                scale_y_continuous(labels=comma) +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
+                facet_grid(Quantity~TradeType,scales="free_y")
+
+sp <- 60/length(unique(rtn_stats[rtn_stats$Trader==101&grepl("Add|New",rtn_stats$TradeType),]$TradeDate))
+size_plot_dk <- ggplot(rtn_stats[rtn_stats$Trader==101&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
+                geom_smooth(method="loess",span=sp) +
+                geom_smooth(method="gam",se=FALSE) +
+                #geom_point() +
+                ylab("") +
+                ggtitle(paste("DK adjusted trades - ",type_str,sep="")) +
+                scale_y_continuous(labels=comma) +
+                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
+                facet_grid(Quantity~TradeType,scales="free_y")
+
+#----------------------------------------------------
+#Overall 'grand average' performance impact
+
 rtn_stats <- aggregate(history_data[c('SkewRtn','SwingRtn','SkewSize','SwingSize')],list(Trader=history_data$Trader,TradeType=history_data$TradeType),function(x)mean(x,na.rm=TRUE))
 rtn_stats <- merge(rtn_stats,
                    aggregate(history_data[c('SkewRtn','SwingRtn')],list(Trader=history_data$Trader,TradeType=history_data$TradeType),function(x)sd(x,na.rm=TRUE)),
@@ -617,51 +728,4 @@ rtn_plot <- ggplot(rtn_plt_data[rtn_plt_data$Trader=='DK'&rtn_plt_data$Quantity!
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
   facet_grid(Quantity~Trader,scales="free_y")
-
-rtn_stats <- aggregate(history_data[c('SkewSize','SwingSize')],list(Trader=history_data$Trader,TradeDate=history_data$TradeDate,TradeType=history_data$TradeType),function(x)mean(x,na.rm=TRUE))
-rtn_stats <- rbind(cbind(data.frame(Adjusted='Not adjusted',Quantity='Size',Value=rtn_stats$SwingSize),rtn_stats[c('Trader','TradeDate','TradeType')]),
-                   cbind(data.frame(Adjusted='Adjusted',Quantity='Size',Value=rtn_stats$SkewSize),rtn_stats[c('Trader','TradeDate','TradeType')]))
-#rtn_stats$SwingRtn <- log(1+rtn_stats$SwingRtn)
-#rtn_stats$SkewRtn <- log(1+rtn_stats$SkewRtn)
-rtn_stats <- rbind(rtn_stats,
-                   cbind(Adjusted='Adjusted',Quantity='Sharpe',compute_rolling_fn(history_data[c('Trader','TradeType','TradeDate','SkewRtn')],'Value','SkewRtn',20,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))[c('Trader','TradeType','TradeDate','Value')]),
-                   cbind(Adjusted='Not adjusted',Quantity='Sharpe',compute_rolling_fn(history_data[c('Trader','TradeType','TradeDate','SwingRtn')],'Value','SwingRtn',20,function(x)mean(x,na.rm=TRUE)/sd(x,na.rm=TRUE))[c('Trader','TradeType','TradeDate','Value')]))
-
-rtn_stats[rtn_stats$Quantity=='Sharpe'&!is.na(rtn_stats$Value)&abs(rtn_stats$Value)>30,]$Value <- NA
-sp <- 60/length(unique(rtn_stats[rtn_stats$Trader==11&grepl("Add|New",rtn_stats$TradeType),]$TradeDate))
-size_plot <- ggplot(rtn_stats[rtn_stats$Trader==11&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
-                geom_smooth(method="loess",span=sp) +
-                geom_smooth(method="gam") +
-                ylab("") +
-                ggtitle("JS adjusted trades - Skew") +
-                scale_y_continuous(labels=comma) +
-                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
-                facet_grid(Quantity~TradeType,scales="free_y")
-
-size_plot <- ggplot(rtn_stats[rtn_stats$Trader==70&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
-                geom_smooth(method="loess",method.args=list(enp.target=30)) +
-                geom_point() +
-                ylab("") +
-              
-                ggtitle("BA adjusted trades - Skew") +
-                scale_y_continuous(labels=comma) +
-                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
-                facet_grid(Quantity~TradeType,scales="free_y")
-
-size_plot <- ggplot(rtn_stats[rtn_stats$Trader==101&grepl("Add|New",rtn_stats$TradeType),],aes(x=TradeDate,y=Value,group=Adjusted,colour=Adjusted)) +
-                geom_smooth(method="loess",method.args=list(enp.target=30)) +
-                ylab("") +
-                ggtitle("DK adjusted trades - Skew") +
-                scale_y_continuous(labels=comma) +
-                theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-                theme(strip.text = element_text(size = 16),axis.title = element_text(size = 16),title = element_text(size = 18),axis.text=element_text(size = 12)) +
-                facet_grid(Quantity~TradeType,scales="free_y")
-
-
-
-
-
-
 
