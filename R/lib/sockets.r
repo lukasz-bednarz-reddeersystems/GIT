@@ -84,8 +84,8 @@ setMethod("writeToConnection","ProcessSocket",
           }
 )
 
-setGeneric("getData",function(object){standardGeneric("getData")})
-setMethod("getData","ProcessSocket",
+setGeneric("getDataFromSocket",function(object){standardGeneric("getDataFromSocket")})
+setMethod("getDataFromSocket","ProcessSocket",
           function(object){
             return(object@data)           
           }

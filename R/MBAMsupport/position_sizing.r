@@ -543,7 +543,7 @@ for(trader in unique(Trade_sharpe$Trader)){
 #----------------------------------------------------
 #Asses impact on performance
 
-q2_only <- TRUE
+q2_only <- FALSE
 if(q2_only){
   bayes_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/bayes_data_Q2_2016.rds")  
 } else {
@@ -560,8 +560,8 @@ trade_weight <- merge(trade_weight,weight_num,by=c('Trader','TradeDate'))
 trade_weight$Weight <- 0.25+0.25*(((trade_weight$Weight/trade_weight$x.x)*trade_weight$x.y)-1)
 trade_weight <- trade_weight[c('Trader','TradeDate','TradeType','Weight')]
                                        
-skew_const <- 30 #non zero to modify by skew
-variable_alloc <- 0 #non zero to apply Bayesian reweighting
+skew_const <- 0 #non zero to modify by skew
+variable_alloc <- 1 #non zero to apply Bayesian reweighting
 if(q2_only){
   history_data <- readRDS("//MBAM/main/MBAM/Trading Enhancements/data/history_data_segmentPL_Q2_2016.rds")  
 } else {
