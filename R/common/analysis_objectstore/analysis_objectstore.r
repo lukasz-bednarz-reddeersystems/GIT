@@ -1,5 +1,6 @@
 sourceTo("../lib/objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+library(digest)
 
 setClass(
   Class          = "AnalysisQuery",
@@ -123,6 +124,13 @@ setMethod("getAnalysisStoreContents","AnalysisObjectStore",
             return(names)
           }
 )
+
+get_analysis_objectstore_name <- function(keys) {
+  date_hash <- digest(sort(as.character(c(keys$start,keys$end))),serialize=FALSE)
+  trader_prefix <- paste(sort(unique(keys$TraderID)),collapse="_")
+  rv <- paste("analysis",trader_prefix,date_hash,collapse='_')
+  return(rv)
+}
 
 analysis_objectstore_factory <- function(name){
   message("Initialising analysis store ...")

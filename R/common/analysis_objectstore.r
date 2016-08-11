@@ -1,10 +1,6 @@
 sourceTo("../lib/objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-
-get_analysis_objectstore_name <- function(keys) {
-  #digest hash of whole key frame
-  return(rv)
-}
+#THIS IS DEPRICATED... SEE DIRETORY ANALYSIS_OBJECT STORE AND ASSOCIATED CLIENT
 
 setClass(
   Class          = "AnalysisQuery",

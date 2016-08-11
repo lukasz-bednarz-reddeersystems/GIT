@@ -2,8 +2,6 @@ sourceTo("../common/datasource_client/datasource_client.r", modifiedOnly = getOp
 sourceTo("../lib/datastore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/dataplex.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/analysis_objectstore/analysis_objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-#sourceTo("../common/trade_factory.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-#sourceTo("../features/trade_feature_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 library(lubridate)
 library(hash)
@@ -42,99 +40,63 @@ setMethod("getAnalysisClass",
 )
 
 setMethod("dataRequest",  
-          signature(object = "VirtualAnalysisClient", key_values = "data.frame"),
-          function(object, key_values){
+          signature(object = "VirtualAnalysisClient", key = "data.frame", force=logical),
+          function(object, key, force=FALSE){
             
-            object <- .setDataSourceQueryKeyValues(object,key_values)
+            object <- .setDataSourceQueryKeyValues(object,key)
             
             non_na_cols <- getNonNAColumnNames(object)
             analysis <- getAnalysisClass(object)
             values <- getDataSourceReturnColumnNames(object)
             colnames_map <- getDataSourceClientColumnNameMap(object)
             
-            key_values <- cbind(data.frame(analysis_class = analysis), key_values)
+            key_with_class <- cbind(data.frame(analysis_class = analysis), key_with_class)
+            store_id <- get_analysis_objectstore_name(key_with_class)
             
-            store_ids <- get_analysis_objectstore_name(key_values)
+            analysis_store <- analysis_objectstore_factory(store_id)
+            analysis_block <- queryAnalysisStore(analysis_store, key_with_class)
             
-            first <- TRUE
-            #####build for analysis objects from this point.
-            for(i_row in seq(length(store_ids))) {
-              trader <- as.integer(key_values$id[i_row])
-              start <- as.Date(key_values$start[i_row])
-              end <- as.Date(key_values$end[i_row])
-              ppm_store_name <- store_ids[i_row]
-              
-              ppm_store <- ppmodel_objectstore_factory(store_ids[i_row])
-              
-              pp_model <- queryPPModelStore(ppm_store, key_values[i_row,])
-              
-              if (is.null(pp_model)) {
-                
-                pp_model <- new(model, keys = data.frame(id = trader, start = start, end = end) )
-                
-                pp_model <- tryCatch({
-                  pp_model <- runPreProcessorModel(pp_model)
-                  pp_model
-                }, error = function(cond){
-                  message(paste("Error occured during update PP model in dataRequest() of class" , class(object)))
-                  message(sprintf("during query for trader: %s, start: %s, end: %s" , trader, start, end))
-                  message(cond)
-                  pp_model
-                })
-                
-                ppm_store <- updatePPModelStore(ppm_store, pp_model,  key_values[i_row,])
-                ppm_store <- commitPPModelStore(ppm_store)
-                
-                query_data <- getData(pp_model@modeldata)
-                
-
-              } else {
-                query_data <- getData(pp_model@modeldata)
+            if (is.null(analysis_block)) {
+              if(force){
+                analysis_block <- new(analysis)
+                analysis_block <- dataRequest(analysis_block,key)
+                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,key)
+                analysis_store <- commitAnalysisStore(analysis_store)
+                query_data     <- getOutputlGGPlotData(analysis_block)
               }
-              
-              if (nrow(query_data) == 0) {
-                query_data <- .generateDataFilledWithNA(object, trader, start, end)
+              else{
+                stop(message(paste("No instance of",analysis,"found in store, either build it, check the key, or run with force=TRUE.")))
               }
-              
-              if (first) {
-                ret_data <- query_data
-                first <- FALSE
-              } else {
-                
-                
-                if (!setequal(colnames(ret_data), colnames(query_data))) {
-                  query_data[setdiff(colnames(ret_data), colnames(query_data))] <- NA
-                }
-                
-                ret_data <- rbind(ret_data, query_data)
-              }
-              
+            } else {
+              query_data <- getOutputGGPlotData(analysis_block)
             }
             
-            ret_data[setdiff(values, colnames(ret_data))] <- NA 
-            ret_data <- ret_data[values]
+            if (nrow(query_data) == 0) {
+              query_data <- .generateDataFilledWithNA(object, trader, start, end)
+            }
             
-            if (0 == nrow(ret_data)) {
+            query_data[setdiff(values, colnames(query_data))] <- NA 
+            query_data <- query_data[values]
+            
+            if (0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
               message(paste("Query sent to", datastore, "returned zero row data.frame"))
               stop(paste("Query sent to", datastore, "returned zero row data.frame"))
             }
             
             # translating column names
-            colnames(ret_data) <- .translateDataSourceColumnNames(object, values)
+            colnames(query_data) <- .translateDataSourceColumnNames(object, values)
             
             # forcing new variables set
-            object <- .setRequiredVariablesNames(object, colnames(ret_data))
-            object <- .setStoredVariablesNames(object, colnames(ret_data))
+            object <- .setRequiredVariablesNames(object, colnames(query_data))
+            object <- .setStoredVariablesNames(object, colnames(query_data))
             
             # storing Reference data internaly
-            object <- setReferenceData(object, ret_data)
-            
+            object <- setReferenceData(object, query_data)
             
             # remove rows undefined rows
             if(length(non_na_cols) > 0 ){
               object <- .removeNAReferenceData(object)
-              
             }
 
             return(object)
