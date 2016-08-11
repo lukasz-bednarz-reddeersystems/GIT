@@ -1,10 +1,9 @@
 sourceTo("../common/datasource_client/datasource_client.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/datastore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/dataplex.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../common/ppmodel_client/ppmodel_client_functions.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../common/ppmodel_objectstore/ppmodel_objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../common/trade_factory.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../features/trade_feature_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../common/analysis_objectstore/analysis_objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+#sourceTo("../common/trade_factory.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+#sourceTo("../features/trade_feature_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 library(lubridate)
 library(hash)
@@ -12,52 +11,53 @@ library(hash)
 
 ####################################
 #
-# VirtualPPModelClient Class
+# AnalysisClient Class
+# Stores instances of the AnalysisBlock class
 #
 ####################################
 
 setClass(
-  Class                = "VirtualPPModelClient",
-  slots                = c(model_class = "character"),
+  Class                = "VirtualAnalysisClient",
+  slots                = c(analysis_class = "character"),
   prototype = list(
-    key_cols = c("model_class", "id", "start", "end")
+    key_cols = c("analysis_class", "id", "start", "end")
 
   ),
   contains = c("VirtualDataSourceClient", "VIRTUAL")
 )
 
-setGeneric("getPPModelClass", function(object,...){standardGeneric("getPPModelClass")})
-# Returns post processing model used to assembly data.
+setGeneric("getAnalysisClass", function(object,...){standardGeneric("getAnalysisClass")})
+# Returns name of the underlying analysis block class.
 #
 # Args:
-#   object : object of type "VirtualPPModelClient"
+#   object : object of type "VirtualAnalysisClient"
 # Returns:
-#   model name
+#   analysis name
 
-setMethod("getPPModelClass",  
-          signature(object = "VirtualPPModelClient"),
+setMethod("getAnalysisClass",  
+          signature(object = "VirtualAnalysisClient"),
           function(object){
-            return(object@model_class)
+            return(object@analysis_class)
           }
 )
 
 setMethod("dataRequest",  
-          signature(object = "VirtualPPModelClient", key_values = "data.frame"),
+          signature(object = "VirtualAnalysisClient", key_values = "data.frame"),
           function(object, key_values){
             
             object <- .setDataSourceQueryKeyValues(object,key_values)
             
             non_na_cols <- getNonNAColumnNames(object)
-            model <- getPPModelClass(object)
+            analysis <- getAnalysisClass(object)
             values <- getDataSourceReturnColumnNames(object)
             colnames_map <- getDataSourceClientColumnNameMap(object)
             
-            key_values <- cbind(data.frame(model_class = model), key_values)
+            key_values <- cbind(data.frame(analysis_class = analysis), key_values)
             
-            store_ids <- get_ppmodel_objectstore_name(key_values)
+            store_ids <- get_analysis_objectstore_name(key_values)
             
             first <- TRUE
-            
+            #####build for analysis objects from this point.
             for(i_row in seq(length(store_ids))) {
               trader <- as.integer(key_values$id[i_row])
               start <- as.Date(key_values$start[i_row])
