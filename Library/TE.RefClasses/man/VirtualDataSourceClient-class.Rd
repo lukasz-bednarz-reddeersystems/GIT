@@ -13,18 +13,18 @@ Inherits from "VirtualReferenceData"
 \section{Slots}{
 
 \describe{
-\item{\code{key_cols}}{= "character",  query keys column names}
+\item{\code{key_cols}}{"character",  query keys column names}
 
-\item{\code{key_values}}{= "data.frame",  query keys}
+\item{\code{key_values}}{"data.frame",  query keys}
 
-\item{\code{values}}{= "character",  columns that neeed to be returned from datastore}
+\item{\code{values}}{"character",  columns that neeed to be returned from datastore}
 
-\item{\code{column_name_map}}{= "hash",  perl-type hash containing mapping of source column names to output column names}
+\item{\code{column_name_map}}{"hash",  perl-type hash containing mapping of source column names to output column names}
 
-\item{\code{non_na_cols}}{= "character",  columns upon which we remove rows to forced to have non NA values}
+\item{\code{non_na_cols}}{"character",  columns upon which we remove rows to forced to have non NA values}
 
-\item{\code{factorized_cols}}{= "character",  factor columns that are expanded to  new columns}
+\item{\code{factorized_cols}}{"character",  factor columns that are expanded to  new columns}
 
-\item{\code{factorization_keys}}{= "character", key columns that are used as a unique keys in factorization}
+\item{\code{factorization_keys}}{"character", key columns that are used as a unique keys in factorization}
 }}
 

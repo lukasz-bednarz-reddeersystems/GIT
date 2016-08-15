@@ -1,0 +1,144 @@
+#' @include datasource_client.r
+#' @include risk_model_handler.r
+NULL
+
+#########################################
+#
+# VirtualRiskModelObjectstoreClient Class
+#
+#########################################
+
+risk_model_objectstore_keys <-  c("Date")
+
+devtools::use_data(risk_model_objectstore_keys,
+                   overwrite = TRUE)
+
+#' Virtual S4 class for access to Risk Model Objectstore.
+#'
+#' This is handler class that is to be inherited
+#' by other classes handling Risk Model Objects
+#'
+#' Inherits from "VirtualDataSourceClient" and "VirtualRiskModelHandler"
+#'
+#' @slot component    "character", name of the component of risk model
+
+setClass(
+  Class                = "VirtualRiskModelObjectstoreClient",
+  slots = c(
+    component          = "character" # name of component in Risk Model
+    ),
+  prototype = list(
+    key_cols        = risk_model_objectstore_keys,
+    key_values      = data.frame(Date = as.Date(character()))
+  ),
+  contains = c("VirtualDataSourceClient","VirtualRiskModelHandler", "VIRTUAL")
+)
+
+
+#' Get Risk Model Component Name
+#'
+#' Returns name of the component that given class is accessing
+#'
+#' @param object object of class 'VirtualRiskModelObjectstoreClient'.
+#' @return \code{component} 'character', name of the component beeing accessed.
+#' @export
+
+setGeneric("getRiskModelObjectstoreComponentName", function(object,...){standardGeneric("getRiskModelObjectstoreComponentName")})
+setMethod("getRiskModelObjectstoreComponentName",
+          signature(object = "VirtualRiskModelObjectstoreClient"),
+          function(object){
+            return(object@component)
+          }
+)
+
+
+#' Generate specific objectstore keys
+#'
+#' Transforms original query key values to risk model objectstore specific keys
+#'
+#' @param object object of class 'VirtualRiskModelObjectstoreClient'.
+#' @param key_values 'data.frame' with original query keys to be transformed .
+#' @return \code{query_key_values} 'data.frame', transformed, component specific query keys.
+#' @export
+
+setGeneric(".generateQueryKeyValues", function(object, key_values,...){standardGeneric(".generateQueryKeyValues")})
+setMethod(".generateQueryKeyValues",
+          signature(object = "VirtualRiskModelObjectstoreClient",
+                    key_values = "data.frame"),
+          function(object, key_values){
+
+            query_key_values <- unique(key_values["Date"])
+            query_key_values$start <- query_key_values$Date - day(query_key_values$Date )
+            query_key_values$end <- (query_key_values$Date - day(query_key_values$Date ) +
+                                    days_in_month(query_key_values$Date))
+            query_key_values <- unique(query_key_values[c("start", "end")])
+
+            return(query_key_values)
+          }
+)
+
+
+
+setMethod("dataRequest",
+          signature(object = "VirtualRiskModelObjectstoreClient", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- .setDataSourceQueryKeyValues(object, key_values)
+
+            key_values <- getDataSourceQueryKeyValues(object)
+
+            colnames(key_values) <- .translateDataSourceColumnNames(object, colnames(key_values))
+
+            model_prefix <- getRiskModelName(object)
+            lookback     <- getRiskModelLookback(object)
+            component    <- getRiskModelObjectstoreComponentName(object)
+
+            query_key_vals <- .generateQueryKeyValues(object, key_values)
+            merge_cols   <- colnames(key_values)
+
+            first <- TRUE
+
+            for(key_idx in seq(nrow(query_key_vals))) {
+
+              start        <- as.Date(query_key_vals$start[key_idx])
+              end          <- as.Date(query_key_vals$end[key_idx])
+
+              rm_str       <- get_most_recent_model_objectstore(model_prefix, end, lookback)
+
+              name         <- getID(rm_str)
+
+              query_data   <- queryDailyRiskModelObjectStore(rm_str,name,lookback,component)
+
+              query_data   <- getData(query_data)
+
+              query_data   <- query_data[query_data$Date >= start & query_data$Date <= end, ]
+
+              if (first) {
+                ret_data <- query_data
+                first <- FALSE
+              }
+              else {
+                ret_data <- rbind(ret_data, query_data)
+              }
+
+            }
+
+            ret_data$Index <- seq(nrow(ret_data))
+
+            ret_data   <- merge(key_values,
+                                  ret_data,
+                                  all.x = TRUE, sort = FALSE)
+
+            ret_data <- ret_data[order(ret_data$Index), setdiff(colnames(ret_data), "Index")]
+
+
+            # translating column names
+            colnames(ret_data) <- .translateDataSourceColumnNames(object, colnames(ret_data))
+
+            # storing Reference data internaly
+            object <- setReferenceData(object, ret_data)
+
+            return(object)
+          }
+)
+
