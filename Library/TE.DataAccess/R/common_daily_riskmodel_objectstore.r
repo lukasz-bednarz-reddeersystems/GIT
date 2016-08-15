@@ -4,6 +4,10 @@
 #' @include common_composite_warehouse.r
 NULL
 
+#' An S4 class handling queries to Daily Risk Model Objectstore.
+#'
+#' @export
+
 setClass(
 	Class = "DailyRiskModelQuery",
 	prototype = prototype(
@@ -27,6 +31,14 @@ setMethod("updateStoredRiskModelKeys","DailyRiskModelQuery",
             return(object)
           }
 )
+
+
+#' An S4 class for storing daily risk models.
+#'
+#' @slot components  "character"
+#' @slot risk_model_q "DailyRiskModelQuery"
+#'
+#' @export
 
 setClass(
 	Class = "DailyRiskModelObjectStore",
@@ -60,6 +72,7 @@ setMethod("generateRiskModelKey","DailyRiskModelObjectStore",
 		  }
 )
 
+#' @export
 setGeneric("queryDailyRiskModelObjectStore",function(object,name,lookback,component){standardGeneric("queryDailyRiskModelObjectStore")})
 setMethod("queryDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  function(object,name,lookback,component){
@@ -301,6 +314,17 @@ get_risk_model_component_on_date <- function(model_prefix,date,component,lookbac
 	return(cmp)
 }
 
+#' Get most recent risk model store
+#'
+#' Finds most recent risk model objectstore containg model
+#' on querried date or earlier
+#'
+#' @param model_prefix character
+#' @param date Date date for model
+#' @param lookback integer lookback of model in days
+#' @return \code{rm_str} if risk model objectstore found returns
+#' object of class "DailyRiskModelObjectStore" otherwise NULL
+#' @export
 
 get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lookback = 150) {
 
