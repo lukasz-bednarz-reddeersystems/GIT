@@ -218,6 +218,16 @@ setMethod("pushTradeFields","WarehouseObjectStore",
 		  }
 )
 
+#' Create WarehouseObjectStore object
+#'
+#' Factory function for WarehouseObjectStore objects.
+#' Creates new WarehouseObjectStore object for given filename.
+#' If file already exists loads file content to memory.
+#'
+#' @param name 'character', name of the objectstore file
+#' @return \code{whstr} object of class "WarehouseObjectStore"
+#' @export
+
 warehouse_objectstore_factory <- function(name){
 	message("Initialising trade warehouse store...")
 	whstr <- new("WarehouseObjectStore",id=name)
