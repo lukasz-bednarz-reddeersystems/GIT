@@ -1,13 +1,12 @@
-context("Testing Factor Correlation Data")
 
 #############################
 #
-# FactorCorrelationData Tests
+# ImpliedFactorReturnsData Tests
 #
 #############################
 
-tested.class          <-  "FactorCorrelationData"
-valid.component       <- "FactorCorrelation"
+tested.class          <-  "ImpliedFactorReturnsData"
+valid.component       <- "ImpliedFactorReturns"
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.lookback        <- 150
@@ -119,8 +118,8 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
   object <- new(tested.class)
 
   nexist.key_vals <- data.frame(Date = seq(from = today() +1,
-                                           to = today() + 5,
-                                           by = "1 day"))
+                                                  to = today() + 5,
+                                                  by = "1 day"))
   diff <- setdiff(valid.required_colnms,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
@@ -156,8 +155,6 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
 
 test_that("Can dataRequest() with valid key_values", {
-
-  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
 

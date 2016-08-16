@@ -118,9 +118,9 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
   object <- new(tested.class)
 
-  nexist.key_vals <- data.frame(Date = seq(from = as.Date('2016-09-01'),
-                                                  to = as.Date('2016-09-03'),
-                                                  by = "1 day"))
+  nexist.key_vals <- data.frame(Date = seq(from = today() +1,
+                                           to = today() + 5,
+                                           by = "1 day"))
   diff <- setdiff(valid.required_colnms,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))

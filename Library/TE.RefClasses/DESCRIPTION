@@ -38,6 +38,7 @@ Collate:
     'risk_model_objectstore_client.r'
     'factor_correlation_data.r'
     'factor_variance_data.r'
+    'implied_factor_returns_data.r'
     'instrument_betas_data.r'
     'market_data.r'
     'portfolio.r'
