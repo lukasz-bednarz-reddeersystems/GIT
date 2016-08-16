@@ -9,6 +9,7 @@
 #' @param cols, cols[1] is the name of the ID column, cols[2] is the name of the date column
 #' @param id_outname is the output name of the ID
 #' @return \code{key_values} data.frame with generated keys
+#' @export
 
 date_id_kgen_fn <- function(x,cols,id_outname=NULL){
   ids <- tryCatch(
