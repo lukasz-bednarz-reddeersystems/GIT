@@ -17,7 +17,4 @@ updateIndex(object, new_data)
 \description{
 Update index based on new incoming data
 }
-\examples{
-updateIndex(object,new_data)
-}
 

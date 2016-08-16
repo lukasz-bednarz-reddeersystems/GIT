@@ -26,7 +26,4 @@ aggregateGroupCompound(object, target_cols, group_by_lst, fn_lst,
 Runs multiple aggregate on data stored in Dataset within groups
 defined by group_by_lst
 }
-\examples{
-aggregateGroupCompound(object,target_cols,group_by_lst,fn_lst,agg_unique=FALSE)
-}
 

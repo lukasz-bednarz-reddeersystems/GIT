@@ -1,6 +1,6 @@
 Package: TE.DataAccess
 Type: Package
-Title: Basic package for RedDeer Trading Enhancement Engine
+Title: Basic package for RedDeer Trading Enhancement Engine.
 Version: 0.1.0
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))

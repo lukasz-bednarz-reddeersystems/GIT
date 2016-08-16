@@ -17,7 +17,4 @@ dataset_factory(key_cols, data)
 \description{
 Builds a dataset from a dataframe
 }
-\examples{
-rowCoalesceOn(object,by=NULL,fn=first)
-}
 

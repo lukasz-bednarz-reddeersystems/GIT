@@ -28,7 +28,4 @@ aggregate_kernel(data, group_by, all_cols, target_cols, fn, agg_unique,
 \description{
 Workhorse function for multi-stage aggregation
 }
-\examples{
-aggregate_kernel(data,group_by,all_cols,target_cols,fn,agg_unique,na="na.omit")
-}
 

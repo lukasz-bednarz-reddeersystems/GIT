@@ -17,7 +17,4 @@ writeToConnection(object, data)
 \description{
 Write data to socket
 }
-\examples{
-writeToConnection(object,data)
-}
 

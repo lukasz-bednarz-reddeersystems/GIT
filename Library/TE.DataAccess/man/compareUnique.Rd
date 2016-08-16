@@ -17,7 +17,4 @@ compareUnique(object, new_data)
 \description{
 Check if new data is unique values in reference to stored data
 }
-\examples{
-compareUnique(object,new_data)
-}
 

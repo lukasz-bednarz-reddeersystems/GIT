@@ -15,7 +15,4 @@ createIndex(object)
 \description{
 Create new index for dataset
 }
-\examples{
-createIndex(object)
-}
 

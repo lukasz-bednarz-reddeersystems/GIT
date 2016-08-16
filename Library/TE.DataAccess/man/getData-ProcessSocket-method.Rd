@@ -17,7 +17,4 @@
 Retrieve data previously read from socket using
 \code{readConnection(object)}
 }
-\examples{
-getData(object)
-}
 

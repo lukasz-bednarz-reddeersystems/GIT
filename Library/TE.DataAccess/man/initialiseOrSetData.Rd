@@ -17,7 +17,4 @@ initialiseOrSetData(object, data)
 \description{
 Sets new data in the dataset and initializes it if not done
 }
-\examples{
-initialiseOrSetData(object,data)
-}
 

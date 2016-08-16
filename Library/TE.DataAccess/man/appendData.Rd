@@ -17,7 +17,4 @@ appendData(object, new_data)
 \description{
 Append new data to dataset
 }
-\examples{
-appendData(object,new_data)
-}
 

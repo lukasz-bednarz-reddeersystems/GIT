@@ -21,7 +21,4 @@ hashRows(object, rows, keys, type = "local")
 \description{
 Hash keys of new incomming rows
 }
-\examples{
-hashRows(object,rows,keys,type='local')
-}
 

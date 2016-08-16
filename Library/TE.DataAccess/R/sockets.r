@@ -35,8 +35,6 @@ setClass(
 #'
 #' @param object object of class 'ProcessSocket'.
 #' @return \code{object} object of class 'ProcessSocket'.
-#' @examples
-#' openConnection(object)
 
 setGeneric("openConnection",function(object){standardGeneric("openConnection")})
 setMethod("openConnection","ProcessSocket",
@@ -69,8 +67,6 @@ setMethod("openConnection","ProcessSocket",
 #'
 #' @param object object of class 'ProcessSocket'.
 #' @return \code{object} object of class 'ProcessSocket'.
-#' @examples
-#' readConnection(object)
 #' @export
 
 setGeneric("readConnection",function(object){standardGeneric("readConnection")})
@@ -96,8 +92,6 @@ setMethod("readConnection","ProcessSocket",
 #' @param object object of class 'ProcessSocket'.
 #' @param data character, data to write to socket.
 #' @return \code{object} object of class 'ProcessSocket'.
-#' @examples
-#' writeToConnection(object,data)
 #' @export
 
 setGeneric("writeToConnection",function(object,data){standardGeneric("writeToConnection")})
@@ -131,8 +125,6 @@ if (!R.methodsS3::isGenericS4("getData")) {
 #'
 #' @param object object of class 'ProcessSocket'.
 #' @return \code{data} character, data read from socket..
-#' @examples
-#' getData(object)
 #' @export
 
 setMethod("getData","ProcessSocket",
@@ -145,8 +137,6 @@ setMethod("getData","ProcessSocket",
 #'
 #' @param object object of class 'ProcessSocket'.
 #' @return \code{object} object of class 'ProcessSocket'.
-#' @examples
-#' closeConnection(object)
 #' @export
 
 setGeneric("closeConnection",function(object){standardGeneric("closeConnection")})

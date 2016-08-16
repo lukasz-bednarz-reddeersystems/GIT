@@ -19,7 +19,4 @@ FrameToXML(df, name, tree_name = "Root")
 \description{
 Generates XML from data.frame
 }
-\examples{
-rowCoalesceOn(object,by=NULL,fn=first)
-}
 

@@ -31,8 +31,6 @@ setClass(
 #' @param object object of class 'DataSet'.
 #' @param data  data.frame.
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' checkUnique(object,data)
 
 
 setGeneric("checkUnique", function(object,data){standardGeneric("checkUnique")})
@@ -68,8 +66,6 @@ setMethod("checkUnique", "DataSet",
 #'
 #' @param object object of class 'DataSet'.
 #' @return \code{data} data.frame with raw data.
-#' @examples
-#' getData(object)
 #' @export
 
 
@@ -86,8 +82,6 @@ setMethod("getData", "DataSet",
 #' @param data  data.frame with data to be set.
 #' @param override_full_index  Should the index be reset? Defaults to FALSE
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' setData(object,data,override_full_index=FALSE)
 #' @export
 
 setGeneric("setData", function(object,data,override_full_index=FALSE){standardGeneric("setData")})
@@ -112,9 +106,6 @@ setMethod("setData", "DataSet",
 #'
 #' @param object object of class 'DataSet'.
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' resetData(object,data)
-
 
 setGeneric("resetData", function(object,data){standardGeneric("resetData")})
 setMethod("resetData", "DataSet",
@@ -139,8 +130,6 @@ setMethod("resetData", "DataSet",
 #' @param object object of class 'DataSet'.
 #' @param data  data.frame.
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' initialiseOrSetData(object,data)
 
 
 setGeneric("initialiseOrSetData", function(object,data){standardGeneric("initialiseOrSetData")})
@@ -177,9 +166,6 @@ setMethod("initialiseOrSetData", "DataSet",
 #' @param object object of class 'DataSet'.
 #' @param data  data.frame.
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' initialiseOrAppendData(object,data)
-
 
 setGeneric("initialiseOrAppendData", function(object,data){standardGeneric("initialiseOrAppendData")})
 setMethod("initialiseOrAppendData", "DataSet",
@@ -202,9 +188,6 @@ setMethod("initialiseOrAppendData", "DataSet",
 #' @param fn  function to use for aggregation
 #' @param agg_unique  should the resulting data be unique?
 #' @return \code{agg} object of class 'data.frame'.
-#' @examples
-#' aggregateGroup(object,target_cols,group_by,fn,agg_unique=FALSE)
-
 
 setGeneric("aggregateGroup", function(object,target_cols,group_by,fn,agg_unique=FALSE){standardGeneric("aggregateGroup")})
 setMethod("aggregateGroup", "DataSet",
@@ -225,9 +208,6 @@ setMethod("aggregateGroup", "DataSet",
 #' @param fn_lst  function to use for aggregation on each step
 #' @param agg_unique  should the resulting data be unique?
 #' @return \code{agg} object of class 'data.frame'.
-#' @examples
-#' aggregateGroupCompound(object,target_cols,group_by_lst,fn_lst,agg_unique=FALSE)
-
 
 setGeneric("aggregateGroupCompound", function(object,target_cols,group_by_lst,fn_lst,agg_unique=FALSE){standardGeneric("aggregateGroupCompound")})
 setMethod("aggregateGroupCompound", "DataSet",
@@ -254,9 +234,6 @@ setMethod("aggregateGroupCompound", "DataSet",
 #' @param agg_unique  should the resulting data be unique?
 #' @param na value passed to aggregate(..., na.action = na)
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' aggregate_kernel(data,group_by,all_cols,target_cols,fn,agg_unique,na="na.omit")
-
 
 aggregate_kernel <- function(data,group_by,all_cols,target_cols,fn,agg_unique,na="na.omit"){
   if(length(group_by) != length(intersect(all_cols,group_by))){
@@ -286,9 +263,6 @@ aggregate_kernel <- function(data,group_by,all_cols,target_cols,fn,agg_unique,na
 #' @param aliases  incomming data.frame column aliases of existing dataset names
 #' @param joinmode  join mode, default is 'inner'
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' innerJoin(object,incoming_dataset,on_columns,aliases=NULL,joinmode='inner')
-
 
 setGeneric("innerJoin", function(object,incoming_dataset,on_columns,aliases=NULL,joinmode='inner'){standardGeneric("innerJoin")})
 setMethod("innerJoin", "DataSet",
@@ -369,9 +343,6 @@ setMethod("innerJoin", "DataSet",
 #' @param aliases  incomming data.frame column aliases of existing dataset names
 #' @param joinmode  join mode, default is 'inner'
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' innerJoinFrame(object,frame,key_cols,aliases=NULL,joinmode='inner')
-
 
 setGeneric("innerJoinFrame", function(object,frame,key_cols,aliases=NULL,joinmode='inner'){standardGeneric("innerJoinFrame")})
 setMethod("innerJoinFrame", "DataSet",
@@ -388,9 +359,6 @@ setMethod("innerJoinFrame", "DataSet",
 #' @param object object of class 'DataSet'.
 #' @param key_values  data.frame with columns corresponding to object key_columns and values of the keys to compare
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' keyDiff(object,key_values)
-
 
 setGeneric("keyDiff",function(object,key_values){standardGeneric("keyDiff")})
 setMethod("keyDiff","DataSet",
@@ -414,9 +382,6 @@ setMethod("keyDiff","DataSet",
 #'
 #' @param object object of class 'DataSet'.
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' createIndex(object)
-
 
 setGeneric("createIndex",function(object){standardGeneric("createIndex")})
 setMethod("createIndex","DataSet",
@@ -441,9 +406,6 @@ setMethod("createIndex","DataSet",
 #' @param object object of class 'DataSet'.
 #' @param new_data  data.frame with new data to be added to dataset
 #' @return \code{object} object of class 'DataSet'.
-#' @examples
-#' updateIndex(object,new_data)
-
 
 setGeneric("updateIndex",function(object,new_data){standardGeneric("updateIndex")})
 setMethod("updateIndex","DataSet",
@@ -480,9 +442,6 @@ setMethod("updateIndex","DataSet",
 #' @param keys  columnames of columns used as keys for hashing
 #' @param type = 'local', c('foreign', 'local'),
 #' @return \code{hashed_rows} vector of hashed key values
-#' @examples
-#' hashRows(object,rows,keys,type='local')
-
 
 setGeneric("hashRows",function(object,rows,keys,type='local'){standardGeneric("hashRows")})
 setMethod("hashRows","DataSet",
@@ -510,9 +469,6 @@ setMethod("hashRows","DataSet",
 #' @param object object of class 'DataSet'.
 #' @param new_data  data.frame with new data
 #' @return \code{new_data} data.frame with incoming_data without duplicated values
-#' @examples
-#' compareUnique(object,new_data)
-
 
 setGeneric("compareUnique", function(object,new_data){standardGeneric("compareUnique")})
 setMethod("compareUnique", "DataSet",
@@ -541,9 +497,6 @@ setMethod("compareUnique", "DataSet",
 #' @param object object of class 'DataSet'.
 #' @param new_data  data.frame with new data
 #' @return \code{object} object of class 'DataSet'
-#' @examples
-#' appendData(object,new_data)
-
 
 setGeneric("appendData",function(object,new_data){standardGeneric("appendData")})
 setMethod("appendData","DataSet",
@@ -567,9 +520,6 @@ setMethod("appendData","DataSet",
 #' @param object object of class 'DataSet'.
 #' @param new_data  data.frame with new data
 #' @return \code{object} object of class 'DataSet'
-#' @examples
-#' aggregateData(object,new_data)
-
 
 setGeneric("aggregateData", function(object,new_data){standardGeneric("aggregateData")})
 setMethod("aggregateData", "DataSet",
@@ -590,9 +540,6 @@ setMethod("aggregateData", "DataSet",
 #' @param data  data.frame with new dataset data to be set combined with existing data
 #' @param new_data  data.frame with original new data
 #' @return \code{object} object of class 'DataSet'
-#' @examples
-#' attemptUpdate(object,data,new_data)
-
 
 setGeneric("attemptUpdate", function(object,data,new_data){standardGeneric("attemptUpdate")})
 setMethod("attemptUpdate", "DataSet",
@@ -643,10 +590,6 @@ first <- function(x){
 #' @param by  character vector of column names on which to aggregate on, default are key columns
 #' @param fn  function used for aggregation, default is first()
 #' @return \code{object} object of class 'DataSet'
-#' @examples
-#' rowCoalesceOn(object,by=NULL,fn=first)
-
-
 setGeneric("rowCoalesceOn", function(object,by=NULL,fn=first){standardGeneric("rowCoalesceOn")})
 
 setMethod("rowCoalesceOn", "DataSet",
@@ -670,8 +613,6 @@ setMethod("rowCoalesceOn", "DataSet",
 #' @param key_col character vector ofs column names to be used as identifying keys.
 #' @param data data.frame to generate dataset.from
 #' @return \code{object} object of class 'DataSet'
-#' @examples
-#' rowCoalesceOn(object,by=NULL,fn=first)
 #' @export
 
 

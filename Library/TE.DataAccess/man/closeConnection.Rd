@@ -15,7 +15,4 @@ closeConnection(object)
 \description{
 Close socket connection
 }
-\examples{
-closeConnection(object)
-}
 

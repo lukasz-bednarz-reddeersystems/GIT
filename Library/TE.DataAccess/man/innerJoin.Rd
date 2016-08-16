@@ -26,7 +26,4 @@ innerJoin(object, incoming_dataset, on_columns, aliases = NULL,
 join existing data in dataset with incomming dataset
 inner join might result in empty data
 }
-\examples{
-innerJoin(object,incoming_dataset,on_columns,aliases=NULL,joinmode='inner')
-}
 

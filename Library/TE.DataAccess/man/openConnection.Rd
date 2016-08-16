@@ -15,7 +15,4 @@ openConnection(object)
 \description{
 open socket connection
 }
-\examples{
-openConnection(object)
-}
 

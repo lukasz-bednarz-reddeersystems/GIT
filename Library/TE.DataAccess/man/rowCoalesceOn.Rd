@@ -19,7 +19,4 @@ rowCoalesceOn(object, by = NULL, fn = first)
 \description{
 aggregates underlying data on specified columns and using specified function
 }
-\examples{
-rowCoalesceOn(object,by=NULL,fn=first)
-}
 

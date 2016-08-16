@@ -17,7 +17,4 @@ checkUnique(object, data)
 \description{
 Check if new incoming data has unique row
 }
-\examples{
-checkUnique(object,data)
-}
 

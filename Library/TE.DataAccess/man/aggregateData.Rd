@@ -17,7 +17,4 @@ aggregateData(object, new_data)
 \description{
 Aggregates new data with new columns to dataset
 }
-\examples{
-aggregateData(object,new_data)
-}
 
