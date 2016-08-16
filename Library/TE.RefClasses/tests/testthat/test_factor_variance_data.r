@@ -1,13 +1,13 @@
-context("Testing Factor Correlation Data")
+context("Testing Factor Variance Data")
 
 #############################
 #
-# FactorCorrelationData Tests
+# FactorVarianceData Tests
 #
 #############################
 
-tested.class          <-  "FactorCorrelationData"
-valid.component       <- "FactorCorrelation"
+tested.class          <-  "FactorVarianceData"
+valid.component       <- "FactorVariance"
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.lookback        <- 150
@@ -57,7 +57,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 })
 
 
-test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
+test_that("Cannot TE.RefClasses:::.setDataSourceQueryKeyValues with invalid data", {
 
   object <- new(tested.class)
 
@@ -76,7 +76,7 @@ test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
 })
 
 
-test_that("Can .setDataSourceQueryKeyValues with valid data", {
+test_that("Can TE.RefClasses:::.setDataSourceQueryKeyValues with valid data", {
 
   object <- new(tested.class)
 

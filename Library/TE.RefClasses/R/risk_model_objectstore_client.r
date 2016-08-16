@@ -77,7 +77,22 @@ setMethod(".generateQueryKeyValues",
           }
 )
 
+setMethod(".generateDataFilledWithNA",
+          signature(object = "VirtualRiskModelObjectstoreClient"),
+          function(object){
 
+            ret_vars <- getDataSourceReturnColumnNames(object)
+            key_vals <- getDataSourceQueryKeyValues(object)
+
+            diff <- setdiff(ret_vars, colnames(key_vals))
+
+            ret_data <- cbind(key_vals, data.frame(t(rep(NA,length(diff)))))
+
+            colnames(ret_data) <- c(ret_vars)
+
+            return(ret_data)
+          }
+)
 
 setMethod("dataRequest",
           signature(object = "VirtualRiskModelObjectstoreClient", key_values = "data.frame"),
@@ -123,13 +138,20 @@ setMethod("dataRequest",
 
             }
 
-            ret_data$Index <- seq(nrow(ret_data))
 
-            ret_data   <- merge(key_values,
-                                  ret_data,
-                                  all.x = TRUE, sort = FALSE)
+            if (0 == nrow(ret_data)) {
+              message(paste("Object", class(object), "in dataRequest() returned zero row data.frame"))
+              ret_data <- .generateDataFilledWithNA(object)
+            } else {
 
-            ret_data <- ret_data[order(ret_data$Index), setdiff(colnames(ret_data), "Index")]
+              ret_data$Index <- seq(nrow(ret_data))
+
+              ret_data   <- merge(key_values,
+                                    ret_data,
+                                    all.x = TRUE, sort = FALSE)
+
+              ret_data <- ret_data[order(ret_data$Index), setdiff(colnames(ret_data), "Index")]
+            }
 
 
             # translating column names
