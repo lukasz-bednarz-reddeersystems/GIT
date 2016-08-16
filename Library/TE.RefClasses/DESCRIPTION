@@ -46,6 +46,7 @@ Collate:
     'warehouse_client_functions.r'
     'warehouse_client.r'
     'position_data.r'
+    'price_data.r'
     'transformation_functions.r'
     'virtual_transformation.r'
     'referencedata_transformation.r'
