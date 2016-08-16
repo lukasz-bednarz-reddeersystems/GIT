@@ -404,6 +404,7 @@ setMethod(".generateDataFilledWithNA",
           function(object){
 
             ret_vars <- getDataSourceReturnColumnNames(object)
+            ret_vars <- .translateDataSourceColumnNames(object, ret_vars)
             key_vals <- getDataSourceQueryKeyValues(object)
 
             diff <- setdiff(ret_vars, colnames(key_vals))
