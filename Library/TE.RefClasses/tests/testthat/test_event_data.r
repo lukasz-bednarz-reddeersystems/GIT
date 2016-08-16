@@ -1,3 +1,5 @@
+context("Testing EventData")
+
 library(plyr)
 
 
