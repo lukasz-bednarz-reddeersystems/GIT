@@ -1071,7 +1071,7 @@ setMethod("buildTrades","TradeWarehouse",
               tid <- murmur3.32(paste(leg_start,instrument,trader,value_usd,strategy,sep=""))
               object <- updateMap(object,tid,instrument,cnt)
               trade_id <- c(trade_id,tid)
-              trades[cnt] <- new("Trade",
+              trades[[cnt]] <- new("Trade",
                                trade_id = tid,
                                leg_start = leg_start,
                                leg_end = leg_end,
