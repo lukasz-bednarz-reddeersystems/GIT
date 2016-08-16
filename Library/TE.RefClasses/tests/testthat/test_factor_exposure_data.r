@@ -177,7 +177,7 @@ test_that("Can dataRequest() with valid key_values", {
   object <- dataRequest(object, valid.key_vals)
 
   expect_equal(getDataSourceQueryKeyColumnNames(object), colnames(valid.key_vals))
-  expect_equal(getDataSourceQueryKeyValues(object), valid.key_vals)
+  expect_equivalent(getDataSourceQueryKeyValues(object), valid.key_vals)
 
   ret_data <- getReferenceData(object)
   ret_data <- ret_data[with(ret_data, order(Date, InstrumentID, FactorRiskInstrumentID)),]

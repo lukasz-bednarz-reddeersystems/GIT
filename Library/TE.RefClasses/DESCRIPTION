@@ -52,6 +52,7 @@ Collate:
     'virtual_transformation.r'
     'referencedata_transformation.r'
     'risk_model_objectstore_client_functions.r'
+    'strategy_data.r'
     'transformations_handler.r'
     'strategy_portfolio.r'
     'strategy_portfolio_transformations.r'
