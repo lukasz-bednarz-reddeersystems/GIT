@@ -41,6 +41,7 @@ Collate:
     'implied_factor_returns_data.r'
     'instrument_betas_data.r'
     'market_data.r'
+    'market_style_data.r'
     'portfolio.r'
     'transformation_functions.r'
     'virtual_transformation.r'

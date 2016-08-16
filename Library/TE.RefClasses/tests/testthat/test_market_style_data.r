@@ -1,13 +1,14 @@
-context("Testing ImpliedFactorReturnsData")
+context("Testing MarketStyleData")
+
 
 #############################
 #
-# ImpliedFactorReturnsData Tests
+# MarketStyleData Tests
 #
 #############################
 
-tested.class          <-  "ImpliedFactorReturnsData"
-valid.component       <- "ImpliedFactorReturns"
+tested.class          <-  "MarketStyleData"
+valid.component       <- "MarketStyle"
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.lookback        <- 150
@@ -119,8 +120,9 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
   object <- new(tested.class)
 
   nexist.key_vals <- data.frame(Date = seq(from = today() +1,
-                                                  to = today() + 5,
-                                                  by = "1 day"))
+                                           to = today() + 5,
+                                           by = "1 day"))
+
   diff <- setdiff(valid.required_colnms,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
