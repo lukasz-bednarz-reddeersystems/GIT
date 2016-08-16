@@ -4,6 +4,11 @@
 #' @include common_composite_warehouse.r
 NULL
 
+
+#' An S4 class handling queries to WarehouseObjectstore.
+#'
+#' @export
+
 setClass(
 	Class = "WarehouseQuery",
 	prototype = prototype(
@@ -13,6 +18,16 @@ setClass(
 	),
 	contains =c("ObjectQuery")
 )
+
+
+#' An S4 class for storing daily risk models.
+#'
+#' Inherits from "VirtualObjectStore"
+#'
+#' @slot key_map  "KeyMap"
+#' @slot warehouse_q "WarehouseQuery"
+#'
+#' @export
 
 setClass(
 	Class = "WarehouseObjectStore",
@@ -39,6 +54,18 @@ setMethod("generateKey","WarehouseObjectStore",
 		  }
 )
 
+#' Get warehouse from WarehouseObjectstore for given keys
+#'
+#' Retrieves from WarehouseObjectstore warehouse matching
+#' keys passed as arguments.
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @param trader_id "integer", trader ID
+#' @param start "Date" start date of Warehouse
+#' @param end "Date" end date of Warehouse
+#' @return \code{wh} object of class "CompositeWarehouse" if present otherwise NULL
+#' @export
+
 setGeneric("getWarehouseFromStore",function(object,trader_id,start,end){standardGeneric("getWarehouseFromStore")})
 setMethod("getWarehouseFromStore","WarehouseObjectStore",
 	      function(object,trader_id,start,end){
@@ -57,6 +84,18 @@ setMethod("getWarehouseFromStore","WarehouseObjectStore",
 	      	return(wh)
 	      }
 )
+
+
+#' Query WarehouseObjectstore for given keys
+#'
+#' Updates Warehouse if it doesn't contain data.
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @param trader_id "integer", trader ID
+#' @param start "Date" start date of Warehouse
+#' @param end "Date" end date of Warehouse
+#' @return \code{object} object object of class "WarehouseObjectStore"
+#' @export
 
 setGeneric("queryWarehouseStore",function(object,trader_id,start,end){standardGeneric("queryWarehouseStore")})
 setMethod("queryWarehouseStore","WarehouseObjectStore",
@@ -80,6 +119,8 @@ setMethod("queryWarehouseStore","WarehouseObjectStore",
 		  	return(object)
 		  }
 )
+
+
 
 setGeneric("updateWarehouseStore",function(object,keys){standardGeneric("updateWarehouseStore")})
 setMethod("updateWarehouseStore","WarehouseObjectStore",
