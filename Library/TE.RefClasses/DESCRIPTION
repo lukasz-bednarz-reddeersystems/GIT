@@ -7,7 +7,8 @@ Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.co
 Description: Pakckage is implementing Reference Classes for handling,
     of various data needed for Trading Analytics Engine
 Depends:
-    R (>= 3.3.0)
+    R (>= 3.3.0),
+    TE.DataAccess,
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -35,6 +36,7 @@ Collate:
     'risk_model_handler.r'
     'risk_model_objectstore_client.r'
     'factor_correlation_data.r'
+    'instrument_betas_data.r'
     'portfolio.r'
     'transformation_functions.r'
     'virtual_transformation.r'

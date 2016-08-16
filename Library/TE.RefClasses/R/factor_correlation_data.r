@@ -12,7 +12,7 @@ NULL
 #'
 #' Implements storage for Factor Correlation
 #'
-#' Inherits from "VirtualReferenceData"
+#' Inherits from "VirtualReferenceData
 
 setClass(
   Class                = "VirtualFactorCorrelationData",

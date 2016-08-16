@@ -8,11 +8,11 @@
 #' @name TE.RefClasses
 #'
 #' @import TE.DataAccess
+#' @import methods
+#' @importClassesFrom TE.DataAccess DailyRiskModelQuery
 #' @import lubridate
 #' @importFrom hash hash values names.hash keys
 #' @importClassesFrom hash hash
-#' @importFrom methods setClass setGeneric setMethod setClassUnion
-#' @importFrom R.methodsS3 isGenericS4
 #' @importFrom RODBC odbcConnect sqlQuery
 NULL
 ## NULL

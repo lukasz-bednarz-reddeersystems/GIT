@@ -8,6 +8,6 @@
 Implements storage for Factor Correlation
 }
 \details{
-Inherits from "VirtualReferenceData"
+Inherits from "VirtualReferenceData
 }
 
