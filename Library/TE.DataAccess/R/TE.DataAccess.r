@@ -12,7 +12,7 @@
 #' @import lubridate
 #' @import XML
 #' @import methods
-#' @importFrom hashFunction cityhash.64
+#' @importFrom hashFunction cityhash.64 murmur3.32
 #' @importFrom plyr rbind.fill
 #' @importFrom XML xmlTreeParse
 #' @importFrom R.methodsS3 isGenericS4
