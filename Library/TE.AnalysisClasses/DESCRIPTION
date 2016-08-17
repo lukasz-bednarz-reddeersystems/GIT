@@ -1,8 +1,25 @@
 Package: TE.AnalysisClasses
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Analysis Classes for RedDeer Trading Enhancement Engine
 Version: 0.1.0
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
+                  role = c("aut", "cre"))
+Description: Package is implementing Analysis and Report Classes for creating reports with data and graphs for Trading Analytics Engine.
+Depends:
+    R (>= 3.3.0),
+    TE.RefClasses (>= 0.1.0),
+License: file LICENSE
 LazyData: TRUE
+Imports:
+    TE.RefClasses,
+    methods,
+    lubridate,
+    quantmod,
+    DMwR,
+    ggplot2,
+Suggests:
+    testthat
+Collate:
+  analysis_block.r
+  analysis_block_functions.r
+RoxygenNote: 5.0.1
