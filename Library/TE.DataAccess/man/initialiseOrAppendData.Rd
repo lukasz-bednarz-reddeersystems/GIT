@@ -17,7 +17,4 @@ initialiseOrAppendData(object, data)
 \description{
 Appends new data in the dataset or initializes it if not done
 }
-\examples{
-initialiseOrAppendData(object,data)
-}
 

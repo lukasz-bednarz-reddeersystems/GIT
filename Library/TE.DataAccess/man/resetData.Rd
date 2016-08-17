@@ -15,7 +15,4 @@ resetData(object, data)
 \description{
 Reset internal data storage to empty dataframe in the dataset
 }
-\examples{
-resetData(object,data)
-}
 

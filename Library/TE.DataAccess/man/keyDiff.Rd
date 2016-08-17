@@ -19,7 +19,4 @@ keyDiff(object, key_values)
 Find set difference between stored keys and argument value
 stores the result internaly
 }
-\examples{
-keyDiff(object,key_values)
-}
 

@@ -1,4 +1,4 @@
-context("Testing Transformation")
+context("Testing Portfolio")
 
 #########################
 #
@@ -252,9 +252,9 @@ test_that("Cannot appendVariable with invalid input", {
 
 test_that("Can buildPortfolioHistory", {
 
-  skip_if_not(getOption("RunLongTests"))
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
-  portf <- new("StrategyPortfolio", trader = 11)
+  portf <- new("StrategyPortfolio", trader_id = 11)
   expect_is(portf, "StrategyPortfolio")
   expect_equal(getTraderID(portf),11)
 
@@ -281,6 +281,7 @@ test_that("Can buildPortfolioHistory", {
 
 
 test_that("Can attachTransformations", {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   portf <- new("StrategyPortfolio", trader_id = 11)
   start <- as.Date("2016-04-01")
@@ -289,7 +290,7 @@ test_that("Can attachTransformations", {
   portf.data <- getReferenceData(portf)
   tested.transf <- "DaysSinceLastFlatTransformation"
 
-  skip_if_not(getOption("RunLongTests"))
+
 
   portf <- new("StrategyPortfolio", trader_id = 11)
   expect_is(portf, "StrategyPortfolio")

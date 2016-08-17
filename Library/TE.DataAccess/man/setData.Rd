@@ -19,7 +19,4 @@ setData(object, data, override_full_index = FALSE)
 \description{
 Sets new data in the DataSet
 }
-\examples{
-setData(object,data,override_full_index=FALSE)
-}
 

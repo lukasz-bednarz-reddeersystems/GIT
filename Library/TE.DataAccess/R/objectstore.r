@@ -10,10 +10,13 @@ setClass(
 		fields     = "character",
 		values     = "character",
 		known_keys = "data.frame"
-	)
+	),
+	contains = c("VIRTUAL")
 )
 
+
 setGeneric("hashKey",function(object,key){standardGeneric("hashKey")})
+
 
 setGeneric("setQueryValuesFromKey",function(object,key){standardGeneric("setQueryValuesFromKey")})
 setMethod("setQueryValuesFromKey","ObjectQuery",
@@ -35,6 +38,7 @@ setMethod("getQueryValueByField","ObjectQuery",
           }
 )
 
+
 setGeneric("setQueryValueByField",function(object,field,value){standardGeneric("setQueryValueByField")})
 setMethod("setQueryValueByField","ObjectQuery",
           function(object,field,value){
@@ -42,6 +46,8 @@ setMethod("setQueryValueByField","ObjectQuery",
             return(object)
           }
 )
+
+
 
 setGeneric("getIdentifier",function(object){standardGeneric("getIdentifier")})
 setMethod("getIdentifier","ObjectQuery",
@@ -109,6 +115,7 @@ setMethod("initialize", "VirtualObjectStore",
           }
 )
 
+#' @export
 setGeneric("getID",function(object){standardGeneric("getID")})
 setMethod("getID","VirtualObjectStore",
           function(object){
@@ -116,12 +123,14 @@ setMethod("getID","VirtualObjectStore",
           }
 )
 
+
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",
 		  function(object){
 		  	return(paste(object@data_path,"/",object@id,"_objectstore.rds",sep=""))
 		  }
 )
+
 
 setGeneric("loadObject",function(object){standardGeneric("loadObject")})
 setMethod("loadObject","VirtualObjectStore",
@@ -133,6 +142,7 @@ setMethod("loadObject","VirtualObjectStore",
 		  }
 )
 
+
 setGeneric("saveObject",function(object){standardGeneric("saveObject")})
 setMethod("saveObject","VirtualObjectStore",
 		  function(object){
@@ -141,6 +151,7 @@ setMethod("saveObject","VirtualObjectStore",
 		  	saveRDS(object@stored,pth)
 		  }
 )
+
 
 setGeneric("placeInObjectStore",function(object,item,name){standardGeneric("placeInObjectStore")})
 setMethod("placeInObjectStore","VirtualObjectStore",

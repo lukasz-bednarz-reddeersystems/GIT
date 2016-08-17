@@ -96,6 +96,10 @@ setClass(
 		contains = c("PPModelSummaryComputation")
 )
 
+#' An S4 class handling batch querries.
+#'
+#' @export
+
 setClass(
 	Class          = "BatchQuery",
 	representation = representation(
@@ -328,6 +332,12 @@ setMethod("setppModelIndex","PPModel",
 	      	return(object)
 	      }
 )
+
+#' run Pre Processor Model computation
+#'
+#'
+#' @param object object of class "PPModel"
+#' @export
 
 setGeneric("runPreProcessorModel",function(object){standardGeneric("runPreProcessorModel")})
 setMethod("runPreProcessorModel","PPModel",

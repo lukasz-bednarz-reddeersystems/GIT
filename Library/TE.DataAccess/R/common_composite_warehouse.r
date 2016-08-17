@@ -1,4 +1,23 @@
 #' @include common_trade_factory.r
+NULL
+
+#' An S4 for composite Warehouse.
+#'
+#' Stores information about trades from multiple
+#' warehouses
+#'
+#' @slot warehouse_names   "character"
+#' @slot orig_trader_ids   "integer"
+#' @slot orig_instruments  "list"
+#' @slot orig_positions    "list"
+#' @slot orig_psn_smries   "list"
+#' @slot orig_dates        "list"
+#' @slot orig_trade_ids    "list"
+#' @slot orig_pads         "list"
+#' @slot orig_maps         "list"
+#' @slot orig_dtr_stores   "list"
+#'
+#' @export
 
 setClass(
 	Class                = "CompositeWarehouse",
@@ -163,7 +182,7 @@ setMethod("getWarehouse","CompositeWarehouse",
 	      		all_trades <- getInstrumentTrades(object,instrument)
 	      		for(trade in all_trades){
 	      			if(trade@trade_id %in% get_trades){
-	      				tl[cnt] <- trade
+	      				tl[[cnt]] <- trade
 	      				nmes <- c(nmes,trade@trade_id)
 	      				cnt <- cnt + 1
 	      			}

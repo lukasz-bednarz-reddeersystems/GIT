@@ -14,13 +14,13 @@ NULL
 #' Handles queries and implements accessors to
 #' internal data.
 #' Inherits from "VirtualReferenceData"
-#' @slot key_cols           = "character",  query keys column names
-#' @slot key_values         = "data.frame",  query keys
-#' @slot values             = "character",  columns that neeed to be returned from datastore
-#' @slot column_name_map    = "hash",  perl-type hash containing mapping of source column names to output column names
-#' @slot non_na_cols        = "character",  columns upon which we remove rows to forced to have non NA values
-#' @slot factorized_cols    = "character",  factor columns that are expanded to  new columns
-#' @slot factorization_keys = "character", key columns that are used as a unique keys in factorization
+#' @slot key_cols           "character",  query keys column names
+#' @slot key_values         "data.frame",  query keys
+#' @slot values             "character",  columns that neeed to be returned from datastore
+#' @slot column_name_map    "hash",  perl-type hash containing mapping of source column names to output column names
+#' @slot non_na_cols        "character",  columns upon which we remove rows to forced to have non NA values
+#' @slot factorized_cols    "character",  factor columns that are expanded to  new columns
+#' @slot factorization_keys "character", key columns that are used as a unique keys in factorization
 
 setClass(
   Class                = "VirtualDataSourceClient",
@@ -283,6 +283,7 @@ setMethod(".removeNAReferenceData",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
+#' @export
 
 setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
 

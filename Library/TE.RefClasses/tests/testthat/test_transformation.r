@@ -41,7 +41,6 @@ test_that("Can getComputedVariablesNames", {
   req.vars <- c("A", "B", "C")
 
   expect_equal(getComputedVariablesNames(comp), character())
-
 })
 
 
@@ -476,6 +475,9 @@ portf <- new("StrategyPortfolio", trader_id = 11)
 portf2 <- new("StrategyPortfolio", trader_id = 11)
 
 test_that("Can buildPortfolioHistory", {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   expect_is(portf, "StrategyPortfolio")
   expect_equal(getTraderID(portf),11)
 
@@ -503,11 +505,16 @@ test_that("Can buildPortfolioHistory", {
 # DaysSinceLastFlatTransformationComputation tests
 #
 #############################################################
+
 start <- as.Date("2016-04-01")
 end <- as.Date("2016-05-04")
-portf <- buildPortfolioHistory(portf, start, end)
-portf.data <- getReferenceData(portf)
-portf2 <- setReferenceData(portf2, getReferenceData(portf)[1:100,])
+
+if (as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE"))) {
+  portf <- buildPortfolioHistory(portf, start, end)
+  portf.data <- getReferenceData(portf)
+  portf2 <- setReferenceData(portf2, getReferenceData(portf)[1:100,])
+}
+
 tested.class <- "DaysSinceLastFlatTransformationComputation"
 req.vars <- c('Date','InstrumentID','Weight')
 comp.vars <- c('DaysSinceLastFlat')
@@ -546,6 +553,9 @@ test_that(paste("Can getOutputVariablesNames on", tested.class,"class"), {
 })
 
 test_that(paste("Can setInputData with valid input on", tested.class,"class"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
@@ -562,6 +572,9 @@ test_that(paste("Can setInputData with valid input on", tested.class,"class"), {
 })
 
 test_that(paste("Cannot setInputData with invalid input on", tested.class,"class"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
@@ -586,6 +599,8 @@ test_that(paste("Cannot setInputData with invalid input on", tested.class,"class
 
 test_that(paste("Can .setOutputData with valid data on", tested.class,"class"), {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
@@ -602,6 +617,9 @@ test_that(paste("Can .setOutputData with valid data on", tested.class,"class"), 
 })
 
 test_that(paste("Cannot setOutputData with invalid input on", tested.class,"class"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
@@ -623,6 +641,8 @@ test_that(paste("Cannot setOutputData with invalid input on", tested.class,"clas
 })
 
 test_that(paste("Can computeTransformation on", tested.class,"class"), {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   comp <- new(tested.class)
   expect_is(comp, tested.class)
 
@@ -667,6 +687,8 @@ test_that(paste("Canot create", tested.class ,"object with invalid argument"), {
 
 test_that(paste("Can create", tested.class ,"object with valid argument"), {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, NULL)
   expect_is(transf, tested.class)
 
@@ -680,6 +702,8 @@ test_that(paste("Can create", tested.class ,"object with valid argument"), {
 
 
 test_that(paste("Can getRequiredVariablesNames on", tested.class,"class"), {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
   expect_equal(getRequiredVariablesNames(transf), req.vars)
@@ -688,6 +712,8 @@ test_that(paste("Can getRequiredVariablesNames on", tested.class,"class"), {
 
 
 test_that(paste("Can getComputation on", tested.class,"class"), {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
   expect_equal(getRequiredVariablesNames(transf), req.vars)
@@ -699,6 +725,8 @@ test_that(paste("Can getComputation on", tested.class,"class"), {
 
 
 test_that(paste("Can setComputation on", tested.class,"class with Valid input"), {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
   expect_equal(getRequiredVariablesNames(transf), req.vars)
@@ -717,6 +745,9 @@ test_that(paste("Can setComputation on", tested.class,"class with Valid input"),
 
 
 test_that(paste("Can setComputationInput on", tested.class,"class with Valid input"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
   expect_equal(getRequiredVariablesNames(transf), req.vars)
@@ -734,6 +765,9 @@ test_that(paste("Can setComputationInput on", tested.class,"class with Valid inp
 
 
 test_that(paste("Cannot setComputationInput on", tested.class,"class with invalid input"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
   expect_equal(getRequiredVariablesNames(transf), req.vars)
@@ -762,6 +796,8 @@ test_that(paste("Cannot setComputationInput on", tested.class,"class with invali
 
 test_that(paste("Can setPortfolio on", tested.class ,"object with valid argument"), {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
 
@@ -777,6 +813,8 @@ test_that(paste("Can setPortfolio on", tested.class ,"object with valid argument
 
 
 test_that(paste("Cannot setPortfolio on", tested.class ,"object with invalid argument"), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)
@@ -794,6 +832,8 @@ test_that(paste("Cannot setPortfolio on", tested.class ,"object with invalid arg
 
 
 test_that(paste("Can triggerComputation on", tested.class ), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   transf <- new(tested.class, portf)
   expect_is(transf, tested.class)

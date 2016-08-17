@@ -25,7 +25,4 @@ innerJoinFrame(object, frame, key_cols, aliases = NULL, joinmode = "inner")
 Join existing data in dataset with incomming data
 inner join might result in empty data
 }
-\examples{
-innerJoinFrame(object,frame,key_cols,aliases=NULL,joinmode='inner')
-}
 

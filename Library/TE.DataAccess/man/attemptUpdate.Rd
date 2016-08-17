@@ -19,7 +19,4 @@ attemptUpdate(object, data, new_data)
 \description{
 Safely attempts to update dataset with new data
 }
-\examples{
-attemptUpdate(object,data,new_data)
-}
 

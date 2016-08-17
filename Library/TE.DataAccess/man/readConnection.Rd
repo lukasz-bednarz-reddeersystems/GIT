@@ -15,7 +15,4 @@ readConnection(object)
 \description{
 Read data from socket
 }
-\examples{
-readConnection(object)
-}
 

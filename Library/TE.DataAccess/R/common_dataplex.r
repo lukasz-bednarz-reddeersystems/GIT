@@ -17,15 +17,13 @@
 NULL
 
 
-
-
 setClass(
   Class          = "DataPlex",
   slots = c(
     warehouse    = "environment"
   ),
   prototype = list(
-    datastore    = new.env()
+    warehouse    = new.env()
   )
 )
 
@@ -103,7 +101,17 @@ if(exists("dataplex_created")==FALSE){
 }
 
 
-#Global data access function
+
+#' Request data from datastore
+#'
+#' Global data access function
+#'
+#' @param store character, store name.
+#' @param keys data.frame store query keys
+#' @param variables character vector of variables to pull from store
+#' @return \code{rval} data.frame, result of query
+#' @export
+
 data_request <- function(store,keys,variables){
   rval <- NULL
   dataplex <- new("DataPlex")
@@ -112,47 +120,166 @@ data_request <- function(store,keys,variables){
   str_obj <- queryStore(str_obj,keys,variables)
   rval  <- getLastResult(str_obj)
 
+  dataplex <- setDataPlexStoreValue(dataplex, store, str_obj)
+
   return (rval)
 }
 
 
+
+
+setClass(
+  Class          = "WarehouseCache",
+  slots = c(
+    cache    = "environment"
+  ),
+  prototype = list(
+    cache    = new.env()
+  )
+)
+
+setGeneric("getWarehouseObjectstoreCache",
+           function(object){standardGeneric("getWarehouseObjectstoreCache")})
+
+setMethod("getWarehouseObjectstoreCache","WarehouseCache",
+          function(object){
+            return(object@cache)
+          }
+)
+
+setGeneric("getWarehouseObjectstoreCacheItem",
+           function(object, name){standardGeneric("getWarehouseObjectstoreCacheItem")})
+
+setMethod("getWarehouseObjectstoreCacheItem",
+          signature(object = "WarehouseCache",
+                    name = "character"),
+          function(object, name){
+            cache <- getWarehouseObjectstoreCache(object)
+
+            return(cache[[name]])
+          }
+)
+
+
+setGeneric("isWarehouseObjectstoreCacheItemPresent",
+           function(object, name){standardGeneric("isWarehouseObjectstoreCacheItemPresent")})
+
+setMethod("isWarehouseObjectstoreCacheItemPresent",
+          signature(object = "WarehouseCache",
+                    name = "character"),
+          function(object, name){
+            cache <- getWarehouseObjectstoreCache(object)
+
+            return(name %in% ls(cache))
+          }
+)
+
+
+setGeneric("setWarehouseObjectstoreCacheItemValue",
+           function(object, name, value){standardGeneric("setWarehouseObjectstoreCacheItemValue")})
+
+setMethod("setWarehouseObjectstoreCacheItemValue",
+          signature(object = "WarehouseCache",
+                    name = "character",
+                    value = "ANY"),
+          function(object, name, value){
+            cache <- getWarehouseObjectstoreCache(object)
+            cache[[name]] <- value
+            return(object)
+          }
+)
+
 if(exists("warehouse_store_created")==FALSE){
 
-  all_stores <- new.env(parent=emptyenv())
-
-  refresh <- function(name){
-    if(name%in%ls(all_stores)==FALSE){
-      message("Warehouse not stored, creating new store")
-    }
-    eval_str <- paste("all_stores[['",name,"']]<<-warehouse_objectstore_factory('",name,"')",sep="")
-    eval(parse(text=eval_str))
-  }
-
-  #Global trade data store
-  warehouse_request <- function(name,trader,start,end){
-    refresh(name)
-    all_stores[[name]] <- queryWarehouseStore(all_stores[[name]],trader,start,end)
-    warehouse <- getWarehouseFromStore(all_stores[[name]],trader,start,end)
-    all_stores[[name]] <- NULL
-    return(warehouse)
-  }
-
-  warehouse_push_features <- function(name,warehouse,replace_features=FALSE){
-    refresh(name)
-    all_stores[[name]] <- pushFeatures(all_stores[[name]],warehouse,keep_old=!replace_features)
-    commitWarehouseStore(all_stores[[name]])
-    all_stores[[name]] <- NULL
-  }
-
-  warehouse_push_summary <- function(name,warehouse){
-    refresh(name)
-    all_stores[[name]] <- pushSummary(all_stores[[name]],warehouse)
-    commitWarehouseStore(all_stores[[name]])
-    all_stores[[name]] <- NULL
-  }
-
   warehouse_store_created <- TRUE
+
+  devtools::use_data(warehouse_store_created, overwrite = TRUE)
 }
+
+
+#' Refresh Warehouse Cache
+#'
+#' Creates new instance of WarehouseObjectstore and
+#' stores it in cache
+#'
+#' @param name warehouse objectstore name
+
+refresh <- function(name) {
+
+  wh_cache <- new("WarehouseCache")
+
+  if(isWarehouseObjectstoreCacheItemPresent(wh_cache, name)==FALSE){
+    message("Warehouse not stored, creating new store")
+  }
+  eval_str <- paste("all_stores[['",name,"']]<<-warehouse_objectstore_factory('",name,"')",sep="")
+  wh_cache <- setWarehouseObjectstoreCacheItemValue(wh_cache,
+                                                    name,
+                                                    warehouse_objectstore_factory(name))
+}
+
+##############################
+#
+# Global trade data store
+#
+##############################
+
+#' Query Warehouse for given keys
+#'
+#' Queries Warehouse for data for given keys.
+#' Query goes via warehouse objectstore cache.
+#'
+#' @param name "character" warehouse objectstore name
+#' @param trader "integer" trader ID
+#' @param start "Date" start date of warehouse
+#' @param end "Date" end date of warehouse
+#' @return \code{warehouse} object of type TradeWarehouse if present NULL otherwise
+#'
+#' @export
+
+warehouse_request <- function(name,trader,start,end){
+  refresh(name)
+
+  wh_cache <- new("WarehouseCache")
+  wh_str <- getWarehouseObjectstoreCacheItem(wh_cache, name)
+
+  wh_str <- queryWarehouseStore(wh_str,trader,start,end)
+  warehouse <- getWarehouseFromStore(wh_str,trader,start,end)
+
+  wh_cache <-  setWarehouseObjectstoreCacheItemValue(wh_cache,
+                                                     name,
+                                                     NULL)
+  return(warehouse)
+}
+
+warehouse_push_features <- function(name,warehouse,replace_features=FALSE){
+  refresh(name)
+
+  wh_cache <- new("WarehouseCache")
+  wh_str <- getWarehouseObjectstoreCacheItem(wh_cache, name)
+
+  wh_str <- pushFeatures(wh_str, warehouse, keep_old=!replace_features)
+  commitWarehouseStore(wh_str)
+
+  wh_cache <-  setWarehouseObjectstoreCacheItemValue(wh_cache,
+                                                     name,
+                                                     NULL)
+}
+
+warehouse_push_summary <- function(name,warehouse){
+  refresh(name)
+
+  wh_cache <- new("WarehouseCache")
+  wh_str <- getWarehouseObjectstoreCacheItem(wh_cache, name)
+
+  wh_str <- pushSummary(wh_str,warehouse)
+  commitWarehouseStore(wh_str)
+
+  wh_cache <-  setWarehouseObjectstoreCacheItemValue(wh_cache,
+                                                     name,
+                                                     NULL)
+}
+
+
 
 if(exists("analysis_store_created")==FALSE){
 

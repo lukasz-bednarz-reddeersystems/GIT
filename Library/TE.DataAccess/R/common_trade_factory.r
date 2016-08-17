@@ -26,6 +26,29 @@ setClass(
 
 # @exportClass NullableDate
 setClassUnion("NullableDate",c('NULL','Date'))
+
+#' An S4 class for storing trade info.
+#'
+#' Stores information about trade leg together with
+#' all necessary "features" that can be attached
+#'
+#'
+#' @slot trade_id      "numeric",
+#' @slot leg_start     "Date",
+#' @slot leg_end       "NullableDate",
+#' @slot long          "logical",
+#' @slot value_usd     "numeric",
+#' @slot features      "list",
+#' @slot daily_data    "DataSet",
+#' @slot strategy      "character",
+#' @slot trader        "character",
+#' @slot instrument    "numeric",
+#' @slot consolidation "data.frame",
+#' @slot dly_data_pad  "integer",
+#' @slot datekey       "character"
+#'
+#' @export
+
 setClass(
   Class          = "Trade",
   representation = representation(
@@ -210,6 +233,24 @@ setMethod("isPsnLong","Trade",
   }
 )
 
+#' An S4 class for storing trades
+#'
+#' Stores information about trades in given timespan for given trader.
+#'
+#' @slot trades        "environment",
+#' @slot instruments   "numeric",
+#' @slot features      "character",
+#' @slot trader_id     "integer",
+#' @slot positions     "PositionComposite",
+#' @slot psn_summary   "DataSet",
+#' @slot start_date    "Date",
+#' @slot end_date      "Date",
+#' @slot dly_data_pad  "numeric",
+#' @slot map           "list",
+#' @slot fctr_datstr   "character"
+#'
+#' @export
+
 setClass(
   Class          = "TradeWarehouse",
   representation = representation(
@@ -236,6 +277,8 @@ setClass(
 #for objects along the same branch in the class hierachy.
 #Must ensure new environments created since they are passed
 #by reference.
+#' @export
+
 setMethod("initialize", "TradeWarehouse",
           function(.Object){
             .Object@trades <- new.env(parent = emptyenv())
@@ -786,12 +829,28 @@ setMethod("getPriceSnapshot","TradeWarehouse",
           }
 )
 
+#' Get position data from Warehouse
+#'
+#' Returns all position data stored in Warehouse
+#'
+#' @param object object of class "TradeWarehouse"
+#' @return \code{positions} object of class "DataSet" with position data
+#' @export
+
 setGeneric("getRawPositionData",function(object){standardGeneric("getRawPositionData")})
 setMethod("getRawPositionData","TradeWarehouse",
           function(object){
             return(object@positions@data)
           }
 )
+
+#' Get position summary data from Warehouse
+#'
+#' Returns all position summary data stored in Warehouse
+#'
+#' @param object object of class "TradeWarehouse"
+#' @return \code{psn_summary} object of class "DataSet" with position summary data
+#' @export
 
 setGeneric("getRawPositionSummary",function(object){standardGeneric("getRawPositionSummary")})
 setMethod("getRawPositionSummary","TradeWarehouse",
@@ -1012,7 +1071,7 @@ setMethod("buildTrades","TradeWarehouse",
               tid <- murmur3.32(paste(leg_start,instrument,trader,value_usd,strategy,sep=""))
               object <- updateMap(object,tid,instrument,cnt)
               trade_id <- c(trade_id,tid)
-              trades[cnt] <- new("Trade",
+              trades[[cnt]] <- new("Trade",
                                trade_id = tid,
                                leg_start = leg_start,
                                leg_end = leg_end,

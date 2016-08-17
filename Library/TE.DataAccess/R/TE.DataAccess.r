@@ -11,7 +11,8 @@
 #'
 #' @import lubridate
 #' @import XML
-#' @importFrom methods setClass setGeneric setMethod setClassUnion
+#' @import methods
+#' @importFrom hashFunction cityhash.64 murmur3.32
 #' @importFrom plyr rbind.fill
 #' @importFrom XML xmlTreeParse
 #' @importFrom R.methodsS3 isGenericS4

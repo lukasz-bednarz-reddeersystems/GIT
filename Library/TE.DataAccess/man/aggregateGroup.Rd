@@ -23,7 +23,4 @@ aggregateGroup(object, target_cols, group_by, fn, agg_unique = FALSE)
 \description{
 Runs aggregate on data stored in Dataset
 }
-\examples{
-aggregateGroup(object,target_cols,group_by,fn,agg_unique=FALSE)
-}
 

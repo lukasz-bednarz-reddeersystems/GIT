@@ -1,12 +1,24 @@
 #' @include datastore.r global_configs.r
 NULL
 
+#' Generate PPModel objectstore name from keys
+#'
+#' Creates PPModel ObjectStore and loads data from
+#' associated file if exists.
+#'
+#' @param keys "data.frame", keys from which name(s) of objectstore is created
+#'
+#' @export
+
 get_ppmodel_objectstore_name <- function(keys) {
   rv <- apply(keys, 1, function(x){paste0(c("ppmodel_store", unlist(x)), collapse = "_")})
   return(rv)
 }
 
 
+#' An S4 class handling queries to PPModelObjectstore.
+#'
+#' @export
 
 setClass(
   Class          = "PPModelQuery",
@@ -55,6 +67,19 @@ setMethod("isPPModelStored","PPModelQuery",
           }
 )
 
+
+#' An S4 class implementing of PPModel Objectstore.
+#'
+#' Implements storage, queries, and update of PPModels
+#' in an object and saving in related file.
+#'
+#' Inherits from "VirtualObjectStore"
+#'
+#' @slot warehouse_q      "PPModelQuery"
+#' @slot qry_store_nme    "character",
+#'
+#' @export
+
 setClass(
   Class          = "PPModelObjectStore",
   representation = representation(
@@ -70,7 +95,8 @@ setClass(
   contains = c("VirtualObjectStore")
 )
 
-setMethod("initialize", "VirtualObjectStore",
+#' @export
+setMethod("initialize", "PPModelObjectStore",
           function(.Object,id){
             .Object@id <- id
             .Object
@@ -85,6 +111,17 @@ setMethod("initialisePPModelStore","PPModelObjectStore",
             return(object)
           }
 )
+
+#' Query store for PPModel
+#'
+#' Querries PPModel Objectstore for PPModel stored under given key
+#' Returns PPModel if present NULL otherwise
+#'
+#' @param object object of class "PPModelObjectStore"
+#' @param key "data.frame" with key related to query
+#' @return \code{rval} object of class "PPModel"
+#'
+#' @export
 
 setGeneric("queryPPModelStore",function(object,key){standardGeneric("queryPPModelStore")})
 setMethod("queryPPModelStore","PPModelObjectStore",
@@ -103,6 +140,18 @@ setMethod("queryPPModelStore","PPModelObjectStore",
             return(rval)
           }
 )
+
+#' Store PPmodel in Store
+#'
+#' Stores PPModel and reated Query in Store
+#'
+#' @param object object of class "PPModelObjectStore"
+#' @param ppmodel_object object of class "PPModel"
+#' @param key "data.frame" with key related to query
+#' @param force "logical" force update of PPModel if it is already present
+#' @return \code{object} object of class "PPModelObjectStore"
+#'
+#' @export
 
 setGeneric("updatePPModelStore",function(object,ppmodel_object,key,force=FALSE){standardGeneric("updatePPModelStore")})
 setMethod("updatePPModelStore","PPModelObjectStore",
@@ -123,6 +172,16 @@ setMethod("updatePPModelStore","PPModelObjectStore",
           }
 )
 
+
+#' Commit store data to file
+#'
+#' Saves data stored in the object into file.
+#'
+#' @param object object of class "PPModelObjectStore"
+#' @return \code{object} object of class "PPModelObjectStore"
+#'
+#' @export
+
 setGeneric("commitPPModelStore",function(object){standardGeneric("commitPPModelStore")})
 setMethod("commitPPModelStore","PPModelObjectStore",
           function(object){
@@ -138,6 +197,15 @@ setMethod("getPPModelStoreContents","PPModelObjectStore",
             return(names)
           }
 )
+
+#' Create PPModelObjectstore object
+#'
+#' Creates PPModel ObjectStore and loads data from
+#' associated file if exists.
+#'
+#' @param name "character", name of the objectstore
+#'
+#' @export
 
 ppmodel_objectstore_factory <- function(name){
   message("Initialising ppmodel store ...")

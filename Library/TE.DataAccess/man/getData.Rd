@@ -15,7 +15,4 @@ getData(object)
 \description{
 Return data stored in the DataSet
 }
-\examples{
-getData(object)
-}
 
