@@ -43,7 +43,7 @@ setClass(
   validity = referencedata_validity
 )
 
-
+#' @exportClass NullableReferenceData
 setClassUnion("NullableReferenceData", c("VirtualReferenceData", "NULL"))
 
 
