@@ -96,6 +96,10 @@ setClass(
 		contains = c("PPModelSummaryComputation")
 )
 
+#' An S4 class handling batch querries.
+#'
+#' @export
+
 setClass(
 	Class          = "BatchQuery",
 	representation = representation(

@@ -1,6 +1,11 @@
 #' @include datastore.r global_configs.r objectstore.r
 NULL
 
+
+#' An S4 class handling queries to AnalysisObjectstore.
+#'
+#' @export
+
 setClass(
   Class          = "AnalysisQuery",
   prototype = prototype(

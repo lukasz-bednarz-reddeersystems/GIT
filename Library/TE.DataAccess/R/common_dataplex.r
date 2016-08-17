@@ -151,7 +151,7 @@ setGeneric("getWarehouseObjectstoreCacheItem",
            function(object, name){standardGeneric("getWarehouseObjectstoreCacheItem")})
 
 setMethod("getWarehouseObjectstoreCacheItem",
-          signature(object = "DataPlex",
+          signature(object = "WarehouseCache",
                     name = "character"),
           function(object, name){
             cache <- getWarehouseObjectstoreCache(object)
@@ -165,7 +165,7 @@ setGeneric("isWarehouseObjectstoreCacheItemPresent",
            function(object, name){standardGeneric("isWarehouseObjectstoreCacheItemPresent")})
 
 setMethod("isWarehouseObjectstoreCacheItemPresent",
-          signature(object = "DataPlex",
+          signature(object = "WarehouseCache",
                     name = "character"),
           function(object, name){
             cache <- getWarehouseObjectstoreCache(object)
@@ -179,7 +179,7 @@ setGeneric("setWarehouseObjectstoreCacheItemValue",
            function(object, name, value){standardGeneric("setWarehouseObjectstoreCacheItemValue")})
 
 setMethod("setWarehouseObjectstoreCacheItemValue",
-          signature(object = "DataPlex",
+          signature(object = "WarehouseCache",
                     name = "character",
                     value = "ANY"),
           function(object, name, value){

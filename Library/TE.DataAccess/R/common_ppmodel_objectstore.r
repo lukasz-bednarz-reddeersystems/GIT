@@ -16,6 +16,10 @@ get_ppmodel_objectstore_name <- function(keys) {
 }
 
 
+#' An S4 class handling queries to PPModelObjectstore.
+#'
+#' @export
+
 setClass(
   Class          = "PPModelQuery",
   prototype = prototype(
