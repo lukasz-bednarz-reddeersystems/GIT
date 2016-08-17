@@ -19,6 +19,14 @@ history_data$TradeType[history_data$Long==1&history_data$MarketValue>0&history_d
 history_data$TradeType[(history_data$Long==0)&history_data$MarketValue>0&history_data$PsnAge!=0] <- 'Decrease'
 history_data$TradeType[history_data$Long==1&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Decrease'
 history_data$TradeType[(history_data$Long==0)&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Increase'
+history_data$TradeType[(history_data$Long==1)&history_data$PsnAge==0] <- 'OpenLong'
+history_data$TradeType[(history_data$Long==0)&history_data$PsnAge==0] <- 'OpenShort'
+history_data$Hit <- history_data$PnLOutof > 0
+history_data$StockHit <- history_data$CompoundReturnOutof > 0
+history_data$StockWin <- NA
+history_data$StockLoss <- NA
+history_data$StockWin[which(history_data$CompoundReturnOutof>0)] <- history_data$CompoundReturnOutof[which(history_data$CompoundReturnOutof>0)]
+history_data$StockLoss[which(history_data$CompoundReturnOutof<0)] <- history_data$CompoundReturnOutof[which(history_data$CompoundReturnOutof<0)]
 psn_increased <- aggregate(history_data$TradeType,list(Strategy=history_data$Strategy,Visit=history_data$Visit,Instrument=history_data$Instrument),function(x)sum(x=='Increase',na.rm=TRUE)>0)
 colnames(psn_increased) <- c('Strategy','Visit','Instrument','PsnIncreased')
 history_data <- merge(history_data,psn_increased,by=c('Strategy','Visit','Instrument'),all.x=TRUE)
@@ -33,5 +41,4 @@ history_data <- switch_direction(history_data,'SkewInto')
 history_data <- switch_direction(history_data,'SkewOutof')
 history_data <- switch_direction(history_data,'CompoundReturnInto')
 history_data <- switch_direction(history_data,'CompoundReturnOutof')
-trade_data <- history_data
-saveRDS(trade_data,"../te_dashboard_app/trade_data.rds")
+saveRDS(history_data,"../te_dashboard_app/trade_data.rds")

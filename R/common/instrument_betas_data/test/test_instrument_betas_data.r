@@ -212,3 +212,52 @@ test_that("Can dataRequest() with valid key_values", {
 })
 
 
+test_that("Can dataRequest() with valid key_values for long period", {
+  
+  object <- new(tested.class)
+  
+  # instruments with large ammount of events for these days
+  # 5004 5793 6496 7703 8038 5826 5687 6002 6203 
+  # 6    6    7    7    7    8   11   11   12 
+  valid.key_vals <- expand.grid(InstrumentID = c(5004, 5793, 6496, 7703, 8038, 5826, 5687, 6002, 6203), 
+                                Date = seq(from = as.Date('2014-12-31'), 
+                                           to = as.Date('2016-06-30'),
+                                           by = "1 day"))
+  
+  values <- getDataSourceReturnColumnNames(object)
+  
+  # create valid return data.frame
+  start        <- min(valid.key_vals$Date)
+  end          <- max(valid.key_vals$Date)
+  rm_str       <- get_most_recent_model_objectstore(valid.model_prefix, end, valid.lookback)
+  name         <- getID(rm_str)
+  query_data   <- queryDailyRiskModelObjectStore(rm_str,name,valid.lookback,valid.component)
+  query_data   <- getData(query_data) 
+  query_data   <- query_data[query_data$Date >= start & query_data$Date <= end, ]
+  
+  merge_keys   <- valid.key_vals
+  
+  colnames(merge_keys) <- .translateDataSourceColumnNames(object, colnames(merge_keys))
+  
+  valid.ret_data <- merge(query_data, 
+                          merge_keys[merge_keys$Date >= start & merge_keys$Date <= end, ], all.y = TRUE)  
+  
+  colnames(valid.ret_data) <- .translateDataSourceColumnNames(object, colnames(valid.ret_data))
+  
+  rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
+  
+  object <- dataRequest(object, valid.key_vals)
+  
+  expect_true(setequal(getDataSourceQueryKeyColumnNames(object), colnames(valid.key_vals)))
+  expect_true(setequal(getDataSourceQueryKeyValues(object), valid.key_vals))
+  
+  ret_data <- getReferenceData(object)
+  
+  valid.ret_data <- valid.ret_data[colnames(ret_data)]
+  
+  expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
+  
+  expect_equal(ret_data, valid.ret_data)
+  
+}) 
+

@@ -5,7 +5,7 @@ library(plotly)
 
 trader   <- 70
 dates <- c("2016-01-01")
-history_data <- analysis_module_load_mutiple(trader,dates,history_analysis_module_builder,dated_twelve_monthly_lookback)
+history_data <- analysis_module_load_multiple(trader,dates,history_analysis_module_builder,dated_twelve_monthly_lookback)
 history_data <- market_rel_pl(history_data)
 instruments <- unique(history_data$Instrument)
 all_trades <- history_data[!is.na(history_data$TradeID),]

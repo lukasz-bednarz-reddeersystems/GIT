@@ -1,5 +1,6 @@
 library(quantmod)
 library(sets)
+library(lubridate)
 
 undo_bps <- function(value){
   return(value/10000)
@@ -238,7 +239,7 @@ cumulative_stats_onside <- function(history_data,colname,tser_fn,xsec_fn){
   return(list(history_break_point,break_point_totals))
 }
 
-market_rel_pl <- function(history_data,trade_rel=FALSE){
+market_rel_pl <- function(history_data,trade_rel=FALSE,index="^SX5E"){
   if(trade_rel){
     message("Computing market relative quantities against earliest TRADE dates")
     psn_dates <- unique(history_data[!is.na(history_data$TradeID),c('Instrument','TradeDate','Strategy')])  
@@ -263,21 +264,24 @@ market_rel_pl <- function(history_data,trade_rel=FALSE){
     }
     history_data$PriorClosePrice[history_data$Instrument==ins] <- c(history_data$ClosePrice[history_data$Instrument==ins][1],history_data$ClosePrice[history_data$Instrument==ins][1:(length(history_data$ClosePrice[history_data$Instrument==ins])-1)])
   }
-  getSymbols("^SX5E")
-  index <- data.frame(TradeDate=as.Date(rownames(as.data.frame(SX5E))),SX5E$SX5E.Close)
+  getSymbols(index)
+  index <- ifelse(substr(index,1,1)=='^',substr(index,2,nchar(index)),index)
+  idata <- as.data.frame(get(index))
+  cname <- paste(index,".Close",sep="")
+  index <- data.frame(TradeDate=as.Date(rownames(as.data.frame(idata))),idata[cname])
   history_data <- merge(history_data,index,by='TradeDate')
   colnames(min_dates) <- c('Instrument','Strategy','MinDate')
   history_data <- merge(history_data,min_dates,by=c('Instrument','Strategy'),all.x=TRUE)
   colnames(min_dates) <- c('Instrument','Strategy','TradeDate')
   initial_holdings <- unique(merge(history_data,min_dates,by=c('Instrument','Strategy','TradeDate')))
-  initial_holdings <- unique(initial_holdings[c('MarketValue','Instrument','ClosePrice','Strategy','SX5E.Close')])
+  initial_holdings <- unique(initial_holdings[c('MarketValue','Instrument','ClosePrice','Strategy',cname)])
   colnames(initial_holdings) <- c('EarliestMarketValue','Instrument','EarliestPrice','Strategy','EarliestIndexLevel')
   history_data <- merge(history_data,initial_holdings,by=c('Instrument','Strategy'),all.x=TRUE)
   history_data$EarliestHolding <- history_data$EarliestMarketValue/history_data$EarliestPrice
   history_data$EarliestIndexHolding <- history_data$EarliestMarketValue/history_data$EarliestIndexLevel
   history_data$CurrentPassiveValue <- history_data$EarliestHolding*history_data$ClosePrice
   history_data$PriorPassiveValue <- history_data$EarliestHolding*history_data$PriorClosePrice
-  history_data$CurrentIndexValue <- history_data$EarliestIndexHolding*history_data$SX5E.Close
+  history_data$CurrentIndexValue <- history_data$EarliestIndexHolding*history_data[[cname]]
   history_data$CurrentPassivePL <- history_data$CurrentPassiveValue - history_data$EarliestMarketValue
   l <- length(history_data$CurrentPassiveValue)
   history_data$PassiveTodayPL <- history_data$PriorPassiveValue*(history_data$ClosePrice/history_data$PriorClosePrice)-history_data$PriorPassiveValue
@@ -286,7 +290,7 @@ market_rel_pl <- function(history_data,trade_rel=FALSE){
   for(ins in instruments){
     for(st in strategies){
       #Need to remove duplicate rows so that PL cumulant is correct
-      local_frame <- unique(history_data[history_data$Instrument==ins&history_data$Strategy==st,c('TradeDate','Instrument','Strategy','TodayPL','CurrentIndexValue')])
+      local_frame <- unique(history_data[history_data$Instrument==ins&history_data$Strategy==st,c('TradeDate','Instrument','Strategy','TodayPL','CurrentIndexValue','ActiveTodayPL','PassiveTodayPL')])
       m <- nrow(local_frame)
       if(m>0){
         local_frame <- local_frame[order(local_frame$TradeDate),]
@@ -296,11 +300,17 @@ market_rel_pl <- function(history_data,trade_rel=FALSE){
         else{
           local_frame$CurrentIndexPL <- 0
         }
+        local_frame$CumulativeActivePL <- NA
+        local_frame$CumulativePassivePL <- NA
         local_frame$MarketRelPL <- local_frame$TodayPL - local_frame$CurrentIndexPL
         local_frame$TodayPL[is.na(local_frame$TodayPL)] <- 0
         local_frame$MarketRelPL[is.na(local_frame$MarketRelPL)] <- 0
+        local_frame$ActiveTodayPL[is.na(local_frame$ActiveTodayPL)] <- 0
+        local_frame$PassiveTodayPL[is.na(local_frame$PassiveTodayPL)] <- 0
         local_frame$CumulativePL <- cumsum(local_frame$TodayPL)
         local_frame$CumulativeMarketRelPL <- cumsum(local_frame$MarketRelPL)
+        local_frame$CumulativeActivePL <- cumsum(local_frame$ActiveTodayPL)
+        local_frame$CumulativePassivePL <- cumsum(local_frame$PassiveTodayPL)
         if(first){
           full_frame <- local_frame
           first <- FALSE
@@ -311,7 +321,7 @@ market_rel_pl <- function(history_data,trade_rel=FALSE){
       }
     }
   }
-  history_data <- merge(history_data[setdiff(colnames(history_data),'CumulativePL')],full_frame[c('TradeDate','Instrument','Strategy','CumulativePL','CumulativeMarketRelPL','MarketRelPL')],by=c('TradeDate','Instrument','Strategy'))
+  history_data <- merge(history_data[setdiff(colnames(history_data),'CumulativePL')],full_frame[c('TradeDate','Instrument','Strategy','CumulativePL','CumulativeMarketRelPL','MarketRelPL','CumulativeActivePL','CumulativePassivePL')],by=c('TradeDate','Instrument','Strategy'))
   return(history_data)
 }
 
@@ -805,7 +815,9 @@ position_age_from_flats <- function(history_data,return_cols,abslimit=-0.1,relli
     history_data$PsnAge <- NA
     history_data$VisitCumulativePL <- NA
     history_data$VisitCumulativeMarketRelPL <- NA
-    cols <- unique(c(return_cols,'PsnAge','VisitCumulativePL','CumulativePL','VisitCumulativeMarketRelPL','CumulativeMarketRelPL','MarketValue','TradeID','MinDate','Strategy','TradeDate','Instrument','EarliestMarketValue'))
+    history_data$VisitCumulativeActivePL <- NA
+    history_data$VisitCumulativePassivePL <- NA
+    cols <- unique(c(return_cols,'PsnAge','VisitCumulativePL','VisitCumulativeActivePL','VisitCumulativePassivePL','CumulativePL','VisitCumulativeMarketRelPL','CumulativeMarketRelPL','MarketValue','TradeID','MinDate','Strategy','TradeDate','Instrument','EarliestMarketValue'))
     traders <- unique(history_data$Trader)
     for(t in traders){
       trader_strategies <- unique(history_data[history_data$Trader==t,]$Strategy)
@@ -825,6 +837,8 @@ position_age_from_flats <- function(history_data,return_cols,abslimit=-0.1,relli
             for(f in fd['FlatDate']){
               flat_date <- as.Date(f[[1]])
               hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$VisitCumulativePL <- cumsum(hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$TodayPL)  
+              hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$VisitCumulativeActivePL <- cumsum(hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$ActiveTodayPL)  
+              hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$VisitCumulativePassivePL <- cumsum(hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$PassiveTodayPL)  
               hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$VisitCumulativeMarketRelPL <- cumsum(hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$MarketRelPL)
               nmd <- unlist(Map(function(x,md=min_date)mda_kernel(md,x),hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$TradeDate))
               hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$PsnAge <- hd[hd$TradeDate>=min_date&hd$TradeDate<flat_date,]$TradeDate - min_date - nmd
@@ -840,6 +854,8 @@ position_age_from_flats <- function(history_data,return_cols,abslimit=-0.1,relli
               min_date <- flat_date
             }
             hd[hd$TradeDate>=min_date,]$VisitCumulativePL <- cumsum(hd[hd$TradeDate>=min_date,]$TodayPL)  
+            hd[hd$TradeDate>=min_date,]$VisitCumulativeActivePL <- cumsum(hd[hd$TradeDate>=min_date,]$ActiveTodayPL)  
+            hd[hd$TradeDate>=min_date,]$VisitCumulativePassivePL <- cumsum(hd[hd$TradeDate>=min_date,]$PassiveTodayPL)  
             hd[hd$TradeDate>=min_date,]$VisitCumulativeMarketRelPL <- cumsum(hd[hd$TradeDate>=min_date,]$MarketRelPL)
             nmd <- unlist(Map(function(x,md=min_date)mda_kernel(md,x),hd[hd$TradeDate>=min_date,]$TradeDate))
             hd[hd$TradeDate>=min_date,]$PsnAge <- hd[hd$TradeDate>=min_date,]$TradeDate - min_date - nmd
@@ -900,4 +916,65 @@ load_and_compute_market_rel <- function(lookback_function,traders,dates){
     history_data <- history_data[!duplicated(history_data[c('Trader','Instrument','TradeDate','Strategy','MarketValue','MidOnEntry','ValueUSD')]),]
     history_data <- market_rel_pl(history_data)
     return(history_data)
+}
+
+trade_typer <- function(history_data){
+  history_data$TradeType <- 'NA'
+  history_data$TradeType[history_data$Long==1&history_data$MarketValue>0&history_data$PsnAge!=0] <- 'Add Long'
+  history_data$TradeType[(history_data$Long==0)&history_data$MarketValue>0&history_data$PsnAge!=0] <- 'Reduce Long'
+  history_data$TradeType[history_data$Long==1&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Reduce Short'
+  history_data$TradeType[(history_data$Long==0)&history_data$MarketValue<0&history_data$PsnAge!=0] <- 'Add Short'
+  history_data$TradeType[grepl('._L.',history_data$Strategy)&history_data$PsnAge==0] <- 'New Long'
+  history_data$TradeType[grepl('._S.',history_data$Strategy)&history_data$PsnAge==0] <- 'New Short'
+  psn_increased <- aggregate(history_data$TradeType,list(Strategy=history_data$Strategy,Visit=history_data$Visit,Instrument=history_data$Instrument),function(x)sum(x=='Increase',na.rm=TRUE)>0)
+  colnames(psn_increased) <- c('Strategy','Visit','Instrument','PsnIncreased')
+  history_data <- merge(history_data,psn_increased,by=c('Strategy','Visit','Instrument'),all.x=TRUE)
+  return(history_data)
+}
+
+switch_direction <- function(history_data,column){
+  history_data[column] <- -1^(1+history_data$PsnLong)*history_data[column]
+  return(history_data)
+}
+
+#integrate this with the version in the preprocessor functions file
+data_fractile <- function(data,on,ntiles,name='Quartile',group_on=NULL){
+  cnames <- colnames(data)
+  data$ntile <- with(data[on], cut(as.numeric(unlist(data[on])), breaks=unique(quantile(data[on], probs=seq(0,1, by=1/ntiles), na.rm=TRUE)), include.lowest=TRUE))
+  ud <- sort(unique(data$ntile))
+  colnames(data) <- c(cnames,paste(on,name,sep=""))  
+  data[paste(on,name,"_N",sep="")] <- unlist(Map(function(x)which(x==ud),data[[paste(on,name,sep="")]]))
+  if(length(group_on)!=0){
+    group_expand <- unique(expand.grid(unique(data[group_on])))
+    cnames <- colnames(data)
+    first <- TRUE
+    for(g in 1:nrow(group_expand)){
+      grp <- group_expand[g,]
+      df <- data[unlist(Map(function(z)Reduce(function(x,y)x&&y,data[z,group_on]==grp),1:nrow(data))),]
+      if(nrow(df)>0){
+        df$grp_ntile <- with(df[on], cut(as.numeric(unlist(df[on])), breaks=unique(quantile(df[on], probs=seq(0,1, by=1/ntiles), na.rm=TRUE)), include.lowest=TRUE))
+        ud <- sort(unique(df$grp_ntile))
+        colnames(df) <- c(cnames,paste(paste(group_on,collapse=""),"Group",name,sep=""))
+        df[paste(paste(group_on,collapse=""),"Group",name,"_N",sep="")] <- unlist(Map(function(x)which(x==ud),df[[paste(paste(group_on,collapse=""),"Group",name,sep="")]]))
+        if(first){
+          fct_data <- df
+          first <- FALSE
+        } else {
+          fct_data <- rbind(fct_data,df)
+        } 
+      }
+    }
+  } else {
+    fct_data <- data
+  }
+  return(fct_data)
+}
+
+scale_and_clip <- function(data,bound=5){
+  na_idx <- is.na(data) 
+  data[na_idx] <- mean(data,na.rm=TRUE)
+  data <- as.numeric(scale(data))
+  data[abs(data)>bound] <- NA
+  data[na_idx] <- NA
+  return(data)
 }

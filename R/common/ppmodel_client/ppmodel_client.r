@@ -18,7 +18,7 @@ library(hash)
 
 setClass(
   Class                = "VirtualPPModelClient",
-  slots               = c(model_class = "character"),
+  slots                = c(model_class = "character"),
   prototype = list(
     key_cols = c("model_class", "id", "start", "end")
 

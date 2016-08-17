@@ -33,7 +33,7 @@ if (!isGenericS4(".checkSlotClass")) {
 setMethod(".checkSlotClass",  
           signature(object = "VirtualAnalysisBlock", slot = "character", class = "character", req_class = "character"),
           function(object,slot, class, req_class){
-          if (!any(class == req_class))  {
+          if (!any(class %in% req_class))  {
               message(paste("Invalid class", class, "."))
               message(paste("in attempt to set", sQuote(slot), "slot in object of class", class(object) ))
               stop(paste("assignment of an object of class",
@@ -47,6 +47,7 @@ setMethod(".checkSlotClass",
             
           }
 )
+
 
 
 if (!isGenericS4("getOutputObject")) {
@@ -115,7 +116,7 @@ setMethod(".setOutputGGPlot",
           signature(object = "VirtualAnalysisBlock", ggplot = "ANY"),
           function(object, ggplot){
             
-            object <- .checkSlotClass(object, "ggplot", class(ggplot), "ggplot")
+            object <- .checkSlotClass(object, "ggplot", class(ggplot), c("ggplot", "grob"))
             object@ggplot <- ggplot
             return(object)
           }
