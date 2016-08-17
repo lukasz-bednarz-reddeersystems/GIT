@@ -7,7 +7,7 @@ context("Testing PriceData")
 #########################
 
 tested.class          <-  "PriceData"
-valid.key_cols        <- c("lInstrumentID", "dtDateTime")
+valid.key_cols        <- c("InstrumentID", "Date")
 valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
                            "dblVolume", "lOutstandingShares","dbl30DayAvgVol" )
 valid.required_colnms <- c('InstrumentID','Date','ClosePrice')
@@ -15,8 +15,8 @@ valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","d
                                 "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
                               c('InstrumentID','Date','ClosePrice',"PreviousClosePrice",
                                 "Volume", "OutstandingShares","AvgVol30Day"))
-init.key_values       <-  data.frame(lInstrumentID = integer(),
-                                     dtDateTime = as.Date(character()))
+init.key_values       <-  data.frame(InstrumentID = integer(),
+                                     Date = as.Date(character()))
 
 
 
@@ -46,8 +46,8 @@ test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
 
   object <- new(tested.class)
 
-  invalid.key_values <- data.frame(lInstrumentID = integer(),
-                                   dtDateTime = as.Date(character()))
+  invalid.key_values <- data.frame(InstrumentID = integer(),
+                                   Date = as.Date(character()))
 
   expect_error(TE.RefClasses:::.setDataSourceQueryKeyValues(object, invalid.key_values),
                regexp = "Zero row query keys data.frame passed")
@@ -68,8 +68,8 @@ test_that("Can .setDataSourceQueryKeyValues with valid data", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- data.frame(lInstrumentID = 4454,
-                               dtDateTime = seq(from = as.Date('2016-06-01'),
+  valid.key_vals <- data.frame(InstrumentID = 4454,
+                               Date = seq(from = as.Date('2016-06-01'),
                                                  to = as.Date('2016-06-03'),
                                                  by = "1 day"))
 
@@ -85,8 +85,8 @@ test_that("Cannot dataRequest() with invalid key_values", {
   object <- new(tested.class)
 
 
-  invalid.key_values <- data.frame(lInstrumentID = integer(),
-                                   dtDateTime = as.Date(character()))
+  invalid.key_values <- data.frame(InstrumentID = integer(),
+                                   Date = as.Date(character()))
 
   expect_error(dataRequest(object, invalid.key_values),
                regexp = "Zero row query keys data.frame passed")
@@ -108,15 +108,16 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
   object <- new(tested.class)
 
-  nexist.key_vals <- data.frame(lInstrumentID = 1984,
-                                dtDateTime = seq(from = as.Date('2016-06-01'),
+  nexist.key_vals <- data.frame(InstrumentID = 1984,
+                                Date = seq(from = as.Date('2016-06-01'),
                                                   to = as.Date('2016-06-03'),
                                                   by = "1 day"))
-  diff <- setdiff(valid.values,valid.key_cols)
+
+  cols <- TE.RefClasses:::.translateDataSourceColumnNames(object, valid.values)
+
+  diff <- setdiff(cols ,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
-
-  cols <- values(valid.column_name_map[valid.values])[valid.values]
 
   colnames(valid.ret_data) <- cols
 
@@ -154,8 +155,8 @@ test_that("Can dataRequest() with valid key_values", {
   # instruments with large ammount of events for these days
   # 5004 5793 6496 7703 8038 5826 5687 6002 6203
   # 6    6    7    7    7    8   11   11   12
-  valid.key_vals <- expand.grid(lInstrumentID = c(5004, 5793, 6496, 7703, 8038, 5826, 5687, 6002, 6203),
-                                dtDateTime = seq(from = as.Date('2016-06-01'),
+  valid.key_vals <- expand.grid(InstrumentID = c(5004, 5793, 6496, 7703, 8038, 5826, 5687, 6002, 6203),
+                                Date = seq(from = as.Date('2016-06-01'),
                                                to = as.Date('2016-06-03'),
                                                by = "1 day"))
   values <- getDataSourceReturnColumnNames(object)

@@ -47,6 +47,8 @@ Collate:
     'warehouse_client_functions.r'
     'warehouse_client.r'
     'position_data.r'
+    'ppmodel_client_functions.r'
+    'ppmodel_client.r'
     'price_data.r'
     'transformation_functions.r'
     'virtual_transformation.r'
@@ -56,4 +58,6 @@ Collate:
     'transformations_handler.r'
     'strategy_portfolio.r'
     'strategy_portfolio_transformations.r'
+    'trade_data.r'
+    'trade_data_simple.r'
 RoxygenNote: 5.0.1

@@ -417,6 +417,7 @@ setMethod(".generateDataFilledWithNA",
           }
 )
 
+
 setMethod("dataRequest",
           signature(object = "VirtualRODBCClient", key_values = "data.frame"),
           function(object, key_values){

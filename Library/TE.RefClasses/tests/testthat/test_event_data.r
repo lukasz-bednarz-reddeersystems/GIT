@@ -121,11 +121,11 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
                                 Date = seq(from = as.Date('2016-06-01'),
                                                   to = as.Date('2016-06-03'),
                                                   by = "1 day"))
-  diff <- setdiff(valid.values,valid.key_cols)
+  cols <- TE.RefClasses:::.translateDataSourceColumnNames(object, valid.values)
+
+  diff <- setdiff(cols ,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
-
-  cols <- values(valid.column_name_map[valid.values])[valid.values]
 
   colnames(valid.ret_data) <- cols
 

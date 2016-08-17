@@ -47,8 +47,8 @@ setClass(
   Class     = "EventDataSQLQuery",
   prototype = list(
     key_cols       = c("InstrumentID", "Date"),
-    key_values     = data.frame(lInstrumentID = integer(),
-                                dtDateTime = as.Date(character())),
+    key_values     = data.frame(InstrumentID = integer(),
+                                Date = as.Date(character())),
     query_parser   = parse_instrument_date_keys,
     results_parser = convert_column_class,
     arguments    = c("@sInstrumentIDs", "@dtFrom", "@dtTo"),
