@@ -33,12 +33,6 @@ setClass(
 #' @export
 
 setGeneric("getPPModelClass", function(object,...){standardGeneric("getPPModelClass")})
-# Returns post processing model used to assembly data.
-#
-# Args:
-#   object : object of type "VirtualPPModelClient"
-# Returns:
-#   model name
 
 setMethod("getPPModelClass",
           signature(object = "VirtualPPModelClient"),
