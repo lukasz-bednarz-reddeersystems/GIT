@@ -1,1 +1,0 @@
-insert into tDashboardModule (sHeader,sProc,lRefreshIntervalSeconds,sURL,lDashboardModuleTypeID,bActive,bCompact) values ('Trading Enhancement','','600000','/TradingEnhancementEngine/TradingEnhancement?lDashboardModuleID={0}',3,1,0)
