@@ -329,6 +329,12 @@ setMethod("setppModelIndex","PPModel",
 	      }
 )
 
+#' run Pre Processor Model computation
+#'
+#'
+#' @param object object of class "PPModel"
+#' @export
+
 setGeneric("runPreProcessorModel",function(object){standardGeneric("runPreProcessorModel")})
 setMethod("runPreProcessorModel","PPModel",
 		  function(object){
