@@ -14,6 +14,18 @@ context_primary_placing_features   <- c("DaysToPrimaryPlacing","DaysSincePrimary
 context_secondary_placing_features <- c("DaysToSecondaryPlacing","DaysSinceSecondaryPlacing")
 context_position_age_features      <- c("Age","NewPosition","ClosePosition")
 
+
+devtools::use_data(outcome_price_features,
+                   context_price_features,
+                   context_volume_features,
+                   control_price_features,
+                   control_features,
+                   context_meta,
+                   context_resultsday_features,
+                   context_primary_placing_features,
+                   context_position_age_features,
+                   overwrite = TRUE)
+
 offside <- function(mv,iv,long){
   if(is.na(mv)||is.na(iv)||is.na(long)){
     rval <- NA
