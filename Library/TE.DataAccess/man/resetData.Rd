@@ -8,6 +8,8 @@ resetData(object, data)
 }
 \arguments{
 \item{object}{object of class 'DataSet'.}
+
+\item{data}{"data.frame" with new data}
 }
 \value{
 \code{object} object of class 'DataSet'.

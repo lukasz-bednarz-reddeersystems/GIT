@@ -112,15 +112,6 @@ setClass(
   contains = c("XMLObject")
 )
 
-#' class wraping xml string and its parameters
-#'
-#' Default schema based on output of C# DataTable serialisation with CreateXML method
-#'
-#' @slot xml_schema     "NullableNode"
-#' @slot xml_body       "NullableNode"
-#' @slot schema_tag     "character"
-#' @slot schema_element "character"
-#' @slot body_tag       "character"
 
 setGeneric("autoSchema",function(object,obj_xml_document){standardGeneric("autoSchema")})
 setMethod("autoSchema","XMLToR",

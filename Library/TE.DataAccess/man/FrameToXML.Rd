@@ -9,9 +9,9 @@ FrameToXML(df, name, tree_name = "Root")
 \arguments{
 \item{df}{data.frame to convert}
 
-\item{tree_name}{name of the xml tree, default is 'Root'}
+\item{name}{character name}
 
-\item{character}{name}
+\item{tree_name}{name of the xml tree, default is 'Root'}
 }
 \value{
 \code{xml} character xml string

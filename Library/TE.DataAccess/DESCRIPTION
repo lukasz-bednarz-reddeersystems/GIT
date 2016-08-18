@@ -1,15 +1,14 @@
 Package: TE.DataAccess
 Type: Package
-Title: Basic package for RedDeer Trading Enhancement Engine.
+Title: Basic package for RedDeer Trading Enhancement Engine
 Version: 0.1.0
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions and classes for data access,
     preprocessing and postprocessing of various data needed for Trading
-    Analytics Engine
+    Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    methods,
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -19,7 +18,7 @@ Imports:
     hashFunction,
     XML,
     plyr,
-    R.methodsS3,
+    moments
 Collate:
     'TE.DataAccess.r'
     'global_configs.r'

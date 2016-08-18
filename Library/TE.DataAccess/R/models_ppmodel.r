@@ -243,6 +243,12 @@ setClass(
 	)
 )
 
+#' Initialize method for "PPModel" class
+#'
+#' @param .Object, object of class "PPModel"
+#' @param keys "character" key names for ppmodel dataset and query
+#' @return \code{.Object} object of class "PPModel"
+
 setMethod("initialize", "PPModel",
           function(.Object,keys){
             .Object@queries <- setBatchKeys(.Object@queries,keys)
@@ -335,11 +341,18 @@ setMethod("setppModelIndex","PPModel",
 
 #' run Pre Processor Model computation
 #'
-#'
 #' @param object object of class "PPModel"
+#' @return \code{object} object of class "PPModel"
 #' @export
 
 setGeneric("runPreProcessorModel",function(object){standardGeneric("runPreProcessorModel")})
+
+#' @describeIn runPreProcessorModel
+#' run Pre Processor Model computation
+#'
+#' @inheritParams runPreProcessorModel
+#' @return \code{object} object of class "PPModel"
+#' @export
 setMethod("runPreProcessorModel","PPModel",
 		  function(object){
 		  	if(length(object@queries)>0){

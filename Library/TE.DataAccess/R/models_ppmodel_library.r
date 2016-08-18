@@ -2,16 +2,34 @@
 #' @include models_ppmodel.r
 NULL
 
+#' List of outcome price features
 outcome_price_features <- c("PnLOutof","PsnReturnOut","PsnReturnOutFull", "Hit1D", 'PtvePnLOutof')
+
+#' List of context price features
 context_price_features <- c("PnLInto", "CompoundReturnInto","CompoundReturnOutof","PsnReturnIn","VolInto","VolOutof","SkewInto","SkewOutof","ClosePrice","PriorClosePrice","PtvePnLInto","PriceMavg","MidOnEntry","Offside","RSI14","PriorRSI14","LegOpenClose","RelativeRSI14","SectorRelativeRSI14","DailyN","MavgPrice50")
+
+#' List of outcome volume features
 context_volume_features<- c("AvgDailyValTraded5Day")
+
+#' List of control price features
 control_price_features <- c("ProfitTarget","StopLoss","MarketValue")
+
+#' List of control features
 control_features       <- c("ActivityIntoTrade","ActivityOutofTrade")
+
+#' List of context meta features
 context_meta           <- c("InputDirection")
 
+#' List context results day features
 context_resultsday_features        <- c("DaysToNextResults","DaysSinceLastResults","EPSRevision")
+
+#' List of primary placing features
 context_primary_placing_features   <- c("DaysToPrimaryPlacing","DaysSincePrimaryPlacing")
+
+#' List of outcome price features
 context_secondary_placing_features <- c("DaysToSecondaryPlacing","DaysSinceSecondaryPlacing")
+
+#' List of position age features
 context_position_age_features      <- c("Age","NewPosition","ClosePosition")
 
 
@@ -62,7 +80,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name ResultsDayBatchGatherer
+#' PPModel derived class ResultsDayBatchGatherer
+#'
+#' @title ResultsDayBatchGatherer
+#' @name ResultsDayBatchGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass ResultsDayBatchGatherer
 
@@ -114,7 +136,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name ResultsDayPsnGatherer
+#' PPModel derived class ResultsDayPsnGatherer
+#'
+#' @title ResultsDayPsnGatherer
+#' @name ResultsDayPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass ResultsDayPsnGatherer
 
@@ -166,7 +192,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name SizeAdjustmentBatchGatherer
+#' PPModel derived class SizeAdjustmentBatchGatherer
+#'
+#' @title SizeAdjustmentBatchGatherer
+#' @name SizeAdjustmentBatchGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass SizeAdjustmentBatchGatherer
 
@@ -218,7 +248,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name PositionSizeBatchQuantiler
+#' PPModel derived class PositionSizeBatchQuantiler
+#'
+#' @title PositionSizeBatchQuantiler
+#' @name PositionSizeBatchQuantiler-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PositionSizeBatchQuantiler
 
@@ -237,7 +271,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name PrimaryPlacingPsnGatherer
+#' PPModel derived class PrimaryPlacingPsnGatherer
+#'
+#' @title PrimaryPlacingPsnGatherer
+#' @name PrimaryPlacingPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PrimaryPlacingPsnGatherer
 
@@ -257,7 +295,11 @@ setClass(
 )
 
 
-#' @name SecondaryPlacingPsnGatherer
+#' PPModel derived class SecondaryPlacingPsnGatherer
+#'
+#' @title SecondaryPlacingPsnGatherer
+#' @name SecondaryPlacingPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass SecondaryPlacingPsnGatherer
 
@@ -320,7 +362,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-#' @name PrimaryPlacingPsnGatherer
+#' PPModel derived class PrimaryPlacingPsnGatherer
+#'
+#' @title PrimaryPlacingPsnGatherer
+#' @name PrimaryPlacingPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PrimaryPlacingPsnGatherer
 
@@ -339,7 +385,11 @@ setClass(
 )
 
 
-#' @name SecondaryPlacingPsnGatherer
+#' PPModel derived class SecondaryPlacingPsnGatherer
+#'
+#' @title SecondaryPlacingPsnGatherer
+#' @name SecondaryPlacingPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass SecondaryPlacingPsnGatherer
 
@@ -403,8 +453,11 @@ setClass(
       contains = c("PPModelPostComputation")
 )
 
-
-#' @name PetNamesPsnGatherer
+#' PPModel derived class PetNamesPsnGatherer
+#'
+#' @title PetNamesPsnGatherer
+#' @name PetNamesPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PetNamesPsnGatherer
 
@@ -437,7 +490,11 @@ setClass(
 )
 
 
-#' @name PsnAgeGatherer
+#' PPModel class for PsnAgeGatherer
+#'
+#' @title PsnAgeGatherer
+#' @name PsnAgeGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PsnAgeGatherer
 
@@ -651,21 +708,33 @@ setClass(
 )
 
 
-#' @name TradeHistory
+#' PPModel derived class TradeHistory
+#'
+#' @title TradeHistory
+#' @name TradeHistory-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass TradeHistory
 
 ppmodel_class_factory("TradeHistory","FeatureGathererWithSummary","gatherFeatures",c(outcome_price_features,context_price_features,context_position_age_features,control_price_features),"PPModelSetupPassThruComputation","PPModelTradeHistoryComputation","PPModelHistoryPostComputation",index_by_date_column='TradeDate')
 
 
-#' @name TradeHistorySimple
+#' PPModel derived class TradeHistorySimple
+#'
+#' @title TradeHistorySimple
+#' @name TradeHistorySimple-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass TradeHistorySimple
 
 ppmodel_class_factory("TradeHistorySimple","FeatureGatherer","gatherFeatures",c(outcome_price_features, context_price_features),"PPModelSetupPassThruComputation","PPModelPostPassThruComputation","PPModelSummaryPassThruComputation",index_by_date_column='TradeDate')
 
 
-#' @name TradeHistorySimpleWithSummary
+#' PPModel derived class TradeHistorySimpleWithSummary
+#'
+#' @title TradeHistorySimpleWithSummary
+#' @name TradeHistorySimpleWithSummary-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass TradeHistorySimpleWithSummary
 
@@ -725,7 +794,11 @@ setClass(
 )
 
 
-#' @name PriceBySnapshotGatherer
+#' PPModel derived class PriceBySnapshotGatherer
+#'
+#' @title PriceBySnapshotGatherer
+#' @name PriceBySnapshotGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass PriceBySnapshotGatherer
 
@@ -761,7 +834,11 @@ setClass(
 )
 
 
-#' @name AverageDownPsnGatherer
+#' PPModel derived class AverageDownPsnGatherer
+#'
+#' @title AverageDownPsnGatherer
+#' @name AverageDownPsnGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass AverageDownPsnGatherer
 
@@ -797,7 +874,11 @@ setClass(
 )
 
 
-#' @name TradeLevelGatherer
+#' PPModel derived class TradeLevelGatherer
+#'
+#' @title TradeLevelGatherer
+#' @name TradeLevelGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass TradeLevelGatherer
 
@@ -854,7 +935,11 @@ setClass(
 )
 
 
-#' @name TradeLevelSnapShot
+#' PPModel derived class TradeLevelSnapShot
+#'
+#' @title TradeLevelSnapShot
+#' @name TradeLevelSnapShot-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass TradeLevelSnapShot
 
@@ -907,7 +992,11 @@ setClass(
 )
 
 
-#' @name StopTargetsGatherer
+#' PPModel derived class StopTargetsGatherer
+#'
+#' @title StopTargetsGatherer
+#' @name StopTargetsGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass StopTargetsGatherer
 
@@ -977,9 +1066,14 @@ setClass(
 )
 
 
-#' @name ResultsDaySnapShotBatchGatherer
+#' PPModel derived class ResultsDaySnapShotBatchGatherer
+#'
+#' @title ResultsDaySnapShotBatchGatherer
+#' @name ResultsDaySnapShotBatchGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass ResultsDaySnapShotBatchGatherer
+
 
 ppmodel_class_factory("ResultsDaySnapShotBatchGatherer","FeatureGathererWithSummary","gatherFeatures",c("TodayPL","MarketValue",outcome_price_features,context_price_features,context_resultsday_features),"PPModelSetupPassThruComputation","PPModelResultsSnapShotPostComputation")
 
@@ -997,7 +1091,11 @@ setClass(
 )
 
 
-#' @name ResultsDayExposureSnapShotBatchGatherer
+#' PPModel derived class ResultsDayExposureSnapShotBatchGatherer
+#'
+#' @title ResultsDayExposureSnapShotBatchGatherer
+#' @name ResultsDayExposureSnapShotBatchGatherer-class
+#' @docType class
 #' @rdname PPModel-class
 #' @exportClass ResultsDayExposureSnapShotBatchGatherer
 

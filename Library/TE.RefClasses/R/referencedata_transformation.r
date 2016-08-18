@@ -3,6 +3,7 @@
 #' @include transformation_functions.r
 NULL
 
+#' @exportClass ReferenceDataTransformationData
 setClassUnion("ReferenceDataTransformationData",c("VirtualReferenceData","NULL"))
 
 ################################################

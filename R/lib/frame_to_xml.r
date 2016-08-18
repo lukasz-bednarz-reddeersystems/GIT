@@ -47,7 +47,7 @@ generate_raid_attribs <- function(type,value){
 format_na <- function(value){
   rval <- value
   if(is.na(value))rval <- ""
-  return(r)
+  return(rval)
 }
 
 format_value <- function(type,value){

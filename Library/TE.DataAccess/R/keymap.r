@@ -85,7 +85,7 @@ date_only_kgen_fn <- function(x,cols){
 #'
 #' @param x data.frame with columns based on which the keys will be generated
 #' @param cols, column names used to create keys
-#' @param id_outname is the output name of the ID
+#' @param fields name of the columns
 #' @return \code{key_values} data.frame with generated keys
 
 direct_keygen <- function(x,cols,fields){

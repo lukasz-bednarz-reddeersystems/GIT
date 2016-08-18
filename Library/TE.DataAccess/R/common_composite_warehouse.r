@@ -43,6 +43,18 @@ setClass(
 #for objects along the same branch in the class hierachy.
 #Must ensure new environments created since they are passed
 #by reference.
+
+#' Initialize method for "PPModelObjectStore" class
+#'
+#' Prototype is made only once and then copied with each call to 'new'
+#' for objects along the same branch in the class hierachy.
+#' Must ensure new environments created since they are passed
+#' by reference.
+#'
+#' @param .Object, object of class "CompositeWarehouse"
+#' @return \code{.Object} object of class "CompositeWarehouse"
+#' @export
+
 setMethod("initialize", "CompositeWarehouse",
           function(.Object){
             .Object@trades <- new.env(parent = emptyenv())

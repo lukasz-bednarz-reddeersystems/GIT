@@ -68,8 +68,14 @@ setMethod("checkUnique", "DataSet",
 #' @return \code{data} data.frame with raw data.
 #' @export
 
-
 setGeneric("getData", function(object){standardGeneric("getData")})
+
+#' @describeIn getData Sets new data in the DataSet
+#'
+#' @inheritParams getData
+#' @return \code{data} data.frame with raw data.
+#' @export
+
 setMethod("getData", "DataSet",
           function(object){
             return(object@data)
@@ -85,6 +91,12 @@ setMethod("getData", "DataSet",
 #' @export
 
 setGeneric("setData", function(object,data,override_full_index=FALSE){standardGeneric("setData")})
+
+#' @describeIn setData Sets new data in the DataSet
+#'
+#' @inheritParams setData
+#' @return \code{object} object of class 'DataSet'.
+#' @export
 setMethod("setData", "DataSet",
           function(object,data,override_full_index=FALSE){
             message("Updating DataSet object.")
@@ -105,6 +117,7 @@ setMethod("setData", "DataSet",
 #' Reset internal data storage to empty dataframe in the dataset
 #'
 #' @param object object of class 'DataSet'.
+#' @param data "data.frame" with new data
 #' @return \code{object} object of class 'DataSet'.
 
 setGeneric("resetData", function(object,data){standardGeneric("resetData")})
@@ -610,11 +623,10 @@ setMethod("rowCoalesceOn", "DataSet",
 
 #' Builds a dataset from a dataframe
 #'
-#' @param key_col character vector ofs column names to be used as identifying keys.
+#' @param key_cols character vector ofs column names to be used as identifying keys.
 #' @param data data.frame to generate dataset.from
 #' @return \code{object} object of class 'DataSet'
 #' @export
-
 
 dataset_factory <- function(key_cols,data){
   all_cols <- colnames(data)

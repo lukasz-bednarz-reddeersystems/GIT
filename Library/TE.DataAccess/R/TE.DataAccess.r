@@ -12,10 +12,12 @@
 #' @import lubridate
 #' @import XML
 #' @import methods
+#' @importFrom stats as.formula aggregate cor sd setNames
+#' @importFrom utils close.socket head make.socket object.size read.socket write.socket
 #' @importFrom hashFunction cityhash.64 murmur3.32
 #' @importFrom plyr rbind.fill
 #' @importFrom XML xmlTreeParse
-#' @importFrom R.methodsS3 isGenericS4
+#' @importFrom moments skewness
 #' @importFrom RODBC odbcConnect sqlQuery
 NULL
 ## NULL

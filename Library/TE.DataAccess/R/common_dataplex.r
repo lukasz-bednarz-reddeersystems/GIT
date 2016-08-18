@@ -52,9 +52,12 @@ setMethod("setDataPlexStoreValue","DataPlex",
           }
 )
 
+#' indicates if dataplex has been initialized
+dataplex_created <- TRUE
+devtools::use_data(dataplex_created, overwrite = TRUE)
 
 #Global singleton datastores
-if(exists("dataplex_created")==FALSE){
+if(dataplex_created ==FALSE){
   initialise_data_store <- function(){
 
     dataplex <- new("DataPlex")
@@ -93,10 +96,9 @@ if(exists("dataplex_created")==FALSE){
     data_map[["watchlist"]] <- "watchlist"
   }
   initialise_data_store()
-  #ToDo: Put datastore operations/acces into singleton class
 
   dataplex_created <- TRUE
-  devtools::use_data(dataplex_created, overwrite = TRUE)
+
 
 }
 
@@ -189,11 +191,14 @@ setMethod("setWarehouseObjectstoreCacheItemValue",
           }
 )
 
-if(exists("warehouse_store_created")==FALSE){
+#' indicates if warehouse cache has been initialized
+warehouse_store_created <- FALSE
+devtools::use_data(warehouse_store_created, overwrite = TRUE)
+
+if(warehouse_store_created == FALSE){
 
   warehouse_store_created <- TRUE
 
-  devtools::use_data(warehouse_store_created, overwrite = TRUE)
 }
 
 

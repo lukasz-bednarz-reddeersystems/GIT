@@ -7,9 +7,9 @@
 dataset_factory(key_cols, data)
 }
 \arguments{
-\item{data}{data.frame to generate dataset.from}
+\item{key_cols}{character vector ofs column names to be used as identifying keys.}
 
-\item{key_col}{character vector ofs column names to be used as identifying keys.}
+\item{data}{data.frame to generate dataset.from}
 }
 \value{
 \code{object} object of class 'DataSet'

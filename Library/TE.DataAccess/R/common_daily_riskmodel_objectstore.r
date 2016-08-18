@@ -72,8 +72,25 @@ setMethod("generateRiskModelKey","DailyRiskModelObjectStore",
 		  }
 )
 
+#' Query objectstore for given set of parameters
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of objectstore
+#' @param lookback "integer" lookback value for model
+#' @param component "character" name of the risk model component
+#' @return \code{rm} "DataSet" object with component if present otherwise NULL
+#'
 #' @export
 setGeneric("queryDailyRiskModelObjectStore",function(object,name,lookback,component){standardGeneric("queryDailyRiskModelObjectStore")})
+
+#' @describeIn queryDailyRiskModelObjectStore
+#' Query objectstore for given set of parameters
+#'
+#' @inheritParams queryDailyRiskModelObjectStore
+#' @return \code{rm} "DataSet" object with component if present otherwise NULL
+#'
+#' @export
+
 setMethod("queryDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  function(object,name,lookback,component){
 		  	rm <- NULL

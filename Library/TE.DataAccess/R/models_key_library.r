@@ -37,7 +37,6 @@ key_generator <- function(trader,end,interval,lookback,calendar=TRUE,lookback_un
 #'
 #' @param trader integer, the user id
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 three_monthly_lookback <- function(trader){
@@ -54,7 +53,6 @@ three_monthly_lookback <- function(trader){
 #'
 #' @param trader integer, the user id
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 last_month <- function(trader){
@@ -72,7 +70,6 @@ last_month <- function(trader){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_three_monthly_lookback <- function(trader,date){
@@ -95,7 +92,6 @@ dated_three_monthly_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_four_monthly_lookback <- function(trader,date){
@@ -118,7 +114,6 @@ dated_four_monthly_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_twelve_monthly_lookback <- function(trader,date){
@@ -140,7 +135,6 @@ dated_twelve_monthly_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_three_day_lookback <- function(trader,date){
@@ -161,7 +155,6 @@ dated_three_day_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated key.
-#' @rdname key_generator
 #' @export
 
 dated_full_month <- function(trader,date){
@@ -185,7 +178,6 @@ dated_full_month <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_one_year_lookback <- function(trader,date){
@@ -216,7 +208,6 @@ dated_one_year_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_three_year_lookback <- function(trader,date){
@@ -247,7 +238,6 @@ dated_three_year_lookback <- function(trader,date){
 #' @param trader integer, the user id
 #' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 dated_whole_year_lookback <- function(trader, date){
@@ -270,7 +260,6 @@ dated_whole_year_lookback <- function(trader, date){
 #'
 #' @param trader integer, the user id
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 three_year_lookback <- function(trader){
@@ -288,7 +277,6 @@ three_year_lookback <- function(trader){
 #'
 #' @param trader integer, the user id
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 last_year <- function(trader){
@@ -307,7 +295,6 @@ last_year <- function(trader){
 #'
 #' @param trader integer, the user id
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 this_year <- function(trader){
@@ -328,7 +315,6 @@ this_year <- function(trader){
 #' @param start  Date, the most distant time (included, i.e. not upto this date, but inclusive)
 #' @param end  Date, the most recent time (included, i.e. not upto this date, but inclusive)
 #' @return \code{keys} data.frame with generated keys.
-#' @rdname key_generator
 #' @export
 
 range_years_lookback <- function(trader, start, end){

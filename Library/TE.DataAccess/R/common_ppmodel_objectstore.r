@@ -95,6 +95,11 @@ setClass(
   contains = c("VirtualObjectStore")
 )
 
+#' Initialize method for "PPModelObjectStore" class
+#'
+#' @param .Object, object of class "PPModelObjectStore"
+#' @param id id to set when initializing
+#' @return \code{.Object} object of class "PPModelObjectStore"
 #' @export
 setMethod("initialize", "PPModelObjectStore",
           function(.Object,id){
@@ -124,6 +129,17 @@ setMethod("initialisePPModelStore","PPModelObjectStore",
 #' @export
 
 setGeneric("queryPPModelStore",function(object,key){standardGeneric("queryPPModelStore")})
+
+#' @describeIn queryPPModelStore
+#' Query store for PPModel
+#'
+#' Querries PPModel Objectstore for PPModel stored under given key
+#' Returns PPModel if present NULL otherwise
+#'
+#' @inheritParams queryPPModelStore
+#' @return \code{rval} object of class "PPModel"
+#' @export
+
 setMethod("queryPPModelStore","PPModelObjectStore",
           function(object,key){
             if(isPPModelStored(object@warehouse_q,key)){
@@ -154,6 +170,17 @@ setMethod("queryPPModelStore","PPModelObjectStore",
 #' @export
 
 setGeneric("updatePPModelStore",function(object,ppmodel_object,key,force=FALSE){standardGeneric("updatePPModelStore")})
+
+
+#' @describeIn updatePPModelStore
+#' Store PPmodel in Store
+#'
+#' Stores PPModel and reated Query in Store
+#'
+#' @inheritParams updatePPModelStore
+#' @return \code{object} object of class "PPModelObjectStore"
+#' @export
+
 setMethod("updatePPModelStore","PPModelObjectStore",
           function(object,ppmodel_object,key,force=FALSE){
             if(isPPModelStored(object@warehouse_q,key) && !force){
@@ -183,6 +210,14 @@ setMethod("updatePPModelStore","PPModelObjectStore",
 #' @export
 
 setGeneric("commitPPModelStore",function(object){standardGeneric("commitPPModelStore")})
+
+#' @describeIn commitPPModelStore
+#' Commit store data to file
+#'
+#' @inheritParams commitPPModelStore
+#' @return \code{object} object of class "PPModelObjectStore"
+#' @export
+
 setMethod("commitPPModelStore","PPModelObjectStore",
           function(object){
             saveObject(object)

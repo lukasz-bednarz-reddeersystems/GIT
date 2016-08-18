@@ -70,6 +70,12 @@ setMethod("openConnection","ProcessSocket",
 #' @export
 
 setGeneric("readConnection",function(object){standardGeneric("readConnection")})
+
+#' @describeIn readConnection
+#' Read data from socket
+#'
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @export
 setMethod("readConnection","ProcessSocket",
           function(object){
             if(object@server){
@@ -95,6 +101,13 @@ setMethod("readConnection","ProcessSocket",
 #' @export
 
 setGeneric("writeToConnection",function(object,data){standardGeneric("writeToConnection")})
+
+#' @describeIn writeToConnection
+#' Write data to socket
+#'
+#' @inheritParams writeToConnection
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @export
 setMethod("writeToConnection","ProcessSocket",
           function(object,data){
             object@data <- data
@@ -114,9 +127,6 @@ setMethod("writeToConnection","ProcessSocket",
           }
 )
 
-if (!R.methodsS3::isGenericS4("getData")) {
-  setGeneric("getData",function(object){standardGeneric("getData")})
-}
 
 #' Get data read from socket
 #'
@@ -140,6 +150,12 @@ setMethod("getData","ProcessSocket",
 #' @export
 
 setGeneric("closeConnection",function(object){standardGeneric("closeConnection")})
+
+#' @describeIn closeConnection Close socket connection
+#'
+#' @inheritParams closeConnection
+#' @return \code{object} object of class 'ProcessSocket'.
+#' @export
 setMethod("closeConnection","ProcessSocket",
           function(object){
             if(object@server){
