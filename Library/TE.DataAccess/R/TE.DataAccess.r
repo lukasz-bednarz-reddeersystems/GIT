@@ -19,5 +19,7 @@
 #' @importFrom XML xmlTreeParse
 #' @importFrom moments skewness
 #' @importFrom RODBC odbcConnect sqlQuery
+#' @importFrom grDevices dev.off
+#' @importFrom graphics plot title
 NULL
 ## NULL

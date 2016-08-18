@@ -27,6 +27,15 @@ setClass(
   )
 )
 
+setGeneric("resetMemory",function(object){standardGeneric("resetMemory")})
+setMethod("resetMemory","DataPlex",
+          function(object){
+            rm(list = ls(object@warehouse))
+            object@warehouse <- new.env()
+            return(object@warehouse)
+          }
+)
+
 setGeneric("getDataPlexWarehouse",function(object){standardGeneric("getDataPlexWarehouse")})
 setMethod("getDataPlexWarehouse","DataPlex",
           function(object){
@@ -56,45 +65,49 @@ setMethod("setDataPlexStoreValue","DataPlex",
 dataplex_created <- TRUE
 devtools::use_data(dataplex_created, overwrite = TRUE)
 
+initialise_data_store <- function(){
+
+  dataplex <- new("DataPlex")
+
+  dataplex <- resetMemory(dataplex)
+
+  data_map <- getDataPlexWarehouse(dataplex)
+
+  data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
+
+  data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
+
+  data_map[["event_datastore"]] <- new("EventDataStore")
+
+  data_map[["ext_pos_datastore"]] <- new("ExtPosDataStore")
+
+  data_map[["dealing_datastore"]] <- new("DealingDataStore")
+
+  data_map[["trade_levels"]] <- new("TradeLevelsDataStore")
+
+  data_map[["instrument_details"]] <- new("InstrumentDataStore")
+
+  data_map[["instrument_history"]] <- new("InstrumentHistoryDataStore")
+
+  data_map[["instrument_country"]] <- new("InstrumentCountryDataStore")
+
+  data_map[["instrument_price"]] <- new("InstrumentPriceDataStore")
+
+  data_map[["instrument_sector"]] <- new("InstrumentSectorDataStore")
+
+  data_map[["risk_instrument_exposure"]] <- new("RiskInstrumentExposuresDataStore")
+
+  data_map[["risk_factor_returns"]] <- new("RiskFactorReturnsDataStore")
+
+  data_map[["trader_allocation"]] <- new("TraderAllocationDataStore")
+
+  watchlist <- new("WatchListDataStore")
+  data_map[["watchlist"]] <- "watchlist"
+}
+
 #Global singleton datastores
 if(dataplex_created ==FALSE){
-  initialise_data_store <- function(){
 
-    dataplex <- new("DataPlex")
-
-    data_map <- getDataPlexWarehouse(dataplex)
-
-    data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
-
-    data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
-
-    data_map[["event_datastore"]] <- new("EventDataStore")
-
-    data_map[["ext_pos_datastore"]] <- new("ExtPosDataStore")
-
-    data_map[["dealing_datastore"]] <- new("DealingDataStore")
-
-    data_map[["trade_levels"]] <- new("TradeLevelsDataStore")
-
-    data_map[["instrument_details"]] <- new("InstrumentDataStore")
-
-    data_map[["instrument_history"]] <- new("InstrumentHistoryDataStore")
-
-    data_map[["instrument_country"]] <- new("InstrumentCountryDataStore")
-
-    data_map[["instrument_price"]] <- new("InstrumentPriceDataStore")
-
-    data_map[["instrument_sector"]] <- new("InstrumentSectorDataStore")
-
-    data_map[["risk_instrument_exposure"]] <- new("RiskInstrumentExposuresDataStore")
-
-    data_map[["risk_factor_returns"]] <- new("RiskFactorReturnsDataStore")
-
-    data_map[["trader_allocation"]] <- new("TraderAllocationDataStore")
-
-    watchlist <- new("WatchListDataStore")
-    data_map[["watchlist"]] <- "watchlist"
-  }
   initialise_data_store()
 
   dataplex_created <- TRUE
