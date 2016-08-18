@@ -4,7 +4,7 @@
 \alias{dataRequest}
 \title{Request data from data source}
 \usage{
-dataRequest(object, key_values, ...)
+dataRequest(object, key_values)
 }
 \arguments{
 \item{object}{object of class 'VirtualDataSourceClient'.}

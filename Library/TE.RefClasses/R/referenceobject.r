@@ -32,27 +32,25 @@ setClass(
 #' @return \code{required_colnms} character vector, list of required column names
 #' @export
 
-setGeneric("getRequiredVariablesNames", function(object,...){standardGeneric("getRequiredVariablesNames")})
-# Returns Names of the variables that are required to be stored in given ReferenceData class.
-#
-# Args:
-#   object : object extending VirtualReferenceObject
-# Returns:
-#   requiredVariablesNames
+setGeneric("getRequiredVariablesNames", function(object){standardGeneric("getRequiredVariablesNames")})
 
+#' @describeIn getRequiredVariablesNames
+#' Get names of required variables stored in data
+#'
+#' @inheritParams getRequiredVariablesNames
+#' @return \code{required_colnms} character vector, list of required column names
+#' @export
 setMethod("getRequiredVariablesNames", "VirtualReferenceObject",
           function(object){
             return(object@required_colnms)
           }
 )
 
-
-setGeneric(".setRequiredVariablesNames", function(object, names, ...){standardGeneric(".setRequiredVariablesNames")})
-# Private function to set required variable names only to be used by derived classes
-# Args:
-#   object : object extending VirtualReferenceObject
-# Returns:
-#   object : object extending VirtualReferenceObject
+#' Private function to set required variable names only to be used by derived classes
+#'
+#' @param object object extending VirtualReferenceObject
+#' @return \code{object} object extending VirtualReferenceObject
+setGeneric(".setRequiredVariablesNames", function(object, names){standardGeneric(".setRequiredVariablesNames")})
 
 setMethod(".setRequiredVariablesNames",
           signature(object = "VirtualReferenceObject", names = "character"),

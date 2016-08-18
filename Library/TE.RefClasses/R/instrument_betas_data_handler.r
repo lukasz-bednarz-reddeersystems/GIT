@@ -31,8 +31,16 @@ setClass(
 #' @return \code{instrument_betas} object of class "VirtualInstrumentBetasData"
 #' @export
 
-setGeneric("getInstrumentBetasDataObject", function(object,...){standardGeneric("getInstrumentBetasDataObject")})
+setGeneric("getInstrumentBetasDataObject", function(object){standardGeneric("getInstrumentBetasDataObject")})
 
+#' @describeIn getInstrumentBetasDataObject
+#' Get instrument_betas stored in object
+#'
+#' Returns instrument_betas object of class "VirtualInstrumentBetasData"
+#'
+#' @inheritParams getInstrumentBetasDataObject
+#' @return \code{instrument_betas} object of class "VirtualInstrumentBetasData"
+#' @export
 setMethod("getInstrumentBetasDataObject",
           signature(object = "VirtualInstrumentBetasDataHandler"),
           function(object){
@@ -52,7 +60,7 @@ setMethod("getInstrumentBetasDataObject",
 #' @return \code{object} object of class "VirtualInstrumentBetasDataHandler"
 #' @export
 
-setGeneric("setInstrumentBetasDataObject", function(object,instrument_betas, ...){standardGeneric("setInstrumentBetasDataObject")})
+setGeneric("setInstrumentBetasDataObject", function(object,instrument_betas){standardGeneric("setInstrumentBetasDataObject")})
 
 
 
@@ -64,7 +72,7 @@ setGeneric("setInstrumentBetasDataObject", function(object,instrument_betas, ...
 #' @param instrument_betas object of class "VirtualInstrumentBetasData"
 #' @return \code{object} object of class "VirtualInstrumentBetasDataHandler"
 
-setGeneric(".setInstrumentBetasDataObject", function(object,instrument_betas, ...){standardGeneric(".setInstrumentBetasDataObject")})
+setGeneric(".setInstrumentBetasDataObject", function(object,instrument_betas){standardGeneric(".setInstrumentBetasDataObject")})
 
 setMethod(".setInstrumentBetasDataObject",
           signature(object = "VirtualInstrumentBetasDataHandler", instrument_betas = "VirtualInstrumentBetasData"),

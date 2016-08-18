@@ -34,8 +34,16 @@ setClass(
 #' @return \code{position_data} object of class "VirtualPositionData"
 #' @export
 
-setGeneric("getPositionDataObject", function(object,...){standardGeneric("getPositionDataObject")})
+setGeneric("getPositionDataObject", function(object){standardGeneric("getPositionDataObject")})
 
+#' @describeIn getPositionDataObject
+#' Get position_data stored in object
+#'
+#' Returns position_data object of class "VirtualPositionData"
+#'
+#' @inheritParams getPositionDataObject
+#' @return \code{position_data} object of class "VirtualPositionData"
+#' @export
 setMethod("getPositionDataObject",
           signature(object = "VirtualPositionDataHandler"),
           function(object){
@@ -56,7 +64,7 @@ setMethod("getPositionDataObject",
 #' @return \code{object} object of class "VirtualPositionDataHandler"
 #' @export
 
-setGeneric("setPositionDataObject", function(object,position_data, ...){standardGeneric("setPositionDataObject")})
+setGeneric("setPositionDataObject", function(object,position_data){standardGeneric("setPositionDataObject")})
 
 
 
@@ -69,7 +77,7 @@ setGeneric("setPositionDataObject", function(object,position_data, ...){standard
 #' @param position_data object of class "VirtualPositionData"
 #' @return \code{object} object of class "VirtualPositionDataHandler"
 
-setGeneric(".setPositionDataObject", function(object,position_data, ...){standardGeneric(".setPositionDataObject")})
+setGeneric(".setPositionDataObject", function(object,position_data){standardGeneric(".setPositionDataObject")})
 
 
 setMethod(".setPositionDataObject",

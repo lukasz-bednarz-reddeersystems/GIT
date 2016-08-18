@@ -31,8 +31,16 @@ setClass(
 #' @return \code{implied_factor_returns} object of class "VirtualImpliedFactorReturnsData"
 #' @export
 
-setGeneric("getImpliedFactorReturnsDataObject", function(object,...){standardGeneric("getImpliedFactorReturnsDataObject")})
+setGeneric("getImpliedFactorReturnsDataObject", function(object){standardGeneric("getImpliedFactorReturnsDataObject")})
 
+#' @describeIn getImpliedFactorReturnsDataObject
+#' Get implied_factor_returns stored in object
+#'
+#' Returns implied_factor_returns object of class "VirtualImpliedFactorReturnsData"
+#'
+#' @inheritParams getImpliedFactorReturnsDataObject
+#' @return \code{implied_factor_returns} object of class "VirtualImpliedFactorReturnsData"
+#' @export
 setMethod("getImpliedFactorReturnsDataObject",
           signature(object = "VirtualImpliedFactorReturnsDataHandler"),
           function(object){
@@ -51,7 +59,7 @@ setMethod("getImpliedFactorReturnsDataObject",
 #' @return \code{object} object of class "VirtualImpliedFactorReturnsDataHandler"
 #' @export
 
-setGeneric("setImpliedFactorReturnsDataObject", function(object,implied_factor_returns, ...){standardGeneric("setImpliedFactorReturnsDataObject")})
+setGeneric("setImpliedFactorReturnsDataObject", function(object,implied_factor_returns){standardGeneric("setImpliedFactorReturnsDataObject")})
 
 
 #' Set implied_factor_returns object in object slot
@@ -62,7 +70,7 @@ setGeneric("setImpliedFactorReturnsDataObject", function(object,implied_factor_r
 #' @param implied_factor_returns object of class "VirtualImpliedFactorReturnsData"
 #' @return \code{object} object of class "VirtualImpliedFactorReturnsDataHandler"
 
-setGeneric(".setImpliedFactorReturnsDataObject", function(object,implied_factor_returns, ...){standardGeneric(".setImpliedFactorReturnsDataObject")})
+setGeneric(".setImpliedFactorReturnsDataObject", function(object,implied_factor_returns){standardGeneric(".setImpliedFactorReturnsDataObject")})
 
 setMethod(".setImpliedFactorReturnsDataObject",
           signature(object = "VirtualImpliedFactorReturnsDataHandler", implied_factor_returns = "VirtualImpliedFactorReturnsData"),

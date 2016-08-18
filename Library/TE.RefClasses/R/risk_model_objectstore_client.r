@@ -8,6 +8,7 @@ NULL
 #
 #########################################
 
+#' List of risk model objectstore keys
 risk_model_objectstore_keys <-  c("Date")
 
 devtools::use_data(risk_model_objectstore_keys,
@@ -43,7 +44,16 @@ setClass(
 #' @return \code{component} 'character', name of the component beeing accessed.
 #' @export
 
-setGeneric("getRiskModelObjectstoreComponentName", function(object,...){standardGeneric("getRiskModelObjectstoreComponentName")})
+setGeneric("getRiskModelObjectstoreComponentName", function(object){standardGeneric("getRiskModelObjectstoreComponentName")})
+
+#' @describeIn getRiskModelObjectstoreComponentName
+#' Get Risk Model Component Name
+#'
+#' Returns name of the component that given class is accessing
+#'
+#' @inheritParams getRiskModelObjectstoreComponentName
+#' @return \code{component} 'character', name of the component beeing accessed.
+#' @export
 setMethod("getRiskModelObjectstoreComponentName",
           signature(object = "VirtualRiskModelObjectstoreClient"),
           function(object){
@@ -59,9 +69,8 @@ setMethod("getRiskModelObjectstoreComponentName",
 #' @param object object of class 'VirtualRiskModelObjectstoreClient'.
 #' @param key_values 'data.frame' with original query keys to be transformed .
 #' @return \code{query_key_values} 'data.frame', transformed, component specific query keys.
-#' @export
 
-setGeneric(".generateQueryKeyValues", function(object, key_values,...){standardGeneric(".generateQueryKeyValues")})
+setGeneric(".generateQueryKeyValues", function(object, key_values){standardGeneric(".generateQueryKeyValues")})
 setMethod(".generateQueryKeyValues",
           signature(object = "VirtualRiskModelObjectstoreClient",
                     key_values = "data.frame"),
@@ -94,6 +103,16 @@ setMethod(".generateDataFilledWithNA",
           }
 )
 
+
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'VirtualRiskModelObjectstoreClient'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'VirtualRiskModelObjectstoreClient'.
+#' @export
 setMethod("dataRequest",
           signature(object = "VirtualRiskModelObjectstoreClient", key_values = "data.frame"),
           function(object, key_values){

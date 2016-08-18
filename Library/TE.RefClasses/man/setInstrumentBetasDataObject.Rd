@@ -4,7 +4,7 @@
 \alias{setInstrumentBetasDataObject}
 \title{Set instrument_betas object in object slot}
 \usage{
-setInstrumentBetasDataObject(object, instrument_betas, ...)
+setInstrumentBetasDataObject(object, instrument_betas)
 }
 \arguments{
 \item{object}{object of class "VirtualInstrumentBetasDataHandler"}

@@ -1,6 +1,5 @@
 context("Testing DealerData")
 
-
 library(plyr)
 
 #########################

@@ -4,7 +4,7 @@
 \alias{setExtendedTradeDataObject}
 \title{Set ex_trade data object in object slot}
 \usage{
-setExtendedTradeDataObject(object, ex_trade_data, ...)
+setExtendedTradeDataObject(object, ex_trade_data)
 }
 \arguments{
 \item{object}{object of class "VirtualExtendedTradeDataHandler"}

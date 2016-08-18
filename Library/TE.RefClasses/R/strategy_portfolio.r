@@ -56,7 +56,14 @@ setClass(
 #' @return \code{trader_id} integer.
 #' @export
 
-setGeneric("getTraderID", function(object,...){standardGeneric("getTraderID")})
+setGeneric("getTraderID", function(object){standardGeneric("getTraderID")})
+
+#' @describeIn getTraderID
+#' Returns TraderID
+#'
+#' @inheritParams getTraderID
+#' @return \code{trader_id} integer.
+#' @export
 setMethod("getTraderID",
           signature(object = "StrategyPortfolio"),
           function(object){
@@ -66,6 +73,15 @@ setMethod("getTraderID",
 
 
 
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'StrategyPortfolio'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'StrategyPortfolio'.
+#' @export
 setMethod("dataRequest",
           signature(object = "StrategyPortfolio", key_values = "data.frame"),
           function(object, key_values){
@@ -137,7 +153,16 @@ setMethod("dataRequest",
           }
 )
 
-
+#' Pool data required for portfolio
+#'
+#' Pools data from data source specific to derived class implementation
+#' Also computes portfolio weights if necessary
+#'
+#' @param object object of class 'StrategyPortfolio'.
+#' @param start Date start of data range.
+#' @param end Date end of data range.
+#' @return \code{object} object of class 'StrategyPortfolio'.
+#' @export
 setMethod("buildPortfolioHistory",
           signature(object = "StrategyPortfolio"),
           function(object,start,end){

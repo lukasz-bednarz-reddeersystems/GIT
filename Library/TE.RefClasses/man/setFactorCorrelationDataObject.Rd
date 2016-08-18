@@ -4,7 +4,7 @@
 \alias{setFactorCorrelationDataObject}
 \title{Set factor_correlation data object in object slot}
 \usage{
-setFactorCorrelationDataObject(object, factor_correlation, ...)
+setFactorCorrelationDataObject(object, factor_correlation)
 }
 \arguments{
 \item{object}{object of class "VirtualFactorCorrelationDataHandler"}

@@ -4,7 +4,7 @@
 \alias{setPortfolioDataObject}
 \title{Set portfolio object in object slot}
 \usage{
-setPortfolioDataObject(object, portfolio, ...)
+setPortfolioDataObject(object, portfolio)
 }
 \arguments{
 \item{object}{object of class "VirtualPortfolioDataHandler"}

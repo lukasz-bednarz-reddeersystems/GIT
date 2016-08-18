@@ -4,7 +4,7 @@
 \alias{buildPortfolioHistory}
 \title{Pool data required for portfolio}
 \usage{
-buildPortfolioHistory(object, start, end, ...)
+buildPortfolioHistory(object, start, end)
 }
 \arguments{
 \item{object}{object of class 'Portfolio'.}

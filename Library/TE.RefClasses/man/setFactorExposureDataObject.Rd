@@ -4,7 +4,7 @@
 \alias{setFactorExposureDataObject}
 \title{Set event data object in object slot}
 \usage{
-setFactorExposureDataObject(object, factor_exposure_data, ...)
+setFactorExposureDataObject(object, factor_exposure_data)
 }
 \arguments{
 \item{object}{object of class "VirtualFactorExposureDataHandler"}

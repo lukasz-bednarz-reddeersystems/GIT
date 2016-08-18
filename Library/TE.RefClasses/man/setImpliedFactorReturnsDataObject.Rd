@@ -4,7 +4,7 @@
 \alias{setImpliedFactorReturnsDataObject}
 \title{Set implied_factor_returns object in object slot}
 \usage{
-setImpliedFactorReturnsDataObject(object, implied_factor_returns, ...)
+setImpliedFactorReturnsDataObject(object, implied_factor_returns)
 }
 \arguments{
 \item{object}{object of class "VirtualImpliedFactorReturnsDataHandler"}

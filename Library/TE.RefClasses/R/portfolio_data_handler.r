@@ -32,9 +32,16 @@ setClass(
 #' @return \code{portfolio} object of class "Portfolio"
 #' @export
 
+setGeneric("getPortfolioDataObject", function(object){standardGeneric("getPortfolioDataObject")})
 
-setGeneric("getPortfolioDataObject", function(object,...){standardGeneric("getPortfolioDataObject")})
-
+#' @describeIn getPortfolioDataObject
+#' Get portfolio stored in object
+#'
+#' Returns portfolio object of class "Portfolio"
+#'
+#' @inheritParams getPortfolioDataObject
+#' @return \code{portfolio} object of class "Portfolio"
+#' @export
 setMethod("getPortfolioDataObject",
           signature(object = "VirtualPortfolioDataHandler"),
           function(object){
@@ -55,7 +62,7 @@ setMethod("getPortfolioDataObject",
 #' @return \code{object} object of class "VirtualPortfolioDataHandler"
 #' @export
 
-setGeneric("setPortfolioDataObject", function(object,portfolio, ...){standardGeneric("setPortfolioDataObject")})
+setGeneric("setPortfolioDataObject", function(object,portfolio){standardGeneric("setPortfolioDataObject")})
 
 
 
@@ -67,7 +74,7 @@ setGeneric("setPortfolioDataObject", function(object,portfolio, ...){standardGen
 #' @param portfolio object of class "Portfolio"
 #' @return \code{object} object of class "VirtualPortfolioDataHandler"
 
-setGeneric(".setPortfolioDataObject", function(object,portfolio, ...){standardGeneric(".setPortfolioDataObject")})
+setGeneric(".setPortfolioDataObject", function(object,portfolio){standardGeneric(".setPortfolioDataObject")})
 
 setMethod(".setPortfolioDataObject",
           signature(object = "VirtualPortfolioDataHandler", portfolio = "Portfolio"),

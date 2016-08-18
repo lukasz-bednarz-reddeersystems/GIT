@@ -4,6 +4,7 @@
 #
 ####################################
 
+#' Virtual S4 class storing strategy related data
 #' @export
 
 setClass(

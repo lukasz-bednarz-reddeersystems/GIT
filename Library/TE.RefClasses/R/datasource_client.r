@@ -49,7 +49,7 @@ setClass(
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-setGeneric(".PostProcessResultsData", function(object,...){standardGeneric(".PostProcessResultsData")})
+setGeneric(".PostProcessResultsData", function(object){standardGeneric(".PostProcessResultsData")})
 setMethod(".PostProcessResultsData",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -64,9 +64,11 @@ setMethod(".PostProcessResultsData",
 #' has to be implemented in derived classes if it is to be used
 #'
 #' @param object object of class 'VirtualDataSourceClient'.
-#' @return \code{object} object of class 'VirtualDataSourceClient'.
+#' @param ... any parameters passed to specific methods implemented by
+#' inheriting classes
+#' @return \code{data} "data.frame" with data
 
-setGeneric(".generateDataFilledWithNA", function(object, trader, start, end,...){standardGeneric(".generateDataFilledWithNA")})
+setGeneric(".generateDataFilledWithNA", function(object, ...){standardGeneric(".generateDataFilledWithNA")})
 
 
 
@@ -79,7 +81,17 @@ setGeneric(".generateDataFilledWithNA", function(object, trader, start, end,...)
 #' @return \code{key_cols} character vector with list of key column names
 #' @export
 
-setGeneric("getDataSourceQueryKeyColumnNames", function(object,...){standardGeneric("getDataSourceQueryKeyColumnNames")})
+setGeneric("getDataSourceQueryKeyColumnNames", function(object){standardGeneric("getDataSourceQueryKeyColumnNames")})
+
+#' @describeIn getDataSourceQueryKeyColumnNames
+#' Get query key column names
+#'
+#' Private method to return key column names
+#' that are used to query raw data source
+#'
+#' @inheritParams getDataSourceQueryKeyColumnNames
+#' @return \code{key_cols} character vector with list of key column names
+#' @export
 setMethod("getDataSourceQueryKeyColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -95,7 +107,16 @@ setMethod("getDataSourceQueryKeyColumnNames",
 #' @return \code{values} character vector with list of returned source column names
 #' @export
 
-setGeneric("getDataSourceReturnColumnNames", function(object,...){standardGeneric("getDataSourceReturnColumnNames")})
+setGeneric("getDataSourceReturnColumnNames", function(object){standardGeneric("getDataSourceReturnColumnNames")})
+
+#' @describeIn getDataSourceReturnColumnNames
+#' Get returned source data column names
+#'
+#' Returns names of the columns that will be returned from data source
+#'
+#' @inheritParams getDataSourceReturnColumnNames
+#' @return \code{values} character vector with list of returned source column names
+#' @export
 setMethod("getDataSourceReturnColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -112,7 +133,17 @@ setMethod("getDataSourceReturnColumnNames",
 #' @return \code{non_na_cols} character vector with list of returned column names
 #' @export
 
-setGeneric("getNonNAColumnNames", function(object,...){standardGeneric("getNonNAColumnNames")})
+setGeneric("getNonNAColumnNames", function(object){standardGeneric("getNonNAColumnNames")})
+
+#' @describeIn getNonNAColumnNames
+#' Get non - NA's column names
+#'
+#' Returns column names that are required to have non-na values
+#' rows where these columns have NA's will be removed
+#'
+#' @inheritParams getNonNAColumnNames
+#' @return \code{non_na_cols} character vector with list of returned column names
+#' @export
 setMethod("getNonNAColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -129,7 +160,16 @@ setMethod("getNonNAColumnNames",
 #' @return \code{has_non_na_cols} logical
 #' @export
 
-setGeneric("hasNonNAColumnNames", function(object,...){standardGeneric("hasNonNAColumnNames")})
+setGeneric("hasNonNAColumnNames", function(object){standardGeneric("hasNonNAColumnNames")})
+
+#' @describeIn hasNonNAColumnNames
+#' Are any non - NA's column names defined in object
+#'
+#' Returns true if object has columns that are required to have non-na-values
+#'
+#' @inheritParams hasNonNAColumnNames
+#' @return \code{has_non_na_cols} logical
+#' @export
 setMethod("hasNonNAColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -147,7 +187,7 @@ setMethod("hasNonNAColumnNames",
 #' @param key_values data.frame with columns matching key column names()
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-setGeneric(".setDataSourceQueryKeyValues", function(object, key_values, ...){standardGeneric(".setDataSourceQueryKeyValues")})
+setGeneric(".setDataSourceQueryKeyValues", function(object, key_values){standardGeneric(".setDataSourceQueryKeyValues")})
 setMethod(".setDataSourceQueryKeyValues",
           signature(object = "VirtualDataSourceClient", key_values = "data.frame"),
           function(object, key_values) {
@@ -183,7 +223,17 @@ setMethod(".setDataSourceQueryKeyValues",
 #' @return \code{has_non_na_cols} logical
 #' @export
 
-setGeneric("getDataSourceQueryKeyValues", function(object,...){standardGeneric("getDataSourceQueryKeyValues")})
+setGeneric("getDataSourceQueryKeyValues", function(object){standardGeneric("getDataSourceQueryKeyValues")})
+
+#' @describeIn getDataSourceQueryKeyValues
+#' Retreive values of query keys
+#'
+#' Get values of key values datatable
+#' with keys used to  match in datasource query
+#'
+#' @inheritParams getDataSourceQueryKeyValues
+#' @return \code{has_non_na_cols} logical
+#' @export
 setMethod("getDataSourceQueryKeyValues",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -201,7 +251,17 @@ setMethod("getDataSourceQueryKeyValues",
 #' @return \code{column_name_map} hash column name map of the datasource to output names
 #' @export
 
-setGeneric("getDataSourceClientColumnNameMap", function(object,...){standardGeneric("getDataSourceClientColumnNameMap")})
+setGeneric("getDataSourceClientColumnNameMap", function(object){standardGeneric("getDataSourceClientColumnNameMap")})
+
+#' @describeIn getDataSourceClientColumnNameMap
+#' Retreive datasource column name map
+#'
+#' Returns hash with mapping of datasource column names
+#' to reference data class column names
+#'
+#' @inheritParams getDataSourceClientColumnNameMap
+#' @return \code{column_name_map} hash column name map of the datasource to output names
+#' @export
 setMethod("getDataSourceClientColumnNameMap",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -220,7 +280,7 @@ setMethod("getDataSourceClientColumnNameMap",
 #' @return \code{ret_colnames} data source column names translated to
 #' output column names as required by "required Variables"
 
-setGeneric(".translateDataSourceColumnNames", function(object, colnames, ...){standardGeneric(".translateDataSourceColumnNames")})
+setGeneric(".translateDataSourceColumnNames", function(object, colnames){standardGeneric(".translateDataSourceColumnNames")})
 setMethod(".translateDataSourceColumnNames",
           signature(object = "VirtualDataSourceClient", colnames = "character"),
           function(object, colnames){
@@ -246,7 +306,7 @@ setMethod(".translateDataSourceColumnNames",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-setGeneric(".removeNAReferenceData", function(object,...){standardGeneric(".removeNAReferenceData")})
+setGeneric(".removeNAReferenceData", function(object){standardGeneric(".removeNAReferenceData")})
 setMethod(".removeNAReferenceData",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -285,7 +345,7 @@ setMethod(".removeNAReferenceData",
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 #' @export
 
-setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
+setGeneric("dataRequest", function(object, key_values){standardGeneric("dataRequest")})
 
 
 #' Get factorized columns names
@@ -301,7 +361,21 @@ setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dat
 #' @return \code{factorized_cols} character vector with list of factorized column names
 #' @export
 
-setGeneric("getFactorColumnNames", function(object,...){standardGeneric("getFactorColumnNames")})
+setGeneric("getFactorColumnNames", function(object){standardGeneric("getFactorColumnNames")})
+
+#' @describeIn getFactorColumnNames
+#' Get factorized columns names
+#'
+#' Returns names of columns that are going to be factorized.
+#' Factorization is unstacking operation where individual
+#' factor values of factorized columns are turned into separate
+#' set of columns spanning factor levels with logical values
+#' indicating if given factor is present for unique set of
+#' remaining factorization key columns
+#'
+#' @inheritParams getFactorColumnNames
+#' @return \code{factorized_cols} character vector with list of factorized column names
+#' @export
 setMethod("getFactorColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -317,7 +391,16 @@ setMethod("getFactorColumnNames",
 #' @return \code{has_factorized_cols} logical
 #' @export
 
-setGeneric("hasFactorColumnNames", function(object,...){standardGeneric("hasFactorColumnNames")})
+setGeneric("hasFactorColumnNames", function(object){standardGeneric("hasFactorColumnNames")})
+
+#' @describeIn hasFactorColumnNames
+#' Are there any columns to  factorize ?
+#'
+#' Returns TRUE if there are some columns to factorize
+#'
+#' @inheritParams hasFactorColumnNames
+#' @return \code{has_factorized_cols} logical
+#' @export
 setMethod("hasFactorColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -339,7 +422,22 @@ setMethod("hasFactorColumnNames",
 #' @return \code{factorization_keys} character vector with list of key columns used in factorization
 #' @export
 
-setGeneric("getFactorizationKeyColumnNames", function(object,...){standardGeneric("getFactorizationKeyColumnNames")})
+setGeneric("getFactorizationKeyColumnNames", function(object){standardGeneric("getFactorizationKeyColumnNames")})
+
+#' @describeIn getFactorizationKeyColumnNames
+#' Get factorization keys
+#'
+#' Returns names of columns that are going to be used as unique keys
+#' during factorizations.
+#' Factorization is unstacking operation where individual
+#' factor values of factorized columns are turned into separate
+#' set of columns spanning factor levels with logical values
+#' indicating if given factor is present for unique set of
+#' remaining factorization key columns
+#'
+#' @inheritParams getFactorizationKeyColumnNames
+#' @return \code{factorization_keys} character vector with list of key columns used in factorization
+#' @export
 setMethod("getFactorizationKeyColumnNames",
           signature(object = "VirtualDataSourceClient"),
           function(object){
@@ -357,7 +455,7 @@ setMethod("getFactorizationKeyColumnNames",
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
-setGeneric(".transformReferenceData", function(object,...){standardGeneric(".transformReferenceData")})
+setGeneric(".transformReferenceData", function(object){standardGeneric(".transformReferenceData")})
 setMethod(".transformReferenceData",
           signature(object = "VirtualDataSourceClient"),
           function(object){

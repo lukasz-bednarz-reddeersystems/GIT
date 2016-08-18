@@ -4,7 +4,7 @@
 \alias{setPositionDataObject}
 \title{Set position_data object in object slot}
 \usage{
-setPositionDataObject(object, position_data, ...)
+setPositionDataObject(object, position_data)
 }
 \arguments{
 \item{object}{object of class "VirtualPositionDataHandler"}

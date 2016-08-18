@@ -12,12 +12,12 @@ NULL
 #'
 #' Implements handling of access to data via SQL queries.
 #'
-#' @slot db_schema  = "character",
-#' @slot sql_query  = "character",
-#' @slot key_cols   = "character",
-#' @slot key_values = "data.frame",
-#' @slot query_parser = "function",
-#' @slot results_parser = "function"
+#' @slot db_schema "character",
+#' @slot sql_query "character",
+#' @slot key_cols   "character",
+#' @slot key_values "data.frame",
+#' @slot query_parser "function",
+#' @slot results_parser "function"
 
 setClass(
   Class     = "VirtualSQLQuery",
@@ -42,7 +42,7 @@ setClass(
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{db_schema} character
 
-setGeneric(".getSQLQuerySchemaName", function(object,...){standardGeneric(".getSQLQuerySchemaName")})
+setGeneric(".getSQLQuerySchemaName", function(object){standardGeneric(".getSQLQuerySchemaName")})
 setMethod(".getSQLQuerySchemaName",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -58,7 +58,7 @@ setMethod(".getSQLQuerySchemaName",
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{sql_query} character vector of constructed SQL query strings.
 
-setGeneric(".getSQLQueryStrings", function(object,...){standardGeneric(".getSQLQueryStrings")})
+setGeneric(".getSQLQueryStrings", function(object){standardGeneric(".getSQLQueryStrings")})
 setMethod(".getSQLQueryStrings",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -75,7 +75,7 @@ setMethod(".getSQLQueryStrings",
 #' @param queries character vector of constructed SQL query strings.
 #' @return \code{object} object of class 'VirtualSQLQuery'.
 
-setGeneric(".setSQLQueryStrings", function(object, queries, ...){standardGeneric(".setSQLQueryStrings")})
+setGeneric(".setSQLQueryStrings", function(object, queries){standardGeneric(".setSQLQueryStrings")})
 setMethod(".setSQLQueryStrings",
           signature(object = "VirtualSQLQuery", queries = "character"),
           function(object, queries){
@@ -92,7 +92,7 @@ setMethod(".setSQLQueryStrings",
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{key_cols} character vector of constructed SQL query strings.
 
-setGeneric("getSQLQueryKeyColumnNames", function(object,...){standardGeneric("getSQLQueryKeyColumnNames")})
+setGeneric("getSQLQueryKeyColumnNames", function(object){standardGeneric("getSQLQueryKeyColumnNames")})
 setMethod("getSQLQueryKeyColumnNames",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -110,7 +110,7 @@ setMethod("getSQLQueryKeyColumnNames",
 #' @param key_values  data.frame with columns matching key column names()
 #' @return \code{object} object of class 'VirtualSQLQuery'.
 
-setGeneric(".setSQLQueryKeyValues", function(object, key_values, ...){standardGeneric(".setSQLQueryKeyValues")})
+setGeneric(".setSQLQueryKeyValues", function(object, key_values){standardGeneric(".setSQLQueryKeyValues")})
 setMethod(".setSQLQueryKeyValues",
           signature(object = "VirtualSQLQuery", key_values = "data.frame"),
           function(object, key_values) {
@@ -141,7 +141,7 @@ setMethod(".setSQLQueryKeyValues",
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{key_values} data.frame with columns matching key column names()
 
-setGeneric("getSQLQueryKeyValues", function(object,...){standardGeneric("getSQLQueryKeyValues")})
+setGeneric("getSQLQueryKeyValues", function(object){standardGeneric("getSQLQueryKeyValues")})
 setMethod("getSQLQueryKeyValues",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -157,7 +157,7 @@ setMethod("getSQLQueryKeyValues",
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{parser} function used to parse the query keys
 
-setGeneric(".getSQLQueryKeyValuesParser", function(object,...){standardGeneric(".getSQLQueryKeyValuesParser")})
+setGeneric(".getSQLQueryKeyValuesParser", function(object){standardGeneric(".getSQLQueryKeyValuesParser")})
 setMethod(".getSQLQueryKeyValuesParser",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -173,7 +173,7 @@ setMethod(".getSQLQueryKeyValuesParser",
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{results_parser} function used to parse the data
 
-setGeneric(".getSQLQueryResultsParser", function(object,...){standardGeneric(".getSQLQueryResultsParser")})
+setGeneric(".getSQLQueryResultsParser", function(object){standardGeneric(".getSQLQueryResultsParser")})
 setMethod(".getSQLQueryResultsParser",
           signature(object = "VirtualSQLQuery"),
           function(object){
@@ -186,11 +186,11 @@ setMethod(".getSQLQueryResultsParser",
 #'
 #' Parses key_values to vector of SQL query strings
 #'
-#' @rdname VirtualSQLQuery-class
 #' @param object object of class 'VirtualSQLQuery'.
+#' @param key_values "data.frame" with query keys
 #' @return \code{object} object of class 'VirtualSQLQuery'.
 
-setGeneric("prepareSQLQuery", function(object, key_values, ...){standardGeneric("prepareSQLQuery")})
+setGeneric("prepareSQLQuery", function(object, key_values){standardGeneric("prepareSQLQuery")})
 
 
 #' Executes SQL query strings
@@ -202,7 +202,7 @@ setGeneric("prepareSQLQuery", function(object, key_values, ...){standardGeneric(
 #' previously set keys or returns an error.
 #' @return \code{ret_val} data.frame with result of the query
 
-setGeneric("executeSQLQuery", function(object, key_values, ...){standardGeneric("executeSQLQuery")})
+setGeneric("executeSQLQuery", function(object, key_values){standardGeneric("executeSQLQuery")})
 setMethod("executeSQLQuery",
           signature(object = "VirtualSQLQuery", key_values = "missing"),
           function(object){
@@ -293,7 +293,7 @@ setClass(
 #' @param object object of class 'VirtualSQLProcedureCall'.
 #' @return \code{arguments} character vector of names of procedure arguments
 
-setGeneric(".getSQLProcedureArgumentNames", function(object,...){standardGeneric(".getSQLProcedureArgumentNames")})
+setGeneric(".getSQLProcedureArgumentNames", function(object){standardGeneric(".getSQLProcedureArgumentNames")})
 setMethod(".getSQLProcedureArgumentNames",
           signature(object = "VirtualSQLProcedureCall"),
           function(object){
@@ -309,7 +309,7 @@ setMethod(".getSQLProcedureArgumentNames",
 #' @param object object of class 'VirtualSQLProcedureCall'.
 #' @return \code{procedure} character procedure name
 
-setGeneric(".getSQLProcedureName", function(object,...){standardGeneric(".getSQLProcedureName")})
+setGeneric(".getSQLProcedureName", function(object){standardGeneric(".getSQLProcedureName")})
 setMethod(".getSQLProcedureName",
           signature(object = "VirtualSQLProcedureCall"),
           function(object){
@@ -370,7 +370,7 @@ setClass(
 #' @param object object of class 'VirtualRODBCClient'.
 #' @return \code{sql_query} object of type "VirtualSQLQuery"
 
-setGeneric(".getSQLQueryObject", function(object,...){standardGeneric(".getSQLQueryObject")})
+setGeneric(".getSQLQueryObject", function(object){standardGeneric(".getSQLQueryObject")})
 setMethod(".getSQLQueryObject",
           signature(object = "VirtualRODBCClient"),
           function(object){
@@ -387,7 +387,7 @@ setMethod(".getSQLQueryObject",
 #' @param sql_query bject of type "VirtualSQLQuery"
 #' @return \code{object} object of class 'VirtualRODBCClient'.
 
-setGeneric(".setSQLQueryObject", function(object, sql_query,...){standardGeneric(".setSQLQueryObject")})
+setGeneric(".setSQLQueryObject", function(object, sql_query){standardGeneric(".setSQLQueryObject")})
 setMethod(".setSQLQueryObject",
           signature(object = "VirtualRODBCClient", sql_query = "VirtualSQLQuery"),
           function(object, sql_query){
@@ -418,6 +418,15 @@ setMethod(".generateDataFilledWithNA",
 )
 
 
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'VirtualRODBCClient'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'VirtualRODBCClient'.
+#' @export
 setMethod("dataRequest",
           signature(object = "VirtualRODBCClient", key_values = "data.frame"),
           function(object, key_values){

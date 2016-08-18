@@ -5,21 +5,22 @@ Version: 0.1.0
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing Reference Classes for handling,
-    of various data needed for Trading Analytics Engine
+    of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
     TE.DataAccess (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:
-    TE.DataAccess,
     methods,
     lubridate,
     RODBC,
     hash,
     quantmod,
+    stats,
 Suggests:
-    testthat
+    testthat,
+    plyr,
 Collate:
     'TE.RefClasses.r'
     'datasource_client_functions.r'

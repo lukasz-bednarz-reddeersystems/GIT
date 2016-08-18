@@ -33,8 +33,16 @@ setClass(
 #' @return \code{event_data} object of class "VirtualEventData"
 #' @export
 
-setGeneric("getEventDataObject", function(object,...){standardGeneric("getEventDataObject")})
+setGeneric("getEventDataObject", function(object){standardGeneric("getEventDataObject")})
 
+#' @describeIn getEventDataObject
+#' Get event_data stored in object
+#'
+#' Returns event_data object of class "VirtualEventData"
+#'
+#' @inheritParams getEventDataObject
+#' @return \code{event_data} object of class "VirtualEventData"
+#' @export
 setMethod("getEventDataObject",
           signature(object = "VirtualEventDataHandler"),
           function(object){
@@ -54,7 +62,7 @@ setMethod("getEventDataObject",
 #' @return \code{object} object of class "VirtualEventDataHandler"
 #' @export
 
-setGeneric("setEventDataObject", function(object,event_data, ...){standardGeneric("setEventDataObject")})
+setGeneric("setEventDataObject", function(object,event_data){standardGeneric("setEventDataObject")})
 
 
 
@@ -66,7 +74,7 @@ setGeneric("setEventDataObject", function(object,event_data, ...){standardGeneri
 #' @param event_data object of class "VirtualEventData"
 #' @return \code{object} object of class "VirtualEventDataHandler"
 
-setGeneric(".setEventDataObject", function(object,event_data, ...){standardGeneric(".setEventDataObject")})
+setGeneric(".setEventDataObject", function(object,event_data){standardGeneric(".setEventDataObject")})
 
 setMethod(".setEventDataObject",
           signature(object = "VirtualEventDataHandler", event_data = "VirtualEventData"),

@@ -4,7 +4,7 @@
 \alias{setFactorVarianceDataObject}
 \title{Set factor_variance object in object slot}
 \usage{
-setFactorVarianceDataObject(object, factor_variance, ...)
+setFactorVarianceDataObject(object, factor_variance)
 }
 \arguments{
 \item{object}{object of class "VirtualFactorVarianceDataHandler"}

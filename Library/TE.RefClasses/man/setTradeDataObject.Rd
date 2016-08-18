@@ -4,7 +4,7 @@
 \alias{setTradeDataObject}
 \title{Set trade_data object in object slot}
 \usage{
-setTradeDataObject(object, trade_data, ...)
+setTradeDataObject(object, trade_data)
 }
 \arguments{
 \item{object}{object of class "VirtualTradeDataHandler"}

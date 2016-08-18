@@ -32,8 +32,16 @@ setClass(
 #' @return \code{factor_correlation} object of class "VirtualFactorCorrelationData"
 #' @export
 
-setGeneric("getFactorCorrelationDataObject", function(object,...){standardGeneric("getFactorCorrelationDataObject")})
+setGeneric("getFactorCorrelationDataObject", function(object){standardGeneric("getFactorCorrelationDataObject")})
 
+#' @describeIn getFactorCorrelationDataObject
+#' Get factor_correlation data stored in object
+#'
+#' Returns factor_correlation object of class "VirtualFactorCorrelationData"
+#'
+#' @inheritParams getFactorCorrelationDataObject
+#' @return \code{factor_correlation} object of class "VirtualFactorCorrelationData"
+#' @export
 setMethod("getFactorCorrelationDataObject",
           signature(object = "VirtualFactorCorrelationDataHandler"),
           function(object){
@@ -52,7 +60,7 @@ setMethod("getFactorCorrelationDataObject",
 #' @return \code{object} object of class "VirtualFactorCorrelationDataHandler"
 #' @export
 
-setGeneric("setFactorCorrelationDataObject", function(object,factor_correlation, ...){standardGeneric("setFactorCorrelationDataObject")})
+setGeneric("setFactorCorrelationDataObject", function(object,factor_correlation){standardGeneric("setFactorCorrelationDataObject")})
 
 
 #' Set factor_correlation data object in object slot
@@ -63,7 +71,7 @@ setGeneric("setFactorCorrelationDataObject", function(object,factor_correlation,
 #' @param factor_correlation object of class "VirtualFactorCorrelationData"
 #' @return \code{object} object of class "VirtualFactorCorrelationDataHandler"
 
-setGeneric(".setFactorCorrelationDataObject", function(object,factor_correlation, ...){standardGeneric(".setFactorCorrelationDataObject")})
+setGeneric(".setFactorCorrelationDataObject", function(object,factor_correlation){standardGeneric(".setFactorCorrelationDataObject")})
 
 setMethod(".setFactorCorrelationDataObject",
           signature(object = "VirtualFactorCorrelationDataHandler", factor_correlation = "VirtualFactorCorrelationData"),

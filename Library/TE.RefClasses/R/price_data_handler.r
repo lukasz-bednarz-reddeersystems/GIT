@@ -36,8 +36,16 @@ setClass(
 #' @return \code{price_data} object of class "VirtualPriceData"
 #' @export
 
-setGeneric("getPriceDataObject", function(object,...){standardGeneric("getPriceDataObject")})
+setGeneric("getPriceDataObject", function(object){standardGeneric("getPriceDataObject")})
 
+#' @describeIn getPriceDataObject
+#' Get price_data stored in object
+#'
+#' Returns price_data object of class "VirtualPriceData"
+#'
+#' @inheritParams getPriceDataObject
+#' @return \code{price_data} object of class "VirtualPriceData"
+#' @export
 setMethod("getPriceDataObject",
           signature(object = "VirtualPriceDataHandler"),
           function(object){
@@ -57,7 +65,7 @@ setMethod("getPriceDataObject",
 #' @return \code{object} object of class "VirtualPriceDataHandler"
 #' @export
 
-setGeneric("setPriceDataObject", function(object,position_data, ...){standardGeneric("setPriceDataObject")})
+setGeneric("setPriceDataObject", function(object,price_data){standardGeneric("setPriceDataObject")})
 
 
 
@@ -70,7 +78,7 @@ setGeneric("setPriceDataObject", function(object,position_data, ...){standardGen
 #' @param price_data object of class "VirtualPriceData"
 #' @return \code{object} object of class "VirtualPriceDataHandler"
 
-setGeneric(".setPriceDataObject", function(object,price_data, ...){standardGeneric(".setPriceDataObject")})
+setGeneric(".setPriceDataObject", function(object,price_data){standardGeneric(".setPriceDataObject")})
 
 setMethod(".setPriceDataObject",
           signature(object = "VirtualPriceDataHandler", price_data = "VirtualPriceData"),

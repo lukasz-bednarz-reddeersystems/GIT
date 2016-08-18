@@ -33,8 +33,16 @@ setClass(
 #' @return \code{ex_trade_data} object of class "VirtualExtendedTradeData"
 #' @export
 
-setGeneric("getExtendedTradeDataObject", function(object,...){standardGeneric("getExtendedTradeDataObject")})
+setGeneric("getExtendedTradeDataObject", function(object){standardGeneric("getExtendedTradeDataObject")})
 
+#' @describeIn  getExtendedTradeDataObject
+#' Get ex_trade data stored in object
+#'
+#' Returns ex_trade_data object of class "VirtualExtendedTradeData"
+#'
+#' @inheritParams getExtendedTradeDataObject
+#' @return \code{ex_trade_data} object of class "VirtualExtendedTradeData"
+#' @export
 setMethod("getExtendedTradeDataObject",
           signature(object = "VirtualExtendedTradeDataHandler"),
           function(object){
@@ -53,7 +61,7 @@ setMethod("getExtendedTradeDataObject",
 #' @return \code{object} object of class "VirtualExtendedTradeDataHandler"
 #' @export
 
-setGeneric("setExtendedTradeDataObject", function(object,ex_trade_data, ...){standardGeneric("setExtendedTradeDataObject")})
+setGeneric("setExtendedTradeDataObject", function(object,ex_trade_data){standardGeneric("setExtendedTradeDataObject")})
 
 
 #' Set ex_trade data object in object slot
@@ -64,7 +72,7 @@ setGeneric("setExtendedTradeDataObject", function(object,ex_trade_data, ...){sta
 #' @param ex_trade_data object of class "VirtualExtendedTradeData"
 #' @return \code{object} object of class "VirtualExtendedTradeDataHandler"
 
-setGeneric(".setExtendedTradeDataObject", function(object,ex_trade_data, ...){standardGeneric(".setExtendedTradeDataObject")})
+setGeneric(".setExtendedTradeDataObject", function(object,ex_trade_data){standardGeneric(".setExtendedTradeDataObject")})
 
 setMethod(".setExtendedTradeDataObject",
           signature(object = "VirtualExtendedTradeDataHandler", ex_trade_data = "VirtualTradeData"),

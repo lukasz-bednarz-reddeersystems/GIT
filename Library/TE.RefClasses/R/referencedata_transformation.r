@@ -3,6 +3,12 @@
 #' @include transformation_functions.r
 NULL
 
+#' Union class ReferenceDataTransformationData
+#' union of "VirtualReferenceData" and "NULL"
+#'
+#' @title ReferenceDataTransformationData-class
+#' @name ReferenceDataTransformationData-class
+#' @docType class
 #' @exportClass ReferenceDataTransformationData
 setClassUnion("ReferenceDataTransformationData",c("VirtualReferenceData","NULL"))
 
@@ -30,6 +36,12 @@ setClass(
   contains = c("VirtualTransformation", "VIRTUAL")
 )
 
+#' Initialize method for "VirtualReferenceDataTransformation" class
+#'
+#' @param .Object, object of class "VirtualReferenceDataTransformation"
+#' @param ref_data object of class derived from "VirtualReferenceData"
+#' @return \code{.Object} object of class "VirtualReferenceDataTransformation"
+
 setMethod("initialize",
           signature(.Object = "VirtualReferenceDataTransformation"),
           function(.Object, ref_data ){
@@ -56,7 +68,16 @@ setMethod("initialize",
 #' @return \code{ref_data} object of class 'VirtualReferenceData'.
 #' @export
 
-setGeneric("getReferenceDataObject",function(object,...){standardGeneric("getReferenceDataObject")})
+setGeneric("getReferenceDataObject",function(object){standardGeneric("getReferenceDataObject")})
+
+#' @describeIn getReferenceDataObject
+#' Get stored VirtualReferenceData Object
+#'
+#' Returns VirtualReferenceData object on which transformation is beeing done
+#'
+#' @inheritParams getReferenceDataObject
+#' @return \code{ref_data} object of class 'VirtualReferenceData'.
+#' @export
 setMethod("getReferenceDataObject",
           signature(object = "VirtualReferenceDataTransformation"),
           function(object){
@@ -75,7 +96,16 @@ setMethod("getReferenceDataObject",
 #' @return \code{ref_data} object of class 'VirtualReferenceDataTransformation'.
 #' @export
 
-setGeneric("setReferenceDataObject",function(object, ref_data, ...){standardGeneric("setReferenceDataObject")})
+setGeneric("setReferenceDataObject",function(object, ref_data){standardGeneric("setReferenceDataObject")})
+
+#' @describeIn setReferenceDataObject
+#' Set VirtualReferenceData Object
+#'
+#' Sets VirtualReferenceData object on which transformation is beeing done
+#'
+#' @inheritParams setReferenceDataObject
+#' @return \code{ref_data} object of class 'VirtualReferenceDataTransformation'.
+#' @export
 setMethod("setReferenceDataObject",
           signature(object = "VirtualReferenceDataTransformation",
                     ref_data = "VirtualReferenceData"),

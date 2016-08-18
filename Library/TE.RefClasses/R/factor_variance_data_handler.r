@@ -31,8 +31,16 @@ setClass(
 #' @return \code{factor_variance} object of class "VirtualFactorVarianceData"
 #' @export
 
-setGeneric("getFactorVarianceDataObject", function(object,...){standardGeneric("getFactorVarianceDataObject")})
+setGeneric("getFactorVarianceDataObject", function(object){standardGeneric("getFactorVarianceDataObject")})
 
+#' @describeIn getFactorVarianceDataObject
+#' Get factor_variance stored in object
+#'
+#' Returns factor_variance object of class "VirtualFactorVarianceData"
+#'
+#' @inheritParams getFactorVarianceDataObject
+#' @return \code{factor_variance} object of class "VirtualFactorVarianceData"
+#' @export
 setMethod("getFactorVarianceDataObject",
           signature(object = "VirtualFactorVarianceDataHandler"),
           function(object){
@@ -52,8 +60,7 @@ setMethod("getFactorVarianceDataObject",
 #' @return \code{object} object of class "VirtualFactorVarianceDataHandler"
 #' @export
 
-
-setGeneric("setFactorVarianceDataObject", function(object,factor_variance, ...){standardGeneric("setFactorVarianceDataObject")})
+setGeneric("setFactorVarianceDataObject", function(object,factor_variance){standardGeneric("setFactorVarianceDataObject")})
 
 
 #' Set factor_variance object in object slot
@@ -64,7 +71,7 @@ setGeneric("setFactorVarianceDataObject", function(object,factor_variance, ...){
 #' @param factor_variance object of class "VirtualFactorVarianceData"
 #' @return \code{object} object of class "VirtualFactorVarianceDataHandler"
 
-setGeneric(".setFactorVarianceDataObject", function(object,factor_variance, ...){standardGeneric(".setFactorVarianceDataObject")})
+setGeneric(".setFactorVarianceDataObject", function(object,factor_variance){standardGeneric(".setFactorVarianceDataObject")})
 
 setMethod(".setFactorVarianceDataObject",
           signature(object = "VirtualFactorVarianceDataHandler", factor_variance = "VirtualFactorVarianceData"),

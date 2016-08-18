@@ -33,7 +33,16 @@ setClass(
 #' @return \code{datastore_name} character
 #' @export
 
-setGeneric("getDataStoreName", function(object,...){standardGeneric("getDataStoreName")})
+setGeneric("getDataStoreName", function(object){standardGeneric("getDataStoreName")})
+
+#' @describeIn getDataStoreName
+#' Get source datastore name
+#'
+#' Returns name of the datastore which will be querried when asked to fill data.
+#'
+#' @inheritParams getDataStoreName
+#' @return \code{datastore_name} character
+#' @export
 setMethod("getDataStoreName",
           signature(object = "VirtualDataStoreClient"),
           function(object){
@@ -41,6 +50,15 @@ setMethod("getDataStoreName",
           }
 )
 
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'VirtualDataStoreClient'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'VirtualDataStoreClient'.
+#' @export
 setMethod("dataRequest",
           signature(object = "VirtualDataStoreClient", key_values = "data.frame"),
           function(object, key_values){

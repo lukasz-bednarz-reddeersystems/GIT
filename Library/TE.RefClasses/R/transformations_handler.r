@@ -29,7 +29,7 @@ setClass(
 #' @param object object of class 'VirtualTransformationHandler'.
 #' @return \code{transformations} list of "VirtualReferenceDataTransformation" objects attached.
 
-setGeneric("getTransformations",function(object, ...){standardGeneric("getTransformations")})
+setGeneric("getTransformations",function(object){standardGeneric("getTransformations")})
 setMethod("getTransformations",
           signature(object = "VirtualTransformationsHandler"),
           function(object){
@@ -45,7 +45,7 @@ setMethod("getTransformations",
 #' @param transformation object of class "VirtualReferenceDataTransformation"
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 
-setGeneric(".addTransformation",function(object, transformation, ...){standardGeneric(".addTransformation")})
+setGeneric(".addTransformation",function(object, transformation){standardGeneric(".addTransformation")})
 setMethod(".addTransformation",
           signature(object = "VirtualTransformationsHandler",
                     transformation = "VirtualReferenceDataTransformation"),
@@ -65,7 +65,7 @@ setMethod(".addTransformation",
 #' @param transformations list of objects of class "VirtualReferenceDataTransformation"
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 
-setGeneric(".setTransformations",function(object, transformations, ...){standardGeneric(".setTransformations")})
+setGeneric(".setTransformations",function(object, transformations){standardGeneric(".setTransformations")})
 # returns list of VirtualReferenceDataTransformation attached to VirtualTransformationHandler (data computed from existing VirtualTransformationHandler data).
 #
 # Args:
@@ -91,7 +91,17 @@ setMethod(".setTransformations",
 #' @return \code{is_attached} logical.
 #' @export
 
-setGeneric("isTransformationAttached", function(object, transformation, ...){standardGeneric("isTransformationAttached")})
+setGeneric("isTransformationAttached", function(object, transformation){standardGeneric("isTransformationAttached")})
+
+#' @describeIn isTransformationAttached
+#' Check if given transformation is attached
+#'
+#' Returns logical value indicating if given transformation
+#' is attached to the object
+#'
+#' @inheritParams VirtualTransformationsHandler
+#' @return \code{is_attached} logical.
+#' @export
 setMethod("isTransformationAttached",
           signature(object = "VirtualTransformationsHandler", transformation = "VirtualReferenceDataTransformation"),
           function(object, transformation){
@@ -113,11 +123,21 @@ setMethod("isTransformationAttached",
 #'
 #' @param object object of class 'VirtualTransformationHandler'.
 #' @param transformation objects of clas "VirtualReferenceDataTransformation"
+#' @param replace "logical" replace transformation if already attached.
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 #' @export
 
+setGeneric("attachTransformation",function(object,transformation, replace){standardGeneric("attachTransformation")})
 
-setGeneric("attachTransformation",function(object,transformation, ...){standardGeneric("attachTransformation")})
+#' @describeIn attachTransformation
+#' Attach transformation to the object
+#'
+#' Attaches new columns with new transformations
+#' (data computed from existing VirtualTransformationHandler data)
+#'
+#' @inheritParams attachTransformation
+#' @return \code{object} object of class 'VirtualTransformationHandler'.
+#' @export
 setMethod("attachTransformation",
           signature(object = "VirtualTransformationsHandler", transformation = "VirtualReferenceDataTransformation"),
           function(object,transformation,replace=TRUE){
@@ -162,6 +182,8 @@ setMethod("attachTransformation",
           }
 )
 
+
+
 #' Attach transformations to the object
 #'
 #' Attaches new columns with new transformations
@@ -169,10 +191,21 @@ setMethod("attachTransformation",
 #'
 #' @param object object of class 'VirtualTransformationHandler'.
 #' @param transformations list of objects of class "VirtualReferenceDataTransformation"
+#' @param replace "logical" replace transformation(s) if already attached.
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 #' @export
 
-setGeneric("attachTransformations",function(object,transformations, ...){standardGeneric("attachTransformations")})
+setGeneric("attachTransformations",function(object,transformations, replace){standardGeneric("attachTransformations")})
+
+#' @describeIn attachTransformations
+#' Attach transformations to the object
+#'
+#' Attaches new columns with new transformations
+#' (data computed from existing VirtualTransformationHandler data)
+#'
+#' @inheritParams VirtualTransformationsHandler
+#' @return \code{object} object of class 'VirtualTransformationHandler'.
+#' @export
 setMethod("attachTransformations",
           signature(object = "VirtualTransformationsHandler", transformations = "list"),
           function(object,transformations,replace=TRUE){

@@ -4,7 +4,7 @@
 \alias{setEventDataObject}
 \title{Set event_data object in object slot}
 \usage{
-setEventDataObject(object, event_data, ...)
+setEventDataObject(object, event_data)
 }
 \arguments{
 \item{object}{object of class "VirtualEventDataHandler"}

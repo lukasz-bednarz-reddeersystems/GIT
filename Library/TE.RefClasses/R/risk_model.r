@@ -33,7 +33,16 @@ setClass(
 #' @return \code{model_name} 'character', name of the model.
 #' @export
 
-setGeneric("getRiskModelName", function(object,...){standardGeneric("getRiskModelName")})
+setGeneric("getRiskModelName", function(object){standardGeneric("getRiskModelName")})
+
+#' @describeIn getRiskModelName
+#' Get Risk Model Name
+#'
+#' Returns name of Risk Model
+#'
+#' @inheritParams getRiskModelName
+#' @return \code{model_name} 'character', name of the model.
+#' @export
 setMethod("getRiskModelName",
           signature(object = "VirtualRiskModel"),
           function(object){
@@ -50,7 +59,16 @@ setMethod("getRiskModelName",
 #' @return \code{model_prefix} 'character', model prefix.
 #' @export
 
-setGeneric("getRiskModelPrefix", function(object,...){standardGeneric("getRiskModelPrefix")})
+setGeneric("getRiskModelPrefix", function(object){standardGeneric("getRiskModelPrefix")})
+
+#' @describeIn getRiskModelPrefix
+#' Get Risk Model Prefix
+#'
+#' Returns prefix of Risk Model used to construct model store querries
+#'
+#' @inheritParams getRiskModelPrefix
+#' @return \code{model_prefix} 'character', model prefix.
+#' @export
 setMethod("getRiskModelPrefix",
           signature(object = "VirtualRiskModel"),
           function(object){
@@ -69,7 +87,17 @@ setMethod("getRiskModelPrefix",
 #' @return \code{lookback} 'integer'
 #' @export
 
-setGeneric("getRiskModelLookback", function(object,...){standardGeneric("getRiskModelLookback")})
+setGeneric("getRiskModelLookback", function(object){standardGeneric("getRiskModelLookback")})
+
+#' @describeIn getRiskModelLookback
+#' Get Risk Model Lookback
+#'
+#' Returns model lookback value in days. Lookback is number of
+#' calendar days over which model is calculated.
+#'
+#' @inheritParams getRiskModelLookback
+#' @return \code{lookback} 'integer'
+#' @export
 setMethod("getRiskModelLookback",
           signature(object = "VirtualRiskModel"),
           function(object){
@@ -86,7 +114,16 @@ setMethod("getRiskModelLookback",
 #' @return \code{model_universe} 'character', name of the universe covered by the model
 #' @export
 
-setGeneric("getRiskModelUniverse", function(object,...){standardGeneric("getRiskModelUniverse")})
+setGeneric("getRiskModelUniverse", function(object){standardGeneric("getRiskModelUniverse")})
+
+#' @describeIn getRiskModelUniverse
+#' Get Risk Model Universe
+#'
+#' Returns name of universe for which model is computed.
+#'
+#' @inheritParams getRiskModelUniverse
+#' @return \code{model_universe} 'character', name of the universe covered by the model
+#' @export
 setMethod("getRiskModelUniverse",
           signature(object = "VirtualRiskModel"),
           function(object){
@@ -102,7 +139,16 @@ setMethod("getRiskModelUniverse",
 #' @return \code{model_factors} 'character', vector of factor names
 #' @export
 
-setGeneric("getRiskModelFactorNames", function(object,...){standardGeneric("getRiskModelFactorNames")})
+setGeneric("getRiskModelFactorNames", function(object){standardGeneric("getRiskModelFactorNames")})
+
+#' @describeIn getRiskModelFactorNames
+#' Get Risk Model Factor Names
+#'
+#' Returns names of factors included in the model
+#'
+#' @inheritParams getRiskModelFactorNames
+#' @return \code{model_factors} 'character', vector of factor names
+#' @export
 setMethod("getRiskModelFactorNames",
           signature(object = "VirtualRiskModel"),
           function(object){
@@ -116,9 +162,16 @@ setMethod("getRiskModelFactorNames",
 #
 ####################################
 
+#' List of risk model market factors
 risk_model_market_factors <- c('Earnings','Growth','PriceMomentum12M','PriceMomentum1M','Size','StreetSentiment','Strength','TrendExtension','Value','Volatility')
+
+#' List of risk model currency factors
 risk_model_currency_factors <- c('JPY','GBP','EUR','CNY','RUB','ZAR','HKD','AUD','DKK','NOK','SEK','CHF','ILS','PLN','HUF','TRY')
+
+#' List of risk model commodity factors
 risk_model_commodity_factors <- c('WTI')
+
+#' List of risk model sector factors
 risk_model_sector_factors <- c('SX3P','SX4P','SX6P','SX7P','SX86P','SX8P','SXAP','SXDP','SXEP','SXFP','SXKP','SXMP','SXNP','SXOP','SXPP','SXQP','SXRP','SXTP')
 
 devtools::use_data(risk_model_market_factors,

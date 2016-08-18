@@ -4,7 +4,7 @@
 \alias{setMarketStyleDataObject}
 \title{Set market_style object in object slot}
 \usage{
-setMarketStyleDataObject(object, market_style, ...)
+setMarketStyleDataObject(object, market_style)
 }
 \arguments{
 \item{object}{object of class "VirtualMarketStyleDataHandler"}

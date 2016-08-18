@@ -4,7 +4,7 @@
 \alias{getSQLQueryKeyColumnNames}
 \title{Get sql query column names}
 \usage{
-getSQLQueryKeyColumnNames(object, ...)
+getSQLQueryKeyColumnNames(object)
 }
 \arguments{
 \item{object}{object of class 'VirtualSQLQuery'.}

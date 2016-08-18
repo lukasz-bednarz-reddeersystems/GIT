@@ -30,16 +30,37 @@ setClass(
 #' Returns post processing model used to assembly data.
 #'
 #' @param object object of class "VirtualPPModelClient"
+#' @return \code{model_class} "character" name of the model class
 #' @export
 
-setGeneric("getPPModelClass", function(object,...){standardGeneric("getPPModelClass")})
+setGeneric("getPPModelClass", function(object){standardGeneric("getPPModelClass")})
 
+#' @describeIn getPPModelClass
+#' Get Post Processing Model Class
+#'
+#' Returns post processing model used to assembly data.
+#'
+#' @inheritParams getPPModelClass
+#' @return \code{model_class} "character" name of the model class
+#' @export
 setMethod("getPPModelClass",
           signature(object = "VirtualPPModelClient"),
           function(object){
             return(object@model_class)
           }
 )
+
+
+
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'VirtualPPModelClient'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'VirtualPPModelClient'.
+#' @export
 
 setMethod("dataRequest",
           signature(object = "VirtualPPModelClient", key_values = "data.frame"),
@@ -116,8 +137,8 @@ setMethod("dataRequest",
 
             if (0 == nrow(ret_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
-              message(paste("Query sent to", datastore, "returned zero row data.frame"))
-              stop(paste("Query sent to", datastore, "returned zero row data.frame"))
+              message(paste("Query sent to PPModel Objectstore for class", model, "returned zero row data.frame"))
+              stop(paste("Query sent to PModel Objectstore for class", model, "returned zero row data.frame"))
             }
 
             # translating column names

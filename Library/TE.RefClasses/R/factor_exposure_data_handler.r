@@ -35,8 +35,16 @@ setClass(
 #' @return \code{factor_exposure_data} object of class "VirtualFactorExposureData"
 #' @export
 
-setGeneric("getFactorExposureDataObject", function(object,...){standardGeneric("getFactorExposureDataObject")})
+setGeneric("getFactorExposureDataObject", function(object){standardGeneric("getFactorExposureDataObject")})
 
+#' @describeIn getFactorExposureDataObject
+#' Get factor_exposure_data stored in object
+#'
+#' Returns factor_exposure_data object of class "VirtualFactorExposureData"
+#'
+#' @inheritParams getFactorExposureDataObject
+#' @return \code{factor_exposure_data} object of class "VirtualFactorExposureData"
+#' @export
 setMethod("getFactorExposureDataObject",
           signature(object = "VirtualFactorExposureDataHandler"),
           function(object){
@@ -56,7 +64,7 @@ setMethod("getFactorExposureDataObject",
 #' @return \code{object} object of class "VirtualFactorExposureDataHandler"
 #' @export
 
-setGeneric("setFactorExposureDataObject", function(object,factor_exposure_data, ...){standardGeneric("setFactorExposureDataObject")})
+setGeneric("setFactorExposureDataObject", function(object,factor_exposure_data){standardGeneric("setFactorExposureDataObject")})
 
 
 #' Set event data object in object slot
@@ -67,7 +75,7 @@ setGeneric("setFactorExposureDataObject", function(object,factor_exposure_data, 
 #' @param factor_exposure_data object of class "VirtualFactorExposureData"
 #' @return \code{object} object of class "VirtualFactorExposureDataHandler"
 
-setGeneric(".setFactorExposureDataObject", function(object,factor_exposure_data, ...){standardGeneric(".setFactorExposureDataObject")})
+setGeneric(".setFactorExposureDataObject", function(object,factor_exposure_data){standardGeneric(".setFactorExposureDataObject")})
 
 setMethod(".setFactorExposureDataObject",
           signature(object = "VirtualFactorExposureDataHandler", factor_exposure_data = "VirtualFactorExposureData"),

@@ -31,8 +31,16 @@ setClass(
 #' @return \code{market_style} object of class "VirtualMarketStyleData"
 #' @export
 
-setGeneric("getMarketStyleDataObject", function(object,...){standardGeneric("getMarketStyleDataObject")})
+setGeneric("getMarketStyleDataObject", function(object){standardGeneric("getMarketStyleDataObject")})
 
+#' @describeIn getMarketStyleDataObject
+#' Get market_style stored in object
+#'
+#' Returns market_style object of class "VirtualMarketStyleData"
+#'
+#' @inheritParams getMarketStyleDataObject
+#' @return \code{market_style} object of class "VirtualMarketStyleData"
+#' @export
 setMethod("getMarketStyleDataObject",
           signature(object = "VirtualMarketStyleDataHandler"),
           function(object){
@@ -53,7 +61,7 @@ setMethod("getMarketStyleDataObject",
 #' @return \code{object} object of class "VirtualMarketStyleDataHandler"
 #' @export
 
-setGeneric("setMarketStyleDataObject", function(object,market_style, ...){standardGeneric("setMarketStyleDataObject")})
+setGeneric("setMarketStyleDataObject", function(object,market_style){standardGeneric("setMarketStyleDataObject")})
 
 
 
@@ -65,7 +73,7 @@ setGeneric("setMarketStyleDataObject", function(object,market_style, ...){standa
 #' @param market_style object of class "VirtualMarketStyleData"
 #' @return \code{object} object of class "VirtualMarketStyleDataHandler"
 
-setGeneric(".setMarketStyleDataObject", function(object,market_style, ...){standardGeneric(".setMarketStyleDataObject")})
+setGeneric(".setMarketStyleDataObject", function(object,market_style){standardGeneric(".setMarketStyleDataObject")})
 
 setMethod(".setMarketStyleDataObject",
           signature(object = "VirtualMarketStyleDataHandler", market_style = "VirtualMarketStyleData"),

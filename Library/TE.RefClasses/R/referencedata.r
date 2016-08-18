@@ -43,6 +43,13 @@ setClass(
   validity = referencedata_validity
 )
 
+
+#' Union class NullableReferenceData
+#' union of "VirtualReferenceData" and "NULL"
+#'
+#' @title NullableReferenceData-class
+#' @name NullableReferenceData-class
+#' @docType class
 #' @exportClass NullableReferenceData
 setClassUnion("NullableReferenceData", c("VirtualReferenceData", "NULL"))
 
@@ -56,7 +63,17 @@ setClassUnion("NullableReferenceData", c("VirtualReferenceData", "NULL"))
 #' @return \code{unique_rows} logical, are stored rows unique
 #' @export
 
-setGeneric("getForceUniqueRows", function(object,...){standardGeneric("getForceUniqueRows")})
+setGeneric("getForceUniqueRows", function(object){standardGeneric("getForceUniqueRows")})
+
+#' @describeIn getForceUniqueRows
+#' Are stored rows forced to be unique
+#'
+#' Returns logical value indicating if stored reference data
+#' rows are forced to be unique.
+#'
+#' @inheritParams getForceUniqueRows
+#' @return \code{unique_rows} logical, are stored rows unique
+#' @export
 setMethod("getForceUniqueRows", "VirtualReferenceData",
           function(object){
             return(object@unique_rows)
@@ -71,7 +88,16 @@ setMethod("getForceUniqueRows", "VirtualReferenceData",
 #' @return \code{column_names} character vector, list of stored column names
 #' @export
 
-setGeneric("getStoredVariablesNames", function(object,...){standardGeneric("getStoredVariablesNames")})
+setGeneric("getStoredVariablesNames", function(object){standardGeneric("getStoredVariablesNames")})
+
+#' @describeIn getStoredVariablesNames
+#' Get names of stored reference data variables
+#'
+#' Returns vector of column names of stored data
+#'
+#' @inheritParams getStoredVariablesNames
+#' @return \code{column_names} character vector, list of stored column names
+#' @export
 setMethod("getStoredVariablesNames", "VirtualReferenceData",
           function(object){
             return(object@column_names)
@@ -86,7 +112,16 @@ setMethod("getStoredVariablesNames", "VirtualReferenceData",
 #' @return \code{stored_rows} integer, list of stored column names
 #' @export
 
-setGeneric("getStoredNRows", function(object,...){standardGeneric("getStoredNRows")})
+setGeneric("getStoredNRows", function(object){standardGeneric("getStoredNRows")})
+
+#' @describeIn getStoredNRows
+#' Number of currently stored rows
+#'
+#' Returns count of currently stored rows
+#'
+#' @inheritParams getStoredNRows
+#' @return \code{stored_rows} integer, list of stored column names
+#' @export
 setMethod("getStoredNRows", "VirtualReferenceData",
           function(object){
             return(object@stored_rows)
@@ -102,7 +137,7 @@ setMethod("getStoredNRows", "VirtualReferenceData",
 #' @param nrows integer number of stored rows.
 #' @return \code{object} object of class 'VirtualReferenceData'.
 
-setGeneric(".setStoredNRows", function(object,nrows, ...){standardGeneric(".setStoredNRows")})
+setGeneric(".setStoredNRows", function(object,nrows){standardGeneric(".setStoredNRows")})
 setMethod(".setStoredNRows",
           signature(object = "VirtualReferenceData", nrows = "numeric"),
           function(object, nrows){
@@ -119,7 +154,7 @@ setMethod(".setStoredNRows",
 #' @param names character vector of new Stored Variable names.
 #' @return \code{object} object of class 'VirtualReferenceData'.
 
-setGeneric(".setStoredVariablesNames", function(object, names, ...){standardGeneric(".setStoredVariablesNames")})
+setGeneric(".setStoredVariablesNames", function(object, names){standardGeneric(".setStoredVariablesNames")})
 setMethod(".setStoredVariablesNames",
           signature(object = "VirtualReferenceObject", names = "character"),
           function(object, names){
@@ -136,7 +171,7 @@ setMethod(".setStoredVariablesNames",
 #' @param names character vector of new Stored Variable names.
 #' @return \code{object} object of class 'VirtualReferenceData'.
 
-setGeneric(".updateStoredVariablesNames", function(object,...){standardGeneric(".updateStoredVariablesNames")})
+setGeneric(".updateStoredVariablesNames", function(object){standardGeneric(".updateStoredVariablesNames")})
 setMethod(".updateStoredVariablesNames", "VirtualReferenceData",
           function(object){
             object <- .setStoredVariablesNames(object, colnames(getReferenceData(object)))
@@ -162,7 +197,16 @@ setMethod(".updateStoredVariablesNames", "VirtualReferenceData",
 #' @return \code{object} object object of class 'VirtualReferenceData'.
 #' @export
 
-setGeneric("setReferenceData", function(object,data, ...){standardGeneric("setReferenceData")})
+setGeneric("setReferenceData", function(object,data){standardGeneric("setReferenceData")})
+
+#' @describeIn setReferenceData
+#' Set stored data to value provided
+#'
+#' Sets new values to stored data. Erases any previous data without warning
+#'
+#' @inheritParams setReferenceData
+#' @return \code{object} object object of class 'VirtualReferenceData'.
+#' @export
 setMethod("setReferenceData",
           signature(object = "VirtualReferenceData", data = "data.frame"),
           function(object,data){
@@ -215,7 +259,16 @@ setMethod("setReferenceData",
 #' @return \code{data} data.frame with stored data..
 #' @export
 
-setGeneric("getReferenceData", function(object, ...){standardGeneric("getReferenceData")})
+setGeneric("getReferenceData", function(object){standardGeneric("getReferenceData")})
+
+#' @describeIn getReferenceData
+#' get stored data
+#'
+#' Returns data.frame with stored data.
+#'
+#' @inheritParams getReferenceData
+#' @return \code{data} data.frame with stored data..
+#' @export
 setMethod("getReferenceData","VirtualReferenceData",
           function(object){
             return(object@data)
@@ -235,6 +288,17 @@ setMethod("getReferenceData","VirtualReferenceData",
 #' @export
 
 setGeneric("updateVariables",function(object, data, var.names){standardGeneric("updateVariables")})
+
+#' @describeIn updateVariables
+#' Update values in specified columns
+#'
+#' Sets new values to specified columns in stored data.
+#' The number of rows of incoming data has to be the same as number of
+#' rows currently stored.
+#'
+#' @inheritParams updateVariables
+#' @return \code{object} object object of class 'VirtualReferenceData'.
+#' @export
 setMethod("updateVariables",
           signature(object= "VirtualReferenceData", data = "data.frame", var.names = "character"),
           function(object, data, var.names    ){
@@ -291,6 +355,17 @@ setMethod("updateVariables",
 #' @export
 
 setGeneric("appendVariables",function(object, data, var.names    ){standardGeneric("appendVariables")})
+
+#' @describeIn appendVariables
+#' Append new columns to stored data
+#'
+#' Adds new columns to stored data
+#' The number of rows of incoming data has to be the same as number of
+#' rows currently stored.
+#'
+#' @inheritParams appendVariables
+#' @return \code{object} object object of class 'VirtualReferenceData'.
+#' @export
 setMethod("appendVariables",
           signature(object= "VirtualReferenceData", data = "data.frame", var.names     = "character"),
           function(object, data, var.names    ){
@@ -303,8 +378,8 @@ setMethod("appendVariables",
                 stored.vars <- getStoredVariablesNames(object)
 
                 message(paste("Error appending", variable, "data in", class(object)))
-                message(paste("Variables in Portfolio:",paste(stored,collapse=" ")))
-                message(paste("Variables in incoming data:",paste(stored.vars,collapse=" ")))
+                message(paste("Variables in Portfolio:",paste(stored.vars,collapse=" ")))
+                message(paste("Variables in incoming data:",paste(colnames(data),collapse=" ")))
                 message(paste("Required Variable:",paste(variable    ,collapse=" ")))
                 stop("Missing required Columns")
 

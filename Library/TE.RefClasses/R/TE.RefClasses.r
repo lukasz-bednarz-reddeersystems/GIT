@@ -12,9 +12,9 @@
 #' @importClassesFrom TE.DataAccess DailyRiskModelQuery
 #' @import lubridate
 #' @import quantmod
-#' @import plyr
 #' @importFrom hash hash values names.hash keys
 #' @importClassesFrom hash hash
 #' @importFrom RODBC odbcConnect sqlQuery
+#' @importFrom stats aggregate
 NULL
 ## NULL

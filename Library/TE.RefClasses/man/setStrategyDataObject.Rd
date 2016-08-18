@@ -4,7 +4,7 @@
 \alias{setStrategyDataObject}
 \title{Set strategy_data object in object slot}
 \usage{
-setStrategyDataObject(object, strategy_data, ...)
+setStrategyDataObject(object, strategy_data)
 }
 \arguments{
 \item{object}{object of class "VirtualStrategyDataHandler"}

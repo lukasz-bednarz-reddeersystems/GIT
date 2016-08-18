@@ -4,7 +4,7 @@
 \alias{setPriceDataObject}
 \title{Set price_data object in object slot}
 \usage{
-setPriceDataObject(object, position_data, ...)
+setPriceDataObject(object, price_data)
 }
 \arguments{
 \item{object}{object of class "VirtualPriceDataHandler"}

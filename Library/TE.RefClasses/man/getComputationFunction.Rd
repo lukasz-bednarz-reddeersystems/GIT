@@ -4,7 +4,7 @@
 \alias{getComputationFunction}
 \title{Get code of computation function}
 \usage{
-getComputationFunction(object, ...)
+getComputationFunction(object)
 }
 \arguments{
 \item{object}{object of class 'VirtualTransformationComputation'.}

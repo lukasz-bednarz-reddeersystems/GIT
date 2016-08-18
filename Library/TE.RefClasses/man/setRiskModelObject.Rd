@@ -4,7 +4,7 @@
 \alias{setRiskModelObject}
 \title{Set Risk Model Object}
 \usage{
-setRiskModelObject(object, risk_model, ...)
+setRiskModelObject(object, risk_model)
 }
 \arguments{
 \item{object}{object of class 'VirtualRiskModelHandler'.}

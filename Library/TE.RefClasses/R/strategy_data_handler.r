@@ -31,8 +31,16 @@ setClass(
 #' @return \code{strategy_data} object of class "VirtualStrategyData"
 #' @export
 
-setGeneric("getStrategyDataObject", function(object,...){standardGeneric("getStrategyDataObject")})
+setGeneric("getStrategyDataObject", function(object){standardGeneric("getStrategyDataObject")})
 
+#' @describeIn getStrategyDataObject
+#' Get strategy_data stored in object
+#'
+#' Returns strategy_data object of class "VirtualStrategyData"
+#'
+#' @inheritParams getStrategyDataObject
+#' @return \code{strategy_data} object of class "VirtualStrategyData"
+#' @export
 setMethod("getStrategyDataObject",
           signature(object = "VirtualStrategyDataHandler"),
           function(object){
@@ -52,7 +60,7 @@ setMethod("getStrategyDataObject",
 #' @return \code{object} object of class "VirtualStrategyDataHandler"
 #' @export
 
-setGeneric("setStrategyDataObject", function(object,strategy_data, ...){standardGeneric("setStrategyDataObject")})
+setGeneric("setStrategyDataObject", function(object,strategy_data){standardGeneric("setStrategyDataObject")})
 
 
 
@@ -64,7 +72,7 @@ setGeneric("setStrategyDataObject", function(object,strategy_data, ...){standard
 #' @param strategy_data object of class "VirtualStrategyData"
 #' @return \code{object} object of class "VirtualStrategyDataHandler"
 
-setGeneric(".setStrategyDataObject", function(object,strategy_data, ...){standardGeneric(".setStrategyDataObject")})
+setGeneric(".setStrategyDataObject", function(object,strategy_data){standardGeneric(".setStrategyDataObject")})
 
 setMethod(".setStrategyDataObject",
           signature(object = "VirtualStrategyDataHandler", strategy_data = "VirtualStrategyData"),
