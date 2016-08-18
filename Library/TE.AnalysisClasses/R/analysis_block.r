@@ -12,6 +12,8 @@ NULL
 #' Class that is to be inherited by any objects
 #' that will encapsulate specific analysis computations.
 #'
+#' Inherits from "VirtualDataSourceClient"
+#'
 #' @slot ggplot object of class "ggplot"
 #' @slot ggplot_data    "data.frame",
 #' @slot frontend_data  "data.frame",
