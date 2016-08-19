@@ -32,7 +32,7 @@ setMethod("resetMemory","DataPlex",
           function(object){
             rm(list = ls(object@warehouse))
             object@warehouse <- new.env()
-            return(object@warehouse)
+            return(object)
           }
 )
 
@@ -62,7 +62,7 @@ setMethod("setDataPlexStoreValue","DataPlex",
 )
 
 #' indicates if dataplex has been initialized
-dataplex_created <- TRUE
+dataplex_created <- FALSE
 devtools::use_data(dataplex_created, overwrite = TRUE)
 
 initialise_data_store <- function(){
