@@ -6,7 +6,7 @@
 \alias{attachTransformations,VirtualTransformationsHandler,list-method}
 \title{Attach transformations to the object}
 \usage{
-attachTransformations(object, transformations, replace)
+attachTransformations(object, transformations, replace = TRUE)
 
 \S4method{attachTransformations}{VirtualTransformationsHandler,list}(object,
   transformations, replace = TRUE)

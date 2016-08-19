@@ -127,7 +127,7 @@ setMethod("isTransformationAttached",
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 #' @export
 
-setGeneric("attachTransformation",function(object,transformation, replace){standardGeneric("attachTransformation")})
+setGeneric("attachTransformation",function(object,transformation, replace = TRUE){standardGeneric("attachTransformation")})
 
 #' @describeIn attachTransformation
 #' Attach transformation to the object
@@ -195,7 +195,7 @@ setMethod("attachTransformation",
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 #' @export
 
-setGeneric("attachTransformations",function(object,transformations, replace){standardGeneric("attachTransformations")})
+setGeneric("attachTransformations",function(object,transformations, replace = TRUE){standardGeneric("attachTransformations")})
 
 #' @describeIn attachTransformations
 #' Attach transformations to the object

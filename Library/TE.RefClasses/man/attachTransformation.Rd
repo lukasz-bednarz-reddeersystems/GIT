@@ -6,7 +6,7 @@
 \alias{attachTransformation,VirtualTransformationsHandler,VirtualReferenceDataTransformation-method}
 \title{Attach transformation to the object}
 \usage{
-attachTransformation(object, transformation, replace)
+attachTransformation(object, transformation, replace = TRUE)
 
 
   \S4method{attachTransformation}{VirtualTransformationsHandler,VirtualReferenceDataTransformation}(object,
