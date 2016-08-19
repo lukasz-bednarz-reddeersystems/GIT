@@ -18,7 +18,7 @@
 \code{object} object of class "AverageDownTradesAnalysisBlock"
 }
 \description{
-Public method to set position_data slot with "AverageDownTradesAnalysisBlock"
-class object to be implemented in derived
+Public method to set position_data slot with "OffsidePositionData"
+class object
 }
 

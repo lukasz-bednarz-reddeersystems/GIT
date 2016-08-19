@@ -34,10 +34,10 @@ setClass(
 )
 
 
-#' Analysis Module for computation of Market Offside Positions
+#' Analysis Module for extraction of Average Down Trades
 #'
-#' Computation block class to pull data required for Computation of offside positions
-#' Pulls data required for computation and adds required columns.
+#' Computation block class to pull data required for extraction of
+#' average down trades.
 #'
 #' Inherits from "VirtualAnalysisBlock",
 #'               "VirtualPositionDataHandler",
@@ -69,9 +69,8 @@ setClass(
 
 #' Set position_data object in object slot
 #'
-#' Public method to set position_data slot with "AverageDownTradesAnalysisBlock"
-#' class object to be implemented in derived
-#  classes where we want to allow for setting data.
+#' Public method to set position_data slot with "OffsidePositionData"
+#' class object
 #'
 #' @rdname setPositionDataObject-AverageDownTradesAnalysisBlock-method
 #' @param object object of class "AverageDownTradesAnalysisBlock"

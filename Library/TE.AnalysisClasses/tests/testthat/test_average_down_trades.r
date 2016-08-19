@@ -1,8 +1,8 @@
-context("Testing ExtendedTradesAnalysisBlock")
+context("Testing AverageDownTradesAnalysisBlock")
 
 ###################################
 #
-# ExtendedTradesAnalysisBlock Tests
+# AverageDownTradesAnalysisBlock Tests
 #
 ###################################
 

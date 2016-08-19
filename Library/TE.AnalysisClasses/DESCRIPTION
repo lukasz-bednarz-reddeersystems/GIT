@@ -30,4 +30,9 @@ Collate:
     'analysis_block.r'
     'offside_positions.r'
     'average_down_trades.r'
+    'average_down_trades_focus.r'
+    'offside_positions_gain_vs_days.r'
+    'offside_positions_cumulative_pnl.r'
+    'offside_positions_pnl_vs_days.r'
+    'offside_positions_relative_bps_per_month.r'
 RoxygenNote: 5.0.1

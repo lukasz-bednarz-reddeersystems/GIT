@@ -3,10 +3,10 @@
 \docType{class}
 \name{AverageDownTradesAnalysisBlock-class}
 \alias{AverageDownTradesAnalysisBlock-class}
-\title{Analysis Module for computation of Market Offside Positions}
+\title{Analysis Module for extraction of Average Down Trades}
 \description{
-Computation block class to pull data required for Computation of offside positions
-Pulls data required for computation and adds required columns.
+Computation block class to pull data required for extraction of
+average down trades.
 }
 \details{
 Inherits from "VirtualAnalysisBlock",
