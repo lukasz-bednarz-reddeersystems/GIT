@@ -597,19 +597,25 @@ group_by_trade_counts_stats <- function(history_data,group_trades,InstrumentIDs,
     other_secondary_frame <- other_secondary
   }
 
-  primary_plot <- plot_ly(primary_frame[primary_frame$TradeCount==1,], x = Age, y = get(stat_primary),name="1")
+  tmp_data <- primary_frame[primary_frame$TradeCount==1,]
+  primary_plot <- plot_ly(x = tmp_data$Age, y = get(stat_primary),name="1")
   mavdown <- max(primary_frame$TradeCount,na.rm=TRUE)
+
   for(a in 2:mavdown){
-    primary_plot <- add_trace(primary_frame[primary_frame$TradeCount==a,], x = Age, y = get(stat_primary),name=as.character(a))
+    tmp_data <- primary_frame[primary_frame$TradeCount==a,]
+    primary_plot <- add_trace( x = tmp_data$Age, y = get(stat_primary),name=as.character(a))
   }
-  primary_plot <- add_trace(other_primary_frame, x = Age, y = get(stat_primary),name="Overall")
+
+  primary_plot <- add_trace(x = other_primary_frame$Age, y = get(stat_primary),name="Overall")
   primary_plot <- layout(yaxis=list(title=stat_primary),xaxis=list(title=""))
 
-  secondary_plot <- plot_ly(secondary_frame[secondary_frame$TradeCount==1,], x = Age, y = get(stat_secondary),name="1")
+  tmp_data <- secondary_frame[secondary_frame$TradeCount==1,]
+  secondary_plot <- plot_ly( x = tmp_data$Age, y = get(stat_secondary),name="1")
   for(a in 2:mavdown){
-    secondary_plot <- add_trace(secondary_frame[secondary_frame$TradeCount==a,], x = Age, y = get(stat_secondary),name=as.character(a))
+    tmp_data <- secondary_frame[secondary_frame$TradeCount==a,]
+    secondary_plot <- add_trace(x = tmp_data$Age, y = get(stat_secondary),name=as.character(a))
   }
-  secondary_plot <- add_trace(other_secondary_frame, x = Age, y = get(stat_secondary),name="Overall")
+  secondary_plot <- add_trace(x = other_secondary_frame$Age, y = get(stat_secondary),name="Overall")
   secondary_plot <- layout(yaxis=list(title=stat_secondary),xaxis=list(title="Age"))
 
   return(subplot(primary_plot,secondary_plot,nrows=2))
@@ -658,21 +664,21 @@ pl_timescales <- function(history_data,data=FALSE){
 
   cum_pl <- aggregate(pl_frame['TodayPL'],list(Age=pl_frame$PsnAge),function(x)sum(x,na.rm=TRUE))
   cumdata <- data.frame(Age=cum_pl$Age,TotalPL=cumsum(cum_pl$TodayPL))
-  cum_pnl_age <- plot_ly(cumdata, x = Age, y = TotalPL)
+  cum_pnl_age <- plot_ly(x = cumdata$Age, y = cumdata$TotalPL)
 
   cum_act_pl <- aggregate(pl_frame['ActiveTodayPL'],list(Age=pl_frame$PsnAge),function(x)sum(x,na.rm=TRUE))
   act_cumdata <- data.frame(Age=cum_act_pl$Age,TotalPL=cumsum(cum_act_pl$ActiveTodayPL))
-  act_cum_pnl_age <- plot_ly(act_cumdata, x = Age, y = TotalPL)
+  act_cum_pnl_age <- plot_ly(x = act_cumdata$Age, y = act_cumdata$TotalPL)
 
   pass_cumdata <- cumdata
   pass_cumdata$TotalPL <- pass_cumdata$TotalPL - act_cumdata$TotalPL
-  act_cum_pnl_age <- add_trace(pass_cumdata, x = Age, y = TotalPL)
+  act_cum_pnl_age <- add_trace(x = pass_cumdata$Age, y = pass_cumdata$TotalPL)
 
   position_history <- position_activity(position_history,median(unique(history_data$Age),na.rm=TRUE)/10)
   activity_frame <- position_history[position_history$PsnAgeCategory>0,]
   activity_frame <- unique(activity_frame[c('InstrumentID','Date','TodayPL','PsnAgeCategory','Activity','PsnAge')])
   activity_frame <- aggregate(activity_frame['Activity'],list(Age=activity_frame$PsnAge),function(x)mean(x,na.rm=TRUE))
-  activity <- plot_ly(activity_frame, x = Age, y = Activity)
+  activity <- plot_ly(x = activity_frame$Age, y = activity_frame$Activity)
 
   weight_active <- activity_frame$Activity/max(activity_frame$Activity,na.rm=TRUE)
   weight_passive<- 1-weight_active
@@ -680,8 +686,8 @@ pl_timescales <- function(history_data,data=FALSE){
   weighted_passive <- pass_cumdata
   weighted_active$TotalPL <- weight_active*(act_cumdata$TotalPL+pass_cumdata$TotalPL)
   weighted_passive$TotalPL <- weight_passive*(pass_cumdata$TotalPL+act_cumdata$TotalPL)
-  activity_blend <- plot_ly(weighted_passive, x = Age, y = TotalPL)
-  activity_blend <- add_trace(weighted_active, x = Age, y = TotalPL)
+  activity_blend <- plot_ly(x = weighted_passive$Age, y = weighted_passive$TotalPL)
+  activity_blend <- add_trace(x = weighted_active$Age, y = weighted_active$TotalPL)
 
   pnl_cum <- subplot(cum_pnl_age,act_cum_pnl_age,activity,activity_blend,nrows=4)
   if(data){

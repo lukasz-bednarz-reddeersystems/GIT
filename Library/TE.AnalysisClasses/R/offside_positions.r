@@ -62,6 +62,12 @@ setClass(
                         )
 )
 
+#' Request data from data source
+#'
+#' @param object object of class 'OffsidePositionsAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'OffsidePositionsAnalysisBlock'.
+#' @export
 
 setMethod("dataRequest",
           signature(object = "OffsidePositionsAnalysisBlock", key_values = "data.frame"),
@@ -120,11 +126,16 @@ setMethod("dataRequest",
           }
 )
 
-
+#' Trigger computation of analysis data.
+#'
+#'
+#' @param object object of class "OffsidePositionsAnalysisBlock"
+#' @return \code{object} object object of class "OffsidePositionsAnalysisBlock"
+#' @export
 
 setMethod("Process",
           signature(object = "OffsidePositionsAnalysisBlock"),
-          function(object, key_values){
+          function(object){
 
             pos_data <- getPositionDataObject(object)
             price_data <- getPriceDataObject(object)
@@ -187,10 +198,12 @@ setMethod("Process",
                                               Value=all_n_psn_data$Total[all_n_psn_data$Quarter],
                                               Delta=all_n_psn_data$Total[all_n_psn_data$Quarter]-all_n_psn_data$Total[!all_n_psn_data$Quarter]))
 
-            off_smmry <- ggplot(data=off_chrt_data, aes(x=Quantity, fill=Quantity)) +
-              geom_bar(aes(weight=Value)) +
+            off_chrt_data$Delta <- round(off_chrt_data$Delta)
+
+            off_smmry <- ggplot(data=off_chrt_data, aes_string(x="Quantity", fill="Quantity")) +
+              geom_bar(aes_string(weight="Value")) +
               ylab("Number of Positions") + xlab("") + ggtitle('Total number of offside positions') +
-              geom_text(aes(x= Quantity, y=Value, label = round(Delta)),size=4,fontface='bold') +
+              geom_text(aes_string(x= "Quantity", y="Value", label = "Delta"),size=4,fontface='bold') +
               theme(legend.position = "none",axis.text.x = element_text(angle = 30, hjust = 1)) +
               # theme(text = element_text(size=15)) +
               scale_fill_brewer(palette="Set1")

@@ -9,8 +9,16 @@
 #' @import TE.RefClasses
 #' @import methods
 #' @import quantmod
+#' @import lubridate
+#' @import ggplot2
 #' @importFrom hash hash values names.hash keys
 #' @importFrom DMwR lofactor
+#' @importFrom graphics barplot frame text
+#' @importFrom stats aggregate cor.test fitted loess median
+#' @importFrom utils head tail
+#' @importFrom plotly plot_ly add_trace layout subplot
 #' @importClassesFrom hash hash
 NULL
 ## NULL
+
+

@@ -66,14 +66,34 @@ setClass(
                         )
 )
 
+
+#' Set position_data object in object slot
+#'
+#' Public method to set position_data slot with "AverageDownTradesAnalysisBlock"
+#' class object to be implemented in derived
+#  classes where we want to allow for setting data.
+#'
+#' @rdname setPositionDataObject-AverageDownTradesAnalysisBlock-method
+#' @param object object of class "AverageDownTradesAnalysisBlock"
+#' @param position_data object of class "OffsidePositionData"
+#' @return \code{object} object of class "AverageDownTradesAnalysisBlock"
+#' @export
+
 setMethod("setPositionDataObject",
           signature(object = "AverageDownTradesAnalysisBlock", position_data = "OffsidePositionData"),
           function(object, position_data){
-            .setPositionDataObject(object, position_data)
+            TE.RefClasses:::.setPositionDataObject(object, position_data)
           }
 )
 
 
+
+#' Request data from data source
+#'
+#' @param object object of class 'AverageDownTradesAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'AverageDownTradesAnalysisBlock'.
+#' @export
 
 setMethod("dataRequest",
           signature(object = "AverageDownTradesAnalysisBlock", key_values = "data.frame"),
@@ -116,17 +136,22 @@ setMethod("dataRequest",
               stop(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(trade_data), cond))
             })
 
-            object <- .setTradeDataObject(object, trade_data)
+            object <- TE.RefClasses:::.setTradeDataObject(object, trade_data)
 
             return(object)
           }
 )
 
-
+#' Trigger computation of analysis data.
+#'
+#'
+#' @param object object of class "AverageDownTradesAnalysisBlock"
+#' @return \code{object} object object of class "AverageDownTradesAnalysisBlock"
+#' @export
 
 setMethod("Process",
           signature(object = "AverageDownTradesAnalysisBlock"),
-          function(object, key_values){
+          function(object){
 
             pos_data <- getPositionDataObject(object)
             trade_data <- getTradeDataObject(object)
@@ -178,13 +203,13 @@ setMethod("Process",
 
             colnames(adown_plt)[colnames(adown_plt)=='Quantity'] <- 'Type'
             colnames(adown_plt)[colnames(adown_plt)=='Ntrades'] <- 'Num.Trades'
-            adown_smmry <- ggplot(data=adown_plt,aes(x=TradeCount,y=PL,size=Num.Trades)) +
+            adown_smmry <- ggplot(data=adown_plt,aes_string(x="TradeCount",y="PL",size="Num.Trades")) +
               ylab("Total position PL $") +
               xlab("Total number average down trades") +
               ggtitle('Position PL by times averaged down') +
               scale_colour_brewer(palette="Set1") +
               theme(text = element_text(size=15)) +
-              geom_point(aes(colour=Type))
+              geom_point(aes_string(colour="Type"))
 
             # set processed data as an output
 

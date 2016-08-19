@@ -7,19 +7,21 @@ context("Testing ExtendedTradesAnalysisBlock")
 ###################################
 
 # Generate Pre-requisite Data
-offside.pos.an <- new("OffsidePositionsAnalysisBlock")
+if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
 
-valid.key_values <- dated_twelve_monthly_lookback(11, '2016-06-30')
-# valid.key_values <- data.frame(id = 11,
-#                              start = as.Date("2015-07-31"),
-#                              end = as.Date("2015-08-31"))
-colnames(valid.key_values) <- c("TraderID", "start", "end")
+  offside.pos.an <- new("OffsidePositionsAnalysisBlock")
 
-offside.pos.an <- dataRequest(offside.pos.an, valid.key_values)
-offside.pos.an <- Process(offside.pos.an)
+  valid.key_values <- dated_twelve_monthly_lookback(11, '2016-06-30')
+  # valid.key_values <- data.frame(id = 11,
+  #                              start = as.Date("2015-07-31"),
+  #                              end = as.Date("2015-08-31"))
+  colnames(valid.key_values) <- c("TraderID", "start", "end")
 
-offside.pos.rd <- getOutputObject(offside.pos.an)
+  offside.pos.an <- dataRequest(offside.pos.an, valid.key_values)
+  offside.pos.an <- Process(offside.pos.an)
 
+  offside.pos.rd <- getOutputObject(offside.pos.an)
+}
 
 # test vectors
 
@@ -77,6 +79,8 @@ test_that("Cannot dataRequest() with invalid key_values", {
 
 test_that("Can dataRequest() with valid key_values and position data set", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   object <- new(tested.class)
 
   valid.key_values <- dated_twelve_monthly_lookback(11, '2016-06-30')
@@ -97,12 +101,13 @@ test_that("Can dataRequest() with valid key_values and position data set", {
   expect_is(trade_data, "TradeData")
   expect_gt(getStoredNRows(trade_data), 0)
 
-
 })
 
 
 
 test_that("Can dataRequest() with valid key_values and no position data set", {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
 
@@ -126,7 +131,9 @@ test_that("Can dataRequest() with valid key_values and no position data set", {
 })
 
 
-test_that(paste("Can Process() on", tested.class), {
+test_that(paste("Can Process() on", tested.class, "without position data set."), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
 
@@ -156,4 +163,36 @@ test_that(paste("Can Process() on", tested.class), {
 
 })
 
+
+test_that(paste("Can Process() on", tested.class, "with position data set."), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
+  object <- new(tested.class)
+
+  valid.key_values <- dated_three_monthly_lookback(11, '2016-06-30')
+  colnames(valid.key_values) <- c("TraderID", "start", "end")
+
+  object <- setPositionDataObject(object, offside.pos.rd)
+
+  object <- dataRequest(object, valid.key_values)
+
+  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values)
+
+  # trade data verification
+  position_data <- getPositionDataObject(object)
+  expect_is(position_data, "OffsidePositionData")
+  expect_gt(getStoredNRows(position_data), 0)
+
+  trade_data <- getTradeDataObject(object)
+  expect_is(trade_data, "TradeData")
+  expect_gt(getStoredNRows(trade_data), 0)
+
+  object <- Process(object)
+
+  expect_is(getOutputGGPlot(object), "ggplot")
+  expect_is(getOutputGGPlotData(object), "data.frame")
+  expect_is(getOutputObject(object), "AverageDownTradesData")
+
+})
 

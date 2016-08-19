@@ -4,7 +4,7 @@
 \alias{Process}
 \title{Trigger computation of analysis data.}
 \usage{
-Process(object, ...)
+Process(object)
 }
 \arguments{
 \item{object}{object of class "VirtualAnalysisBlock"}
@@ -13,7 +13,6 @@ Process(object, ...)
 \code{object} object object of class "VirtualAnalysisBlock"
 }
 \description{
-Private method to set slot with data used by frontend utility.
-Needs to be implemented by each class derived from "VirtualAnalysisBlock"
+Trigger computation of analysis data.
 }
 

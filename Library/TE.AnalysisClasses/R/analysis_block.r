@@ -38,7 +38,7 @@ setClass(
 #' @param object object of class "VirtualAnalysisBlock"
 #' @return \code{object} object of class "VirtualAnalysisBlock"
 
-setGeneric(".checkSlotClass", function(object,slot, class, req_class, ...){standardGeneric(".checkSlotClass")})
+setGeneric(".checkSlotClass", function(object,slot, class, req_class){standardGeneric(".checkSlotClass")})
 
 setMethod(".checkSlotClass",
           signature(object = "VirtualAnalysisBlock", slot = "character", class = "character", req_class = "character"),
@@ -47,9 +47,11 @@ setMethod(".checkSlotClass",
               message(paste("Invalid class", class, "."))
               message(paste("in attempt to set", sQuote(slot), "slot in object of class", class(object) ))
               stop(paste("assignment of an object of class",
-                         dQuote(tail(class(class), 1),
+                         dQuote(tail(class(class), 1)),
                                 "is not valid for @", sQuote(slot), " in an object of class",
-                                dQuote(class(object)))))
+                                dQuote(class(object))
+                         )
+                   )
             } else {
               return(object)
             }
@@ -71,8 +73,19 @@ setMethod(".checkSlotClass",
 #'
 #' @export
 
-setGeneric("getOutputObject", function(object,...){standardGeneric("getOutputObject")})
+setGeneric("getOutputObject", function(object){standardGeneric("getOutputObject")})
 
+#' @describeIn getOutputObject
+#' Returns generated output object
+#'
+#' Returns Reference Data Object that possibly was computed by
+#' analysis object. If module doesn't compute any output
+#' returns NULL
+#'
+#' @inheritParams getOutputObject
+#' @return \code{output} object of class derived from "VirtualReferenceData"
+#'
+#' @export
 setMethod("getOutputObject",
           signature(object = "VirtualAnalysisBlock"),
           function(object){
@@ -89,7 +102,7 @@ setMethod("getOutputObject",
 #' @param ref_data_object object of class derived from "VirtualReferenceData"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
 
-setGeneric(".setOutputObject", function(object,ref_data_object, ...){standardGeneric(".setOutputObject")})
+setGeneric(".setOutputObject", function(object,ref_data_object){standardGeneric(".setOutputObject")})
 
 setMethod(".setOutputObject",
           signature(object = "VirtualAnalysisBlock", ref_data_object = "VirtualReferenceData" ),
@@ -108,8 +121,17 @@ setMethod(".setOutputObject",
 #'
 #' @export
 
-setGeneric("getOutputGGPlot", function(object,...){standardGeneric("getOutputGGPlot")})
+setGeneric("getOutputGGPlot", function(object){standardGeneric("getOutputGGPlot")})
 
+#' @describeIn getOutputGGPlot
+#' Returns generated output ggplot
+#'
+#' Returns ggplot object generated as a result of analysis computation.
+#'
+#' @inheritParams getOutputGGPlot
+#' @return \code{ggplot} object of class "ggplot"
+#'
+#' @export
 setMethod("getOutputGGPlot",
           signature(object = "VirtualAnalysisBlock"),
           function(object){
@@ -126,12 +148,11 @@ setMethod("getOutputGGPlot",
 #' @param ggplot object of class "ggplot"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
 
-setGeneric(".setOutputGGPlot", function(object,ggplot, ...){standardGeneric(".setOutputGGPlot")})
+setGeneric(".setOutputGGPlot", function(object,ggplot){standardGeneric(".setOutputGGPlot")})
 
 setMethod(".setOutputGGPlot",
           signature(object = "VirtualAnalysisBlock", ggplot = "ANY"),
           function(object, ggplot){
-
             object <- .checkSlotClass(object, "ggplot", class(ggplot), c("ggplot", "grob"))
             object@ggplot <- ggplot
             return(object)
@@ -148,8 +169,17 @@ setMethod(".setOutputGGPlot",
 #'
 #' @export
 
-setGeneric("getOutputGGPlotData", function(object,...){standardGeneric("getOutputGGPlotData")})
+setGeneric("getOutputGGPlotData", function(object){standardGeneric("getOutputGGPlotData")})
 
+#' @describeIn getOutputGGPlotData
+#' Returns generated output ggplot data
+#'
+#' Returns "data.frame" with data used to generate ggplot
+#'
+#' @inheritParams getOutputGGPlotData
+#' @return \code{ggplot_data} object of class "data.frame"
+#'
+#' @export
 setMethod("getOutputGGPlotData",
           signature(object = "VirtualAnalysisBlock"),
           function(object){
@@ -166,7 +196,7 @@ setMethod("getOutputGGPlotData",
 #' @param ggplot_data object of class "data.frame"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
 
-setGeneric(".setOutputGGPlotData", function(object, ggplot_data,...){standardGeneric(".setOutputGGPlotData")})
+setGeneric(".setOutputGGPlotData", function(object, ggplot_data){standardGeneric(".setOutputGGPlotData")})
 
 setMethod(".setOutputGGPlotData",
           signature(object = "VirtualAnalysisBlock", ggplot_data = "data.frame"),
@@ -186,8 +216,17 @@ setMethod(".setOutputGGPlotData",
 #'
 #' @export
 
-setGeneric("getOutputFrontendData", function(object,...){standardGeneric("getOutputFrontendData")})
+setGeneric("getOutputFrontendData", function(object){standardGeneric("getOutputFrontendData")})
 
+#' @describeIn getOutputFrontendData
+#' Returns generated output frontend data
+#'
+#' Returns data to be used by any frontend using the module
+#'
+#' @inheritParams getOutputFrontendData
+#' @return \code{frontend_data} object of class "data.frame"
+#'
+#' @export
 setMethod("getOutputFrontendData",
           signature(object = "VirtualAnalysisBlock"),
           function(object){
@@ -204,7 +243,7 @@ setMethod("getOutputFrontendData",
 #' @param frontend_data object of class "data.frame"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
 
-setGeneric(".setOutputFrontendData", function(object, frontend_data, ...){standardGeneric(".setOutputFrontendData")})
+setGeneric(".setOutputFrontendData", function(object, frontend_data){standardGeneric(".setOutputFrontendData")})
 
 setMethod(".setOutputFrontendData",
           signature(object = "VirtualAnalysisBlock", frontend_data = "data.frame"),
@@ -218,10 +257,8 @@ setMethod(".setOutputFrontendData",
 
 #' Trigger computation of analysis data.
 #'
-#' Private method to set slot with data used by frontend utility.
-#' Needs to be implemented by each class derived from "VirtualAnalysisBlock"
-#'
 #' @param object object of class "VirtualAnalysisBlock"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
+#' @export
 
-setGeneric("Process", function(object, ...){standardGeneric("Process")})
+setGeneric("Process", function(object){standardGeneric("Process")})

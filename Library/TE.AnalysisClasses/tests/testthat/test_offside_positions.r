@@ -61,6 +61,8 @@ test_that("Cannot dataRequest() with invalid key_values", {
 
 test_that("Can dataRequest() with valid key_values", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   object <- new(tested.class)
 
   valid.key_values <- dated_twelve_monthly_lookback(11, today())
@@ -88,6 +90,8 @@ test_that("Can dataRequest() with valid key_values", {
 
 
 test_that(paste("Can Process() on", tested.class), {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
 

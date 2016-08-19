@@ -12,15 +12,18 @@ Depends:
 License: file LICENSE
 LazyData: TRUE
 Imports:
-    TE.RefClasses,
     methods,
     lubridate,
     quantmod,
     DMwR,
     ggplot2,
     hash,
+    stats,
+    utils,
+    plotly,
 Suggests:
-    testthat
+    testthat,
+    plyr,
 Collate:
     'TE.AnalysisClasses.r'
     'analysis_block_functions.r'
