@@ -303,20 +303,31 @@ market_rel_pl <- function(history_data,trade_rel=TRUE, index){
     psn_dates <- unique(history_data[c('InstrumentID','Date','Strategy')])
   }
   InstrumentIDs <- unique(psn_dates$InstrumentID)
-  strategies <- unique(psn_dates$Strategy)
   history_data <- history_data[order(history_data$Date),]
   first <- TRUE
   for(ins in InstrumentIDs){
+
+    strategies <- unique(psn_dates$Strategy[psn_dates$InstrumentID==ins])
+
     for(st in strategies){
+
+      min_date <- min(psn_dates[psn_dates$InstrumentID==ins&psn_dates$Strategy==st,'Date'],na.rm=TRUE)
+
       if(first){
-        min_dates <- data.frame(InstrumentID = ins,Strategy=st,Date = min(psn_dates[psn_dates$InstrumentID==ins&psn_dates$Strategy==st,'Date'],na.rm=TRUE))
+        min_dates <- data.frame(InstrumentID = ins,Strategy=st,Date = min_date)
         first <- FALSE
       }
       else{
-        min_dates <- rbind(min_dates,data.frame(InstrumentID = ins,Strategy=st,Date = min(psn_dates[psn_dates$InstrumentID==ins&psn_dates$Strategy==st,'Date'],na.rm=TRUE)))
+        min_dates <- rbind(min_dates,data.frame(InstrumentID = ins,Strategy=st,Date = min_date))
       }
     }
-    history_data$PreviousClosePrice[history_data$InstrumentID==ins] <- c(NA,history_data$ClosePrice[history_data$InstrumentID==ins][1:(length(history_data$ClosePrice[history_data$InstrumentID==ins])-1)])
+
+    prev_close <- history_data$ClosePrice[history_data$InstrumentID==ins]
+    prev_close <- c(NA, prev_close[-length(prev_close)])
+
+    history_data$PreviousClosePrice[history_data$InstrumentID==ins] <- prev_close
+
+    #history_data$PreviousClosePrice[history_data$InstrumentID==ins] <- c(NA,history_data$ClosePrice[history_data$InstrumentID==ins][1:(length(history_data$ClosePrice[history_data$InstrumentID==ins])-1)])
   }
 
   history_data <- merge(history_data,index,by='Date')
@@ -337,6 +348,8 @@ market_rel_pl <- function(history_data,trade_rel=TRUE, index){
   history_data$ActiveTodayPL <- history_data$TodayPL - history_data$PassiveTodayPL
   first <- TRUE
   for(ins in InstrumentIDs){
+    strategies <- unique(psn_dates$Strategy[psn_dates$InstrumentID==ins])
+
     for(st in strategies){
       #Need to remove duplicate rows so that PL cumulant is correct
       local_frame <- unique(history_data[history_data$InstrumentID==ins&history_data$Strategy==st,c('Date','InstrumentID','Strategy','TodayPL','CurrentIndexValue')])

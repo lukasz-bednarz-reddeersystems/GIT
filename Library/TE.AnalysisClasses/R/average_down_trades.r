@@ -157,7 +157,6 @@ setMethod("Process",
 
             # retrieve needed ref_data
             history_data <- getReferenceData(pos_data)
-            instruments <- unique(history_data$Instrument)
 
             trade_df <- getReferenceData(trade_data)
 
@@ -174,6 +173,7 @@ setMethod("Process",
 
             # merge price data to position data
             history_data <- merge(trade_df,history_data[hist_cols], by = merge_cols)
+            instruments <- unique(history_data$InstrumentID)
 
             object <- setReferenceData(object, history_data)
 
@@ -193,7 +193,13 @@ setMethod("Process",
             for(ins in instruments){
               cnt <- sum(average_down_trades$InstrumentID==ins)
               pl_frame$TradeCount[pl_frame$InstrumentID==ins] <- cnt
-              pl_frame$PsnAge[pl_frame$InstrumentID==ins] <- as.numeric(pl_frame$Date[pl_frame$InstrumentID==ins] - min(pl_frame$Date[pl_frame$InstrumentID==ins],na.rm=TRUE))
+
+              min_date <- min(pl_frame$Date[pl_frame$InstrumentID==ins],na.rm=TRUE)
+
+              if (is.infinite(min_date)) browser()
+
+              pl_frame$PsnAge[pl_frame$InstrumentID==ins] <- as.numeric(pl_frame$Date[pl_frame$InstrumentID==ins] - min_date)
+
             }
             avg_dwn <- aggregate(pl_frame[pl_frame$PsnAge<50,c('TodayPL','MarketRelPL')],list(TradeCount=pl_frame[pl_frame$PsnAge<50,]$TradeCount),function(x){sum(x, na.rm = TRUE)})
             avg_dwn <- merge(avg_dwn,aggregate(pl_frame[pl_frame$PsnAge<50,c('InstrumentID')],list(TradeCount=pl_frame[pl_frame$PsnAge<50,]$TradeCount),function(x)length(unique(x))),by=c('TradeCount'))

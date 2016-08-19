@@ -10,7 +10,7 @@ if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
   # Generate Pre-requisite Data
   avg.down.trd.an <- new("AverageDownTradesAnalysisBlock")
 
-  valid.key_values <- dated_three_monthly_lookback(11, '2016-06-30')
+  valid.key_values <- dated_twelve_monthly_lookback(11, '2016-06-30')
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   avg.down.trd.an <- dataRequest(avg.down.trd.an, valid.key_values)
