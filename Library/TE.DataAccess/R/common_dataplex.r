@@ -20,7 +20,7 @@ NULL
 setClass(
   Class          = "DataPlex",
   slots = c(
-    warehouse    = "environment"
+    warehouse        = "environment"
   ),
   prototype = list(
     warehouse    = new.env()
@@ -61,59 +61,94 @@ setMethod("setDataPlexStoreValue","DataPlex",
           }
 )
 
-#' indicates if dataplex has been initialized
-dataplex_created <- FALSE
-devtools::use_data(dataplex_created, overwrite = TRUE)
+setGeneric("isDataPlexInitialized",function(object){standardGeneric("isDataPlexInitialized")})
+setMethod("isDataPlexInitialized","DataPlex",
+          function(object){
+            wh <- getDataPlexWarehouse(object)
 
+            is_initialized = FALSE
+
+            if (exists("is_initialized", envir = wh)) {
+              is_initialized <- wh$is_initialized
+            }
+            return(is_initialized)
+          }
+)
+
+# setGeneric(".setDataPlexInitialized",function(object, store, value){standardGeneric(".setDataPlexInitialized")})
+# setMethod(".setDataPlexInitialized",
+#           signature(object = "DataPlex", is_initialized = "logical"),
+#           function(object, is_initialized){
+#             wh <- getDataPlexWarehouse(object)
+#             wh$is_initialized <- is_initialized
+#
+#             return(object)
+#           }
+# )
+
+
+setGeneric("initializeDataPlex",function(object){standardGeneric("initializeDataPlex")})
+setMethod("initializeDataPlex","DataPlex",
+          function(object){
+            data_map <- getDataPlexWarehouse(object)
+
+            data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
+
+            data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
+
+            data_map[["event_datastore"]] <- new("EventDataStore")
+
+            data_map[["ext_pos_datastore"]] <- new("ExtPosDataStore")
+
+            data_map[["dealing_datastore"]] <- new("DealingDataStore")
+
+            data_map[["trade_levels"]] <- new("TradeLevelsDataStore")
+
+            data_map[["instrument_details"]] <- new("InstrumentDataStore")
+
+            data_map[["instrument_history"]] <- new("InstrumentHistoryDataStore")
+
+            data_map[["instrument_country"]] <- new("InstrumentCountryDataStore")
+
+            data_map[["instrument_price"]] <- new("InstrumentPriceDataStore")
+
+            data_map[["instrument_sector"]] <- new("InstrumentSectorDataStore")
+
+            data_map[["risk_instrument_exposure"]] <- new("RiskInstrumentExposuresDataStore")
+
+            data_map[["risk_factor_returns"]] <- new("RiskFactorReturnsDataStore")
+
+            data_map[["trader_allocation"]] <- new("TraderAllocationDataStore")
+
+            data_map[["watchlist"]] <- new("WatchListDataStore")
+
+            data_map[["is_initialized"]] <- TRUE
+
+            return(object)
+          }
+)
+
+#' Initialization method for DataPlex
+#' Populates DataPlex with respective DataStores
+#'
+#' @param .Object object of class "DataPlex"
+#' @return \code{.Object} object of class "DataPlex"
+setMethod("initialize","DataPlex",
+          function(.Object){
+            if(!isDataPlexInitialized(.Object)){
+              .Object <- initializeDataPlex(.Object)
+            }
+            return(.Object)
+          }
+)
+
+#' function to reset DataPlex
 initialise_data_store <- function(){
-
   dataplex <- new("DataPlex")
-
   dataplex <- resetMemory(dataplex)
-
-  data_map <- getDataPlexWarehouse(dataplex)
-
-  data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
-
-  data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
-
-  data_map[["event_datastore"]] <- new("EventDataStore")
-
-  data_map[["ext_pos_datastore"]] <- new("ExtPosDataStore")
-
-  data_map[["dealing_datastore"]] <- new("DealingDataStore")
-
-  data_map[["trade_levels"]] <- new("TradeLevelsDataStore")
-
-  data_map[["instrument_details"]] <- new("InstrumentDataStore")
-
-  data_map[["instrument_history"]] <- new("InstrumentHistoryDataStore")
-
-  data_map[["instrument_country"]] <- new("InstrumentCountryDataStore")
-
-  data_map[["instrument_price"]] <- new("InstrumentPriceDataStore")
-
-  data_map[["instrument_sector"]] <- new("InstrumentSectorDataStore")
-
-  data_map[["risk_instrument_exposure"]] <- new("RiskInstrumentExposuresDataStore")
-
-  data_map[["risk_factor_returns"]] <- new("RiskFactorReturnsDataStore")
-
-  data_map[["trader_allocation"]] <- new("TraderAllocationDataStore")
-
-  watchlist <- new("WatchListDataStore")
-  data_map[["watchlist"]] <- "watchlist"
+  dataplex <- initializeDataPlex(dataplex)
 }
 
-#Global singleton datastores
-if(dataplex_created ==FALSE){
-
-  initialise_data_store()
-
-  dataplex_created <- TRUE
-
-
-}
 
 
 
@@ -203,16 +238,6 @@ setMethod("setWarehouseObjectstoreCacheItemValue",
             return(object)
           }
 )
-
-#' indicates if warehouse cache has been initialized
-warehouse_store_created <- FALSE
-devtools::use_data(warehouse_store_created, overwrite = TRUE)
-
-if(warehouse_store_created == FALSE){
-
-  warehouse_store_created <- TRUE
-
-}
 
 
 #' Refresh Warehouse Cache
