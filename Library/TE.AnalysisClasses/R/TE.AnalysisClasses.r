@@ -16,8 +16,9 @@
 #' @importFrom DMwR lofactor
 #' @importFrom graphics barplot frame text
 #' @importFrom stats aggregate cor.test fitted loess median cor reorder start
-#' @importFrom utils head tail
+#' @importFrom utils head tail stack
 #' @importFrom plotly plot_ly add_trace layout subplot
+#' @importFrom RColorBrewer brewer.pal brewer.pal.info
 #' @importClassesFrom hash hash
 NULL
 ## NULL

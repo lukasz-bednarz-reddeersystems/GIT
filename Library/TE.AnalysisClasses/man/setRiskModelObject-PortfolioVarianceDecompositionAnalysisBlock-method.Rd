@@ -18,7 +18,7 @@
 \code{object} object of class "PortfolioVarianceDecompositionAnalysisBlock"
 }
 \description{
-Public method to set trade_data slot with "TradeData"
+Public method to set trade_data slot with "VirtualRiskModel"
 class object
 }
 

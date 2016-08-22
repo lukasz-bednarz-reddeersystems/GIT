@@ -22,6 +22,7 @@ Imports:
     stats,
     utils,
     plotly,
+    RColorBrewer,
 Suggests:
     testthat,
     plyr,
@@ -42,5 +43,6 @@ Collate:
     'offside_positions_relative_bps_per_month.r'
     'portfolio_factor_exposure.r'
     'portfolio_variance_decomposition.r'
+    'portfolio_factor_exposures.r'
     'relative_market_return.r'
 RoxygenNote: 5.0.1

@@ -119,7 +119,7 @@ setClass(
 
 #' Set risk_model object in object slot
 #'
-#' Public method to set trade_data slot with "TradeData"
+#' Public method to set trade_data slot with "VirtualRiskModel"
 #' class object
 #'
 #' @rdname setRiskModelObject-PortfolioVarianceDecompositionAnalysisBlock-method
