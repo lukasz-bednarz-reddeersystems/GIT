@@ -31,6 +31,7 @@ Collate:
     'offside_positions.r'
     'average_down_trades.r'
     'average_down_trades_focus.r'
+    'extended_trades.r'
     'offside_positions_gain_vs_days.r'
     'offside_positions_cumulative_pnl.r'
     'offside_positions_pnl_vs_days.r'
