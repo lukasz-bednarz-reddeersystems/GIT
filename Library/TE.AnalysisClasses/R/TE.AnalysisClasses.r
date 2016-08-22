@@ -15,7 +15,7 @@
 #' @importFrom hash hash values names.hash keys
 #' @importFrom DMwR lofactor
 #' @importFrom graphics barplot frame text
-#' @importFrom stats aggregate cor.test fitted loess median cor
+#' @importFrom stats aggregate cor.test fitted loess median cor reorder start
 #' @importFrom utils head tail
 #' @importFrom plotly plot_ly add_trace layout subplot
 #' @importClassesFrom hash hash
