@@ -39,5 +39,6 @@ Collate:
     'offside_positions_cumulative_pnl.r'
     'offside_positions_pnl_vs_days.r'
     'offside_positions_relative_bps_per_month.r'
+    'portfolio_variance_decomposition.r'
     'relative_market_return.r'
 RoxygenNote: 5.0.1
