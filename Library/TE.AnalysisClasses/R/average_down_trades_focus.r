@@ -49,7 +49,8 @@ setClass(
 setMethod("setTradeDataObject",
           signature(object = "AverageDownTradesFocusAnalysisBlock", trade_data = "AverageDownTradesData"),
           function(object, trade_data){
-            TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            object <- TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            return(object)
           }
 )
 

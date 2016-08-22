@@ -67,7 +67,8 @@ setClass(
 setMethod("setTradeDataObject",
           signature(object = "MarketReturnAnalysisBlock", trade_data = "ExtendedTradeData"),
           function(object, trade_data){
-            TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            object <- TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            return(object)
           }
 )
 
@@ -85,7 +86,8 @@ setMethod("setTradeDataObject",
 setMethod("setMarketDataObject",
           signature(object = "MarketReturnAnalysisBlock", market_data = "MarketDataSX5E"),
           function(object, market_data){
-            TE.RefClasses:::.setMarketDataObject(object, market_data)
+            object <- TE.RefClasses:::.setMarketDataObject(object, market_data)
+            return(object)
           }
 )
 

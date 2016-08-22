@@ -42,7 +42,8 @@ setClass(
 setMethod("setTradeDataObject",
           signature(object = "ExtendedTradesSummaryAnalysisBlock", trade_data = "TradeData"),
           function(object, trade_data){
-            TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            object <- TE.RefClasses:::.setTradeDataObject(object, trade_data)
+            return(object)
           }
 )
 
@@ -60,7 +61,8 @@ setMethod("setTradeDataObject",
 setMethod("setExtendedTradeDataObject",
           signature(object = "ExtendedTradesSummaryAnalysisBlock", ex_trade_data = "ExtendedTradeData"),
           function(object, ex_trade_data){
-            TE.RefClasses:::.setExtendedTradeDataObject(object, ex_trade_data)
+           object <-  TE.RefClasses:::.setExtendedTradeDataObject(object, ex_trade_data)
+           return(object)
           }
 )
 

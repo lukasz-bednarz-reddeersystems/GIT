@@ -7,6 +7,7 @@
 #' @name TE.AnalysisClasses
 #'
 #' @import TE.RefClasses
+#' @import TE.RiskModel
 #' @import methods
 #' @import quantmod
 #' @import lubridate

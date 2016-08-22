@@ -104,8 +104,8 @@ test_that(paste("Can Process() on", tested.class), {
 
   object <- new(tested.class)
 
-  #valid.key_values <- dated_three_monthly_lookback(11, "2016-05-30")
-  valid.key_values <- dated_full_month(11, "2016-05-30")
+  valid.key_values <- dated_three_monthly_lookback(11, "2016-08-30")
+  #valid.key_values <- dated_full_month(11, "2016-05-30")
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   object <- dataRequest(object, valid.key_values)

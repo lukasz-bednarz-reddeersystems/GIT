@@ -9,6 +9,7 @@ Description: Package is implementing Analysis and Report Classes for creating
 Depends:
     R (>= 3.3.0),
     TE.RefClasses (>= 0.1.0),
+    TE.RiskModel (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:

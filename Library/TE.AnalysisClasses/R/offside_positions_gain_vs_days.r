@@ -71,7 +71,8 @@ setClass(
 setMethod("setPositionDataObject",
           signature(object = "OffsidePositionsGainVsDaysAnalysisBlock", position_data = "OffsidePositionData"),
           function(object, position_data){
-            TE.RefClasses:::.setPositionDataObject(object, position_data)
+            object <- TE.RefClasses:::.setPositionDataObject(object, position_data)
+            return(object)
           }
 )
 

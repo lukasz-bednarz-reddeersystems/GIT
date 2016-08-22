@@ -131,7 +131,7 @@ setMethod("setRiskModelObject",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
-            object <- .setRiskModelObject(object, risk_model)
+            object <- TE.RefClasses:::.setRiskModelObject(object, risk_model)
             return(object)
           }
 )
@@ -238,8 +238,6 @@ setMethod("Process",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock"),
           function(object){
 
-            browser()
-
             # retrieve data
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
@@ -309,18 +307,18 @@ setMethod("Process",
               }
             }
 
-            risk_plot_data <- rbind(data.frame(Date=variance_decomposition$Date,RiskType='TotalSystematic',Value=sqrt(variance_decomposition$TotalSystematicVar)*10000),
-                                    data.frame(Date=variance_decomposition$Date,RiskType='MarketRiskFactor',Value=sqrt(variance_decomposition$MarketFactorVar)*10000),
-                                    data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=sqrt(variance_decomposition$CurrencyVar)*10000),
-                                    data.frame(Date=variance_decomposition$Date,RiskType='Commodity',Value=sqrt(variance_decomposition$CommodityVar)*10000),
-                                    data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=sqrt(variance_decomposition$CurrencyVar)*10000),
-                                    data.frame(Date=variance_decomposition$Date,RiskType='Sector',Value=sqrt(variance_decomposition$SectorVar)*10000))
-            # risk_plot_data <- rbind(data.frame(Date=variance_decomposition$Date,RiskType='TotalSystematic',Value=variance_decomposition$TotalSystematicVar*100),
-            #                         data.frame(Date=variance_decomposition$Date,RiskType='MarketRiskFactor',Value=variance_decomposition$MarketFactorVar*100),
-            #                         data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=variance_decomposition$CurrencyVar*100),
-            #                         data.frame(Date=variance_decomposition$Date,RiskType='Commodity',Value=variance_decomposition$CommodityVar*100),
-            #                         data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=variance_decomposition$CurrencyVar*100),
-            #                         data.frame(Date=variance_decomposition$Date,RiskType='Sector',Value=variance_decomposition$SectorVar*100))
+            # risk_plot_data <- rbind(data.frame(Date=variance_decomposition$Date,RiskType='TotalSystematic',Value=sqrt(variance_decomposition$TotalSystematicVar)*10000),
+            #                         data.frame(Date=variance_decomposition$Date,RiskType='MarketRiskFactor',Value=sqrt(variance_decomposition$MarketFactorVar)*10000),
+            #                         data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=sqrt(variance_decomposition$CurrencyVar)*10000),
+            #                         data.frame(Date=variance_decomposition$Date,RiskType='Commodity',Value=sqrt(variance_decomposition$CommodityVar)*10000),
+            #                         data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=sqrt(variance_decomposition$CurrencyVar)*10000),
+            #                         data.frame(Date=variance_decomposition$Date,RiskType='Sector',Value=sqrt(variance_decomposition$SectorVar)*10000))
+            risk_plot_data <- rbind(data.frame(Date=variance_decomposition$Date,RiskType='TotalSystematic',Value=variance_decomposition$TotalSystematicVar*100),
+                                    data.frame(Date=variance_decomposition$Date,RiskType='MarketRiskFactor',Value=variance_decomposition$MarketFactorVar*100),
+                                    data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=variance_decomposition$CurrencyVar*100),
+                                    data.frame(Date=variance_decomposition$Date,RiskType='Commodity',Value=variance_decomposition$CommodityVar*100),
+                                    data.frame(Date=variance_decomposition$Date,RiskType='Currency',Value=variance_decomposition$CurrencyVar*100),
+                                    data.frame(Date=variance_decomposition$Date,RiskType='Sector',Value=variance_decomposition$SectorVar*100))
             plt_risk <- ggplot(data=risk_plot_data,aes_string(x="Date",y="Value",colour="RiskType")) +
               geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type")
 
