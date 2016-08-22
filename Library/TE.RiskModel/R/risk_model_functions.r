@@ -265,55 +265,20 @@ stock_betas <- function(stocks,factors,cl=NULL){
   return(all_beta)
 }
 
-# instrument_regression_on_cluster <- function(ins){
-#   data <- stocks[stocks$Instrument == ins,]
-#   data <- merge(data,factors,by='Date')
-#   data[is.na(data)] <- 0
-#   data <- cbind(data[c('Date','Instrument')],data.frame(Map(function(x)log(x+1),data[setdiff(colnames(data),c('Instrument','Date'))])))
-#   data <- data[setdiff(colnames(data),'Date')]
-#
-#   rgr <- apply(data[setdiff(colnames(data),c('Instrument','Return'))], 2, Curry(rgr_kernel,data=data))
-#
-#   if(length(rgr)>0){
-#     rval <- unlist(Map(function(x)x[[1]][2],rgr))
-#     names(rval) <- gsub('.x2','',names(rval))
-#     rval <- cbind(Instrument=ins,as.data.frame(t(rval)))
-#   }
-#   else{
-#     nmes <- setdiff(colnames(data),c('Instrument','Return'))
-#     df <- data.frame(t(rep(NA,length(nmes))))
-#     rval <- cbind(Instrument=ins,df)
-#     colnames(rval) <- c('Instrument',nmes)
-#   }
-#   return(rval)
-# }
-
-#Expects stock return frame with columns Instrument, Date and Return
-#Expects factor frame with column for each factor and Date.
-# stock_betas <- function(stocks,factors,cl=NULL){
-#   instruments <- unique(stocks$Instrument)
-#
-#   if(length(cl)==0){
-#     fnames <- setdiff(colnames(factors),'Date')
-#     all_data <- merge(stocks,factors,by='Date')
-#     all_data[is.na(all_data)] <- 0
-#     all_data <- cbind(all_data[c('Date','Instrument')],data.frame(Map(function(x)log(x+1),all_data[setdiff(colnames(all_data),c('Instrument','Date'))])))
-#     all_beta <- apply(data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data))
-#   }
-#   else{
-#     clusterExport(cl,list('stocks', 'factors'), envir = environment())
-#     all_beta <- parApply(cl,data.frame(Instrument=instruments),1,instrument_regression_on_cluster)
-#   }
-#   all_beta <- Reduce(function(x,y)rbind(x,y),all_beta)
-#   return(all_beta)
-# }
-
-#Point in time estimation of risk model:
-#Cross sectional regression of stock returns against raw factor returns
-#to produce the implied factor returns
-#Expects stock return frame with columns Instrument and Return
-#Expects stock betas in a frame with one column for Instrument and a column for each factor
-#Expects stock weights in frame with columns for Instrument and Weight
+#' Cross sectional factor return computation
+#'
+#' Point in time estimation of risk model:
+#' Cross sectional regression of stock returns against raw factor returns
+#' to produce the implied factor returns
+#' Expects stock return frame with columns Instrument and Return
+#' Expects stock betas in a frame with one column for Instrument and a column for each factor
+#' Expects stock weights in frame with columns for Instrument and Weight
+#'
+#' @param stock_return "data.frame" with stock returns
+#' @param stock_betas "data.frame" with stock betas
+#' @return \code{x_sectional_model} list with two components :\cr
+#' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of implied factor returns\cr
+#' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of stock residual returns
 x_sectional_model <- function(stock_return,stock_betas){
   weighted_return <- merge(stock_return,stock_betas,by='Instrument')
   weighted_return$PfoRtn <- log(weighted_return$Return+1)
@@ -330,12 +295,20 @@ x_sectional_model <- function(stock_return,stock_betas){
   return(list(log_implied_rtn=implied_rtn,residual_log_rtn=resid_returns[c('Instrument','Return')]))
 }
 
-#Point in time composite model computed against preceeding block residuals:
-#Single cross sectional regression model is built for each factor block using the
-#preceeding block residuals
-#Expects stock return frame with columns Instrument and Return
-#Expects stock weights in frame with columns for Instrument and Weight
-#Factor blocks is a list of dataframes with one column for Instrument and a column for each factor
+#' Compute composite model for blocks of factors
+#'
+#' Point in time composite model computed against preceeding block residuals:
+#' Single cross sectional regression model is built for each factor block using the
+#' preceeding block residuals
+#' Expects stock return frame with columns Instrument and Return
+#' Expects stock weights in frame with columns for Instrument and Weight
+#' Factor blocks is a list of dataframes with one column for Instrument and a column for each factor
+#'
+#' @param stock_returns_on_date "data.frame" with stock returns for date
+#' @param factor_blocks list containing "data.frame" with returns of factors within a block
+#' @return \code{x_sectional_model} list with two components :\cr
+#' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of implied factor returns\cr
+#' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of stock residual returns
 composite_model <- function(stock_returns_on_date,factor_blocks){
 
   rtn <- stock_returns_on_date
@@ -354,13 +327,24 @@ composite_model <- function(stock_returns_on_date,factor_blocks){
   return(list(log_implied_rtns=all_implied,log_residual_returns=rtn))
 }
 
-#Compute the factor correlation matrix from the implied factor returns
+#' Compute the factor correlation matrix from the implied factor returns
+#'
+#' @param implied_fct_rtns data.frame with implied factor returns
+#' @return \code{factor_cor} "data.frame" with factor correlation
 factor_correlation <- function(implied_fct_rtns){
   return(cor(implied_fct_rtns[setdiff(colnames(implied_fct_rtns),'Date')]))
 }
 
-#Use the stock betas and the factor correlation matrix to generate the
-#stock covariance matrix
+#' Compute stock covariance matrix
+#'
+#' Use the stock betas and the factor correlation matrix to generate the
+#' stock correlation matrix
+#'
+#' @param betas "data.frame" with factor betas
+#' @param implied_fct_rtns "data.frame" with implied factor returns
+#' @param factor_correlation_matrix "data.frame" with factor correlation matrix
+#' @param risk_model_date "Date" with risk model date
+#' @return \code{stock_corr} "matrix" with stock correlation
 stock_correlation <- function(betas,implied_fct_rtns,factor_correlation_matrix,risk_model_date){
   instruments <- betas[betas$Date==risk_model_date,'Instrument']
   ir <- implied_fct_rtns[implied_fct_rtns$Date==risk_model_date,setdiff(colnames(implied_fct_rtns),'Date')]
@@ -373,20 +357,36 @@ stock_correlation <- function(betas,implied_fct_rtns,factor_correlation_matrix,r
   return(stock_corr)
 }
 
-#Compute the factor covariance matrix by scaling the correlaiton matrix by the factor
-#returns standard deviation
+#' Factor covariance from correlation
+#'
+#' Compute the factor covariance matrix by scaling the correlaiton matrix by the factor
+#' returns standard deviation
+#'
+#' @param correlation "data.frame" with factor correlation
+#' @param factor_stdev "data.frame" with factor's standard deviation
+#' @return \code{correlation} "matrix" with factor correlation
 factor_covariance <- function(correlation,factor_stdev){
   vrnce <- as.matrix(factor_stdev)%*%t(as.matrix(factor_stdev))
   if(!nrow(vrnce)>1)vrnce <- t(as.matrix(factor_stdev))%*%as.matrix(factor_stdev)
   return(vrnce*as.matrix(correlation))
 }
 
-#This computes the variance of the log returns. This is not identical to the variance of the
-#returns. However we take the variance of the log returns as equal to the variance of the
-#returns beacuse the Taylor expansion of the variance of the log returns gives var[log(R)] ~ var[R]/mean[R]^2
-#and since the mean return will generally be close to one, this is a reasonable approximation.
-#If the mean return is above 1, then the risk measure will slightly underestimate risk, whereas if
-#mean return is lower than 1, risks will be slightly over estimated.
+#' Compute portfolio variance decomposition
+#'
+#' This computes the variance of the log returns. This is not identical to the variance of the
+#' returns. However we take the variance of the log returns as equal to the variance of the
+#' returns beacuse the Taylor expansion of the variance of the log returns gives var[log(R)] ~ var[R]/mean[R]^2
+#' and since the mean return will generally be close to one, this is a reasonable approximation.
+#' If the mean return is above 1, then the risk measure will slightly underestimate risk, whereas if
+#' mean return is lower than 1, risks will be slightly over estimated.
+#'
+#' @param weight "data.frame" with portfolio constituents weights
+#' @param betas "data.frame" with portfolio instrument's betas
+#' @param factor_covariance "matrix" with factor covariance
+#' @param columns "character" list of factors to account when computing decomposition.
+#' Default is NULL. If missing or NULL all factors will be used
+#'
+#' @export
 pfo_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
   wtbt <- merge(betas,weight,by='Instrument')
   weight_matrix <- as.matrix(wtbt['Weight'])
