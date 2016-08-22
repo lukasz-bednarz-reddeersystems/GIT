@@ -16,8 +16,6 @@ getFactorExposureDataObject(object)
 }
 \value{
 \code{factor_exposure_data} object of class "VirtualFactorExposureData"
-
-\code{factor_exposure_data} object of class "VirtualFactorExposureData"
 }
 \description{
 Returns factor_exposure_data object of class "VirtualFactorExposureData"

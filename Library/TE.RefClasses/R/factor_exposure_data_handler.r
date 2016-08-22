@@ -32,7 +32,6 @@ setClass(
 #' Returns factor_exposure_data object of class "VirtualFactorExposureData"
 #'
 #' @param object object of class "VirtualFactorExposureDataHandler"
-#' @return \code{factor_exposure_data} object of class "VirtualFactorExposureData"
 #' @export
 
 setGeneric("getFactorExposureDataObject", function(object){standardGeneric("getFactorExposureDataObject")})
