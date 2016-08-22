@@ -118,11 +118,3 @@ setClass(
 
 setClassUnion("NullableTradeDataWithMarketReturn", c("NULL", "TradeDataWithMarketReturn"))
 
-setClass(
-  Class             = "TradesExtendedReturnPerMonth",
-  prototype         = list(
-    required_colnms = c("Return", "Month", "Strategy", "Long", "Value")
-  ),
-  contains          = c("VirtualTradeData")
-)
-
