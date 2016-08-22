@@ -365,6 +365,7 @@ stock_correlation <- function(betas,implied_fct_rtns,factor_correlation_matrix,r
 #' @param correlation "data.frame" with factor correlation
 #' @param factor_stdev "data.frame" with factor's standard deviation
 #' @return \code{correlation} "matrix" with factor correlation
+#' @export
 factor_covariance <- function(correlation,factor_stdev){
   vrnce <- as.matrix(factor_stdev)%*%t(as.matrix(factor_stdev))
   if(!nrow(vrnce)>1)vrnce <- t(as.matrix(factor_stdev))%*%as.matrix(factor_stdev)
