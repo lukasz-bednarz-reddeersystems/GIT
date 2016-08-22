@@ -5,7 +5,7 @@
 \alias{ExtendedTradesAnalysisBlock-class}
 \title{Analysis Module for extraction of Extended Trades}
 \description{
-Computation block class compute summary focus data for
+Computation block class compute data for
 extended trades.
 }
 \details{

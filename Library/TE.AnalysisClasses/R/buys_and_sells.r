@@ -1,14 +1,24 @@
-sourceTo("../analysis_modules/analysis_block/analysis_block.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules/analysis_block/trade_data_handler.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules/analysis_block/market_data_handler.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+#' @include analysis_block.r
+#' @include extended_trades.r
+NULL
+
 
 ################################################################################
 #
 # BuysAndSellsAnalysisBlock Class
-# 
-#1. Number of extended buys and sells in month compared to number market down days
+#
+# Number of extended buys and sells in month compared to number market down days
 #
 ###############################################################################
+
+
+#' Number of extended buys and sells in month compared to number market down days
+#'
+#' Inherits from "VirtualAnalysisBlock",
+#'               "VirtualTradeDataHandler",
+#'               "VirtualMarketDataHandler"
+#' @export
+
 
 setClass(
   Class             = "BuysAndSellsAnalysisBlock",
@@ -25,32 +35,60 @@ setClass(
                         )
 )
 
-setMethod("setTradeDataObject",  
-          signature(object = "BuysAndSellsAnalysisBlock", trade_data = "TradeData"),
+#' Set trade_data object in object slot
+#'
+#' Public method to set trade_data slot with "ExtendedTradeData"
+#' class object
+#'
+#' @rdname setTradeDataObject-BuysAndSellsAnalysisBlock-method
+#' @param object object of class "BuysAndSellsAnalysisBlock"
+#' @param trade_data object of class "ExtendedTradeData"
+#' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
+#' @export
+
+setMethod("setTradeDataObject",
+          signature(object = "BuysAndSellsAnalysisBlock", trade_data = "ExtendedTradeData"),
           function(object, trade_data){
-            .setTradeDataObject(object, trade_data)
+            TE.RefClasses:::.setTradeDataObject(object, trade_data)
           }
 )
 
-setMethod("setMarketDataObject",  
+#' Set market_data object in object slot
+#'
+#' Public method to set market_data slot with "MarketData"
+#' class object
+#'
+#' @rdname setMarketDataObject-BuysAndSellsAnalysisBlock-method
+#' @param object object of class "BuysAndSellsAnalysisBlock"
+#' @param market_data object of class "MarketData"
+#' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
+#' @export
+
+setMethod("setMarketDataObject",
           signature(object = "BuysAndSellsAnalysisBlock", market_data = "MarketData"),
           function(object, market_data){
-            .setMarketDataObject(object, market_data)
+            TE.RefClasses:::.setMarketDataObject(object, market_data)
           }
 )
 
-setMethod("Process",  
+#' Trigger computation of analysis data.
+#'
+#' @param object object of class "BuysAndSellsAnalysisBlock"
+#' @return \code{object} object object of class "BuysAndSellsAnalysisBlock"
+#' @export
+
+setMethod("Process",
           signature(object = "BuysAndSellsAnalysisBlock"),
-          function(object, key_values){
-            
+          function(object){
+
             # retrieve needed ref_data
             trades <- getReferenceData(getTradeDataObject(object))
             index <- getReferenceData(getMarketDataObject(object))
-            
+
             trader <- unique(trades$TraderName)
             s_str <- paste0(trader, "_S")
             l_str <- paste0(trader, "_L")
-            
+
             # compute required data
             buy_sells <- trades
             buy_sells$Month <- format(buy_sells$Date,'%Y-%m')
@@ -66,28 +104,28 @@ setMethod("Process",
             buy_sells <- rbind(buy_sells[c('Month','Strategy','Count','Side')],
                                cbind(Side='Up_Buy',up_days[c('Month','Strategy')],Count=up_days$Up_Buy),
                                cbind(Side='Up_Sell',up_days[c('Month','Strategy')],Count=up_days$Up_Sell))
-            
-            
+
+
             ttls_long <- aggregate(buy_sells[grep(l_str,buy_sells$Strategy),]$Count,list(Month=buy_sells[grep(l_str,buy_sells$Strategy),]$Month,Side=buy_sells[grep(l_str,buy_sells$Strategy),]$Side),sum)
             ttls_long$Strategy <- 'Overall Long'
             colnames(ttls_long) <- c('Month','Side','Count','Strategy')
             ttls_short <- aggregate(buy_sells[grep(s_str,buy_sells$Strategy),]$Count,list(Month=buy_sells[grep(s_str,buy_sells$Strategy),]$Month,Side=buy_sells[grep(s_str,buy_sells$Strategy),]$Side),sum)
             ttls_short$Strategy <- 'Overall Short'
             colnames(ttls_short) <- c('Month','Side','Count','Strategy')
-            
-            
+
+
             buy_sells <- rbind(buy_sells,ttls_long)
             buy_sells <- rbind(buy_sells,ttls_short)
-            
-             n_buys_sells <- ggplot(data=buy_sells, aes(x=Month, fill=Side)) +
-              geom_bar(aes(weight=Count),position="dodge") +
+
+             n_buys_sells <- ggplot(data=buy_sells, aes_string(x="Month", fill="Side")) +
+              geom_bar(aes_string(weight="Count"),position="dodge") +
               facet_grid(Strategy~.) +
-              ylab("") + xlab("") + ggtitle('Stock extension') 
-            
+              ylab("") + xlab("") + ggtitle('Stock extension')
+
             object <- .setOutputGGPlotData(object,buy_sells)
             object <- .setOutputGGPlot(object, n_buys_sells)
-            
-             
+
+
             return(object)
           }
 )

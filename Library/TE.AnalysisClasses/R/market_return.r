@@ -1,4 +1,4 @@
-#' @include analysis_block.r
+#' @include extended_trades.r
 NULL
 
 
@@ -11,8 +11,27 @@ NULL
 ###############################################################################
 
 
+#' TradesExtendedReturnPerMonth Reference Data class.
+#'
+#' Concrete S4 class storing data of Extended Trades Return per Month
+#' Generated only by MarketReturnAnalysisBlock module.
+#'
+#' Inherits from "VirtualTradeData"
+#'
+#' @export
 
-#' Number of extended buys and sells in month compared to number market down days
+setClass(
+  Class             = "TradesExtendedReturnPerMonth",
+  prototype         = list(
+    required_colnms = c("Return", "Month", "Strategy", "Long", "Value")
+  ),
+  contains          = c("VirtualTradeData")
+)
+
+
+
+#' Analysis Module for computation of
+#' market return of extended trades positions
 #'
 #' Inherits from "VirtualAnalysisBlock",
 #'               "VirtualTradeDataHandler",
@@ -22,27 +41,31 @@ NULL
 setClass(
   Class             = "MarketReturnAnalysisBlock",
   slots             = c(
-    market_data = "MarketDataSX5E"
+    market_data = "MarketDataSX5E",
+    output      = "TradesExtendedReturnPerMonth"
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualTradeDataHandler",
                         "VirtualMarketDataHandler"
-                        )
+                        ),
+  prototype         = list(
+    output      = new("TradesExtendedReturnPerMonth")
+  )
 )
 
 #' Set trade_data object in object slot
 #'
-#' Public method to set trade_data slot with "AverageDownTradesData"
+#' Public method to set trade_data slot with "ExtendedTradeData"
 #' class object
 #'
 #' @rdname setTradeDataObject-MarketReturnAnalysisBlock-method
 #' @param object object of class "MarketReturnAnalysisBlock"
-#' @param trade_data object of class "TradeData"
+#' @param trade_data object of class "ExtendedTradeData"
 #' @return \code{object} object of class "MarketReturnAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
-          signature(object = "MarketReturnAnalysisBlock", trade_data = "TradeData"),
+          signature(object = "MarketReturnAnalysisBlock", trade_data = "ExtendedTradeData"),
           function(object, trade_data){
             TE.RefClasses:::.setTradeDataObject(object, trade_data)
           }
@@ -51,10 +74,10 @@ setMethod("setTradeDataObject",
 
 #' Set market_data object in object slot
 #'
-#' Public method to set market_data slot with "AverageDownTradesData"
+#' Public method to set market_data slot with "MarketDataSX5E"
 #' class object
 #'
-#' @rdname setTradeDataObject-MarketReturnAnalysisBlock-method
+#' @rdname setMarketDataObject-MarketReturnAnalysisBlock-method
 #' @param object object of class "MarketReturnAnalysisBlock"
 #' @param market_data object of class "MarketDataSX5E"
 #' @return \code{object} object of class "MarketReturnAnalysisBlock"
@@ -75,7 +98,7 @@ setMethod("setMarketDataObject",
 
 setMethod("Process",
           signature(object = "MarketReturnAnalysisBlock"),
-          function(object, key_values){
+          function(object){
 
             # retrieve needed ref_data
             trades <- getReferenceData(getTradeDataObject(object))
@@ -116,7 +139,7 @@ setMethod("Process",
 
             # generate plot data
             extension_rtns <- ggplot(data=extended_return, aes_string(x="Month", fill="Return")) +
-              geom_bar(aes(weight=Value),position="dodge") +
+              geom_bar(aes_string(weight="Value"),position="dodge") +
               facet_grid(Strategy~Long, scales="free_y") +
               ylab("ln(Return)") + xlab("Month") + ggtitle('Average daily log return due to extended trades')
 
@@ -124,7 +147,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object,extended_return)
             object <- .setOutputGGPlot(object, extension_rtns)
 
-            output_obj <- new("TradesExtendedReturnPerMonth")
+            output_obj <- getOutputObject(object)
 
             output_obj <- setReferenceData(output_obj, extended_return)
             object <- .setOutputObject(object, output_obj)

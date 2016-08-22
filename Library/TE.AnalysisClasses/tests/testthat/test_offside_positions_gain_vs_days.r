@@ -1,4 +1,4 @@
-context("Testing AverageDownTradesAnalysisBlock")
+context("Testing OffsidePositionsGainVsDaysAnalysisBlock")
 
 ###############################################
 #
