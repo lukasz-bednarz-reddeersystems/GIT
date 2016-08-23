@@ -48,6 +48,7 @@ Collate:
     'pnl_traded_in_long_short_hedge.r'
     'portfolio_factor_exposure.r'
     'portfolio_factor_exposures.r'
+    'portfolio_factor_returns.r'
     'position_revisits.r'
     'position_revisits_delta_prev_quarter.r'
     'positions_holding_capital_distribution.r'
