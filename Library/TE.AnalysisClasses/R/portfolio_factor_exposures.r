@@ -25,6 +25,17 @@ setClass(
   contains          = c("VirtualImpliedFactorReturnsData")
 )
 
+
+#' Analyser for Portfolio risk factors exposure
+#'
+#' Computation block class to pull data required for portfolio factor exposure.
+#'
+#' Inherits from "VirtualAnalysisBlock",
+#'               "VirtualPortfolioDataHandler",
+#'               "VirtualRiskModelHandler",
+#'               "VirtualInstrumentBetasDataHandler"
+#'
+#' @export
 setClass(
   Class             = "PortfolioFactorExposuresAnalysisBlock",
   slots             = c(
@@ -251,8 +262,6 @@ setMethod("Process",
             for( group in names(portfolio_decomposition_factor_groups)) {
               ret_plot_data$Colour[ret_plot_data$RiskGroup == group] <- as.integer(as.factor(as.character(ret_plot_data$RiskType[ret_plot_data$RiskGroup == group] )))
             }
-
-            browser()
 
             #Create a custom color scale
             myColors <- brewer.pal(brewer.pal.info["Set1", "maxcolors"],"Set1")
