@@ -50,6 +50,7 @@ Collate:
     'position_revisits_delta_prev_quarter.r'
     'positions_holding_capital_distribution.r'
     'positions_holding_day_zero_pnl.r'
+    'positions_holding_period.r'
     'relative_market_return.r'
     'strategy_breakdown.r'
     'strategy_breakdown_aum_and_turnover.r'

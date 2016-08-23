@@ -7,6 +7,7 @@ NULL
 #
 # Computation block class to pull data required for Computation of
 # position PnL at day zero of trade
+#
 ###############################################################################
 
 
