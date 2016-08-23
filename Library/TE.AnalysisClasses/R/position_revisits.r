@@ -91,8 +91,8 @@ setMethod("dataRequest",
 
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+#' @param object object of class "PositionRevisitsAnalysisBlock"
+#' @return \code{object} object object of class "PositionRevisitsAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "PositionRevisitsAnalysisBlock"),

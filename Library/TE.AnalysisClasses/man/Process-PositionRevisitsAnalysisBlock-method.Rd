@@ -8,10 +8,10 @@
 \S4method{Process}{PositionRevisitsAnalysisBlock}(object)
 }
 \arguments{
-\item{object}{object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"}
+\item{object}{object of class "PositionRevisitsAnalysisBlock"}
 }
 \value{
-\code{object} object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+\code{object} object object of class "PositionRevisitsAnalysisBlock"
 }
 \description{
 Trigger computation of analysis data.
