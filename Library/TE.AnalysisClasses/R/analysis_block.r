@@ -87,7 +87,6 @@ setGeneric("getOutputObject", function(object){standardGeneric("getOutputObject"
 #' returns NULL
 #'
 #' @inheritParams getOutputObject
-#' @return \code{output} object of class derived from "VirtualReferenceData"
 #'
 #' @export
 setMethod("getOutputObject",
@@ -122,7 +121,6 @@ setMethod(".setOutputObject",
 #' Returns ggplot object generated as a result of analysis computation.
 #'
 #' @param object object of class "VirtualAnalysisBlock"
-#' @return \code{ggplot} object of class "ggplot"
 #'
 #' @export
 
@@ -171,7 +169,6 @@ setMethod(".setOutputGGPlot",
 #' Returns "data.frame" with data used to generate ggplot
 #'
 #' @param object object of class "VirtualAnalysisBlock"
-#' @return \code{ggplot_data} object of class "data.frame"
 #'
 #' @export
 
@@ -201,8 +198,7 @@ setMethod("getOutputGGPlotData",
 #' @rdname private_setOutputGGPlotData
 #' @param object object of class "VirtualAnalysisBlock"
 #' @param ggplot_data object of class "data.frame"
-#' @return \code{object} object object of class "VirtualAnalysisBlock"
-
+#' @return object object of class "VirtualAnalysisBlock"
 setGeneric(".setOutputGGPlotData", function(object, ggplot_data){standardGeneric(".setOutputGGPlotData")})
 
 setMethod(".setOutputGGPlotData",
@@ -219,7 +215,6 @@ setMethod(".setOutputGGPlotData",
 #' Returns data to be used by any frontend using the module
 #'
 #' @param object object of class "VirtualAnalysisBlock"
-#' @return \code{frontend_data} object of class "data.frame"
 #'
 #' @export
 
@@ -266,7 +261,6 @@ setMethod(".setOutputFrontendData",
 #' Trigger computation of analysis data.
 #'
 #' @param object object of class "VirtualAnalysisBlock"
-#' @return \code{object} object object of class "VirtualAnalysisBlock"
 #' @export
 
 setGeneric("Process", function(object){standardGeneric("Process")})
