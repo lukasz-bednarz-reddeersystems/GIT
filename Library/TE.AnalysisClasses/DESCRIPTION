@@ -46,6 +46,7 @@ Collate:
     'offside_positions_relative_bps_per_month.r'
     'portfolio_factor_exposure.r'
     'portfolio_factor_exposures.r'
+    'position_revisits.r'
     'relative_market_return.r'
     'strategy_breakdown.r'
     'strategy_breakdown_aum_and_turnover.r'
