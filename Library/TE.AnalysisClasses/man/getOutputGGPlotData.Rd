@@ -15,8 +15,6 @@ getOutputGGPlotData(object)
 }
 \value{
 \code{ggplot_data} object of class "data.frame"
-
-\code{ggplot_data} object of class "data.frame"
 }
 \description{
 Returns "data.frame" with data used to generate ggplot

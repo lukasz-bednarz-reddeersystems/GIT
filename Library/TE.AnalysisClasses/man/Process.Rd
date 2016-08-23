@@ -9,9 +9,6 @@ Process(object)
 \arguments{
 \item{object}{object of class "VirtualAnalysisBlock"}
 }
-\value{
-\code{object} object object of class "VirtualAnalysisBlock"
-}
 \description{
 Trigger computation of analysis data.
 }

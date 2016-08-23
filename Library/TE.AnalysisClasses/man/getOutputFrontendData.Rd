@@ -15,8 +15,6 @@ getOutputFrontendData(object)
 }
 \value{
 \code{frontend_data} object of class "data.frame"
-
-\code{frontend_data} object of class "data.frame"
 }
 \description{
 Returns data to be used by any frontend using the module

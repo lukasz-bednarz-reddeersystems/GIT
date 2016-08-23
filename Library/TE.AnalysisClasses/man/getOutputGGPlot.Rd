@@ -15,8 +15,6 @@ getOutputGGPlot(object)
 }
 \value{
 \code{ggplot} object of class "ggplot"
-
-\code{ggplot} object of class "ggplot"
 }
 \description{
 Returns ggplot object generated as a result of analysis computation.

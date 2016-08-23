@@ -12,7 +12,7 @@
 \item{ggplot_data}{object of class "data.frame"}
 }
 \value{
-\code{object} object object of class "VirtualAnalysisBlock"
+object object of class "VirtualAnalysisBlock"
 }
 \description{
 Private method to set slot with data used to generate ggplot object.

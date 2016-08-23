@@ -15,8 +15,6 @@ getOutputObject(object)
 }
 \value{
 \code{output} object of class derived from "VirtualReferenceData"
-
-\code{output} object of class derived from "VirtualReferenceData"
 }
 \description{
 Returns Reference Data Object that possibly was computed by

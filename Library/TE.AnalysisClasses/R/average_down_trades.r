@@ -16,9 +16,9 @@ avg_dwn_cols <- c('InstrumentID','Date','TodayPL','PnLOutof','VolInto','SkewInto
 
 
 
-#' Extended Trades Reference Data class.
+#' Average Down Trades Reference Data class.
 #'
-#' Concrete S4 class storing data of Extended Trades info.
+#' Concrete S4 class storing data of Average Down Trades info.
 #' Generated only by AverageDownTradesAnalysisBlock module.
 #'
 #' Inherits from "VirtualTradeData"

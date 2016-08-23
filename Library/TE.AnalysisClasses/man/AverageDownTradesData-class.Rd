@@ -3,9 +3,9 @@
 \docType{class}
 \name{AverageDownTradesData-class}
 \alias{AverageDownTradesData-class}
-\title{Extended Trades Reference Data class.}
+\title{Average Down Trades Reference Data class.}
 \description{
-Concrete S4 class storing data of Extended Trades info.
+Concrete S4 class storing data of Average Down Trades info.
 Generated only by AverageDownTradesAnalysisBlock module.
 }
 \details{
