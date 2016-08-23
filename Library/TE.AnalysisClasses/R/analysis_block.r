@@ -35,7 +35,11 @@ setClass(
 #'
 #' Private method to check if given value has correct class for the slot
 #'
+#' @rdname private_checkSlotClass
 #' @param object object of class "VirtualAnalysisBlock"
+#' @param slot "character" slot name which class is beeing checked
+#' @param class "character" class name of the slot
+#' @param req_class "character" vector of allowed slot classes
 #' @return \code{object} object of class "VirtualAnalysisBlock"
 
 setGeneric(".checkSlotClass", function(object,slot, class, req_class){standardGeneric(".checkSlotClass")})
@@ -98,6 +102,7 @@ setMethod("getOutputObject",
 #'
 #' Private method to set output object slot
 #'
+#' @rdname private_setOutputObject
 #' @param object object of class "VirtualAnalysisBlock"
 #' @param ref_data_object object of class derived from "VirtualReferenceData"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
@@ -144,6 +149,7 @@ setMethod("getOutputGGPlot",
 #'
 #' Private method to set output ggplot object slot
 #'
+#' @rdname private_setOutputGGPlot
 #' @param object object of class "VirtualAnalysisBlock"
 #' @param ggplot object of class "ggplot"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
@@ -192,6 +198,7 @@ setMethod("getOutputGGPlotData",
 #'
 #' Private method to set slot with data used to generate ggplot object.
 #'
+#' @rdname private_setOutputGGPlotData
 #' @param object object of class "VirtualAnalysisBlock"
 #' @param ggplot_data object of class "data.frame"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"
@@ -239,6 +246,7 @@ setMethod("getOutputFrontendData",
 #'
 #' Private method to set frontend_data slot with data.frame used to provide to frontend services object
 #'
+#' @rdname private_setOutputFrontendData
 #' @param object object of class "VirtualAnalysisBlock"
 #' @param frontend_data object of class "data.frame"
 #' @return \code{object} object object of class "VirtualAnalysisBlock"

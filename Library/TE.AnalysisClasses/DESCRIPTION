@@ -52,4 +52,5 @@ Collate:
     'strategy_breakdown_value_traded_per_signal.r'
     'strategy_breakdown_pnl_and_turnover_by_event.r'
     'strategy_breakdown_pnl_on_trade_day_per_signal.r'
+    'strategy_breakdown_signal_characteristic_and_effeciveness.r'
 RoxygenNote: 5.0.1
