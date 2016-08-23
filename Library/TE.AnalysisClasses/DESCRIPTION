@@ -48,4 +48,5 @@ Collate:
     'portfolio_factor_exposures.r'
     'relative_market_return.r'
     'strategy_breakdown.r'
+    'strategy_breakdown_aum_and_turnover.r'
 RoxygenNote: 5.0.1
