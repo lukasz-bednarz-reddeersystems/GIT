@@ -4,14 +4,14 @@ NULL
 
 ################################################################################
 #
-# MarketStyleFactorStatisticAnalysisBlock Class
+# MarketStyleAnalysisBlock Class
 #
 # Computation block class to pull data required data for Market Style
 # Pulls data required for computation and adds required columns.
 ###############################################################################
 
 
-#' Analysis computing MarketStyle data and generating boxplot
+#' Analysis computing MarketStyle data and generating timeseries plot
 #'
 #' Market style is z-score of first eigenvector of factor covariance matrix.
 #'
@@ -25,7 +25,7 @@ NULL
 #' @export
 
 setClass(
-  Class             = "MarketStyleFactorStatisticAnalysisBlock",
+  Class             = "MarketStyleAnalysisBlock",
   slots             = c(
     market_style       = "MarketStyleData"
   ),
@@ -43,15 +43,16 @@ setClass(
   )
 )
 
+
 #' Request data from data source
 #'
-#' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+#' @param object object of class 'MarketStyleAnalysisBlock'.
 #' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+#' @return \code{object} object of class 'MarketStyleAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
-          signature(object = "MarketStyleFactorStatisticAnalysisBlock", key_values = "data.frame"),
+          signature(object = "MarketStyleAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
@@ -85,11 +86,12 @@ setMethod("dataRequest",
 
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
-#' @return \code{object} object object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @param object object of class "MarketStyleAnalysisBlock"
+#' @return \code{object} object object of class "MarketStyleAnalysisBlock"
 #' @export
+
 setMethod("Process",
-          signature(object = "MarketStyleFactorStatisticAnalysisBlock"),
+          signature(object = "MarketStyleAnalysisBlock"),
           function(object){
 
             # retrieve data
@@ -114,10 +116,6 @@ setMethod("Process",
 
                 plot_data <- data.frame(Date = rm_date, plot_data)
 
-                plot_data$RiskGroup <- plot_data$RiskType
-                levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
-                plot_data <- data.frame(Date = rm_date, plot_data)
-
                 if(first){
                   mrkt_plot_data <- plot_data
                   first <- FALSE
@@ -130,22 +128,14 @@ setMethod("Process",
               }
             }
 
-            #order of factors
-            ord_frm <- unique(mrkt_plot_data[c("RiskType", "RiskGroup")])
-            ord_frm <- ord_frm[order(ord_frm$RiskGroup, ord_frm$RiskType, decreasing = TRUE),]
-
-            mrkt_plot_data$RiskType <- factor(as.character(mrkt_plot_data$RiskType),
-                                                 levels = as.character(ord_frm$RiskType))
-
             #Create plot
-            plt_risk <- ggplot(data=mrkt_plot_data,aes_string(x="RiskType",
-                                                              y="Value",
-                                                              color="RiskType"
-                                                              )
-                               ) +
-                        geom_boxplot() +
-                        coord_flip() +
-                        guides(color = FALSE)
+
+            mrkt_plot_data$Value.Abs <- abs(mrkt_plot_data$Value)
+
+            plt_risk <- ggplot(data=mrkt_plot_data,aes_string(x="Date",
+                                                              y="Value.Abs",
+                                                              color="RiskType")) +
+                        geom_line()
 
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)

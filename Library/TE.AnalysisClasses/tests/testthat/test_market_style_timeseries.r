@@ -1,14 +1,13 @@
-context("Testing MarketStyleFactorStatisticAnalysisBlock")
-
+context("Testing MarketStyleAnalysisBlock")
 
 ################################
 #
-# MarketStyleFactorStatisticAnalysisBlock Tests
+# MarketStyleAnalysisBlock Tests
 #
 ################################
 
 # test vectors
-tested.class          <-  "MarketStyleFactorStatisticAnalysisBlock"
+tested.class          <-  "MarketStyleAnalysisBlock"
 valid.column_name_map <- hash(c("start", "end"), c("start", "end"))
 init.key_values       <- data.frame(start    = as.Date(character()),
                                     end    = as.Date(character()))
@@ -75,7 +74,9 @@ test_that("Can dataRequest() with valid key_values and no previous data set", {
   # market style data verification
   market_data <- getMarketStyleDataObject(object)
   expect_is(market_data, "MarketStyleData")
-  expect_gt(getStoredNRows(market_data), 0)
+  expect_equal(getStoredNRows(market_data), 0)
+
+
 
 })
 
@@ -85,7 +86,7 @@ test_that(paste("Can Process() on", tested.class), {
 
   object <- new(tested.class)
 
-  valid.key_values <- dated_full_month(11, "2016-07-30")
+  valid.key_values <- dated_full_month(11, "2016-05-30")
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   # Request Data
@@ -98,6 +99,9 @@ test_that(paste("Can Process() on", tested.class), {
   market_data <- getMarketStyleDataObject(object)
   expect_is(market_data, "MarketStyleData")
   expect_gt(getStoredNRows(market_data), 0)
+
+  # Request Data
+
 
 
   object <- Process(object)

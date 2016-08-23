@@ -39,6 +39,7 @@ Collate:
     'market_return.r'
     'portfolio_variance_decomposition.r'
     'market_style_factor_stat.r'
+    'market_style_timeseries.r'
     'offside_positions_gain_vs_days.r'
     'offside_positions_cumulative_pnl.r'
     'offside_positions_pnl_vs_days.r'
