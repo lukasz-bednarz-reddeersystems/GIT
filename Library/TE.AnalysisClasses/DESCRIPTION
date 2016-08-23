@@ -49,4 +49,6 @@ Collate:
     'relative_market_return.r'
     'strategy_breakdown.r'
     'strategy_breakdown_aum_and_turnover.r'
+    'strategy_breakdown_value_traded_per_signal.r'
+    'strategy_breakdown_pnl_and_turnover_by_event.r'
 RoxygenNote: 5.0.1
