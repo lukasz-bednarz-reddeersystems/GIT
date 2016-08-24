@@ -213,6 +213,33 @@ setMethod(".setDataSourceQueryKeyValues",
           }
 )
 
+#' Store values of query keys
+#'
+#' Public method to set values of key values datatable
+#' needs to be implemented by inheriting classes
+#'
+#' @param object object of class 'VirtualDataSourceClient'.
+#' @param key_values data.frame with columns matching key column names()
+#' @export
+
+setGeneric("setDataSourceQueryKeyValues", function(object, key_values){standardGeneric("setDataSourceQueryKeyValues")})
+
+#' @describeIn setDataSourceQueryKeyValues
+#' Store values of query keys
+#'
+#' Public method to set values of key values datatable
+#'
+#' @inheritParams setDataSourceQueryKeyValues
+#' @return \code{object} object of class 'VirtualDataSourceClient'.
+#' @export
+setMethod("setDataSourceQueryKeyValues",
+          signature(object = "VirtualDataSourceClient", key_values = "data.frame"),
+          function(object, key_values) {
+
+            return(.setDataSourceQueryKeyValues(object, key_values))
+          }
+)
+
 
 #' Retreive values of query keys
 #'
