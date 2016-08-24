@@ -37,7 +37,7 @@ setClass(
 
 
 setMethod(".generateDataFilledWithNA",
-          signature(object = "TradeDataSimple", trader = "integer", start = "Date", end = "Date"),
+          signature(object = "TradeDataSimple"),
           function(object, trader, start, end){
 
             ret_vars <- getDataSourceReturnColumnNames(object)

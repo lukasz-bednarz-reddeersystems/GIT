@@ -2,31 +2,71 @@
 % Please edit documentation in R/models_ppmodel.r, R/models_ppmodel_library.r
 \docType{class}
 \name{PPModel-class}
-\alias{AverageDownPsnGatherer}
+\alias{AverageDownPsnGatherer-class}
 \alias{PPModel-class}
-\alias{PetNamesPsnGatherer}
-\alias{PositionSizeBatchQuantiler}
-\alias{PriceBySnapshotGatherer}
-\alias{PrimaryPlacingPsnGatherer}
-\alias{PsnAgeGatherer}
-\alias{ResultsDayBatchGatherer}
-\alias{ResultsDayExposureSnapShotBatchGatherer}
-\alias{ResultsDayPsnGatherer}
-\alias{ResultsDaySnapShotBatchGatherer}
-\alias{SecondaryPlacingPsnGatherer}
-\alias{SizeAdjustmentBatchGatherer}
-\alias{StopTargetsGatherer}
-\alias{TradeHistory}
-\alias{TradeHistorySimple}
-\alias{TradeHistorySimpleWithSummary}
-\alias{TradeLevelGatherer}
-\alias{TradeLevelSnapShot}
+\alias{PetNamesPsnGatherer-class}
+\alias{PositionSizeBatchQuantiler-class}
+\alias{PriceBySnapshotGatherer-class}
+\alias{PrimaryPlacingPsnGatherer-class}
+\alias{PsnAgeGatherer-class}
+\alias{ResultsDayBatchGatherer-class}
+\alias{ResultsDayExposureSnapShotBatchGatherer-class}
+\alias{ResultsDayPsnGatherer-class}
+\alias{ResultsDaySnapShotBatchGatherer-class}
+\alias{SecondaryPlacingPsnGatherer-class}
+\alias{SizeAdjustmentBatchGatherer-class}
+\alias{StopTargetsGatherer-class}
+\alias{TradeHistory-class}
+\alias{TradeHistorySimple-class}
+\alias{TradeHistorySimpleWithSummary-class}
+\alias{TradeLevelGatherer-class}
+\alias{TradeLevelSnapShot-class}
 \title{An S4 class to represent generic ppmodel set.}
 \description{
 Pre Processing Model is an object that gathers and
 processes raw data and aggregates it into one DataSet.
 Depending on specific derived classes different result
 can be obtained
+
+PPModel derived class ResultsDayBatchGatherer
+
+PPModel derived class ResultsDayPsnGatherer
+
+PPModel derived class SizeAdjustmentBatchGatherer
+
+PPModel derived class PositionSizeBatchQuantiler
+
+PPModel derived class PrimaryPlacingPsnGatherer
+
+PPModel derived class SecondaryPlacingPsnGatherer
+
+PPModel derived class PrimaryPlacingPsnGatherer
+
+PPModel derived class SecondaryPlacingPsnGatherer
+
+PPModel derived class PetNamesPsnGatherer
+
+PPModel class for PsnAgeGatherer
+
+PPModel derived class TradeHistory
+
+PPModel derived class TradeHistorySimple
+
+PPModel derived class TradeHistorySimpleWithSummary
+
+PPModel derived class PriceBySnapshotGatherer
+
+PPModel derived class AverageDownPsnGatherer
+
+PPModel derived class TradeLevelGatherer
+
+PPModel derived class TradeLevelSnapShot
+
+PPModel derived class StopTargetsGatherer
+
+PPModel derived class ResultsDaySnapShotBatchGatherer
+
+PPModel derived class ResultsDayExposureSnapShotBatchGatherer
 }
 \section{Slots}{
 

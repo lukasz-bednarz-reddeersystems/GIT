@@ -1,8 +1,5 @@
 context("Testing EventData")
 
-library(plyr)
-
-
 #########################
 #
 # EventData Tests

@@ -5,11 +5,25 @@
 NULL
 
 
+#' Union class PreprocessorOutput
+#' union of "DataSet" and "NULL"
+#'
+#' @title PreprocessorOutput-class
+#' @name PreprocessorOutput-class
+#' @docType class
 #' @exportClass PreprocessorOutput
 setClassUnion("PreprocessorOutput",c("DataSet","NULL"))
 
 #Preprocessors should return a DataSet.
+
+#' Union class PreprocessorInput
+#' union of "data.frame"
+#'
+#' @title PreprocessorInput-class
+#' @name PreprocessorInput-class
+#' @docType class
 #' @exportClass PreprocessorInput
+
 setClassUnion("PreprocessorInput",c("data.frame"))
 
 setClass(

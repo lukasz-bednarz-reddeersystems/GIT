@@ -31,6 +31,13 @@ setClass(
   contains          = c("VirtualDataSourceClient")
 )
 
+#' Initialize method for "MarketData" class
+#'
+#' @param .Object, object of class "MarketData"
+#' @param symbol "character" name of the symbol queried
+#' @param start "Date" start date of the data range
+#' @param end "Date" end date of the data range
+#' @return \code{.Object} object of class "MarketData"
 #' @export
 setMethod("initialize",
           signature(.Object = "MarketData"),
@@ -41,6 +48,15 @@ setMethod("initialize",
           })
 
 
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'MarketData'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'MarketData'.
+#' @export
 setMethod("dataRequest",
           signature(object = "MarketData", key_values = "data.frame"),
           function(object, key_values){
@@ -110,6 +126,12 @@ setClass(
   contains          = c("MarketData")
 )
 
+#' Initialize method for "MarketData" class
+#'
+#' @param .Object, object of class "MarketData"
+#' @param start "Date" start date of the data range
+#' @param end "Date" end date of the data range
+#' @return \code{.Object} object of class "MarketData"
 #' @export
 setMethod("initialize",
           signature(.Object = "MarketDataSX5P"),
@@ -145,6 +167,12 @@ setClass(
   contains          = c("MarketData")
 )
 
+#' Initialize method for "MarketData" class
+#'
+#' @param .Object, object of class "MarketData"
+#' @param start "Date" start date of the data range
+#' @param end "Date" end date of the data range
+#' @return \code{.Object} object of class "MarketData"
 #' @export
 setMethod("initialize",
           signature(.Object = "MarketDataSX5E"),

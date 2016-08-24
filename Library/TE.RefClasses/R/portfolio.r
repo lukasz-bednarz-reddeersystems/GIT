@@ -42,7 +42,7 @@ setClass(
 #' @return \code{object} object of class 'Portfolio'.
 #' @export
 
-setGeneric("buildPortfolioHistory", function(object, start, end, ...){standardGeneric("buildPortfolioHistory")})
+setGeneric("buildPortfolioHistory", function(object, start, end){standardGeneric("buildPortfolioHistory")})
 
 
 #' Get start date of portfolio timespan
@@ -51,7 +51,14 @@ setGeneric("buildPortfolioHistory", function(object, start, end, ...){standardGe
 #' @return \code{start} Date start of data range.
 #' @export
 
-setGeneric("getStartDate", function(object,...){standardGeneric("getStartDate")})
+setGeneric("getStartDate", function(object){standardGeneric("getStartDate")})
+
+#' @describeIn getStartDate
+#' Get start date of portfolio timespan
+#'
+#' @inheritParams getStartDate
+#' @return \code{start} Date start of data range.
+#' @export
 setMethod("getStartDate",
           signature(object = "Portfolio"),
           function(object){
@@ -67,7 +74,14 @@ setMethod("getStartDate",
 #' @return \code{object} object of class 'Portfolio'.
 #' @export
 
-setGeneric("setStartDate", function(object, start, ...){standardGeneric("setStartDate")})
+setGeneric("setStartDate", function(object, start){standardGeneric("setStartDate")})
+
+#' @describeIn setStartDate
+#' Set start date of portfolio timespan
+#'
+#' @inheritParams setStartDate
+#' @return \code{object} object of class 'Portfolio'.
+#' @export
 setMethod("setStartDate",
           signature(object = "Portfolio", start = "Date"),
           function(object, start){
@@ -86,14 +100,14 @@ setMethod("setStartDate",
 #' @return \code{end} Date end of data range.
 #' @export
 
-setGeneric("getEndDate", function(object,...){standardGeneric("getEndDate")})
-# Returns start slot value.
-#
-# Args:
-#   object : object of type Portfolio
-# Returns:
-#   startDate
+setGeneric("getEndDate", function(object){standardGeneric("getEndDate")})
 
+#' @describeIn getEndDate
+#' Get end date of portfolio timespan
+#'
+#' @inheritParams getEndDate
+#' @return \code{end} Date end of data range.
+#' @export
 setMethod("getEndDate",
           signature(object = "Portfolio"),
           function(object){
@@ -108,14 +122,14 @@ setMethod("getEndDate",
 #' @return \code{object} object of class 'Portfolio'.
 #' @export
 
-setGeneric("setEndDate", function(object, end, ...){standardGeneric("setEndDate")})
-# Returns TraderID slot value.
-#
-# Args:
-#   object : object of type Portfolio
-# Returns:
-#   TraderID
+setGeneric("setEndDate", function(object, end){standardGeneric("setEndDate")})
 
+#' @describeIn setEndDate
+#' Set end date of portfolio timespan
+#'
+#' @inheritParams setEndDate
+#' @return \code{object} object of class 'Portfolio'.
+#' @export
 setMethod("setEndDate",
           signature(object = "Portfolio"),
           function(object, end){

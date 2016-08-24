@@ -7,11 +7,20 @@ NULL
 #
 ####################################
 
+#' List of position summary features names
 position_summary_features <- c('Av.Age','Av.PL','Av.MarketValue','Av.Quantity','Av.PsnReturn','PsnRtnVol','Total.PL','Gm.PsnReturn','PsnReturn','InitialValue','StockReturn','RelativeReturn')
+
+#' List of trade history features names
 trade_history_features <- c('MarketValue','TodayPL')
+
+#' List of trade delta features names
 trade_delta_features <- c('DeltaSwing','DeltaSkew','DeltaPL')
+
+#' List of trade history basic features names
 trade_basic_features <- c("TradeDate", "TradeID", "Long", "Instrument", "Trader", "ValueUSD", "Strategy",
                          "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
+
+#' List of translated trade history basic features names
 trade_basic_features_transl <- c("Date", "TradeID", "Long", "InstrumentID", "TraderName", "ValueUSD", "Strategy",
                           "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
 
@@ -77,7 +86,7 @@ setClass(
 
 
 setMethod(".generateDataFilledWithNA",
-          signature(object = "TradeData", trader = "integer", start = "Date", end = "Date"),
+          signature(object = "TradeData"),
           function(object, trader, start, end){
 
             ret_vars <- getDataSourceReturnColumnNames(object)
@@ -108,12 +117,4 @@ setClass(
 )
 
 setClassUnion("NullableTradeDataWithMarketReturn", c("NULL", "TradeDataWithMarketReturn"))
-
-setClass(
-  Class             = "TradesExtendedReturnPerMonth",
-  prototype         = list(
-    required_colnms = c("Return", "Month", "Strategy", "Long", "Value")
-  ),
-  contains          = c("VirtualTradeData")
-)
 

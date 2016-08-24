@@ -277,6 +277,11 @@ setClass(
 #for objects along the same branch in the class hierachy.
 #Must ensure new environments created since they are passed
 #by reference.
+
+#' Initialize method for "TradeWarehouse" class
+#'
+#' @param .Object, object of class "TradeWarehouse"
+#' @return \code{.Object} object of class "TradeWarehouse"
 #' @export
 
 setMethod("initialize", "TradeWarehouse",
@@ -838,6 +843,16 @@ setMethod("getPriceSnapshot","TradeWarehouse",
 #' @export
 
 setGeneric("getRawPositionData",function(object){standardGeneric("getRawPositionData")})
+
+#' @describeIn getRawPositionData
+#' Get position data from Warehouse
+#'
+#' Returns all position data stored in Warehouse
+#'
+#' @inheritParams getRawPositionData
+#' @return \code{positions} object of class "DataSet" with position data
+#' @export
+
 setMethod("getRawPositionData","TradeWarehouse",
           function(object){
             return(object@positions@data)
@@ -853,6 +868,16 @@ setMethod("getRawPositionData","TradeWarehouse",
 #' @export
 
 setGeneric("getRawPositionSummary",function(object){standardGeneric("getRawPositionSummary")})
+
+#' @describeIn getRawPositionSummary
+#' Get position summary data from Warehouse
+#'
+#' Returns all position summary data stored in Warehouse
+#'
+#' @inheritParams getRawPositionSummary
+#' @return \code{psn_summary} object of class "DataSet" with position summary data
+#' @export
+
 setMethod("getRawPositionSummary","TradeWarehouse",
           function(object){
             return(object@psn_summary@data)

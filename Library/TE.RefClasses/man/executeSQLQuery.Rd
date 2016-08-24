@@ -4,7 +4,7 @@
 \alias{executeSQLQuery}
 \title{Executes SQL query strings}
 \usage{
-executeSQLQuery(object, key_values, ...)
+executeSQLQuery(object, key_values)
 }
 \arguments{
 \item{object}{object of class 'VirtualSQLQuery'.}

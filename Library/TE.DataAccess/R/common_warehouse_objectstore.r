@@ -67,6 +67,16 @@ setMethod("generateKey","WarehouseObjectStore",
 #' @export
 
 setGeneric("getWarehouseFromStore",function(object,trader_id,start,end){standardGeneric("getWarehouseFromStore")})
+
+#' @describeIn getWarehouseFromStore
+#' Get warehouse from WarehouseObjectstore for given keys
+#'
+#' Retrieves from WarehouseObjectstore warehouse matching
+#' keys passed as arguments.
+#'
+#' @inheritParams getWarehouseFromStore
+#' @return \code{wh} object of class "CompositeWarehouse" if present otherwise NULL
+#' @export
 setMethod("getWarehouseFromStore","WarehouseObjectStore",
 	      function(object,trader_id,start,end){
 	      	key <- generateKey(object,trader_id,start,end)
@@ -98,6 +108,16 @@ setMethod("getWarehouseFromStore","WarehouseObjectStore",
 #' @export
 
 setGeneric("queryWarehouseStore",function(object,trader_id,start,end){standardGeneric("queryWarehouseStore")})
+
+#' @describeIn queryWarehouseStore
+#' Query WarehouseObjectstore for given keys
+#'
+#' Updates Warehouse if it doesn't contain data.
+#'
+#' @inheritParams queryWarehouseStore
+#' @return \code{object} object object of class "WarehouseObjectStore"
+#' @export
+
 setMethod("queryWarehouseStore","WarehouseObjectStore",
 		  function(object,trader_id,start,end){
 
@@ -121,6 +141,13 @@ setMethod("queryWarehouseStore","WarehouseObjectStore",
 )
 
 
+#' Update WarehouseObjectstore for given keys
+#'
+#' Updates Warehouse if it doesn't contain data.
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @param keys "data.frame", keys to update for
+#' @return \code{object} object object of class "WarehouseObjectStore"
 
 setGeneric("updateWarehouseStore",function(object,keys){standardGeneric("updateWarehouseStore")})
 setMethod("updateWarehouseStore","WarehouseObjectStore",
@@ -146,6 +173,13 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  }
 )
 
+
+#' Adds Warehouse to Warehouse Objectstore
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @param new_warehouse object of class "CompositeWarehouse"
+#' @return \code{object} object object of class "WarehouseObjectStore"
+
 setGeneric("updateWarehouseStoreForKey",function(object,new_warehouse){standardGeneric("updateWarehouseStoreForKey")})
 setMethod("updateWarehouseStoreForKey","WarehouseObjectStore",
 		  function(object,new_warehouse){
@@ -168,6 +202,13 @@ setMethod("updateWarehouseStoreForKey","WarehouseObjectStore",
 		 }
 )
 
+
+
+#' Get KeyMap ID
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @return \code{keymap_id} "character"
+
 setGeneric("getKeyMapID",function(object){standardGeneric("getKeyMapID")})
 setMethod("getKeyMapID","WarehouseObjectStore",
 	      function(object){
@@ -175,12 +216,24 @@ setMethod("getKeyMapID","WarehouseObjectStore",
 	      }
 )
 
+
+#' Get QueryID ID
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @return \code{objectquery_id} "character"
+
 setGeneric("getQueryID",function(object){standardGeneric("getQueryID")})
 setMethod("getQueryID","WarehouseObjectStore",
 	      function(object){
 	      	return(paste(object@id,"_objectquery",sep=""))
 	      }
 )
+
+
+#' Get QueryID ID
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @return \code{objectquery_id} "character"
 
 setGeneric("commitWarehouseStore",function(object){standardGeneric("commitWarehouseStore")})
 setMethod("commitWarehouseStore","WarehouseObjectStore",
@@ -191,17 +244,19 @@ setMethod("commitWarehouseStore","WarehouseObjectStore",
 		  }
 )
 
-setGeneric("tearDownAllFeatures",function(object,trader_id,start,end){standardGeneric("tearDownAllFeatures")})
-setMethod("tearDownAllFeatures","WarehouseObjectStore",
-			function(object,trader_id,start,end){
-			  wh <- getWarehouseFromStore(object,trader_id,start,end)
-			  if(length(wh)>0){
-			  	wh <- tearDownFeatures(wh,wh@features)
-			  	object <- placeInObjectStore(object,wh,object@id)
-			  }
-			  return(object)
-			}
-)
+# !!! Comented unused method with missing dependency tearDownFeatures !!!
+#
+# setGeneric("tearDownAllFeatures",function(object,trader_id,start,end){standardGeneric("tearDownAllFeatures")})
+# setMethod("tearDownAllFeatures","WarehouseObjectStore",
+# 			function(object,trader_id,start,end){
+# 			  wh <- getWarehouseFromStore(object,trader_id,start,end)
+# 			  if(length(wh)>0){
+# 			  	wh <- tearDownFeatures(wh,wh@features)
+# 			  	object <- placeInObjectStore(object,wh,object@id)
+# 			  }
+# 			  return(object)
+# 			}
+# )
 
 setGeneric("pushFeatures",function(object,warehouse,keep_old=TRUE){standardGeneric("pushFeatures")})
 setMethod("pushFeatures","WarehouseObjectStore",
@@ -250,7 +305,7 @@ setMethod("pushTradeDailyData","WarehouseObjectStore",
 
 setGeneric("pushTradeFields",function(object,warehouse,fields){standardGeneric("pushTradeFields")})
 setMethod("pushTradeFields","WarehouseObjectStore",
-		  function(object,warehouse){
+		  function(object,warehouse, fields){
 		  	wh <- getFromObjectStore(object,object@id)
 		  	if(class(wh)[[1]]!="CompositeWarehouse")stop("Attempt to push features to a non CompositeWarehouse object.")
 		  	wh <- copyTradeFields(wh,warehouse,fields)

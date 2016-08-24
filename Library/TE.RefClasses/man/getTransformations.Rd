@@ -4,7 +4,7 @@
 \alias{getTransformations}
 \title{Get list of transformations attached to the Object}
 \usage{
-getTransformations(object, ...)
+getTransformations(object)
 }
 \arguments{
 \item{object}{object of class 'VirtualTransformationHandler'.}

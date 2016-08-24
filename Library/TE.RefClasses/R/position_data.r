@@ -58,7 +58,7 @@ setClass(
 
 
 setMethod(".generateDataFilledWithNA",
-          signature(object = "PositionData", trader = "integer", start = "Date", end = "Date"),
+          signature(object = "PositionData"),
           function(object, trader, start, end){
 
             ret_vars <- getDataSourceReturnColumnNames(object)

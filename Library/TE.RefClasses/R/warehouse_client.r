@@ -24,6 +24,16 @@ setClass(
   contains = c("VirtualDataSourceClient", "VIRTUAL")
 )
 
+
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'VirtualWarehouseClient'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'VirtualWarehouseClient'.
+#' @export
 setMethod("dataRequest",
           signature(object = "VirtualWarehouseClient", key_values = "data.frame"),
           function(object, key_values){
@@ -85,8 +95,8 @@ setMethod("dataRequest",
 
             if (0 == nrow(ret_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
-              message(paste("Query sent to", datastore, "returned zero row data.frame"))
-              stop(paste("Query sent to", datastore, "returned zero row data.frame"))
+              message(paste("Query sent to warehouse store returned zero row data.frame"))
+              stop(paste("Query sent to warehouse store returned zero row data.frame"))
             }
 
             # translating column names

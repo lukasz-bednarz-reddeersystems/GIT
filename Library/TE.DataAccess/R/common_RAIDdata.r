@@ -13,6 +13,15 @@ setClass(
     root_url     = middleware_urls@positions_url
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "PositionHistoryURL" class
+#'
+#' @param .Object, object of class "PositionHistoryURL"
+#' @param user_id "integer" trader ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "PositionHistoryURL"
+
 setMethod("initialize", "PositionHistoryURL",
           function(.Object,user_id,start,end){
             .Object@user_id <- user_id
@@ -37,6 +46,14 @@ setClass(
   ), contains = c('URLQuery')
 )
 
+#' Initialize method for "TradeHistoryURL" class
+#'
+#' @param .Object, object of class "TradeHistoryURL"
+#' @param user_ids "integer" trader ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "TradeHistoryURL"
+
 setMethod("initialize", "TradeHistoryURL",
           function(.Object,user_ids,start,end){
             .Object@user_ids <- user_ids
@@ -48,6 +65,7 @@ setMethod("initialize", "TradeHistoryURL",
             .Object
           }
 )
+
 
 #Data pulled for each instrument, a list of URLs
 #is created if multiple instruments present.
@@ -64,6 +82,14 @@ setClass(
     root_url     = middleware_urls@instr_hist_url
   ), contains = c("URLQuery")
 )
+
+#' Initialize method for "InstrumentHistoryURL" class
+#'
+#' @param .Object, object of class "InstrumentHistoryURL"
+#' @param instrument_ids "integer" vector of instrument ID's
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "InstrumentHistoryURL"
 
 setMethod("initialize", "InstrumentHistoryURL",
           function(.Object,instrument_ids,start,end){
@@ -93,6 +119,15 @@ setClass(
     root_url     = middleware_urls@static_factors1
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "StaticHistoryURL" class
+#'
+#' @param .Object, object of class "StaticHistoryURL"
+#' @param instrument "integer" instrument ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "StaticHistoryURL"
+
 setMethod("initialize", "StaticHistoryURL",
           function(.Object,instrument,start,end){
             .Object@instrument <- instrument
@@ -116,6 +151,15 @@ setClass(
     root_url     = middleware_urls@static_factors2
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "Static2HistoryURL" class
+#'
+#' @param .Object, object of class "Static2HistoryURL"
+#' @param instrument "integer" instrument ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "Static2HistoryURL"
+
 setMethod("initialize", "Static2HistoryURL",
           function(.Object,instrument,start,end){
             .Object@instrument <- instrument
@@ -139,6 +183,16 @@ setClass(
     root_url     = middleware_urls@dynamic_factors
   ),contains = c('URLQuery')
 )
+
+
+#' Initialize method for "DynamicHistoryURL" class
+#'
+#' @param .Object, object of class "DynamicHistoryURL"
+#' @param instrument "integer" instrument ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "DynamicHistoryURL"
+
 setMethod("initialize", "DynamicHistoryURL",
           function(.Object,instrument,start,end){
             .Object@instrument <- instrument
@@ -158,6 +212,13 @@ setClass(
     root_url     = middleware_urls@event_types_url
   ),contains = c('URLQuery')
 )
+
+
+#' Initialize method for "EventsTypesURL" class
+#'
+#' @param .Object, object of class "EventsTypesURL"
+#' @return \code{.Object} object of class "EventsTypesURL"
+
 setMethod("initialize", "EventsTypesURL",
           function(.Object){
             .Object <- buildURL(.Object)
@@ -177,6 +238,15 @@ setClass(
     root_url     = middleware_urls@events_url
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "EventsURL" class
+#'
+#' @param .Object, object of class "EventsURL"
+#' @param instrument "integer" instrument ID
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "EventsURL"
+
 setMethod("initialize", "EventsURL",
           function(.Object,instrument,start,end){
             .Object@instrument <- instrument
@@ -200,6 +270,15 @@ setClass(
     root_url     = middleware_urls@ext_psns_url
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "ExtendedPositionDataURL" class
+#'
+#' @param .Object, object of class "ExtendedPositionDataURL"
+#' @param strategy "character" strategy name
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "ExtendedPositionDataURL"
+
 setMethod("initialize", "ExtendedPositionDataURL",
           function(.Object,strategy,start,end){
             .Object@strategy <- strategy
@@ -223,6 +302,15 @@ setClass(
     root_url     = middleware_urls@dealing_url
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "DealingBookURL" class
+#'
+#' @param .Object, object of class "DealingBookURL"
+#' @param trader_id "integer" trader id
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "DealingBookURL"
+
 setMethod("initialize", "DealingBookURL",
           function(.Object,trader_id,start,end){
             .Object@trader_id <- trader_id
@@ -244,9 +332,18 @@ setClass(
     root_url     = middleware_urls@psn_diary_url
   ),contains = c('URLQuery')
 )
+
+#' Initialize method for "PositionDiaryURL" class
+#'
+#' @param .Object, object of class "PositionDiaryURL"
+#' @param trader_id "integer" trader id
+#' @param start "Date" start date
+#' @param end "Date" end date
+#' @return \code{.Object} object of class "PositionDiaryURL"
+
 setMethod("initialize", "PositionDiaryURL",
           function(.Object,trader_id,start,end){
-            .Object@position_id <- id
+            .Object@position_id <- trader_id
             .Object@values <- c(as.character(.Object@position_id))
             .Object <- buildURL(.Object)
             .Object

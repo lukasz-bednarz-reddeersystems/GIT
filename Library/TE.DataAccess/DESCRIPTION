@@ -1,15 +1,14 @@
 Package: TE.DataAccess
 Type: Package
-Title: Basic package for RedDeer Trading Enhancement Engine.
+Title: Basic package for RedDeer Trading Enhancement Engine
 Version: 0.1.0
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions and classes for data access,
     preprocessing and postprocessing of various data needed for Trading
-    Analytics Engine
+    Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    methods,
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -19,27 +18,27 @@ Imports:
     hashFunction,
     XML,
     plyr,
-    R.methodsS3,
+    moments,
+    grDevices,
+    graphics,
 Collate:
     'TE.DataAccess.r'
+    'visualisation_functions.r'
+    'dataset.r'
+    'visualisation_computation_functions.r'
+    'base_visualisation.r'
+    'visualisation_snapshot.r'
+    'visualisation_frequencyplot.r'
+    'visualisation_library.r'
     'global_configs.r'
+    'features_preprocessor_functions.r'
+    'features_virtual_feature.r'
     'urldatareader_functions.r'
     'urldatareader.r'
-    'common_RAIDdata.r'
     'keymap.r'
-    'dataset.r'
     'datastore.r'
-    'common_allocation_datastore.r'
-    'objectstore.r'
-    'common_analysis_objectstore.r'
-    'common_composite_datasets.r'
-    'features_virtual_feature.r'
-    'common_dataset.r'
-    'functions.r'
-    'common_trade_factory.r'
-    'common_composite_warehouse.r'
-    'common_daily_riskmodel_objectstore.r'
     'common_watchlist_datastore.r'
+    'common_allocation_datastore.r'
     'common_risk_factor_returns_datastore.r'
     'common_risk_instrument_exposure_datastore.r'
     'common_instrument_price.r'
@@ -48,29 +47,38 @@ Collate:
     'common_instrument_history_datastore.r'
     'common_instrument_datastore.r'
     'common_trade_levels_datastore.r'
+    'objectstore.r'
+    'common_analysis_objectstore.r'
+    'common_RAIDdata.r'
+    'common_composite_datasets.r'
+    'common_dataset.r'
+    'functions.r'
+    'common_trade_factory.r'
+    'common_composite_warehouse.r'
     'common_warehouse_objectstore.r'
     'common_dealing_datastore.r'
     'common_ext_pos_datastore.r'
     'common_event_datastore.r'
     'common_factor_datastore.r'
     'common_dataplex.r'
+    'features_virtual_aggregate_feature.r'
+    'features_preprocessor.r'
+    'features_preprocessor_fractile.r'
+    'features_preprocessor_library.r'
+    'models_ppmodel.r'
+    'analysis_module.r'
+    'common_daily_riskmodel_objectstore.r'
     'common_ppmodel_objectstore.r'
     'common_trading_analysis_datastore.r'
     'features_feature_functions.r'
     'features_trade_feature.r'
     'features_context_features.r'
     'features_control_features.r'
-    'features_preprocessor_functions.r'
-    'features_virtual_aggregate_feature.r'
-    'features_preprocessor.r'
-    'features_preprocessor_fractile.r'
-    'features_preprocessor_library.r'
     'features_price_features.r'
     'features_trade_aggregate_feature_library.r'
     'features_trade_feature_library.r'
     'frame_to_xml.r'
     'models_key_library.r'
-    'models_ppmodel.r'
     'models_ppmodel_library.r'
     'sockets.r'
 RoxygenNote: 5.0.1

@@ -5,21 +5,22 @@ Version: 0.1.0
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing Reference Classes for handling,
-    of various data needed for Trading Analytics Engine
+    of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
     TE.DataAccess (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:
-    TE.DataAccess,
     methods,
     lubridate,
     RODBC,
     hash,
     quantmod,
+    stats,
 Suggests:
-    testthat
+    testthat,
+    plyr,
 Collate:
     'TE.RefClasses.r'
     'datasource_client_functions.r'
@@ -33,31 +34,45 @@ Collate:
     'rodbc_client_functions.r'
     'rodbc_client.r'
     'event_data.r'
+    'event_data_handler.r'
+    'ppmodel_client_functions.r'
+    'ppmodel_client.r'
+    'trade_data.r'
+    'extended_trade_data_handler.r'
     'risk_model.r'
     'risk_model_handler.r'
     'risk_model_objectstore_client.r'
     'factor_correlation_data.r'
+    'factor_correlation_data_handler.r'
     'factor_exposure_data.r'
+    'factor_exposure_data_handler.r'
     'factor_variance_data.r'
+    'factor_variance_data_handler.r'
     'implied_factor_returns_data.r'
+    'implied_factor_returns_data_handler.r'
     'instrument_betas_data.r'
+    'instrument_betas_data_handler.r'
     'market_data.r'
+    'market_data_handler.r'
     'market_style_data.r'
+    'market_style_data_handler.r'
     'portfolio.r'
-    'warehouse_client_functions.r'
-    'warehouse_client.r'
-    'position_data.r'
-    'ppmodel_client_functions.r'
-    'ppmodel_client.r'
-    'price_data.r'
     'transformation_functions.r'
     'virtual_transformation.r'
     'referencedata_transformation.r'
-    'risk_model_objectstore_client_functions.r'
-    'strategy_data.r'
     'transformations_handler.r'
     'strategy_portfolio.r'
+    'portfolio_data_handler.r'
+    'warehouse_client_functions.r'
+    'warehouse_client.r'
+    'position_data.r'
+    'position_data_handler.r'
+    'price_data.r'
+    'price_data_handler.r'
+    'risk_model_objectstore_client_functions.r'
+    'strategy_data.r'
+    'strategy_data_handler.r'
     'strategy_portfolio_transformations.r'
-    'trade_data.r'
+    'trade_data_handler.r'
     'trade_data_simple.r'
 RoxygenNote: 5.0.1

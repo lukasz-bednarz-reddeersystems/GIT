@@ -107,6 +107,12 @@ setClass(
 
 )
 
+#' Initialize method for "VirtualObjectStore" class
+#'
+#' @param .Object, object of class "VirtualObjectStore"
+#' @param id "character" name of the objectstore
+#' @return \code{.Object} object of class "VirtualObjectStore"
+
 setMethod("initialize", "VirtualObjectStore",
           function(.Object,id){
             .Object@stored <- new.env(parent = emptyenv())
@@ -115,8 +121,20 @@ setMethod("initialize", "VirtualObjectStore",
           }
 )
 
+#' Get ID of the objectstore
+#'
+#' @param object object of class "VirtualObjectStore"
+#' @return \code{id} "character" object id
 #' @export
+
 setGeneric("getID",function(object){standardGeneric("getID")})
+
+#' @describeIn getID Get ID of the objectstore
+#'
+#' @inheritParams getID
+#'
+#' @return \code{id} "character" object id
+#' @export
 setMethod("getID","VirtualObjectStore",
           function(object){
             return(object@id)

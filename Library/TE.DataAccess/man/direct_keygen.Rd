@@ -11,7 +11,7 @@ direct_keygen(x, cols, fields)
 
 \item{cols, }{column names used to create keys}
 
-\item{id_outname}{is the output name of the ID}
+\item{fields}{name of the columns}
 }
 \value{
 \code{key_values} data.frame with generated keys

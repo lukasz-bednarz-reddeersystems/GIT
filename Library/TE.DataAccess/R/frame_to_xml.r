@@ -1,7 +1,7 @@
 #' Generates XML from data.frame
 #'
 #' @param df data.frame to convert
-#' @param character name
+#' @param name character name
 #' @param tree_name name of the xml tree, default is 'Root'
 #' @return \code{xml} character xml string
 FrameToXML <- function(df,name,tree_name="Root")
@@ -50,7 +50,7 @@ generate_raid_attribs <- function(type,value){
 format_na <- function(value){
   rval <- value
   if(is.na(value))rval <- ""
-  return(r)
+  return(rval)
 }
 
 format_value <- function(type,value){

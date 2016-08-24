@@ -180,6 +180,11 @@ setClass(
   )
 )
 
+#' Initialize method for "ModelDefaults" class
+#'
+#' @param .Object, object of class "ModelDefaults"
+#' @return \code{.Object} object of class "ModelDefaults"
+
 setMethod("initialize", "ModelDefaults", function(.Object){
   r_root <- gsub('\\\\', '/',Sys.getenv("R_RAID_ROOT"))
   if(file.exists(r_root) & (r_root != "")) {
@@ -197,6 +202,11 @@ setClass(
     file_path    = 'C:/Development/AllRaid/Services/Raid.Services.TradingEnhancementEngine/R/templates'
   )
 )
+
+#' Initialize method for "VisualisationDefaults" class
+#'
+#' @param .Object, object of class "VisualisationDefaults"
+#' @return \code{.Object} object of class "VisualisationDefaults"
 
 setMethod("initialize", "VisualisationDefaults", function(.Object){
   r_root <- gsub('\\\\', '/',Sys.getenv("R_RAID_ROOT"))
@@ -227,6 +237,12 @@ setClass(
     store_database =  'RAIDSTAGEDB'
   )
 )
+
+#' Initialize method for "RiskModelDefaults" class
+#'
+#' @param .Object, object of class "RiskModelDefaults"
+#' @return \code{.Object} object of class "RiskModelDefaults"
+
 setMethod("initialize", "RiskModelDefaults", function(.Object){
   db <-  Sys.getenv("R_RISK_MODEL_DB")
   if ((db != ""))
