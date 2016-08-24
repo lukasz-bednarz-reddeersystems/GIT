@@ -10,6 +10,7 @@ NULL
 # Pulls data required for computation and outputs plots to plot list
 ###############################################################################
 
+#' List of Analysis modules used by RiskReviewReport Class
 risk_review_analysis_blocks <- c(
                                              "PortfolioVarianceDecomposition",
                                              "PortfolioFactorReturns",
