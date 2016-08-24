@@ -20,7 +20,7 @@ average_down_trades_report_analysis_blocks <- c("OffsidePositions",
                                                 "AverageDownTrades",
                                                 "AverageDownTradesFocus")
 
-#' Average Down Trades Report Data class.
+#' Average Down Trades Report class.
 #'
 #'
 #' Report class computing following blocks:

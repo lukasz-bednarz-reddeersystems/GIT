@@ -1,4 +1,4 @@
-context("Testing VirtualReportAnalysisBlock")
+context("Testing AverageDownTradesReport")
 
 #########################
 #

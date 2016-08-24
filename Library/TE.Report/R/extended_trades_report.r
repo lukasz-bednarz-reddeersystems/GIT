@@ -15,7 +15,7 @@ extended_trades_report_analysis_blocks <- c("ExtendedTrades",
                                             "MarketReturn",
                                             "RelativeMarketReturn",
                                             "ExtendedTradesSummary")
-#' Extended Trades Report Data class.
+#' Extended Trades Report class.
 #'
 #' Report class computing following blocks:
 #'  "ExtendedTrades",

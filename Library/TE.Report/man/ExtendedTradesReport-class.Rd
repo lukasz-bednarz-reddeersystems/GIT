@@ -3,7 +3,7 @@
 \docType{class}
 \name{ExtendedTradesReport-class}
 \alias{ExtendedTradesReport-class}
-\title{Extended Trades Report Data class.}
+\title{Extended Trades Report class.}
 \description{
 Report class computing following blocks:
  "ExtendedTrades",

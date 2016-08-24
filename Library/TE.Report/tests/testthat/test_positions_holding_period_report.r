@@ -1,11 +1,11 @@
-context("Testing ExtendedTradesReport")
+context("Testing PositionsHoldingPeriodReport")
 
 #########################
 #
 # ExtendedTradesAnalysisBlock Tests
 #
 #########################
-tested.class             <-  "ExtendedTradesReport"
+tested.class             <-  "PositionsHoldingPeriodReport"
 valid.column_name_map    <- hash(c("TraderID", "start", "end"), c("id", "start", "end"))
 valid.key_cols           <- c("TraderID", "start", "end")
 init.key_values          <- data.frame(TraderID = character(),
@@ -69,7 +69,7 @@ test_that("Can dataRequest() with valid key_values", {
 
   object <- new(tested.class)
 
-  valid.key_values <- dated_twelve_monthly_lookback(11, today())
+  valid.key_values <- dated_three_monthly_lookback(11, '2016-06-30')
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   object <- dataRequest(object, valid.key_values)
@@ -85,7 +85,9 @@ test_that(paste("Can Process() on", tested.class), {
 
   object <- new(tested.class)
 
-  valid.key_values <- dated_twelve_monthly_lookback(11, today())
+  # valid.key_values <- dated_twelve_monthly_lookback(11, today())
+  valid.key_values <- dated_three_monthly_lookback(11, '2016-06-30')
+
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   object <- dataRequest(object, valid.key_values)
@@ -102,16 +104,19 @@ test_that(paste("Can Process() on", tested.class), {
   expect_is(getOutputFrontendDataList(object), "list")
 
   expect_true(setequal(names(getOutputGGPlotList(object)),
-                       TE.Report:::extended_trades_report_analysis_blocks))
+                       TE.Report:::positions_holding_period_report_analysis_blocks))
 
   expect_true(setequal(names(getOutputGGPlotDataList(object)),
-                       TE.Report:::extended_trades_report_analysis_blocks))
+                       TE.Report:::positions_holding_period_report_analysis_blocks))
 
   expect_true(setequal(names(getOutputObjectList(object)),
-                       setdiff(TE.Report:::extended_trades_report_analysis_blocks, c("BuysAndSells", "ExtendedTradesSummary"))))
+                       setdiff(TE.Report:::positions_holding_period_report_analysis_blocks,
+                               c("PositionsHoldingDayZeroPnL",
+                                 "PositionsHoldingPeriod",
+                                 "PositionsHoldingCapitalDistribution"))))
 
   expect_true(setequal(names(getOutputFrontendDataList(object)),
-                       TE.Report:::extended_trades_report_analysis_blocks))
+                       TE.Report:::positions_holding_period_report_analysis_blocks))
 
 })
 

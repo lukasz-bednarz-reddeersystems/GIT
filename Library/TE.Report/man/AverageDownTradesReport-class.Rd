@@ -3,7 +3,7 @@
 \docType{class}
 \name{AverageDownTradesReport-class}
 \alias{AverageDownTradesReport-class}
-\title{Average Down Trades Report Data class.}
+\title{Average Down Trades Report class.}
 \description{
 Report class computing following blocks:
  "OffsidePositions",
