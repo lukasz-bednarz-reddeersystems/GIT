@@ -3,22 +3,26 @@ Type: Package
 Title: Report Classes for RedDeer Trading Enhancement Engine
 Version: 0.1.0
 Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: Package is implementing Report Classes for creating reports with data and graphs for Trading Analytics Engine.
+Description: Package is implementing Report Classes for creating reports with
+    data and graphs for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
     TE.AnalysisClasses (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:
+    TE.RefClasses,
     methods,
     lubridate,
     ggplot2,
     grid,
     gridExtra,
     utils,
+    hash,
 Suggests:
     testthat,
 Collate:
     'TE.Report.r'
     'report_analysis_block.r'
+    'average_down_trades_report.r'
 RoxygenNote: 5.0.1

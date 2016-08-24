@@ -62,7 +62,7 @@ setMethod(".checkSlotClass",
               message(paste("Invalid class", class, "."))
               message(paste("in attempt to set", sQuote(slot), "slot in object of class", class(object) ))
               stop(paste("assignment of an object of class",
-                         dQuote(tail(class(class), 1)),
+                         dQuote(head(class, 1)),
                                 "is not valid for @", sQuote(slot), " in an object of class",
                                 dQuote(class(object))
                          )
@@ -124,7 +124,10 @@ setMethod(".setOutputObjectList",
           function(object, list) {
 
             for (rd_obj in list) {
-              object <- .checkSlotClass(object, "OutputObjectList", extends(class(rd_obj)), "NullableReferenceData")
+              object <- .checkSlotClass(object,
+                                        "OutputObjectList",
+                                        extends(class(rd_obj)),
+                                        c("NULL", "VirtualReferenceData"))
             }
 
             object@output_list <- list
