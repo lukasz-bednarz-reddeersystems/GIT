@@ -6,20 +6,20 @@
 \title{Average Down Trades Report Data class.}
 \description{
 Report class computing following blocks:
-"OffsidePositions",
-"OffsidePositionsGainVsDays",
-"OffsidePositionsPnLVsDays",
-"OffsidePositionsCumulativePnL",
-"OffsidePositionsBpsPerMonth",
-"AverageDownTrades",
-"AverageDownTradesFocus"
+ "OffsidePositions",
+ "OffsidePositionsGainVsDays",
+ "OffsidePositionsPnLVsDays",
+ "OffsidePositionsCumulativePnL",
+ "OffsidePositionsBpsPerMonth",
+ "AverageDownTrades",
+ "AverageDownTradesFocus"
 }
 \details{
 Also generates summary plot with following subplots:
-"OffsidePositions",
-"OffsidePositionsPnLVsDays",
-"AverageDownTrades",
-"OffsidePositionsCumulativePnL"
+ "OffsidePositions",
+ "OffsidePositionsPnLVsDays",
+ "AverageDownTrades",
+ "OffsidePositionsCumulativePnL"
 
 Inherits from "VirtualReportAnalysisBlock"
 }

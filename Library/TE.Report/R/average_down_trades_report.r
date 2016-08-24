@@ -22,20 +22,21 @@ average_down_trades_report_analysis_blocks <- c("OffsidePositions",
 
 #' Average Down Trades Report Data class.
 #'
+#'
 #' Report class computing following blocks:
-#' "OffsidePositions",
-#' "OffsidePositionsGainVsDays",
-#' "OffsidePositionsPnLVsDays",
-#' "OffsidePositionsCumulativePnL",
-#' "OffsidePositionsBpsPerMonth",
-#' "AverageDownTrades",
-#' "AverageDownTradesFocus"
+#'  "OffsidePositions",
+#'  "OffsidePositionsGainVsDays",
+#'  "OffsidePositionsPnLVsDays",
+#'  "OffsidePositionsCumulativePnL",
+#'  "OffsidePositionsBpsPerMonth",
+#'  "AverageDownTrades",
+#'  "AverageDownTradesFocus"
 #'
 #' Also generates summary plot with following subplots:
-#' "OffsidePositions",
-#' "OffsidePositionsPnLVsDays",
-#' "AverageDownTrades",
-#' "OffsidePositionsCumulativePnL"
+#'  "OffsidePositions",
+#'  "OffsidePositionsPnLVsDays",
+#'  "AverageDownTrades",
+#'  "OffsidePositionsCumulativePnL"
 #'
 #' Inherits from "VirtualReportAnalysisBlock"
 #'

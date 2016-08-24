@@ -25,4 +25,5 @@ Collate:
     'TE.Report.r'
     'report_analysis_block.r'
     'average_down_trades_report.r'
+    'extended_trades_report.r'
 RoxygenNote: 5.0.1
