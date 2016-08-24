@@ -29,4 +29,5 @@ Collate:
     'positions_holding_period_report.r'
     'risk_review_report.r'
     'strategy_tactics_report.r'
+    'trading_review_2016.2_report.r'
 RoxygenNote: 5.0.1
