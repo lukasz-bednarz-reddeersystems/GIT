@@ -24,25 +24,6 @@ convert_column_class <- function(df, classes = NULL) {
 }
 
 
-generate_procedure_call_strings <- function(proc_n, args, parsed_keys){
-
-  SQL <- NULL
-  sql <- proc_n
-
-  colnames(parsed_keys) <- args
-
-  for (row_idx in seq(nrow(parsed_keys))) {
-    sql <- proc_n
-    sql <- paste(sql, args[1], sprintf(" = '%s'",parsed_keys[row_idx, args[1]]))
-    for( col in args[-1]) {
-      sql <- paste(sql ,",",  col , sprintf(" = '%s'", parsed_keys[row_idx, col]))
-    }
-    SQL[row_idx] <- sql
-  }
-
-  return(SQL)
-}
-
 parse_instrument_date_keys <- function(key_values) {
   instruments <- unique(key_values[,1])
   start <- min(key_values[,2])

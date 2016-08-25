@@ -5,32 +5,6 @@
 .__DEFAULT_FILE_DB_SCHEMA__. <- "FileTableDB"
 
 
-#' Execute sql query
-#'
-#' @param SQL "character" query string
-#' @param db "character" ODBC alias name of database
-#' @param schema "character" name of DB schema
-execute_sql_query <- function(SQL,
-                              db = .__DEFAULT_ODBC_DB_NAME__.,
-                              schema = .__DEFAULT_FILE_DB_SCHEMA__.){
-
-  cn <- odbcConnect(db,uid=.__DEFAULT_DB_USER__., DBMSencoding = "UTF-8")
-  on.exit(close(cn))
-
-  ret_data <- tryCatch({
-    sqlQuery(cn, paste("USE", schema))
-
-    sqlQuery(cn,SQL, as.is = FALSE, stringsAsFactors  = FALSE)
-
-  }, error = function(cond) {
-    message(sprintf("Error occured when executing SQL query:\n\t%s", SQL))
-    message(sprintf("Error message:\n%s", cond))
-    stop(sprintf("Error occured when executing SQL query:\n\t%s", SQL))
-  })
-
-  return(ret_data)
-}
-
 #' Get unc share path of file table
 #'
 #' @param tb_name "character" name of the filetable
