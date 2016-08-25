@@ -145,8 +145,8 @@ check_file_stored <- function(filename,
 #' @param schema "character" name of DB schema
 #' @param overwrite "logical" should file be overwritten if already exists?
 #' @return \code{status} "integer" status of saving:\cr
-#'  \code{0} - new file has been stored
-#'  \code{1} - file has been overwritten
+#'  \code{0} - new file has been stored\cr
+#'  \code{1} - file has been overwritten\cr
 #'  \code{-1} - file has not been stored as it already exists and \code{overwrite} param was set to FALSE
 #'
 #' @export
@@ -203,7 +203,7 @@ store_file_in_filetable <- function(file,
 #' @param db "character" ODBC alias name of database
 #' @param schema "character" name of DB schema
 #' @return \code{status} "integer" status of saving:\cr
-#'  \code{0} - file has been removed
+#'  \code{0} - file has been removed\cr
 #'  \code{-1} - file has not been stored and couldn't be removed
 #'
 #' @export

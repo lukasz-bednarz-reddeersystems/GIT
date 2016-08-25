@@ -18,7 +18,7 @@ remove_file_from_filetable(filename, tb_name, db = .__DEFAULT_ODBC_DB_NAME__.,
 }
 \value{
 \code{status} "integer" status of saving:\cr
- \code{0} - file has been removed
+ \code{0} - file has been removed\cr
  \code{-1} - file has not been stored and couldn't be removed
 }
 \description{

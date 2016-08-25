@@ -20,8 +20,8 @@ store_file_in_filetable(file, tb_name, db = .__DEFAULT_ODBC_DB_NAME__.,
 }
 \value{
 \code{status} "integer" status of saving:\cr
- \code{0} - new file has been stored
- \code{1} - file has been overwritten
+ \code{0} - new file has been stored\cr
+ \code{1} - file has been overwritten\cr
  \code{-1} - file has not been stored as it already exists and \code{overwrite} param was set to FALSE
 }
 \description{
