@@ -19,6 +19,7 @@ Collate:
     'TE.BlobStorage.r'
     'filetable_query.r'
     'filetable_storage_functions.r'
+    'junction_table_query.r'
 RoxygenNote: 5.0.1
 Suggests:
     testthat

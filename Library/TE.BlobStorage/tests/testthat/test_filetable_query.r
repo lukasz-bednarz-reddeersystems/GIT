@@ -1,12 +1,12 @@
-context("Test FileTableQuery Classes")
+context("Test FileTable Query Classes")
 
-########################################
+###########################################
 #
-# Testing VirtualFileTableSQLQuery class
+# Testing BlobStorage.VirtualSQLQuery class
 #
-########################################
+###########################################
 
-tested.class <- "VirtualFileTableSQLQuery"
+tested.class <- "BlobStorage.VirtualSQLQuery"
 test.class   <- "TestFileTableSQLQuery"
 
 test_that(sprintf("Cannot instantiate %s class", tested.class ),{
@@ -22,13 +22,13 @@ test_that(sprintf("Can inherit from %s class", tested.class),{
 })
 
 
-##########################################
+######################################################
 #
-# Testing SQLQuery.FileTableRootPath class
+# Testing BlobStorage.SQLQuery.FileTableRootPath class
 #
-##########################################
+######################################################
 
-tested.class  <- "SQLQuery.FileTableRootPath"
+tested.class  <- "BlobStorage.SQLQuery.FileTableRootPath"
 valid.tb_name <- "ftMultiFactorRiskBlobTest"
 valid.db      <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
 valid.schema  <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
@@ -66,11 +66,11 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
 ##########################################
 #
-# Testing SQLQuery.IsFileStoredInFileTable class
+# Testing BlobStorage.SQLQuery.FileStoredInFileTable class
 #
 ##########################################
 
-tested.class        <- "SQLQuery.FileStoredInFileTable"
+tested.class        <- "BlobStorage.SQLQuery.FileStoredInFileTable"
 valid.tb_name       <- "ftMultiFactorRiskBlobTest"
 valid.db            <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
 valid.schema        <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.

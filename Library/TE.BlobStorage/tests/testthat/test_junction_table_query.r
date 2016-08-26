@@ -1,0 +1,65 @@
+context("Test JunctionTable Query Classes")
+
+#####################################################
+#
+# Testing BlobStorage.VirtualSQLProcedureCall class
+#
+#####################################################
+
+tested.class <- "BlobStorage.VirtualSQLProcedureCall"
+test.class   <- "TestFileTableSQLQuery"
+
+test_that(sprintf("Cannot instantiate %s class", tested.class ),{
+  expect_error(new(tested.class), regexp = "trying to generate an object from a virtual class")
+})
+
+
+test_that(sprintf("Can inherit from %s class", tested.class),{
+
+  setClass(test.class, contains = tested.class)
+  expect_true(isClass(test.class))
+
+})
+
+
+########################################################################################
+#
+# Testing BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName class
+#
+########################################################################################
+
+tested.class  <- "BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName"
+valid.tb_name <- "tMultiFactorRiskBlobTest"
+valid.db      <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
+valid.schema  <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
+valid.ret     <- data.frame(ReferencedTableName = "ftMultiFactorRiskBlobTest",
+                            ParentColName = "hPathLocator",
+                            ReferencedColName = "path_locator",
+                            stringsAsFactors = FALSE)
+
+test_that(sprintf("Cannot instantiate %s class without parameters", tested.class),{
+  expect_error(new(tested.class), regexp = 'argument "db_name" is missing, with no default')
+})
+
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name)
+
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object)
+
+  expect_equal(ret, valid.ret)
+})

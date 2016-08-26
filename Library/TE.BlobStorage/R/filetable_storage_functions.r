@@ -21,7 +21,7 @@ get_filetable_path <- function(tb_name,
                                schema = .__DEFAULT_FILE_DB_SCHEMA__.) {
 
 
-  query <- new("SQLQuery.FileTableRootPath",
+  query <- new("BlobStorage.SQLQuery.FileTableRootPath",
                db, schema, tb_name)
 
   ret <- executeSQLQuery(query)
@@ -75,7 +75,7 @@ check_file_stored <- function(filename,
                                   schema = .__DEFAULT_FILE_DB_SCHEMA__.
                               ) {
 
-  query <- new("SQLQuery.FileStoredInFileTable", db, schema, tb_name, filename)
+  query <- new("BlobStorage.SQLQuery.FileStoredInFileTable", db, schema, tb_name, filename)
 
   ret <- executeSQLQuery(query)
 

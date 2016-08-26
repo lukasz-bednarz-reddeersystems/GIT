@@ -1,36 +1,34 @@
 #' @include TE.BlobStorage.r
 NULL
 
-#' VirtualFileTableSQLQuery class
+#' BlobStorage.VirtualSQLQuery class
 #'
 #' Implements handling querries for File Tables
 #'
 #' Inherits from "VirtualSQLQuery"
 setClass(
-  Class     = "VirtualFileTableSQLQuery",
+  Class     = "BlobStorage.VirtualSQLQuery",
   contains  = c("VirtualSQLQuery", "VIRTUAL")
 )
 
-#' Initialize method for "VirtualSQLQuery"
+#' Initialize method for "BlobStorage.VirtualSQLQuery"
 #'
-#' @param .Object object of class derived from FileTableSQLQuerry
+#' @param .Object object of class derived from BlobStorage.VirtualSQLQuery
 #' @param db_name "character" database name
 #' @param db_schema "character" database schema
 setMethod("initialize",
-          signature(.Object = "VirtualFileTableSQLQuery"),
+          signature(.Object = "BlobStorage.VirtualSQLQuery"),
           function(.Object, db_name, db_schema) {
           .Object <- callNextMethod()
 
           return(.Object)
 })
 
-
-
-##########################################
+###############################################
 #
-# SQLQuery.FileTableRootPath class
+# BlobStorage.SQLQuery.FileTableRootPath class
 #
-##########################################
+##############################################
 
 
 #' function to generate filetable rootpath query
@@ -49,34 +47,32 @@ generate_filetable_rootpath_query <- function(keys) {
   return(SQL)
 }
 
-#' SQLQuery.FileTableRootPath class
-#'
 #' Implements handling querries for root path of file tables
 #'
 #' Inherits from "VirtualFileTableSQLQuerry"
 #'
 #' @export
 setClass(
-  Class     = "SQLQuery.FileTableRootPath",
+  Class     = "BlobStorage.SQLQuery.FileTableRootPath",
   prototype = list(
     key_cols   = c("TableName"),
     key_values = data.frame(TableName = character()),
     query_parser   = generate_filetable_rootpath_query
   ),
-  contains  = c("VirtualFileTableSQLQuery")
+  contains  = c("BlobStorage.VirtualSQLQuery")
 )
 
 
-#' Initialize method for "SQLQuery.FileTableRootPath"
+#' Initialize method for "BlobStorage.SQLQuery.FileTableRootPath"
 #'
-#' @param .Object object of class derived from FileTableSQLQuerry
+#' @param .Object object of class BlobStorage.SQLQuery.FileTableRootPath
 #' @param db_name "character" database name
 #' @param db_schema "character" database schema
 #' @param tb_name "character" table name to be querried
 #'
 #' @export
 setMethod("initialize",
-          signature(.Object = "SQLQuery.FileTableRootPath"),
+          signature(.Object = "BlobStorage.SQLQuery.FileTableRootPath"),
           function(.Object, db_name, db_schema,tb_name) {
 
             .Object <- callNextMethod(.Object, db_name, db_schema )
@@ -86,11 +82,11 @@ setMethod("initialize",
           })
 
 
-##########################################
+#####################################################
 #
-# SQLQuery.FileStoredInFileTable class
+# BlobStorage.SQLQuery.FileStoredInFileTable class
 #
-##########################################
+#####################################################
 
 
 #' function to generate filetable query for stored file
@@ -110,27 +106,25 @@ generate_filetable_is_stored_query <- function(keys) {
   return(SQL)
 }
 
-#' SQLQuery.FileTableRootPath class
+#' Implements handling querries for files stored in filetables
 #'
-#' Implements handling querries for root path of file tables
-#'
-#' Inherits from "VirtualFileTableSQLQuerry"
+#' Inherits from "BlobStorage.VirtualSQLQuery"
 #'
 #' @export
 setClass(
-  Class     = "SQLQuery.FileStoredInFileTable",
+  Class     = "BlobStorage.SQLQuery.FileStoredInFileTable",
   prototype = list(
     key_cols   = c("TableName"),
     key_values = data.frame(TableName = character()),
     query_parser   = generate_filetable_is_stored_query
   ),
-  contains  = c("VirtualFileTableSQLQuery")
+  contains  = c("BlobStorage.VirtualSQLQuery")
 )
 
 
-#' Initialize method for "SQLQuery.FileStoredInFileTable"
+#' Initialize method for "BlobStorage.SQLQuery.FileStoredInFileTable"
 #'
-#' @param .Object object of class derived from FileTableSQLQuerry
+#' @param .Object object of class derived from BlobStorage.SQLQuery.FileStoredInFileTable
 #' @param db_name "character" database name
 #' @param db_schema "character" database schema
 #' @param tb_name "character" table name to be querried
@@ -138,7 +132,7 @@ setClass(
 #'
 #' @export
 setMethod("initialize",
-          signature(.Object = "SQLQuery.FileStoredInFileTable"),
+          signature(.Object = "BlobStorage.SQLQuery.FileStoredInFileTable"),
           function(.Object, db_name, db_schema,tb_name, filename) {
 
             .Object <- callNextMethod(.Object, db_name, db_schema )
