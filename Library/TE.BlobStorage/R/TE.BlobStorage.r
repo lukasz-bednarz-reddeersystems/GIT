@@ -9,7 +9,6 @@
 #' @import TE.SQLQuery
 #' @import lubridate
 #' @import methods
-#' @importFrom RODBC odbcConnect sqlQuery
 #' @importFrom R.utils copyFile
 NULL
 ## NULL
