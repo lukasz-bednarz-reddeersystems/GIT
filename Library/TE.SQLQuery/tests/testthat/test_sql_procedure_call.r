@@ -13,7 +13,7 @@ valid.key_cols <- c("InstrumentID", "Date")
 
 valid.key_vals <-data.frame(lInstrumentID = integer(),
                              dtDateTime = as.Date(character()))
-test.key_vals  <- data.frame(InstrumentID = 4454, Date = today() -1)
+test.key_vals  <- data.frame(InstrumentID = 4454, Date = as.Date("2016-08-01"))
 
 valid.parsed.key_vals <- data.frame(InstrumentIDs = 4454,
                                     start = today() -1,
@@ -88,7 +88,7 @@ test_that("Can executeSQLQuery",{
   ret <- executeSQLQuery(object)
 
   expect_is(ret, "data.frame")
-  expect_gt(nrow(ret, 0))
+  expect_gt(nrow(ret), 0)
 
 
 })

@@ -6,6 +6,7 @@
 #' @docType package
 #' @name TE.BlobStorage
 #'
+#' @import TE.SQLQuery
 #' @import lubridate
 #' @import methods
 #' @importFrom RODBC odbcConnect sqlQuery

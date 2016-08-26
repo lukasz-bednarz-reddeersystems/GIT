@@ -8,6 +8,7 @@ Description: Package is implementing classes and functions for retrieval, of
     Binary Large Objects (BLOB's) into Database Tables.
 Depends:
     R (>= 3.3.0),
+    TE.SQLQuery (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -17,7 +18,8 @@ Imports:
     R.utils,
 Collate:
     'TE.BlobStorage.r'
-    'blob_storage_functions.r'
+    'filetable_query.r'
+    'filetable_storage_functions.r'
 RoxygenNote: 5.0.1
 Suggests:
     testthat

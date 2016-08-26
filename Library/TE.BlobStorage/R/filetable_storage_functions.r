@@ -1,8 +1,11 @@
 #' @include TE.BlobStorage.r
+#' @include filetable_query.r
+NULL
 
 .__DEFAULT_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
 .__DEFAULT_DB_USER__.        <- Sys.info()["user"]
 .__DEFAULT_FILE_DB_SCHEMA__. <- "FileTableDB"
+
 
 
 #' Get unc share path of file table
@@ -17,9 +20,12 @@ get_filetable_path <- function(tb_name,
                                db = .__DEFAULT_ODBC_DB_NAME__.,
                                schema = .__DEFAULT_FILE_DB_SCHEMA__.) {
 
-  query <- sprintf("SELECT FileTableRootPath('%s') [Path]", tb_name)
 
-  ret <- execute_sql_query(query, db, schema)
+  query <- new("SQLQuery.FileTableRootPath",
+               db, schema, tb_name)
+
+  ret <- executeSQLQuery(query)
+
   if (nrow(ret) == 0) {
      ret <- NULL
   } else {
@@ -69,9 +75,9 @@ check_file_stored <- function(filename,
                                   schema = .__DEFAULT_FILE_DB_SCHEMA__.
                               ) {
 
-  query <- sprintf("SELECT name FROM %s WHERE name = '%s'", tb_name, filename)
+  query <- new("SQLQuery.FileStoredInFileTable", db, schema, tb_name, filename)
 
-  ret <- execute_sql_query(query, db, schema)
+  ret <- executeSQLQuery(query)
 
   is_stored <- NULL
 

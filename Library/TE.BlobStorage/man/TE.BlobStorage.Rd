@@ -9,7 +9,4 @@
 Package providing classes and functions for retrieval and storage
 of Binary Large Objects (BLOB's) into Database Tables
 }
-\section{TE.BlobStorage classes}{
-
-}
 

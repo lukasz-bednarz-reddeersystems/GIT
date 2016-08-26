@@ -226,11 +226,33 @@ setMethod(".getSQLQueryResultsParser",
 #'
 #' @param object object of class 'VirtualSQLQuery'.
 #' @param key_values "data.frame" with query keys
-#' @return \code{object} object of class 'VirtualSQLQuery'.
 #' @export
 
 setGeneric("prepareSQLQuery", function(object, key_values){standardGeneric("prepareSQLQuery")})
 
+
+#' @describeIn prepareSQLQuery
+#' Prepare SQL query strings
+#'
+#' Parses key_values to vector of SQL query strings
+#'
+#' @inheritParams prepareSQLQuery
+#' @return \code{object} object of class 'VirtualSQLQuery'.
+#' @export
+setMethod("prepareSQLQuery",
+          signature(object = "VirtualSQLQuery", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- .setSQLQueryKeyValues(object, key_values)
+            parser <- .getSQLQueryKeyValuesParser(object)
+
+            sql_strings <- parser(key_values)
+
+            object <- .setSQLQueryStrings(object, sql_strings)
+
+            return(object)
+          }
+)
 
 #' Executes SQL query strings
 #'
