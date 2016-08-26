@@ -124,6 +124,7 @@ test_that("Cannot dataRequest() with invalid key_values", {
 
 
 test_that("Generates empty data.frame when dataRequest() with nonexistent key_values", {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   # create new object
   object <- new(tested.class)
 
@@ -169,6 +170,7 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
 
 test_that("Can dataRequest() with valid key_values", {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   # create new instance of class
   object <- new(tested.class)

@@ -10,6 +10,7 @@ NULL
 setClass(
   Class     = "FactorExposureDataSQLQuery",
   prototype = list(
+    db_name        = RISK_MODEL_DB(),
     db_schema      = "Razor",
     key_cols       = c("InstrumentID", "Date"),
     key_values     = data.frame(lInstrumentID = integer(),

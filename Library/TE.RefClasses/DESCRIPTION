@@ -9,6 +9,7 @@ Description: Pakckage is implementing Reference Classes for handling,
 Depends:
     R (>= 3.3.0),
     TE.DataAccess (>= 0.1.0),
+    TE.SQLQuery (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:

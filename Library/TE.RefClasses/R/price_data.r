@@ -11,6 +11,8 @@ NULL
 setClass(
   Class     = "PriceDataSQLQuery",
   prototype = list(
+    db_name        = RISK_MODEL_DB(),
+    db_schema      = "Research",
     key_cols       = c("InstrumentID", "Date"),
     key_values     = data.frame(InstrumentID = integer(),
                                 Date = as.Date(character())),

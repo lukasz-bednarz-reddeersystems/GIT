@@ -44,26 +44,3 @@ parse_start_date_keys <- function(key_values) {
 }
 
 
-get_bulk_price_data_by_instrument_list <- function(instruments,start,end){
-  message("Price data bulk fetch from DB...")
-  instr_str <- paste0(instruments, collapse = ",")
-  SQL <- sprintf("prInstrumentHistory_SelectByInstrList '%s', '%s', '%s'", instr_str, start, end)
-
-  price_data <- execute_sql_query(SQL)
-
-  return(price_data)
-}
-
-
-execute_sql_query <- function(SQL, schema = NULL){
-  cn <- odbcConnect(RISK_MODEL_DB(),uid=RAID_DB_USER(), DBMSencoding = "UTF-8")
-
-  if (!is.null(schema)) {
-    sqlQuery(cn, paste("USE", schema))
-  }
-
-  ret_data <- sqlQuery(cn,SQL, as.is = FALSE, stringsAsFactors  = FALSE)
-  close(cn)
-
-  return(ret_data)
-}
