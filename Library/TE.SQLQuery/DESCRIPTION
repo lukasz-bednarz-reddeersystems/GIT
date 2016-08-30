@@ -21,6 +21,7 @@ Collate:
     'sql_query.r'
     'sql_procedure_call_functions.r'
     'sql_procedure_call.r'
+    'sql_query_handler.r'
 RoxygenNote: 5.0.1
 Suggests:
     testthat
