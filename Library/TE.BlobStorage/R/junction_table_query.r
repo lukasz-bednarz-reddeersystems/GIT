@@ -127,18 +127,21 @@ setClass(
 #' @param db_name "character" database name
 #' @param db_schema "character" database schema
 #' @param tb_name "character" table name to be querried
-#' @param keys "data.frame" with columns 'TraderID', 'StartDate', 'EndDate'
+#' @param keys "data.frame" with columns 'JointTableName' 'TraderID', 'StartDate', 'EndDate'
 #'
 #' @export
 setMethod("initialize",
           signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"),
-          function(.Object, db_name, db_schema,tb_name, keys) {
+          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
 
             .Object <- callNextMethod(.Object, db_name, db_schema )
 
-            keys <- cbind(data.frame(TableName = tb_name), keys)
+            if (!is.null(keys) && is.data.frame(keys)) {
 
-            .Object <- prepareSQLQuery(.Object, keys)
+              keys <- cbind(data.frame(TableName = tb_name), keys)
+
+              .Object <- prepareSQLQuery(.Object, keys)
+            }
 
             return(.Object)
           })

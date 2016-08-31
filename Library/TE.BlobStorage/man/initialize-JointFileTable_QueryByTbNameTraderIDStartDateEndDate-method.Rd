@@ -7,7 +7,7 @@
 \usage{
 
   \S4method{initialize}{BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate}(.Object,
-  db_name, db_schema, tb_name, keys)
+  db_name, db_schema, tb_name, keys = NULL)
 }
 \arguments{
 \item{.Object}{object of class derived from FileTableSQLQuerry}
@@ -18,7 +18,7 @@
 
 \item{tb_name}{"character" table name to be querried}
 
-\item{keys}{"data.frame" with columns 'TraderID', 'StartDate', 'EndDate'}
+\item{keys}{"data.frame" with columns 'JointTableName' 'TraderID', 'StartDate', 'EndDate'}
 }
 \description{
 Initialize method for "SQLQuery.FileTableRootPath"

@@ -91,7 +91,16 @@ test_that(sprintf("Cannot instantiate %s class without parameters", tested.class
 })
 
 
-test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+test_that(sprintf("Can instantiate %s class without keys parameter", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name)
+
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can instantiate %s class with keys parameter", tested.class),{
 
   object <- new(tested.class, db_name = valid.db,
                 db_schema = valid.schema,
@@ -101,7 +110,27 @@ test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
   expect_is(object, tested.class)
 })
 
-test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+test_that(sprintf("Can prepareSQLQuery on  %s", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name)
+
+  expect_is(object, tested.class)
+
+  keys <- cbind(data.frame(TableName = valid.tb_name), valid.keys)
+
+  object <- prepareSQLQuery(object, keys)
+
+  expect_equal(getSQLQueryKeyValues(object), keys)
+
+})
+
+
+
+test_that(sprintf("Can executeSQLQuery on  %s class without calling prepareSQLQuery()",
+                  tested.class),{
 
   object <- new(tested.class, db_name = valid.db,
                 db_schema = valid.schema,
@@ -114,3 +143,31 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_equal(ret, valid.ret)
 })
+
+
+
+
+test_that(sprintf("Can executeSQLQuery on  %s class with calling prepareSQLQuery()",
+                  tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name)
+
+  expect_is(object, tested.class)
+
+  keys <- cbind(data.frame(TableName = valid.tb_name), valid.keys)
+
+  object <- prepareSQLQuery(object, keys)
+
+  expect_equal(getSQLQueryKeyValues(object), keys)
+
+  ret <- executeSQLQuery(object)
+
+  expect_equal(ret, valid.ret)
+
+})
+
+
+
+
