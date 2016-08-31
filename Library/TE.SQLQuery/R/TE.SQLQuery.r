@@ -12,5 +12,7 @@
 #' @import methods
 #' @import lubridate
 #' @importFrom RODBC odbcConnect sqlQuery
+#' @importFrom hash hash values names.hash keys
+#' @importClassesFrom hash hash
 NULL
 ## NULL

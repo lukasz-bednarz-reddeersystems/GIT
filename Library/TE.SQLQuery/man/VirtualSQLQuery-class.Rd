@@ -23,5 +23,7 @@ Implements handling of access to data via SQL queries.
 \item{\code{query_parser}}{"function" query parsing function}
 
 \item{\code{results_parser}}{"function" result parsing function}
+
+\item{\code{column_name_map}}{"hash" slot storing map hash for column names}
 }}
 

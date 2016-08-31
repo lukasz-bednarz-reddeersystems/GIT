@@ -18,6 +18,7 @@ NULL
 #' @slot key_values "data.frame" key values
 #' @slot query_parser "function" query parsing function
 #' @slot results_parser "function" result parsing function
+#' @slot column_name_map "hash" slot storing map hash for column names
 #'
 #' @export
 setClass(
@@ -29,7 +30,9 @@ setClass(
     key_cols   = "character",
     key_values = "data.frame",
     query_parser = "function",
-    results_parser = "function"
+    results_parser = "function",
+    column_name_map = "hash"
+
   ),
   prototype = list(
     query_parser   = pass_thru_parser,
@@ -218,6 +221,65 @@ setMethod(".getSQLQueryResultsParser",
             return(object@results_parser)
           }
 )
+
+
+
+#' Retreive SQL query column name map
+#'
+#' Returns hash with mapping of query column names
+#' to return column names
+#'
+#' @param object object of class 'VirtualSQLQuery'.
+#' @return \code{column_name_map} hash column name map of the datasource to output names
+#' @export
+
+setGeneric("getSQLQueryColumnNameMap", function(object){standardGeneric("getSQLQueryColumnNameMap")})
+
+#' @describeIn getSQLQueryColumnNameMap
+#' Retreive SQL query column name map
+#'
+#' Returns hash with mapping of query column names
+#' to return column names
+#'
+#' @inheritParams getSQLQueryColumnNameMap
+#' @return \code{column_name_map} hash column name map of the datasource to output names
+#' @export
+setMethod("getSQLQueryColumnNameMap",
+          signature(object = "VirtualSQLQuery"),
+          function(object){
+            return(object@column_name_map)
+          }
+)
+
+
+#' Translate datasource column names
+#'
+#' Pubic method to translate raw data column names
+#' to required output names
+#'
+#' @param object object of class 'VirtualSQLQuery'.
+#' @param colnames character vector with list of raw data column names
+#' @return \code{ret_colnames} data source column names translated to
+#' output column names
+
+setGeneric(".translateSQLQueryColumnNames", function(object, colnames){standardGeneric(".translateSQLQueryColumnNames")})
+
+setMethod(".translateSQLQueryColumnNames",
+          signature(object = "VirtualSQLQuery", colnames = "character"),
+          function(object, colnames){
+
+            colnames_map <- getSQLQueryColumnNameMap(object)
+
+            names_to_translate <- intersect(colnames, names(colnames_map))
+            idx <- (colnames %in% names_to_translate)
+
+            ret_colnames <- colnames
+            ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate]
+
+            return(ret_colnames)
+          }
+)
+
 
 
 #' Prepare SQL query strings

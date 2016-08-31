@@ -15,6 +15,7 @@ Imports:
     RODBC,
     R.utils,
     lubridate,
+    hash,
 Collate:
     'TE.SQLQuery.r'
     'sql_query_functions.r'
