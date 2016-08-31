@@ -11,6 +11,7 @@ valid.model_prefix    <- "developed_europe_prototype"
 valid.lookback        <- 150
 
 
+
 test_that("Can get_most_recent_model_objectstore() with valid key_values", {
 
   valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-20'),
@@ -25,6 +26,9 @@ test_that("Can get_most_recent_model_objectstore() with valid key_values", {
   expect_is(rm_str, "DailyRiskModelObjectStore")
 
 })
+
+
+
 
 
 

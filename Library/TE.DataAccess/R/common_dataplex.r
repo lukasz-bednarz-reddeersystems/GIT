@@ -254,7 +254,6 @@ refresh <- function(name) {
   if(isWarehouseObjectstoreCacheItemPresent(wh_cache, name)==FALSE){
     message("Warehouse not stored, creating new store")
   }
-  eval_str <- paste("all_stores[['",name,"']]<<-warehouse_objectstore_factory('",name,"')",sep="")
   wh_cache <- setWarehouseObjectstoreCacheItemValue(wh_cache,
                                                     name,
                                                     warehouse_objectstore_factory(name))

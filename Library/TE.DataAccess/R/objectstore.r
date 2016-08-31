@@ -95,13 +95,15 @@ setMethod("isKeyKnown","ObjectQuery",
 #' @slot stored      "environment"
 #' @slot id          "character"
 #' @slot data_path   "character"
+#' @slot warehouse_q "ObjectQuery"
 
 setClass(
 	Class           = "VirtualObjectStore",
 	representation	= representation(
 		stored      = "environment",
 		id          = "character",
-		data_path   = "character"
+		data_path   = "character",
+		warehouse_q = "ObjectQuery"
 	),
 	contains = c("VIRTUAL")
 
@@ -141,6 +143,51 @@ setMethod("getID","VirtualObjectStore",
           }
 )
 
+#' Get objectstore query object
+#'
+#' @param object object of class "VirtualObjectStore"
+#' @export
+
+setGeneric("getObjectStoreQuery",function(object){standardGeneric("getObjectStoreQuery")})
+
+#' @describeIn getObjectStoreQuery Get ID of the objectstore
+#'
+#' @inheritParams getObjectStoreQuery
+#'
+#' @return \code{warehouse_q} "character" object of class "ObjectQuery"
+#' @export
+setMethod("getObjectStoreQuery","VirtualObjectStore",
+          function(object){
+            return(object@warehouse_q)
+          }
+)
+
+#' Set objectstore query object
+#'
+#' Private method to store objectquery object
+#'
+#' @rdname private_setObjectStoreQuery
+#' @param object object of class "VirtualObjectStore"
+#' @param warehouse_q object of class "ObjectQuery"
+#' @export
+
+setGeneric(".setObjectStoreQuery",function(object, warehouse_q){standardGeneric(".setObjectStoreQuery")})
+
+#' @describeIn private_setObjectStoreQuery
+#' Set objectstore query object
+#'
+#' @param object object of class "VirtualObjectStore"
+#' @param warehouse_q object of class "ObjectQuery"
+#' @return \code{object} object of class "VirtualObjectStore"
+#' @export
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualObjectStore",
+                     warehouse_q = "ObjectQuery"),
+          function(object){
+            object@warehouse_q <- warehouse_q
+            return(object)
+          }
+)
 
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",
