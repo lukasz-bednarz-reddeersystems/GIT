@@ -19,6 +19,7 @@ Collate:
     'TE.SQLQuery.r'
     'sql_query_functions.r'
     'sql_query.r'
+    'sql_insert_handler.r'
     'sql_procedure_call_functions.r'
     'sql_procedure_call.r'
     'sql_query_handler.r'
