@@ -53,3 +53,29 @@ has_required_columns <- function(data, required_colnms) {
     return(FALSE)
   }
 }
+
+#' convert df column classes based on prefixes
+#'
+#' @param df "data.frame" with data to convert
+#' @param classes "character" vector with class names, needs to be the same length as
+#' number of columns
+#' @return \code{ret_data} "data.frame" with converted column's classes
+
+convert_column_class <- function(df, classes = NULL) {
+
+  class_map <- list(l ="integer", dbl = "numeric", s = "character", dt = "Date")
+  setAs("character", "Date", function(from){ as.Date(from)}, where = environment())
+  setAs("POSIXct", "Date", function(from){ as.Date(from)}, where = environment())
+
+  cols <- colnames(df)
+
+  res <- sapply(paste0("^", names(class_map)), function(x){grepl(x, cols)})
+  class_names <- unlist(apply(res,1,function(x){class_map[x]} ) )
+  names(class_names) <- cols
+
+  ret_data <- as.data.frame(lapply(seq(length(class_names)),
+                                   function(x) {as(df[,x], class_names[x])}), stringsAsFactors = FALSE)
+  colnames(ret_data) <- cols
+
+  return(ret_data)
+}

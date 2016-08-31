@@ -167,7 +167,7 @@ test_that("Can dataRequest() with valid key_values", {
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
   query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
   valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string, valid.db_name, "Razor")
-  valid.ret_data <- TE.RefClasses:::convert_column_class(valid.ret_data)
+  valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
   valid.ret_data <- valid.ret_data[values]
   colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]
