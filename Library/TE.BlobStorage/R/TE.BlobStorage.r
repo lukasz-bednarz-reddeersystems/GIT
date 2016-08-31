@@ -10,5 +10,7 @@
 #' @import lubridate
 #' @import methods
 #' @importFrom R.utils copyFile
+#' @importFrom hash hash values names.hash keys
+#' @importClassesFrom hash hash
 NULL
 ## NULL

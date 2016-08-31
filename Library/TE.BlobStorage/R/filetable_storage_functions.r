@@ -219,3 +219,4 @@ remove_file_from_filetable <- function(filename,
 
   return(ret)
 }
+

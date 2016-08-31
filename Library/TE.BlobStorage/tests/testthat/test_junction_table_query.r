@@ -63,3 +63,54 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_equal(ret, valid.ret)
 })
+
+
+
+########################################################################################
+#
+# Testing BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName class
+#
+########################################################################################
+
+tested.class  <- "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
+valid.tb_name <- "tMultiFactorRiskBlobTest"
+valid.db      <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
+valid.schema  <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
+valid.keys    <- data.frame(TraderID  = 11,
+                            StartDate = as.Date("2016-01-01"),
+                            EndDate   = as.Date("2016-01-01"))
+valid.ret     <- data.frame(lTraderID  = 11,
+                            dtStartDate = "2016-01-01",
+                            dtEndDate   = "2016-01-01",
+                            dtCreatedDate = "2016-08-30",
+                            sFileName  = "temp.txt",
+                            stringsAsFactors = FALSE)
+
+test_that(sprintf("Cannot instantiate %s class without parameters", tested.class),{
+  expect_error(new(tested.class), regexp = 'argument "db_name" is missing, with no default')
+})
+
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name,
+                keys    = valid.keys)
+
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class, db_name = valid.db,
+                db_schema = valid.schema,
+                tb_name = valid.tb_name,
+                keys    = valid.keys)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object)
+
+  expect_equal(ret, valid.ret)
+})

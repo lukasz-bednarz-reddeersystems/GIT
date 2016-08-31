@@ -15,6 +15,7 @@ Imports:
     methods,
     lubridate,
     R.utils,
+    hash,
 Collate:
     'TE.BlobStorage.r'
     'filetable_query.r'
