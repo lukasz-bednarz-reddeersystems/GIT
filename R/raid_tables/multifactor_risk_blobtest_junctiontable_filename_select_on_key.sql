@@ -40,7 +40,13 @@ SET
 
 @SQL = 
 
-N'SELECT * FROM ' +  
+N'SELECT ' + 
+	N' jt.lTraderID, ' +
+	N' jt.dtStartDate, ' +
+	N' jt.dtEndDate, ' +
+	N' jt.dtCreatedDate, ' +
+	N' ft.name AS sFileName ' +
+' FROM ' +  
    @sJointTableName + N' jt' +
 N' INNER JOIN ' +
    @sReferencedTableName + N' ft' +
