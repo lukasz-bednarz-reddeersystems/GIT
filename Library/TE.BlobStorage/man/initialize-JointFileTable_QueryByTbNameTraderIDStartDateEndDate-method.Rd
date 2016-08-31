@@ -3,7 +3,7 @@
 \docType{methods}
 \name{initialize,BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate-method}
 \alias{initialize,BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate-method}
-\title{Initialize method for "SQLQuery.FileTableRootPath"}
+\title{Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"}
 \usage{
 
   \S4method{initialize}{BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate}(.Object,
@@ -21,6 +21,6 @@
 \item{keys}{"data.frame" with columns 'JointTableName' 'TraderID', 'StartDate', 'EndDate'}
 }
 \description{
-Initialize method for "SQLQuery.FileTableRootPath"
+Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
 }
 

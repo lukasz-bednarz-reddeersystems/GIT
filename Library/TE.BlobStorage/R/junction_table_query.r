@@ -107,20 +107,19 @@ setClass(
                              "@dtStartDate",
                              "@dtEndDate",
                              "@sFileName"
-                             ),
+                              ),
                            c("@JointTableName",
                              "@TraderID",
                              "@StartDate",
                              "@EndDate",
                              "@FileName")),
-
     procedure    = "prMultiFactorRisk_JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
   ),
   contains  = c("BlobStorage.VirtualSQLProcedureCall")
 )
 
 
-#' Initialize method for "SQLQuery.FileTableRootPath"
+#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
 #'
 #' @rdname initialize-JointFileTable_QueryByTbNameTraderIDStartDateEndDate-method
 #' @param .Object object of class derived from FileTableSQLQuerry
@@ -132,6 +131,85 @@ setClass(
 #' @export
 setMethod("initialize",
           signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"),
+          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
+
+            .Object <- callNextMethod(.Object, db_name, db_schema )
+
+            if (!is.null(keys) && is.data.frame(keys)) {
+
+              keys <- cbind(data.frame(TableName = tb_name), keys)
+
+              .Object <- prepareSQLQuery(.Object, keys)
+            }
+
+            return(.Object)
+          })
+
+
+#################################################################################
+#
+# BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate class
+#
+#################################################################################
+
+
+#' BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate class
+#'
+#' Implements handling querries for joint table that
+#' stores keys of associated file table. Returns file name column that
+#' is associated with given key
+#'
+#' Inherits from "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
+#'
+#' @rdname JointFileTable_UpdateByTbNameTraderIDStartDateEndDate-class
+#' @export
+setClass(
+  Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
+  prototype = list(
+    key_cols   = c("TableName", "TraderID", "StartDate", "EndDate", "CreatedDate", "CreatedBy", "FileName"),
+    key_values = data.frame(TableName = character()),
+    arguments  = c("@sJointTableName",
+                   "@lTraderID",
+                   "@dtStartDate",
+                   "@dtEndDate",
+                   "@dtCreatedDate",
+                   "@sCreatedByUserID",
+                   "@sFileName"),
+
+    column_name_map = hash(c("@sJointTableName",
+                             "@lTraderID",
+                             "@dtStartDate",
+                             "@dtEndDate",
+                             "@dtCreatedDate",
+                             "@sCreatedByUserID",
+                             "@sFileName"
+                             ),
+                           c("@JointTableName",
+                             "@TraderID",
+                             "@StartDate",
+                             "@EndDate",
+                             "@CreatedDate",
+                             "@CreatedByUserID",
+                             "@FileName")),
+    procedure    = "prMultiFactorRisk_JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
+  ),
+  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+)
+
+
+#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
+#'
+#' @rdname initialize-JointFileTable_UpdateByTbNameTraderIDStartDateEndDate-method
+#' @param .Object object of class derived from FileTableSQLQuerry
+#' @param db_name "character" database name
+#' @param db_schema "character" database schema
+#' @param tb_name "character" table name to be querried
+#' @param keys "data.frame" with columns
+#' 'JointTableName' 'TraderID', 'StartDate', 'EndDate', 'CreatedDate', 'CreatedByUserID', 'FileName'
+#'
+#' @export
+setMethod("initialize",
+          signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"),
           function(.Object, db_name, db_schema,tb_name, keys = NULL) {
 
             .Object <- callNextMethod(.Object, db_name, db_schema )
