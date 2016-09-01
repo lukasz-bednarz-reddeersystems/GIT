@@ -59,33 +59,33 @@ test_that("Can call check_file_stored()", {
 })
 
 
-test_that("Can store_file_in_filetable()", {
+test_that("Can store_file_in_referenced_filetable()", {
 
   # store new file
-  ret <- store_file_in_filetable(valid.tempfile,
-                                 valid.table,
-                                 valid.db,
-                                 valid.schema)
+  ret <- store_file_in_referenced_filetable(valid.tempfile,
+                                            valid.junct.table,
+                                            valid.db,
+                                            valid.schema)
 
   expect_equal(ret, 0)
   expect_true(check_file_exists(valid.tempfilename, valid.table, valid.db, valid.schema))
 
   # try to store the same file without overwrite set
-  ret <- store_file_in_filetable(valid.tempfile,
-                                 valid.table,
-                                 valid.db,
-                                 valid.schema)
+  ret <- store_file_in_referenced_filetable(valid.tempfile,
+                                            valid.junct.table,
+                                            valid.db,
+                                            valid.schema)
 
   expect_equal(ret, -1)
   expect_true(check_file_exists(valid.tempfilename, valid.table, valid.db, valid.schema))
 
 
   # try to store the same file with overwrite set
-  ret <- store_file_in_filetable(valid.tempfile,
-                                 valid.table,
-                                 valid.db,
-                                 valid.schema,
-                                 overwrite = TRUE)
+  ret <- store_file_in_referenced_filetable(valid.tempfile,
+                                            valid.junct.table,
+                                            valid.db,
+                                            valid.schema,
+                                            overwrite = TRUE)
   expect_equal(ret, 1)
   expect_true(check_file_exists(valid.tempfilename, valid.table, valid.db, valid.schema))
 
@@ -95,19 +95,19 @@ test_that("Can store_file_in_filetable()", {
 test_that("Can remove_file_from_filetable()", {
 
   # remove file
-  ret <- remove_file_from_filetable(valid.tempfilename,
-                                    valid.table,
-                                    valid.db,
-                                    valid.schema)
+  ret <- remove_file_from_referenced_filetable(valid.tempfilename,
+                                               valid.junct.table,
+                                               valid.db,
+                                               valid.schema)
 
   expect_equal(ret, 0)
   expect_false(check_file_exists(valid.tempfilename, valid.table, valid.db, valid.schema))
 
   # try to remove removed file
-  ret <- remove_file_from_filetable(valid.tempfilename,
-                                    valid.table,
-                                    valid.db,
-                                    valid.schema)
+  ret <- remove_file_from_referenced_filetable(valid.tempfilename,
+                                               valid.junct.table,
+                                               valid.db,
+                                               valid.schema)
 
   expect_equal(ret, -1)
 

@@ -68,7 +68,7 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
 ########################################################################################
 #
-# Testing BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName class
+# Testing BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate class
 #
 ########################################################################################
 

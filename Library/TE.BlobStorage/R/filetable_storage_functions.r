@@ -225,6 +225,37 @@ store_file_in_filetable <- function(file,
 }
 
 
+#' Store file in referenced file table
+#'
+#' @param file "character" full file path of the file to be stored in filetable
+#' @param tb_name "character" name of the parent table
+#' @param db "character" ODBC alias name of database
+#' @param schema "character" name of DB schema
+#' @param overwrite "logical" should file be overwritten if already exists?
+#' @return \code{status} "integer" status of saving:\cr
+#'  \code{0} - new file has been stored\cr
+#'  \code{1} - file has been overwritten\cr
+#'  \code{-1} - file has not been stored as it already exists and \code{overwrite} param was set to FALSE
+#'
+#' @export
+store_file_in_referenced_filetable <- function(file,
+                                               tb_name,
+                                               db = .__DEFAULT_ODBC_DB_NAME__.,
+                                               schema = .__DEFAULT_FILE_DB_SCHEMA__.,
+                                               overwrite = FALSE) {
+
+  tb_name <- get_referenced_filetable_name(tb_name, db, schema)
+
+  ret <- store_file_in_filetable(file,
+                                 tb_name,
+                                 db,
+                                 schema,
+                                 overwrite)
+
+  return(ret)
+}
+
+
 #' Remove file from file table
 #'
 #' @param filename "character" filename of  file to be removed from filetable
@@ -269,3 +300,28 @@ remove_file_from_filetable <- function(filename,
   return(ret)
 }
 
+
+#' Remove file from referenced file table
+#'
+#' @param filename "character" filename of  file to be removed from filetable
+#' @param tb_name "character" name of the parent of the filetable
+#' @param db "character" ODBC alias name of database
+#' @param schema "character" name of DB schema
+#' @return \code{status} "integer" status of saving:\cr
+#'  \code{0} - file has been removed\cr
+#'  \code{-1} - file has not been stored and couldn't be removed
+#'
+#' @export
+remove_file_from_referenced_filetable <- function(filename,
+                                       tb_name,
+                                       db = .__DEFAULT_ODBC_DB_NAME__.,
+                                       schema = .__DEFAULT_FILE_DB_SCHEMA__.) {
+
+  tb_name <- get_referenced_filetable_name(tb_name, db, schema)
+
+  ret <- remove_file_from_filetable(filename,
+                                    tb_name,
+                                    db,
+                                    schema)
+  return(ret)
+}
