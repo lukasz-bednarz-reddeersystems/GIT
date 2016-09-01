@@ -69,6 +69,7 @@ setMethod("updateKnownKeys","ObjectQuery",
 	      }
 )
 
+
 setGeneric("isKeyKnown",function(object,key){standardGeneric("isKeyKnown")})
 setMethod("isKeyKnown","ObjectQuery",
 	      function(object,key){
@@ -79,6 +80,14 @@ setMethod("isKeyKnown","ObjectQuery",
 	      }
 )
 
+setGeneric("isKeyKnownInLocalStore",function(object,key){standardGeneric("isKeyKnownInLocalStore")})
+setMethod("isKeyKnownInLocalStore",
+          signature(object = "ObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+            return(isKeyKnown(object, key))
+          }
+)
 
 #' A VIRTUAL S4 class implementing basic functionalities of objectstore.
 #'
@@ -95,7 +104,7 @@ setMethod("isKeyKnown","ObjectQuery",
 #' @slot stored      "environment"
 #' @slot id          "character"
 #' @slot data_path   "character"
-#' @slot warehouse_q "ObjectQuery"
+#' @slot objectstore_q "ObjectQuery"
 
 setClass(
 	Class           = "VirtualObjectStore",
@@ -103,7 +112,7 @@ setClass(
 		stored      = "environment",
 		id          = "character",
 		data_path   = "character",
-		warehouse_q = "ObjectQuery"
+		objectstore_q = "ObjectQuery"
 	),
 	contains = c("VIRTUAL")
 
@@ -150,15 +159,17 @@ setMethod("getID","VirtualObjectStore",
 
 setGeneric("getObjectStoreQuery",function(object){standardGeneric("getObjectStoreQuery")})
 
-#' @describeIn getObjectStoreQuery Get ID of the objectstore
+#' @describeIn getObjectStoreQuery
+#'
+#' Get ID of the objectstore
 #'
 #' @inheritParams getObjectStoreQuery
 #'
-#' @return \code{warehouse_q} "character" object of class "ObjectQuery"
+#' @return \code{objectstore_q} "character" object of class "ObjectQuery"
 #' @export
 setMethod("getObjectStoreQuery","VirtualObjectStore",
           function(object){
-            return(object@warehouse_q)
+            return(object@objectstore_q)
           }
 )
 
@@ -168,23 +179,14 @@ setMethod("getObjectStoreQuery","VirtualObjectStore",
 #'
 #' @rdname private_setObjectStoreQuery
 #' @param object object of class "VirtualObjectStore"
-#' @param warehouse_q object of class "ObjectQuery"
-#' @export
+#' @param objectstore_q object of class "ObjectQuery"
 
-setGeneric(".setObjectStoreQuery",function(object, warehouse_q){standardGeneric(".setObjectStoreQuery")})
-
-#' @describeIn private_setObjectStoreQuery
-#' Set objectstore query object
-#'
-#' @param object object of class "VirtualObjectStore"
-#' @param warehouse_q object of class "ObjectQuery"
-#' @return \code{object} object of class "VirtualObjectStore"
-#' @export
+setGeneric(".setObjectStoreQuery",function(object, objectstore_q){standardGeneric(".setObjectStoreQuery")})
 setMethod(".setObjectStoreQuery",
           signature( object = "VirtualObjectStore",
-                     warehouse_q = "ObjectQuery"),
-          function(object){
-            object@warehouse_q <- warehouse_q
+                     objectstore_q = "ObjectQuery"),
+          function(object, objectstore_q){
+            object@objectstore_q <- objectstore_q
             return(object)
           }
 )

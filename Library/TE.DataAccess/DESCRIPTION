@@ -9,6 +9,8 @@ Description: Pakckage is implementing functions and classes for data access,
     Analytics Engine.
 Depends:
     R (>= 3.3.0),
+    TE.SQLQuery (>= 0.1.0),
+    TE.BlobStorage (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -21,6 +23,7 @@ Imports:
     moments,
     grDevices,
     graphics,
+    R.utils
 Collate:
     'TE.DataAccess.r'
     'visualisation_functions.r'
@@ -55,6 +58,7 @@ Collate:
     'functions.r'
     'common_trade_factory.r'
     'common_composite_warehouse.r'
+    'remote_objectstore.r'
     'common_warehouse_objectstore.r'
     'common_dealing_datastore.r'
     'common_ext_pos_datastore.r'
