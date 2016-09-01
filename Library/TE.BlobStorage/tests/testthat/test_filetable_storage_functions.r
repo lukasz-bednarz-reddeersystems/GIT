@@ -10,6 +10,7 @@ context("Test blob storage functions")
 valid.db            <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
 valid.schema        <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
 valid.path          <- "\\\\RAIDSTAGEDB\\MSSQLSERVER_STAGEDB\\FileTableDB\\BlobTest"
+valid.junct.table   <- "tMultiFactorRiskBlobTest"
 valid.table         <- "ftMultiFactorRiskBlobTest"
 valid.testfilename  <- "temp.txt"
 valid.tempfile     <- tempfile("temp", fileext = ".txt")
@@ -22,11 +23,28 @@ test_that("Created temporary file.", {
 
 })
 
+
+test_that("Can get_referenced_filetable_name", {
+
+  ret.name <- get_referenced_filetable_name(valid.junct.table, valid.db, valid.schema)
+
+  expect_equal(ret.name, valid.table)
+
+})
+
 test_that("Can get_filetable_path", {
 
   ret.path <- get_filetable_path(valid.table, valid.db, valid.schema)
 
   expect_equal(ret.path, valid.path)
+
+})
+
+test_that("Can get_referenced_filetable_path", {
+
+  ret.name <- get_referenced_filetable_path(valid.junct.table, valid.db, valid.schema)
+
+  expect_equal(ret.name, valid.path)
 
 })
 
@@ -95,3 +113,8 @@ test_that("Can remove_file_from_filetable()", {
 
 
 })
+
+
+
+
+

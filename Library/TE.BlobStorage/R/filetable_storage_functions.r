@@ -8,6 +8,34 @@ NULL
 
 
 
+#' Get name of file table associated with Junction Table
+#'
+#' @param tb_name "character" name of the junction table
+#' @param db "character" ODBC alias name of database
+#' @param schema "character" name of DB schema
+#' @return \code{filetable} "character" name of the filetable
+#'
+#' @export
+get_referenced_filetable_name <- function(tb_name,
+                               db = .__DEFAULT_ODBC_DB_NAME__.,
+                               schema = .__DEFAULT_FILE_DB_SCHEMA__.) {
+
+
+  query <- new("BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName",
+               db, schema, tb_name)
+
+  ret <- executeSQLQuery(query)
+
+  if (nrow(ret) == 0) {
+    ret <- NULL
+  } else {
+    ret <- ret[1, "ReferencedTableName"]
+  }
+
+  return(ret)
+}
+
+
 #' Get unc share path of file table
 #'
 #' @param tb_name "character" name of the filetable
@@ -35,6 +63,27 @@ get_filetable_path <- function(tb_name,
   return(ret)
 }
 
+
+
+#' Get unc share path of file table
+#'
+#' @param tb_name "character" name of the junction table
+#' @param db "character" ODBC alias name of database
+#' @param schema "character" name of DB schema
+#' @return \code{path} "character" unc path of the file table storage
+#'
+#' @export
+get_referenced_filetable_path <- function(tb_name,
+                                          db = .__DEFAULT_ODBC_DB_NAME__.,
+                                          schema = .__DEFAULT_FILE_DB_SCHEMA__.) {
+
+
+  file_table <- get_referenced_filetable_name(tb_name, db, schema)
+
+  ret <- get_filetable_path(file_table, db, schema)
+
+  return(ret)
+}
 
 #' check if file exists in filetable shared unc path
 #'

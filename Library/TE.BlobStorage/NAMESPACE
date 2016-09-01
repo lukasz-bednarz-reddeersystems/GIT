@@ -3,6 +3,8 @@
 export(check_file_exists)
 export(check_file_stored)
 export(get_filetable_path)
+export(get_referenced_filetable_name)
+export(get_referenced_filetable_path)
 export(remove_file_from_filetable)
 export(store_file_in_filetable)
 exportClasses(BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate)
