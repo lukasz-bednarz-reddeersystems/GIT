@@ -54,8 +54,21 @@ setClass(
 	contains = c("VirtualObjectStore")
 )
 
+#' Get list of storable components
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 
 setGeneric("getRiskModelComponents",function(object){standardGeneric("getRiskModelComponents")})
+
+#' @describeIn getRiskModelComponents
+#' Get list of storable components
+#'
+#' @inheritParams getRiskModelComponents
+#' @return \code{components} "character" vector of storable components
+#'
+#' @export
 setMethod("getRiskModelComponents","DailyRiskModelObjectStore",
           function(object){
             return(object@components)
@@ -146,7 +159,22 @@ setMethod("getRiskModelQueryID","DailyRiskModelObjectStore",
 	      }
 )
 
+
+#' Commit object to store and save
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
+
 setGeneric("commitDailyRiskModelObjectStore",function(object){standardGeneric("commitDailyRiskModelObjectStore")})
+
+#' @describeIn commitDailyRiskModelObjectStore
+#' Commit object to store and save
+#'
+#' @inheritParams commitDailyRiskModelObjectStore
+#' @return \code{object} object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("commitDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  function(object){
 		  	object <- placeInObjectStore(object,object@risk_model_q,getRiskModelQueryID(object))
@@ -154,8 +182,33 @@ setMethod("commitDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  }
 )
 
+
+#' Get most recent risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param component "character" name of the component of the risk model, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param date "Date" date of the risk model for which it was computed.
+#' @param lookback "integer" number of lookback horizon of the model
+#'
+#' @export
 setGeneric("getRiskModelComponentOnDate",function(object,name,component,date,lookback=150){standardGeneric("getRiskModelComponentOnDate")})
-setMethod("getRiskModelComponentOnDate","DailyRiskModelObjectStore",
+
+#' @describeIn getRiskModelComponentOnDate
+#' Get most recent risk model date stored in object
+#'
+#' @inheritParams getRiskModelComponentOnDate
+#' @return \code{rdata} "data.frame with risk component
+#'
+#' @export
+setMethod("getRiskModelComponentOnDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    component = "character",
+                    date = "Date",
+                    lookback = "integer"),
 		  function(object,name,component,date,lookback=150){
 		    risk_comp <- queryDailyRiskModelObjectStore(object,name,lookback,component)
 		  	if(component%in%c('ImpliedFactorReturns','ResidualReturns','Betas')){
@@ -171,9 +224,30 @@ setMethod("getRiskModelComponentOnDate","DailyRiskModelObjectStore",
 		  }
 )
 
+#' Get most recent risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#'
+#' @export
 
-setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelDate")})
-setMethod("getMostRecentRiskModelDate","DailyRiskModelObjectStore",
+setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150L){standardGeneric("getMostRecentRiskModelDate")})
+
+#' @describeIn getMostRecentRiskModelDate
+#' Get most recent risk model date stored in object
+#'
+#' @inheritParams getMostRecentRiskModelDate
+#' @return \code{date} "Date" date of the most recent risk model.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
+
+setMethod("getMostRecentRiskModelDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer"),
 		  function(object,name,lookback=150){
 		  	comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
 		  	if(nrow(comp@data)>0){
@@ -186,7 +260,24 @@ setMethod("getMostRecentRiskModelDate","DailyRiskModelObjectStore",
 		  }
 )
 
+#' Get most recent betas date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#' @export
+
 setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelBetasDate")})
+
+#' @describeIn getMostRecentRiskModelBetasDate
+#' Get most recent betas date stored in object
+#'
+#' @inheritParams getMostRecentRiskModelBetasDate
+#' @return \code{date} "Date" date of the most recent betas and factor variances.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
 setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
           function(object,name,lookback=150){
             comp <- queryDailyRiskModelObjectStore(object,name,lookback,'Betas')
@@ -204,7 +295,7 @@ setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
 setGeneric("reInitializeRiskModelComponents",function(object, name, lookback = 150,
                                            components = NULL){standardGeneric("reInitializeRiskModelComponents")})
 setMethod("reInitializeRiskModelComponents",
-          signature(object = "DailyRiskModelObjectStore", name = "character", lookback = "numeric"),
+          signature(object = "DailyRiskModelObjectStore", name = "character", lookback = "integer"),
           function(object, name, lookback = 150, components = NULL){
 
           if (is.null(name)) {
@@ -233,14 +324,48 @@ setMethod("reInitializeRiskModelComponents",
           })
 
 
+#' Copy risk model data from one store to current object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param source_rmstr object of class "DailyRiskModelObjectStore" from which the data will be copied
+#' @param name_in_source "character" name of the store from which the data will be copied
+#' @param date "Date" latest date of data from source "DailyRiskModelObjectStore"
+#' @param lookback "integer" number of lookback horizon of the model, default is 150L
+#' @param cmp_to_update "character" vector of components to update, default is
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param force "logical" if TRUE existing values will be overwritten
+#' @export
 
-setGeneric("copyRiskModelHistory",function(object, source_rmstr, name_in_source, date, lookback = 150,
-                                          cmp_to_update = c('ImpliedFactorReturns','ResidualReturns','Betas','FactorCorrelation','FactorVariance','MarketStyle'),
+setGeneric("copyRiskModelHistory",function(object, source_rmstr, name_in_source, date, lookback = 150L,
+                                          cmp_to_update = c('ImpliedFactorReturns',
+                                                            'ResidualReturns',
+                                                            'Betas',
+                                                            'FactorCorrelation',
+                                                            'FactorVariance',
+                                                            'MarketStyle'),
                                           force = FALSE){standardGeneric("copyRiskModelHistory")})
+
+#' @describeIn copyRiskModelHistory
+#' Copy risk model data from one store to current object
+#'
+#' @inheritParams copyRiskModelHistory
+#' @return \code{object} object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("copyRiskModelHistory",
-          signature(object = "DailyRiskModelObjectStore", source_rmstr = "DailyRiskModelObjectStore", name_in_source = "character", date = "Date", lookback = "numeric"),
-          function(object, source_rmstr, name_in_source, date, lookback = 150,
-                  cmp_to_update = c('ImpliedFactorReturns','ResidualReturns','Betas','FactorCorrelation','FactorVariance','MarketStyle'),
+          signature(object = "DailyRiskModelObjectStore",
+                    source_rmstr = "DailyRiskModelObjectStore",
+                    name_in_source = "character",
+                    date = "Date",
+                    lookback = "integer"),
+          function(object, source_rmstr, name_in_source, date, lookback = 150L,
+                  cmp_to_update = c('ImpliedFactorReturns',
+                                    'ResidualReturns',
+                                    'Betas',
+                                    'FactorCorrelation',
+                                    'FactorVariance',
+                                    'MarketStyle'),
                   force = FALSE) {
 
             updated = FALSE

@@ -8,7 +8,7 @@ context("Test Daily Risk Model Objectstore")
 
 valid.component       <- "FactorCorrelation"
 valid.model_prefix    <- "developed_europe_prototype"
-valid.lookback        <- 150
+valid.lookback        <- 150L
 
 
 test_that("Can get_most_recent_model_objectstore() with valid key_values", {
