@@ -139,6 +139,10 @@ setMethod("dataRequest",
 
               rm_str       <- get_most_recent_model_objectstore(model_prefix, end, lookback)
 
+              if (is.null(rm_str)) {
+                next
+                }
+
               name         <- getID(rm_str)
 
               query_data   <- queryDailyRiskModelObjectStore(rm_str,name,lookback,component)
