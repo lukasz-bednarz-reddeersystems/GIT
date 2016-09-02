@@ -35,6 +35,16 @@ setClass(
 )
 
 
+setMethod(".generateRemoteQueryKey",
+          signature(object = "RemoteObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+            key$date <- as.Date(key$date)
+            key <- data.frame(id = unique(key$id), start = min(key$date), end = max(key$date))
+            return(key)
+          }
+)
+
 
 #' An S4 class for storing daily risk models.
 #'

@@ -56,22 +56,30 @@ test_that("Can check for keys in remote store() ", {
 
 test_that("Can check for keys in remote store() ", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
   object <- warehouse_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
 
-  is_known <- TE.DataAccess:::isKeyKnown(object, valid.key)
+  query <- getObjectStoreQuery(object)
+  expect_is(query, "RemoteWarehouseQuery")
+
+
+
+  is_known <- TE.DataAccess:::isKeyKnown(query, key)
   expect_true(is_known)
 
-  is_known <- TE.DataAccess:::isKeyKnownInLocalStore(object, valid.key)
+  is_known <- TE.DataAccess:::isKeyKnownInLocalStore(query, key)
   expect_true(is_known)
 
-  is_known <- TE.DataAccess:::isKeyKnownInRemoteStore(object, valid.key)
+  is_known <- TE.DataAccess:::isKeyKnownInRemoteStore(query, key)
   expect_false(is_known)
-
-
 
   object <- TE.DataAccess:::saveObjectInRemoteStore(object)
   expect_is(object, tested.class)
+
+  is_known <- TE.DataAccess:::isKeyKnownInRemoteStore(query, key)
+  expect_true(is_known)
 
 })

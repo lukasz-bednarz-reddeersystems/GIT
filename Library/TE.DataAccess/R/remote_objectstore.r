@@ -156,9 +156,11 @@ setMethod("getKnownRemoteKeys","RemoteObjectQuery",
 
             tb_name <- .getObjectQueryTableName(object)
 
+
+            colnames(key) <- c("TraderID", "StartDate", "EndDate")
             key <- cbind(data.frame(TableName = tb_name), key)
 
-            ret <- executeSQLQuery(sql_insert, key)
+            ret <- executeSQLQuery(sql_query, key)
 
             colnames(ret) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query,
                                                                          colnames(ret))
@@ -167,6 +169,14 @@ setMethod("getKnownRemoteKeys","RemoteObjectQuery",
           }
 )
 
+setGeneric(".generateRemoteQueryKey",function(object,key){standardGeneric(".generateRemoteQueryKey")})
+setMethod(".generateRemoteQueryKey",
+          signature(object = "RemoteObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+            return(key)
+          }
+)
 
 setGeneric("isKeyKnownInRemoteStore",function(object,key){standardGeneric("isKeyKnownInRemoteStore")})
 setMethod("isKeyKnownInRemoteStore",
@@ -360,7 +370,8 @@ setMethod("saveObjectInRemoteStore",
                                       CreatedByUserID = .__DEFAULT_OBJECTSTORE_DB_USER__. ,
                                       FileName = filename))
 
-              ret <- updateKnownRemoteKeys(object, key)
+
+              ret <- updateKnownRemoteKeys(query, key)
 
               if (ret) {
                 message(paste("Keys updated successfully"))
@@ -369,6 +380,8 @@ setMethod("saveObjectInRemoteStore",
               }
 
             }
+
+            return(ret)
 
       }
 )
