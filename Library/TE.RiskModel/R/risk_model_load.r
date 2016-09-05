@@ -1,6 +1,71 @@
 #' @include risk_model_functions.r
 NULL
 
+
+##################################################################################################################
+#
+# ModelFactors
+#
+##################################################################################################################
+
+get_model_type_factors <-function(model_name, lookback){
+
+  ret <- query_model_type_factors(model_name, lookback)
+
+  factor_info <- get_factors()[c("lFactorID", "sFactorName")]
+
+  ret <- merge(factor_info, ret)
+
+  if (nrow(ret) ==  0) {
+    ret <- NULL
+  }
+
+  return(ret[,"sFactorName"])
+}
+
+
+query_model_type_factors <- function(model_name, lookback){
+
+  model_type_id <- get_model_type_id(model_name, lookback)
+
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
+  on.exit(odbcClose(cn))
+  SQL <- paste0("SELECT * FROM [Research].[dbo].[tMultiFactorRiskModelFactors] WHERE ",
+                "[lModelTypeID] = ", model_type_id)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
+  return(ret)
+}
+
+
+insert_model_type_factors <- function(model_name, lookback, factors){
+
+  model_type_id <- get_model_type_id(model_name, lookback)
+
+  model_factors <- get_model_type_factors(model_name, lookback)
+
+  if (!is.null(model_factors) && (length(model_factors) > 0)) {
+    message(paste("Some or all factors are already inserted inserting only missing ones."))
+    print(cbind(model_type_id, data.frame(model_name, lookback)))
+
+    factors <- setdiff(factors, model_factors)
+  }
+
+  if (length(factors) > 0) {
+    factor_info <- get_factors()[c("lFactorID", "sFactorName")]
+
+    factor_data <- merge(factor_info, data.frame(sFactorName = factors))
+
+    data <- cbind(data.frame(lModelTypeID = model_type_id), factor_data[c("lFactorID")])
+
+    cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
+    on.exit(odbcClose(cn))
+
+    sqlSave(cn, data, tablename = "tMultiFactorRiskModelFactors", append = TRUE, rownames = FALSE)
+  }
+
+  return(query_model_type_factors(model_name, lookback))
+}
+
 ##################################################################################################################
 #
 # ModelType
@@ -25,7 +90,7 @@ query_model_type_id <- function(model_name, lookback){
   SQL <- paste0("SELECT [lModelTypeID] FROM [Research].[dbo].[tMultiFactorRiskModelTypes] WHERE",
                 "[sName] = '", model_name,"'",
                 "AND [lLookback] = ", lookback)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -96,7 +161,7 @@ query_model_id <- function(model_type,model_date,computation_date){
 		           "@lModelTypeID = ", model_type,
                ", @dtModelDate = '", model_date, "'",
                ", @dtComputationDate = '", computation_date, "'")
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -119,7 +184,7 @@ get_model_info <-function(model_id){
   cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
   on.exit(odbcClose(cn))
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_ModelInfo_SelectByModelID] @lModelID = ", model_id)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -135,7 +200,7 @@ query_factor_type_id <- function(factor_type){
   on.exit(odbcClose(cn))
   SQL <- paste0("SELECT [lFactorTypeID] FROM [Research].[dbo].[tMultiFactorRiskFactorTypes] WHERE",
                 "[sFactorTypeName] = '", factor_type, "'")
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -195,7 +260,7 @@ query_factor_id <- function(factor_name){
   on.exit(odbcClose(cn))
   SQL <- paste0("SELECT [lFactorID] FROM [Research].[dbo].[tMultiFactorRiskFactors] WHERE",
                 "[sFactorName] = '", factor_name, "'")
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -205,7 +270,7 @@ get_factor_name<- function(factor_id){
   on.exit(odbcClose(cn))
   SQL <- paste0("SELECT [sFactorName] FROM [Research].[dbo].[tMultiFactorRiskFactors] WHERE",
                 "[lFactorID] = ", factor_id)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(unlist(ret["sFactorName"][1]))
 }
 
@@ -222,7 +287,7 @@ get_factors <- function(){
   cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
   on.exit(odbcClose(cn))
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_Factors_InfoSelectAll]")
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -247,7 +312,7 @@ query_factor_couple_id <- function(factor1_name, factor2_name){
                 "[lFactor1ID] = ", factor_ids[[1]],
                 " AND [lFactor2ID] = ", factor_ids[[2]])
 
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -291,7 +356,7 @@ get_factor_couples <- function(){
   cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
   on.exit(odbcClose(cn))
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_FactorCouples_InfoSelectAll]")
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -352,7 +417,7 @@ query_existing_data <- function(table_name, unique_keys){
   }
 
   print(SQL)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
 
@@ -660,7 +725,7 @@ query_factor_correlations_on_model_id <- function(rm_id) {
   on.exit(odbcClose(cn))
 
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_FactorCorrelation_SelectByModelID] @lModelID = ", rm_id)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 
 }
@@ -774,7 +839,7 @@ query_market_style_on_model_id <- function(rm_id) {
   on.exit(odbcClose(cn))
 
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_MarketStyle_SelectByModelID] @lModelID = ", rm_id)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 
 }
@@ -829,7 +894,7 @@ query_residual_returns_on_model_id <- function(rm_id) {
   on.exit(odbcClose(cn))
 
   SQL <- paste0("EXEC	[dbo].[prMultiFactorRisk_ResidualReturns_SelectByModelID] @lModelID =", rm_id)
-  ret <- sqlQuery(cn, SQL)
+  ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 
 }

@@ -13,7 +13,7 @@
 #' @import snow
 #' @importFrom stats cor lm lm.fit sd
 #' @importFrom functional Curry
-#' @importFrom RODBC odbcConnect sqlQuery odbcClose sqlColumns
+#' @importFrom RODBC odbcConnect sqlQuery odbcClose sqlColumns sqlSave
 #' @importFrom matrixcalc is.positive.definite
 #' @importFrom utils write.table
 NULL
