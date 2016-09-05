@@ -1,6 +1,9 @@
+#' @include TE.RiskModel.r
+NULL
 
-RISK_MODEL_DB <- new("RiskModelDefaults")@store_database
-RAID_DB_USER <- Sys.info()["user"]
+
+.__DEFAULT_RISK_MODEL_DB__ <- new("RiskModelDefaults")@store_database
+.__DEFAULT_RAID_DB_USER__ <- Sys.info()["user"]
 
 
 
@@ -16,7 +19,7 @@ prepare_cluster <- function(cl){
 
 get_region_table <- function(){
   SQL <- 'SELECT [lRegionID],[sRegionName],[bMajorRegion] FROM [Research].[dbo].[tRegion]'
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   regions <- sqlQuery(cn,SQL)
   close(cn)
   return(regions)
@@ -24,7 +27,7 @@ get_region_table <- function(){
 
 get_instrument_region <- function(){
   SQL <- 'prInstrument_SelectRegionMappings'
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   ins_regions <- sqlQuery(cn,SQL)
   close(cn)
   return(ins_regions)
@@ -32,7 +35,7 @@ get_instrument_region <- function(){
 
 get_bulk_price_data <- function(start,end){
   message("Price data bulk fetch from DB...")
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   SQL <- paste("prInstrumentHistory_SelectByDate '",start,"', '",end,"'",sep="")
   price_data <- sqlQuery(cn,SQL)
   close(cn)
@@ -92,7 +95,11 @@ get_region_stock_returns <- function(start,end,regions){
   return(rtn)
 }
 
-get_factor_returns <- function(start,end,factors){
+
+
+get_risk_factor_returns <- function(start,end){
+  factors <- c('rValue','rStrength','rGrowth','rSize','rStreetSentiment','rPriceMomentum1M','rPriceMomentum12M','rTrendExtension','rEarnings','rVolatility')
+
   ds <- seq(ymd(start),ymd(end),by='1 day')
   ds <- ds[wday(ds)!=7&wday(ds)!=1]
   factor_data <- data_request("risk_factor_returns",data.frame(dtDateTime=as.Date(ds)),c("sFactorName","dblChangePercent"))
@@ -102,11 +109,8 @@ get_factor_returns <- function(start,end,factors){
   factor_rtns$dtDateTime  <- as.Date(factor_rtns$dtDateTime)
   factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent/100
   colnames(factor_rtns) <- c('FactorName','Date','Return')
-  return(factor_rtns)
-}
 
-get_risk_factor_returns <- function(start,end){
-  factors <- c('rValue','rStrength','rGrowth','rSize','rStreetSentiment','rPriceMomentum1M','rPriceMomentum12M','rTrendExtension','rEarnings','rVolatility')
+
   factor_rtns <- get_factor_returns(start,end,factors)
   factor_rtns$FactorName <- substr(factor_rtns$FactorName,2,nchar(factor_rtns$FactorName))
   return(factor_rtns)
@@ -114,6 +118,17 @@ get_risk_factor_returns <- function(start,end){
 
 get_sector_returns <- function(start,end){
   sectors <- c('SX3P','SX4P','SX6P','SX7P','SX86P','SX8P','SXAP','SXDP','SXEP','SXFP','SX1P','SXKP','SXMP','SXNP','SXOP','SXPP','SXQP','SXRP','SXTP')
+
+  ds <- seq(ymd(start),ymd(end),by='1 day')
+  ds <- ds[wday(ds)!=7&wday(ds)!=1]
+  factor_data <- data_request("risk_factor_returns",data.frame(dtDateTime=as.Date(ds)),c("sFactorName","dblChangePercentAbsolute"))
+  factor_rtns <- factor_data@data
+  factor_rtns <- merge(factor_rtns,data.frame(sFactorName=sectors),by=c('sFactorName'))
+  factor_rtns$sFactorName <- as.character(factor_rtns$sFactorName)
+  factor_rtns$dtDateTime  <- as.Date(factor_rtns$dtDateTime)
+  factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent
+  colnames(factor_rtns) <- c('FactorName','Date','Return')
+
   return(get_factor_returns(start,end,sectors))
 }
 
