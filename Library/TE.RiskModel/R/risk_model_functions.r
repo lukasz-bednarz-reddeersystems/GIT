@@ -109,9 +109,6 @@ get_risk_factor_returns <- function(start,end){
   factor_rtns$dtDateTime  <- as.Date(factor_rtns$dtDateTime)
   factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent/100
   colnames(factor_rtns) <- c('FactorName','Date','Return')
-
-
-  factor_rtns <- get_factor_returns(start,end,factors)
   factor_rtns$FactorName <- substr(factor_rtns$FactorName,2,nchar(factor_rtns$FactorName))
   return(factor_rtns)
 }
@@ -129,7 +126,7 @@ get_sector_returns <- function(start,end){
   factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent
   colnames(factor_rtns) <- c('FactorName','Date','Return')
 
-  return(get_factor_returns(start,end,sectors))
+  return(factor_rtns)
 }
 
 get_FX <- function(start,end){

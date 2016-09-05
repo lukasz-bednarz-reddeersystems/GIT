@@ -6,12 +6,13 @@
 
 #' Virtual S4 class for handling Risk Model Properties.
 #'
-#' Inherits from "VirtualReferenceObject"
 #'
 #' @slot model_prefix    "character"
 #' @slot lookback        "integer"
 #' @slot model_universe  "character"
 #' @slot model_factors   "character"
+#'
+#' @export
 
 setClass(
   Class     = "VirtualRiskModel",
@@ -21,7 +22,7 @@ setClass(
     model_universe  = "character",
     model_factors   = "character"
   ),
-  contains  = c("VirtualReferenceObject", "VIRTUAL")
+  contains  = c("VIRTUAL")
 )
 
 

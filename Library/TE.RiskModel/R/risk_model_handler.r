@@ -16,6 +16,8 @@ NULL
 #' Inherits from "VirtualReferenceObject"
 #'
 #' @slot risk_model    "VirtualRiskModel", default is "RiskModel.DevelopedEuropePrototype150"
+#'
+#' @export
 
 setClass(
   Class     = "VirtualRiskModelHandler",
