@@ -1,5 +1,5 @@
 #' @include datasource_client.r
-#' @include risk_model_handler.r
+#' @include risk_model_component.r
 NULL
 
 #########################################
@@ -32,9 +32,33 @@ setClass(
     key_cols        = risk_model_objectstore_keys,
     key_values      = data.frame(Date = as.Date(character()))
   ),
-  contains = c("VirtualDataSourceClient","VirtualRiskModelHandler", "VIRTUAL")
+  contains = c("VirtualDataSourceClient","VirtualRiskModelFactorDependentComponent", "VIRTUAL")
 )
 
+
+
+#' initialize method for "VirtualRiskModelObjectstoreClient" derived classes
+#'
+#' initializes required column names from the values obtained from contained risk model
+#'
+#' @param .Object object of class derived from "VirtualRiskModelObjectstoreClient"
+#' @export
+
+setMethod("initialize",
+          "VirtualRiskModelObjectstoreClient",
+          function(.Object){
+
+            .Object <- callNextMethod()
+
+            # retrieve factor names from specific_risk model
+            ret_values <- getRequiredVariablesNames(.Object)
+
+
+            .Object <- .setDataSourceReturnColumnNames(.Object, ret_values)
+
+            return(.Object)
+          }
+)
 
 #' Get Risk Model Component Name
 #'

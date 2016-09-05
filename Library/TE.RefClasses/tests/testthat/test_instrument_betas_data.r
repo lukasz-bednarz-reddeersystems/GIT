@@ -9,19 +9,16 @@ context("Testing Instrument Betas Data")
 tested.class          <-  "InstrumentBetasData"
 valid.component       <- "Betas"
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
-valid.model_prefix    <- "developed_europe_prototype"
-valid.lookback        <- 150
+valid.risk_model_obj  <- new(valid.risk_model)
+valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
+valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
+valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
+
 valid.key_cols        <- c(risk_model_objectstore_keys, "InstrumentID")
-valid.values          <- c("Date", "Instrument",
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors)
-valid.required_colnms <- c('InstrumentID','Date',
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors)
+valid.values          <- c("Date", "InstrumentID",
+                           valid.model_factors)
+valid.required_colnms <- c('Date', "InstrumentID",
+                           valid.model_factors)
 
 valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
                               c("InstrumentID","Instrument"))

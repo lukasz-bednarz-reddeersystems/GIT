@@ -8,6 +8,7 @@ Description: Pakckage is implementing Reference Classes for handling,
     of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
+    TE.RiskModel (>= 0.1.0),
     TE.DataAccess (>= 0.1.0),
 License: file LICENSE
 LazyData: TRUE
@@ -39,8 +40,7 @@ Collate:
     'ppmodel_client.r'
     'trade_data.r'
     'extended_trade_data_handler.r'
-    'risk_model.r'
-    'risk_model_handler.r'
+    'risk_model_component.r'
     'risk_model_objectstore_client.r'
     'factor_correlation_data.r'
     'factor_correlation_data_handler.r'

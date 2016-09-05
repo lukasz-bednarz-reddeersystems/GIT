@@ -124,6 +124,27 @@ setMethod("getDataSourceReturnColumnNames",
           }
 )
 
+
+
+#' set column names returned by data source
+#'
+#' Private method to set column names returned by datasource
+#'
+#' @param object object of class 'VirtualDataSourceClient'.
+#' @param values "character" vector with list of returned source column names
+#' @return \code{object} object of class 'VirtualDataSourceClient'.
+
+setGeneric(".setDataSourceReturnColumnNames", function(object, values){standardGeneric(".setDataSourceReturnColumnNames")})
+setMethod(".setDataSourceReturnColumnNames",
+          signature(object = "VirtualDataSourceClient", values = "character"),
+          function(object, values) {
+              object@values <- values
+              return(object)
+
+          }
+)
+
+
 #' Get non - NA's column names
 #'
 #' Returns column names that are required to have non-na values

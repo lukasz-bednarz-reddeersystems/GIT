@@ -1,4 +1,5 @@
 #' @include referencedata.r
+#' @include risk_model_component.r
 #' @include risk_model_objectstore_client.r
 NULL
 
@@ -17,11 +18,7 @@ NULL
 setClass(
   Class                = "VirtualImpliedFactorReturnsData",
   prototype = list(
-    required_colnms = c('Date',
-                        risk_model_market_factors,
-                        risk_model_currency_factors,
-                        risk_model_commodity_factors,
-                        risk_model_sector_factors)
+    required_colnms = c('Date')
   ),
   contains = c("VirtualReferenceData", "VIRTUAL")
 )
@@ -41,11 +38,7 @@ setClass(
     component          = "ImpliedFactorReturns", # name of component
     key_cols        = c(risk_model_objectstore_keys),
     key_values      = data.frame(Date = as.Date(character())),
-    values             = c("Date",
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors), # columns that neeed to be returned from datastore
+    values             = c("Date"), # columns that neeed to be returned from datastore
     column_name_map = hash()
 
     ),
