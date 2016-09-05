@@ -7,4 +7,6 @@ R/model_data/**
 **/*.png
 **/*.wmf
 **/*.emf
+**/*.log
+**/*.sql
 .Rproj.user
