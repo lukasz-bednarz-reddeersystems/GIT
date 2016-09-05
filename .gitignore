@@ -1,4 +1,5 @@
 R/model_data/**
+R/scripts/**
 **/*.Rhistory
 **/*.RData
 **/*.docx
