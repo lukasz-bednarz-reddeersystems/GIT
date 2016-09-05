@@ -49,7 +49,9 @@ shinyUI(fluidPage(
                   selected = 1),
       # model selection
       selectInput("select_model", label = h3("Select Model"), 
-                  choices = list("Developed Europe (Prototype)" = "developed_europe_prototype"), 
+                  choices = list("Developed Europe (Prototype 1.0)" = "developed_europe_prototype",
+                                 "Developed Europe (Prototype 1.1)" = "developed_europe_prototype_1.1"
+                                 ), 
                   selected = 1),
       actionButton("update_now_button", "Update Now", icon = icon("refresh"))
       

@@ -12,27 +12,21 @@ library(lubridate)
 library(gtools)
 library(ggplot2)
 library(reshape2)
+library(TE.DataAccess)
 
-source_dir <- gsub('\\\\', '/',Sys.getenv("R_RAID_ROOT"))
-source_dir <- paste0(source_dir, '/Services/Raid.Services.TradingEnhancementEngine/R/MBAMsupport/')
-
-setwd(source_dir)
-
-sourceTo("risk_model_update_functions.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("risk_model_load.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../risk_model_app/RiskModelUpdater/latest_model_date.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../risk_model_app/RiskModelUpdater/status_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../risk_model_app/RiskModelUpdater/auto_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../risk_model_app/RiskModelUpdater/latest_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("latest_model_date.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("status_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("auto_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("latest_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
   log <- file("RiskModelUpdater.log", "w")
-  
+
   sink(file = log, type = "message")
   sink(file = log, type = "output")
-  
+  # 
   values <- reactiveValues()
   values$model_date <- today() -1
   values$model_name <- ""
@@ -120,7 +114,7 @@ shinyServer(function(input, output, session) {
   # observer to trigger loading of model data and reading latest computeddate of the model
   # when model name or lookback dropdown is picked
   observe({
-    values$lookback <- as.numeric(input$select_lookback[[1]])
+    values$lookback <- as.integer(input$select_lookback[[1]])
     values$model_name <- input$select_model[[1]]
     values$status_message <-   "Loading latest model info ..."
     values$trigger_load <- TRUE
