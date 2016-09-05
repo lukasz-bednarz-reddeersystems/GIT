@@ -3,14 +3,14 @@
 \docType{methods}
 \name{getMostRecentRiskModelDate}
 \alias{getMostRecentRiskModelDate}
-\alias{getMostRecentRiskModelDate,DailyRiskModelObjectStore,character,integer-method}
+\alias{getMostRecentRiskModelDate,DailyRiskModelObjectStore,character,integer,NullableDate-method}
 \title{Get most recent risk model date stored in object}
 \usage{
-getMostRecentRiskModelDate(object, name, lookback = 150L)
+getMostRecentRiskModelDate(object, name, lookback = 150L, date = NULL)
 
 
-  \S4method{getMostRecentRiskModelDate}{DailyRiskModelObjectStore,character,integer}(object,
-  name, lookback = 150)
+  \S4method{getMostRecentRiskModelDate}{DailyRiskModelObjectStore,character,integer,NullableDate}(object,
+  name, lookback = 150, date = NULL)
 }
 \arguments{
 \item{object}{object of class "DailyRiskModelObjectStore"}
@@ -18,6 +18,10 @@ getMostRecentRiskModelDate(object, name, lookback = 150L)
 \item{name}{"character" name of the model eg: "developed_europe_prototype"}
 
 \item{lookback}{"integer" number of lookback horizon of the model}
+
+\item{date}{"Date" the latest date for which we should look.
+Method will return latest model date not later than this parameter if not NULL.
+This is provided to be able to query gaps in model dates.}
 }
 \value{
 \code{date} "Date" date of the most recent risk model.
@@ -29,6 +33,6 @@ Get most recent risk model date stored in object
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{object = DailyRiskModelObjectStore,name = character,lookback = integer}: Get most recent risk model date stored in object
+\item \code{object = DailyRiskModelObjectStore,name = character,lookback = integer,date = NullableDate}: Get most recent risk model date stored in object
 }}
 

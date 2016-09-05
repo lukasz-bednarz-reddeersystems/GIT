@@ -91,7 +91,6 @@ setMethod("generateRiskModelKey","DailyRiskModelObjectStore",
 #' @param name "character" name of objectstore
 #' @param lookback "integer" lookback value for model
 #' @param component "character" name of the risk model component
-#' @return \code{rm} "DataSet" object with component if present otherwise NULL
 #'
 #' @export
 setGeneric("queryDailyRiskModelObjectStore",function(object,name,lookback,component){standardGeneric("queryDailyRiskModelObjectStore")})
@@ -124,7 +123,30 @@ setMethod("queryDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  }
 )
 
+
+#' Push component into risk model objectsotre
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param data "data.frame" with data that will be appended to existing data
+#' @param name "character" name of objectstore
+#' @param lookback "integer" lookback value for model
+#' @param component "character" name of the component of the risk model, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param force "logical" if TRUE the existing values will be replaced if the same
+#'
+#' @export
+
 setGeneric("pushRiskModelComponent",function(object,data,name,lookback,component,force=FALSE){standardGeneric("pushRiskModelComponent")})
+
+#' @describeIn pushRiskModelComponent
+#' Push component into risk model objectsotre
+#'
+#' @inheritParams pushRiskModelComponent
+#' @return \code{rm} "DataSet" object with component if present otherwise NULL
+#'
+#' @export
+
 setMethod("pushRiskModelComponent","DailyRiskModelObjectStore",
 		  function(object,data,name,lookback,component){
 			  key    <- generateRiskModelKey(object,name,lookback,component)
@@ -224,15 +246,23 @@ setMethod("getRiskModelComponentOnDate",
 		  }
 )
 
+setClassUnion("NullableDate", c("Date", "NULL", "missing"))
+
 #' Get most recent risk model date stored in object
 #'
 #' @param object object of class "DailyRiskModelObjectStore"
 #' @param name "character" name of the model eg: "developed_europe_prototype"
 #' @param lookback "integer" number of lookback horizon of the model
+#' @param date "Date" the latest date for which we should look.
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
 #'
 #' @export
 
-setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150L){standardGeneric("getMostRecentRiskModelDate")})
+setGeneric("getMostRecentRiskModelDate",function(object,
+                                                 name,
+                                                 lookback=150L,
+                                                 date = NULL){standardGeneric("getMostRecentRiskModelDate")})
 
 #' @describeIn getMostRecentRiskModelDate
 #' Get most recent risk model date stored in object
@@ -247,13 +277,21 @@ setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150L){stan
 setMethod("getMostRecentRiskModelDate",
           signature(object = "DailyRiskModelObjectStore",
                     name = "character",
-                    lookback = "integer"),
-		  function(object,name,lookback=150){
+                    lookback = "integer",
+                    date = "NullableDate"),
+		  function(object,name,lookback=150, date = NULL){
 		  	comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
 		  	if(nrow(comp@data)>0){
-		  		date <- max(comp@data$Date)
+		  	  dates <- unique(comp@data$Date)
+		  	  if (!is.null(date)) {
+		  	    dates <- dates[dates<=date]
 		  	}
-		  	else{
+		  	  if (length(dates) > 0) {
+		  		date <- max(dates)
+		  	  } else {
+		  	    date <- NULL
+		  	  }
+		  	} else {
 		  		date <- NULL
 		  	}
 		  	return(date)
@@ -265,9 +303,16 @@ setMethod("getMostRecentRiskModelDate",
 #' @param object object of class "DailyRiskModelObjectStore"
 #' @param name "character" name of the model eg: "developed_europe_prototype"
 #' @param lookback "integer" number of lookback horizon of the model
+#' @param date "Date" the latest date for which we should look.
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
+#'
 #' @export
 
-setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelBetasDate")})
+setGeneric("getMostRecentRiskModelBetasDate",function(object,
+                                                      name,
+                                                      lookback=150,
+                                                      date = NULL){standardGeneric("getMostRecentRiskModelBetasDate")})
 
 #' @describeIn getMostRecentRiskModelBetasDate
 #' Get most recent betas date stored in object
@@ -278,22 +323,54 @@ setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150){
 #' or only components that are not model specific are stored.
 #'
 #' @export
-setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
-          function(object,name,lookback=150){
+setMethod("getMostRecentRiskModelBetasDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer",
+                    date = "NullableDate"),
+          function(object,name,lookback=150, date = NULL){
             comp <- queryDailyRiskModelObjectStore(object,name,lookback,'Betas')
             if(nrow(comp@data)>0){
-              date <- max(comp@data$Date)
+              dates <- unique(comp@data$Date)
+              if (!is.null(date)) {
+                dates <- dates[dates<=date]
             }
-            else{
+              if (length(dates) > 0) {
+                date <- max(dates)
+              } else {
+                date <- NULL
+              }
+            } else {
               date <- NULL
             }
             return(date)
           }
 )
 
+#' Reinitialize components to empty datasets
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model, defaults to 150
+#' @param components "character" name of the components of the risk model to be
+#' re-initialized, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#'
+#' @export
 
-setGeneric("reInitializeRiskModelComponents",function(object, name, lookback = 150,
-                                           components = NULL){standardGeneric("reInitializeRiskModelComponents")})
+setGeneric("reInitializeRiskModelComponents",function(object,
+                                                      name,
+                                                      lookback = 150,
+                                                      components = NULL){standardGeneric("reInitializeRiskModelComponents")})
+
+#' @describeIn reInitializeRiskModelComponents
+#' Reinitialize components to empty datasets
+#'
+#' @inheritParams reInitializeRiskModelComponents
+#' @return \code{object} object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("reInitializeRiskModelComponents",
           signature(object = "DailyRiskModelObjectStore", name = "character", lookback = "integer"),
           function(object, name, lookback = 150, components = NULL){
@@ -402,6 +479,16 @@ setMethod("copyRiskModelHistory",
             return(object)
           })
 
+#' Risk Model Objectstore factory
+#'
+#' Factory to create Risk Model Objectstore objects and load data if
+#' stored in file
+#'
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model, defaults to 150
+#' @return \code{rmstr} object of class "DailyRiskModelObjectstore"
+#'
+#' @export
 
 risk_model_objectstore_factory <- function(name,lookback=150){
 	message("Initialising risk model store...")

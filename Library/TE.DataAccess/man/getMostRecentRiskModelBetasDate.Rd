@@ -3,13 +3,14 @@
 \docType{methods}
 \name{getMostRecentRiskModelBetasDate}
 \alias{getMostRecentRiskModelBetasDate}
-\alias{getMostRecentRiskModelBetasDate,DailyRiskModelObjectStore-method}
+\alias{getMostRecentRiskModelBetasDate,DailyRiskModelObjectStore,character,integer,NullableDate-method}
 \title{Get most recent betas date stored in object}
 \usage{
-getMostRecentRiskModelBetasDate(object, name, lookback = 150)
+getMostRecentRiskModelBetasDate(object, name, lookback = 150, date = NULL)
 
-\S4method{getMostRecentRiskModelBetasDate}{DailyRiskModelObjectStore}(object,
-  name, lookback = 150)
+
+  \S4method{getMostRecentRiskModelBetasDate}{DailyRiskModelObjectStore,character,integer,NullableDate}(object,
+  name, lookback = 150, date = NULL)
 }
 \arguments{
 \item{object}{object of class "DailyRiskModelObjectStore"}
@@ -17,6 +18,10 @@ getMostRecentRiskModelBetasDate(object, name, lookback = 150)
 \item{name}{"character" name of the model eg: "developed_europe_prototype"}
 
 \item{lookback}{"integer" number of lookback horizon of the model}
+
+\item{date}{"Date" the latest date for which we should look.
+Method will return latest model date not later than this parameter if not NULL.
+This is provided to be able to query gaps in model dates.}
 }
 \value{
 \code{date} "Date" date of the most recent betas and factor variances.
@@ -28,6 +33,6 @@ Get most recent betas date stored in object
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{DailyRiskModelObjectStore}: Get most recent betas date stored in object
+\item \code{object = DailyRiskModelObjectStore,name = character,lookback = integer,date = NullableDate}: Get most recent betas date stored in object
 }}
 
