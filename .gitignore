@@ -10,4 +10,5 @@ R/scripts/**
 **/*.emf
 **/*.log
 **/*.sql
+**/*.RDS
 .Rproj.user
