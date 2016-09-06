@@ -180,7 +180,8 @@ setMethod("dataRequest",
                 first <- FALSE
               }
               else {
-                ret_data <- rbind(ret_data, query_data)
+                
+                ret_data <- rbind(ret_data, query_data[!(query_data$Date %in% unique(ret_data$Date)), ])
               }
 
             }
