@@ -11,4 +11,5 @@ R/scripts/**
 **/*.log
 **/*.sql
 **/*.RDS
+**/*.pdf
 .Rproj.user

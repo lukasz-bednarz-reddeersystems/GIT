@@ -88,7 +88,7 @@ setMethod("setRiskModelObject",
           signature(object = "PortfolioFactorReturnsAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
-            object <- TE.RefClasses:::.setRiskModelObject(object, risk_model)
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
             return(object)
           }
 )
@@ -180,7 +180,7 @@ setMethod("dataRequest",
 
             if (getStoredNRows(betas_data) == 0) {
               # important step to copy risk_model info
-              betas_data <- TE.RefClasses:::.setRiskModelObject(betas_data, risk_model)
+              betas_data <- TE.RiskModel:::.setRiskModelObject(betas_data, risk_model)
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)
@@ -197,7 +197,7 @@ setMethod("dataRequest",
             # getting Implied Factor Returns data
             factor_ret <- getImpliedFactorReturnsDataObject(object)
             # important step to copy risk_model info
-            factor_ret <- TE.RefClasses:::.setRiskModelObject(factor_ret, risk_model)
+            factor_ret <- TE.RiskModel:::.setRiskModelObject(factor_ret, risk_model)
 
             query_keys <- unique(query_keys["Date"])
             factor_ret <- tryCatch({
@@ -258,7 +258,13 @@ setMethod("Process",
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
 
-                  market_ret <- portfolio_returns_decomposition(wt,bt,fct_ir)
+                  market_ret <- tryCatch({
+                    portfolio_returns_decomposition(wt,bt,fct_ir)
+                  }, error = function(cond){
+                    message(sprintf("Error when calculating portfolio returns  decomposition for day : %s",
+                                    rm_date))
+                    browser()
+                  })
                   total_sys_ret <- sum(market_ret)
                   factor_ret <- sum(market_ret[portfolio_decomposition_market_factors,])
                   currency_ret <- sum(market_ret[portfolio_decomposition_currency_factors,])

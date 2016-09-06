@@ -78,7 +78,7 @@ setMethod("setRiskModelObject",
           signature(object = "PortfolioFactorExposuresAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
-            object <- TE.RefClasses:::.setRiskModelObject(object, risk_model)
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
             return(object)
           }
 )
@@ -164,7 +164,7 @@ setMethod("dataRequest",
 
             if (getStoredNRows(betas_data) == 0) {
               # important step to copy risk_model info
-              betas_data <- TE.RefClasses:::.setRiskModelObject(betas_data, risk_model)
+              betas_data <- TE.RiskModel:::.setRiskModelObject(betas_data, risk_model)
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)

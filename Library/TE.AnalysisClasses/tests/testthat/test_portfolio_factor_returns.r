@@ -235,7 +235,7 @@ test_that(paste("Can Process() on", tested.class), {
   expect_is(getOutputGGPlotData(object), "data.frame")
 
   output <- getOutputObject(object)
-  expect_is(output, "PortfolioVarianceFactorDecompositionData")
+  expect_is(output, "PortfolioFactorReturnsData")
   expect_gt(getStoredNRows(output), 0)
 
 })

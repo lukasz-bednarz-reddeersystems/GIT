@@ -74,7 +74,7 @@ test_that("Can dataRequest() with valid key_values and no previous data set", {
   # market style data verification
   market_data <- getMarketStyleDataObject(object)
   expect_is(market_data, "MarketStyleData")
-  expect_equal(getStoredNRows(market_data), 0)
+  expect_gt(getStoredNRows(market_data), 0)
 
 
 
