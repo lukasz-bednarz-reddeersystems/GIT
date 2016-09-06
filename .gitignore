@@ -12,4 +12,5 @@ R/scripts/**
 **/*.sql
 **/*.RDS
 **/*.pdf
+**/*.bak
 .Rproj.user
