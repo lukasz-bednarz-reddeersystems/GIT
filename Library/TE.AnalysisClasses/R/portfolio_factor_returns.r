@@ -263,7 +263,8 @@ setMethod("Process",
                   }, error = function(cond){
                     message(sprintf("Error when calculating portfolio returns  decomposition for day : %s",
                                     rm_date))
-                    browser()
+                    stop(sprintf("Error when calculating portfolio returns  decomposition for day : %s, error: %s.",
+                                 rm_date, cond))
                   })
                   total_sys_ret <- sum(market_ret)
                   factor_ret <- sum(market_ret[portfolio_decomposition_market_factors,])
