@@ -298,6 +298,52 @@ setMethod("getMostRecentRiskModelDate",
 		  }
 )
 
+
+#' Get earliest risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
+#'
+#' @export
+
+setGeneric("getEarliestRiskModelDate",function(object,
+                                                 name,
+                                                 lookback=150L){standardGeneric("getEarliestRiskModelDate")})
+
+#' @describeIn getEarliestRiskModelDate
+#' Get earliest risk model date stored in object
+#'
+#' @inheritParams getEarliestRiskModelDate
+#' @return \code{date} "Date" date of the most recent risk model.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
+
+setMethod("getEarliestRiskModelDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer"),
+          function(object,name,lookback=150){
+            comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
+            if(nrow(comp@data)>0){
+              dates <- unique(comp@data$Date)
+              if (length(dates) > 0) {
+                date <- min(dates)
+              } else {
+                date <- NULL
+              }
+            } else {
+              date <- NULL
+            }
+            return(date)
+          }
+)
+
+
 #' Get most recent betas date stored in object
 #'
 #' @param object object of class "DailyRiskModelObjectStore"
@@ -571,6 +617,46 @@ get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lo
       rmstr <- loadObject(rmstr)
       rmstr@risk_model_q <- getFromObjectStore(rmstr,getRiskModelQueryID(rmstr))
       rm_date_last <- getMostRecentRiskModelDate(rmstr,rm_name,lookback)
+
+      if (length(rm_date_last)==0) {
+        next()
+      } else {
+        retv <- rmstr
+        break()
+      }
+    }
+  }
+
+  return(retv)
+
+}
+
+
+#' Get earliest risk model store
+#'
+#' Finds earliest risk model objectstore containg model
+#' on querried date or earlier
+#'
+#' @param model_prefix character
+#' @param lookback integer lookback of model in days
+#' @return \code{rm_str} if risk model objectstore found returns
+#' object of class "DailyRiskModelObjectStore" otherwise NULL
+#' @export
+get_earliest_model_objectstore <- function(model_prefix, lookback = 150) {
+
+  months <- sort(format(seq(from = today(), by = "-1 month", length.out = 150),'%Y-%m' ))
+  retv <- NULL
+
+  for (month in months) {
+    rm_name  <- paste(model_prefix,month,sep="_")
+    rmstr <- new("DailyRiskModelObjectStore",id=rm_name)
+    pth <- getPath(rmstr)
+
+    if(file.exists(pth) ){
+      message(paste("Found risk model store at",pth))
+      rmstr <- loadObject(rmstr)
+      rmstr@risk_model_q <- getFromObjectStore(rmstr,getRiskModelQueryID(rmstr))
+      rm_date_last <- getEarliestRiskModelDate(rmstr,rm_name,lookback)
 
       if (length(rm_date_last)==0) {
         next()
