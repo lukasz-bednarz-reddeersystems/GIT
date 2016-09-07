@@ -233,15 +233,26 @@ setMethod("getRiskModelComponentOnDate",
                     lookback = "integer"),
 		  function(object,name,component,date,lookback=150){
 		    risk_comp <- queryDailyRiskModelObjectStore(object,name,lookback,component)
-		  	if(component%in%c('ImpliedFactorReturns','ResidualReturns','Betas')){
-		  		rdata <- risk_comp@data[risk_comp@data$Date>=(as.Date(date)-lookback)&risk_comp@data$Date<=as.Date(date),]
-		  	}
-		  	else{
-		  		rdata <- risk_comp@data[risk_comp@data$Date==as.Date(date),]
-		  	}
-		  	if(nrow(rdata)==0){
-		  		message(paste("No risk model data found for component",component,'on date',date))
-		  	}
+
+		    if(is.null(risk_comp)){
+		      message(paste("No risk model data found for component",component))
+		      message(paste("Looks like remote store", name, "is not initialized."))
+          object <- reInitializeRiskModelComponents(object, name, lookback, component)
+          risk_comp <- queryDailyRiskModelObjectStore(object,name,lookback,component)
+          rdata <- risk_comp@data
+		    }
+		    else {
+  		  	if(component%in%c('ImpliedFactorReturns','ResidualReturns','Betas')){
+  		  		rdata <- risk_comp@data[risk_comp@data$Date>=(as.Date(date)-lookback)&risk_comp@data$Date<=as.Date(date),]
+  		  	}
+  		  	else{
+  		  		rdata <- risk_comp@data[risk_comp@data$Date==as.Date(date),]
+  		  	}
+  		  	if(nrow(rdata)==0){
+  		  		message(paste("No risk model data found for component",component,'on date',date))
+  		  	}
+		    }
+
 		  	return(rdata)
 		  }
 )
