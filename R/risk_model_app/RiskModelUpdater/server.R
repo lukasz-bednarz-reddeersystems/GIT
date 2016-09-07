@@ -91,6 +91,7 @@ shinyServer(function(input, output, session) {
       values$latest_update_message <-  paste("Model Update last run on  ", now())
       values$trigger_load <- TRUE
       values$trigger_update <- FALSE
+      values$trigger_build <- FALSE
 
     }
   })
