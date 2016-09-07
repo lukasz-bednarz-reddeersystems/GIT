@@ -13,44 +13,46 @@ library(gtools)
 library(ggplot2)
 library(reshape2)
 library(TE.DataAccess)
+library(TE.RiskModel)
 
-sourceTo("latest_model_date.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("status_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("auto_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("latest_update_info.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+source("latest_model_date.r")
+source("status_info.r")
+source("auto_update_info.r")
+source("latest_update_info.r")
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output, session) {
   
-  log <- file("RiskModelUpdater.log", "w")
-
-  sink(file = log, type = "message")
-  sink(file = log, type = "output")
+  # filepath <- file.path(Sys.getenv("TEMP"), "RiskModelUpdater.log")
+  # 
+  # log <- file(filepath, "w")
+  # 
+  # sink(file = log, type = "message")
+  # sink(file = log, type = "output")
   # 
   values <- reactiveValues()
   values$model_date <- today() -1
+  values$model_start_date <- NULL
+  values$risk_model <- new("RiskModel.DevelopedEuropePrototype150")
   values$model_name <- ""
   values$rmstr_name <- ""
-  values$lookback <- ""
   values$trigger_update <- FALSE
+  values$trigger_build <- FALSE
   values$trigger_load <- FALSE
   values$render_plot <- FALSE
+  values$wake_up_timed_observer <- FALSE
   values$status_message <- "Welcome..."
   values$latest_update_message <- paste("No update since last launch on", now())
   values$auto_update_message <- "No auto update info"
-  # values$progress <- shiny::Progress$new(session, min = 0, max = 100)
-  # on.exit(values$progress$close())
-  
+
   # event observer to trigger computation
   observe({
     
     if (!values$trigger_update) {
       return()
     } else {
-      # update model
       
-      model_name <- isolate(values$model_name)
-      lookback <- isolate(values$lookback)
+      # update model
       model_date <- isolate(values$model_date)
       update_date <- today() -1
       while((wday(update_date) %in% c(7,1))) {
@@ -58,11 +60,38 @@ shinyServer(function(input, output, session) {
       }
       
       if (update_date > model_date) {
-        update_risk_model_on_date(model_name, as.Date(update_date), lookback, FALSE, TRUE)
+        
+        risk_model <- isolate(values$risk_model)
+        model_builder <- new("RiskModelBuilder", risk_model = risk_model)
+        
+        updateRiskModelOnDate(model_builder, as.Date(update_date), FALSE, TRUE)
+        
         values$latest_update_message <-  paste("Model Update last run on  ", now())
         values$trigger_load <- TRUE
         values$trigger_update <- FALSE
       }
+    }
+  })
+  
+  # event observer to trigger build
+  observe({
+    
+    if (!values$trigger_build) {
+      return()
+    } else {
+      # build model
+      
+      risk_model <- isolate(values$risk_model)
+      
+      model_builder <- new("RiskModelBuilder", risk_model = risk_model)
+      
+      dates <- isolate(input$date_range)
+
+      buildRiskModelForDateRange  (model_builder, dates[1], dates[2])
+      values$latest_update_message <-  paste("Model Update last run on  ", now())
+      values$trigger_load <- TRUE
+      values$trigger_update <- FALSE
+
     }
   })
   
@@ -103,7 +132,6 @@ shinyServer(function(input, output, session) {
       # isolate(values$progress$set(message = "Model Load finished.. ", value =  0.8))
       
       values$status_message <- paste("Latest module loaded : ", getID(isolate(values$rmstr)))
-      values$render_plot <- TRUE
       values$trigger_load <- FALSE
       isolate(values$timed_observer$resume())
       
@@ -114,8 +142,8 @@ shinyServer(function(input, output, session) {
   # observer to trigger loading of model data and reading latest computeddate of the model
   # when model name or lookback dropdown is picked
   observe({
-    values$lookback <- as.integer(input$select_lookback[[1]])
-    values$model_name <- input$select_model[[1]]
+    values$risk_model <- new(input$select_model[[1]])
+    values$model_name <- getRiskModelPrefix(values$risk_model)
     values$status_message <-   "Loading latest model info ..."
     values$trigger_load <- TRUE
     
@@ -131,7 +159,8 @@ shinyServer(function(input, output, session) {
       
       
       output$MarketStyle <- renderPlot({
-        lookback <- isolate(values$lookback)
+        risk_model <- isolate(values$risk_model)
+        lookback <- getRiskModelLookback(risk_model)
         rmstr_name <- isolate(values$rmstr_name)
         date <- isolate(values$model_date)
         market <- getRiskModelComponentOnDate(isolate(values$rmstr), rmstr_name, 'MarketStyle', date,  lookback)
@@ -165,10 +194,38 @@ shinyServer(function(input, output, session) {
   })
   
   
+  # observer to kick off build when the update button is pressed
+  observeEvent(input$build_now_button,{
+    
+    dates <- as.Date(isolate(input$date_range))
+    
+    if (is.null(dates[2])) {
+      dates[2] <- today() -1
+    }
+    
+    if (is.null(dates[1])) {
+      # setting start date to end of previous month
+      dates[1] <- dates[2]
+      day(dates[1]) <- 1
+      dates[1] <- dates[1] -1
+    }
+    
+    values$latest_update_message <- paste("Building Model started at ", now())
+    values$trigger_build <- TRUE
+
+  })
+  
+  
   # observer to periodicaly check if latest model has computed
   values$timed_observer <- observe({
+    
+    
     # check every 4  hours
-    model_date <- isolate(as.Date(values$model_date))
+    model_date <- tryCatch({
+      as.Date(values$model_date)
+    }, error = function(cond){
+      today() -1
+    })
     
     update_date <- ymd(model_date) + 1
     
