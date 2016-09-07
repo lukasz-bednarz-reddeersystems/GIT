@@ -118,7 +118,7 @@ setMethod("buildRiskModelForDateRange",
 
             for (date in dates) {
 
-              update_risk_model_on_date(risk_model, as.Date(date), force, copy_history)
+              update_risk_model_on_date(risk_model, as_date(date), force, copy_history)
               force <- !force
               if (first) {
                 first <- FALSE

@@ -404,7 +404,7 @@ query_existing_data <- function(table_name, unique_keys){
   for (col in colnames(unique_keys)) {
     val <- unique_keys[1, col]
     if (is.Date(val)) {
-      val <- as.Date(val)
+      val <- as_date(val)
     }
 
     if (next_statement) {
@@ -461,7 +461,7 @@ bulk_load_data <- function(table_name, data, unique_keys, index_key_names) {
   for (col in colnames(unique_keys)) {
     val <- unique_keys[col][1]
     if (is.Date(val)) {
-      val <- as.Date(val)
+      val <- as_date(val)
     }
 
     filename <- paste(filename, col , val[1,1], sep = "_")
@@ -532,7 +532,7 @@ bulk_load_factor_betas <- function(betas, rm_type){
     insert_data <- insert_data[,col_names]
     index_key_names <- c("lModelTypeID", "dtDate", "lInstrumentID", "lFactorID" )
 
-    bulk_load_data(table_name, insert_data, data.frame(lModelTypeID = rm_type, dtDate = as.Date(date)), index_key_names )
+    bulk_load_data(table_name, insert_data, data.frame(lModelTypeID = rm_type, dtDate = as_date(date)), index_key_names )
 
   }
 
@@ -576,7 +576,7 @@ bulk_load_implied_factor_returns <- function(returns, rm_type){
     }
 
     index_key_names <- c("lModelTypeID", "dtDate", "lFactorID" )
-    bulk_load_data(table_name, data, data.frame(dtDate = as.Date(date)), index_key_names )
+    bulk_load_data(table_name, data, data.frame(dtDate = as_date(date)), index_key_names )
   }
 }
 

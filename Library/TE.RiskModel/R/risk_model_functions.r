@@ -13,7 +13,9 @@ declare_local_cluster <- function(ncores){
 
 prepare_cluster <- function(cl){
   clusterEvalQ(cl,library(functional))
-  clusterExport(cl,list('omit_value','rgr_kernel','instrument_regression', 'instrument_regression_on_cluster'))
+  clusterExport(cl,
+                list('omit_value','rgr_kernel','instrument_regression'),
+                envir  = as.environment("package:TE.RiskModel"))
   return(cl)
 }
 
@@ -220,15 +222,30 @@ pivot_frame <- function(frame,pivot_on,value_col,date_col){
   return(rval)
 }
 
-#function to remove values that disrupt regression
+#' Remove values that disrupt regression
+#'
+#' Clears array from NA's, INF's and NAN's
+#'
+#' @param values_arr array of values to be cleared
+#' @return \code{values_arr} cleared array
+#'
+#' @export
 omit_value <- function(values_arr){
   values_arr <- unlist(values_arr)
   return(is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr))
 }
 
-#function to apply regression, but also to remove values that
-#will cause regression to fail.
-#using lm.fit because it is faster
+#' kernel function to run regression
+#'
+#' function to apply regression, but also to remove values that
+#' will cause regression to fail.
+#' using lm.fit because it is faster
+#'
+#' @param xi array with x values
+#' @param data array with values to be regressed
+#' @return \code{rval} list with components returned by lm.fit
+#'
+#' @export
 rgr_kernel <- function(xi,data){
   omit_rows <- omit_value(xi)|omit_value(data$Return)
   rval <- tryCatch({
@@ -239,7 +256,15 @@ rgr_kernel <- function(xi,data){
   return(rval)
 }
 
-#perform regressions for one instrument
+#' Perform regressions for one instrument
+#'
+#' function to apply regression for all factors
+#'
+#' @param ins "integer" instrument id
+#' @param all_data "data.frame" with all instruments returns
+#' @return \code{rval} "data.frame" with all instruments betas in columns named after factor names
+#'
+#' @export
 instrument_regression <- function(ins,all_data){
     data <- all_data[all_data$Instrument==ins,]
     data <- data[setdiff(colnames(data),'Date')]

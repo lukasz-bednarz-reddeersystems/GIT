@@ -31,7 +31,7 @@ update_risk_model_on_date <- function(risk_model,date, force = FALSE, copy_histo
     # object store exists for given month, possibly has betas and other calculations in it and
     # there is history of valid model in previous file that needs to be copied
     rmstr_previous <- get_most_recent_model_objectstore(model_prefix, date %m-% months(1))
-    rmstr_current <- reInitializeRiskModelComponents(rmstr_current,name ,lookback = 150, components = setdiff(getRiskModelComponents(rmstr_current), 'Betas'))
+    rmstr_current <- reInitializeRiskModelComponents(rmstr_current,name ,lookback, components = setdiff(getRiskModelComponents(rmstr_current), 'Betas'))
 
     if (!is.null(rmstr_curr_last_betas_date)) {
       # do not copy betas
@@ -49,7 +49,7 @@ update_risk_model_on_date <- function(risk_model,date, force = FALSE, copy_histo
   } else if (force) {
     # object store exists for given month and has betas and risk model that needs update
     # all calculations apart of betas have to be redone also for lookback history
-    rmstr_current <- reInitializeRiskModelComponents(rmstr_current,name ,lookback = 150, components = setdiff(getRiskModelComponents(rmstr_current), 'Betas'))
+    rmstr_current <- reInitializeRiskModelComponents(rmstr_current,name ,lookback, setdiff(getRiskModelComponents(rmstr_current), 'Betas'))
     rm_date_start = date - lookback
   } else if (!is.null(rmstr_curr_last_rm_date)) {
 
@@ -114,10 +114,10 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
 
   for (day in days) {
 
-    day <- as.Date(day)
+    day <- as_date(day)
 
-    insert_model_definition(as.Date(day), today(), lookback, model_prefix)
-    model_id <- query_model_id(rm_type, as.Date(day), today() )
+    insert_model_definition(as_date(day), today(), lookback, model_prefix)
+    model_id <- query_model_id(rm_type, as_date(day), today() )
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorVariance', day, lookback)
     bulk_load_factor_variances(data, model_id)
@@ -214,12 +214,10 @@ compute_risk_model_on_dates <- function(risk_model,
 
     if (betas_date_start <= rm_date_end ) {
       lback   <- ymd(min(calculate_betas_on)) %m-% days(lookback-1)
-      all_fct <- get_risk_factor_returns(as.Date(lback),rm_date_end)
-      all_fct <- pivot_frame(all_fct,'FactorName','Return','Date')
-      all_fx  <- get_FX_returns(as.Date(lback),rm_date_end)
-      all_oil <- get_commodity_returns(as.Date(lback),rm_date_end)
-      all_sct <- unique(get_sector_returns(as.Date(lback),rm_date_end))
-      all_sct <- pivot_frame(all_sct,'FactorName','Return','Date')
+      all_fct <- getRiskModelMarketFactorReturns(risk_model, as.Date(lback),rm_date_end)
+      all_fx  <- getRiskModelCurrencyFactorReturns(risk_model, as.Date(lback),rm_date_end)
+      all_oil <- getRiskModelCommodityFactorReturns(risk_model, as.Date(lback),rm_date_end)
+      all_sct <- getRiskModelSectorFactorReturns(risk_model,as.Date(lback),rm_date_end)
     }
 
   } else {

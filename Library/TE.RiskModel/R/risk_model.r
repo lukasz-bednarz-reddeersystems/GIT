@@ -97,7 +97,7 @@ setClass(
     beta_estimator  = "VirtualBetaEstimator"
   ),
   prototype = list(
-    beta_model      = new("BetaEstimator.OLS")
+    beta_estimator  = new("BetaEstimator.OLS")
   ),
   contains  = c("VIRTUAL")
 )
@@ -609,11 +609,11 @@ setClass(
   contains  = c("VirtualRiskModel", "VIRTUAL")
 )
 
-####################################
+#############################################
 #
 # RiskModel.DevelopedEuropePrototype150 Class
 #
-####################################
+############################################
 
 #' Concrete S4 class for Developed Europe Risk Model.
 #'
