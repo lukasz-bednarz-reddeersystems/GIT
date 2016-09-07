@@ -62,6 +62,85 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_equal(getRiskModelSectorFactorNames(object), valid.risk_model_sector_factors)
 })
 
+test_that(paste("Can use getRiskModeCommodityFactorReturns() of ",
+                tested.class, "object"), {
+
+  date_start <- as.Date("2016-06-01")
+  date_end   <- as.Date("2016-06-30")
+
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+
+  factors <- getRiskModelCommodityFactorNames(object)
+  ret <- getRiskModelCommodityFactorReturns(object, date_start, date_end)
+
+  expect_is(ret, "data.frame")
+  expect_gt(nrow(ret), 0)
+  expect_true(setequal(intersect(colnames(ret), factors),factors))
+
+})
+
+test_that(paste("Can use getRiskModeCurrencyFactorReturns() of ",
+                tested.class, "object"), {
+
+  date_start <- as.Date("2016-06-01")
+  date_end   <- as.Date("2016-06-30")
+
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+
+  factors <- getRiskModelCurrencyFactorNames(object)
+  ret <- getRiskModelCurrencyFactorReturns(object, date_start, date_end)
+
+  expect_is(ret, "data.frame")
+  expect_gt(nrow(ret), 0)
+  expect_true(setequal(intersect(colnames(ret), factors),factors))
+
+})
+
+
+test_that(paste("Can use getRiskModeMarketFactorReturns() of ",
+                tested.class, "object"), {
+
+  date_start <- as.Date("2016-06-01")
+  date_end   <- as.Date("2016-06-30")
+
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+
+  factors <- getRiskModelMarketFactorNames(object)
+  ret <- getRiskModelMarketFactorReturns(object, date_start, date_end)
+
+  expect_is(ret, "data.frame")
+  expect_gt(nrow(ret), 0)
+  expect_true(setequal(intersect(colnames(ret), factors),factors))
+
+})
+
+
+test_that(paste("Can use getRiskModeSectorFactorReturns() of ",
+                tested.class, "object"), {
+
+  date_start <- as.Date("2016-06-01")
+  date_end   <- as.Date("2016-06-30")
+
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+
+  factors <- getRiskModelSectorFactorNames(object)
+  ret <- getRiskModelSectorFactorReturns(object, date_start, date_end)
+
+  expect_is(ret, "data.frame")
+  expect_gt(nrow(ret), 0)
+  expect_true(setequal(intersect(colnames(ret), factors),factors))
+
+})
+
+
 ##############################################
 #
 # RiskModel.DevelopedEuropePrototype150.1.1 Tests

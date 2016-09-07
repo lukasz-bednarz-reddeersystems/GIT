@@ -386,6 +386,166 @@ setMethod("getRiskModelMarketFactorNames",
           }
 )
 
+
+#' Get Risk Model Commodity Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @param date_start "Date" start date of requested factor returns
+#' @param date_end "Date" end date of requested factor returns
+#' @export
+
+setGeneric("getRiskModelCommodityFactorReturns", function(object,
+                                                          date_start,
+                                                          date_end
+                                                          ){standardGeneric("getRiskModelCommodityFactorReturns")})
+
+#' @describeIn getRiskModelCommodityFactorReturns
+#' Get Risk Model Commodity Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @inheritParams getRiskModelCommodityFactorReturns
+#' @return \code{fct_returns} 'data.frame' with "Date" "FactorName" and "Return" columns
+#' @export
+setMethod("getRiskModelCommodityFactorReturns",
+          signature(object = "VirtualRiskModel",
+                    date_start = "Date",
+                    date_end   = "Date"),
+          function(object, date_start, date_end){
+
+            factors <- getRiskModelCommodityFactorNames(object)
+
+            fct_returns <- get_commodity_returns(date_start,date_end)
+
+            fct_returns <- fct_returns[c("Date", factors)]
+
+            return(fct_returns)
+          }
+)
+
+
+#' Get Risk Model Currency Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @param date_start "Date" start date of requested factor returns
+#' @param date_end "Date" end date of requested factor returns
+#' @export
+
+setGeneric("getRiskModelCurrencyFactorReturns", function(object,
+                                                          date_start,
+                                                          date_end
+){standardGeneric("getRiskModelCurrencyFactorReturns")})
+
+#' @describeIn getRiskModelCurrencyFactorReturns
+#' Get Risk Model Currency Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @inheritParams getRiskModelCurrencyFactorReturns
+#' @return \code{fct_returns} 'data.frame' with "Date" "FactorName" and "Return" columns
+#' @export
+setMethod("getRiskModelCurrencyFactorReturns",
+          signature(object = "VirtualRiskModel",
+                    date_start = "Date",
+                    date_end   = "Date"),
+          function(object, date_start, date_end){
+
+            factors <- getRiskModelCurrencyFactorNames(object)
+
+            fct_returns <- get_FX_returns(date_start,date_end)
+
+            fct_returns <- fct_returns[c("Date", factors)]
+
+            return(fct_returns)
+          }
+)
+
+
+#' Get Risk Model Market Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @param date_start "Date" start date of requested factor returns
+#' @param date_end "Date" end date of requested factor returns
+#' @export
+
+setGeneric("getRiskModelMarketFactorReturns", function(object,
+                                                          date_start,
+                                                          date_end
+){standardGeneric("getRiskModelMarketFactorReturns")})
+
+#' @describeIn getRiskModelMarketFactorReturns
+#' Get Risk Model Market Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @inheritParams getRiskModelMarketFactorReturns
+#' @return \code{fct_returns} 'data.frame' with "Date" "FactorName" and "Return" columns
+#' @export
+setMethod("getRiskModelMarketFactorReturns",
+          signature(object = "VirtualRiskModel",
+                    date_start = "Date",
+                    date_end   = "Date"),
+          function(object, date_start, date_end){
+
+            factors <- getRiskModelMarketFactorNames(object)
+
+            fct_returns <- get_risk_factor_returns(date_start,date_end)
+
+            fct_returns <- pivot_frame(fct_returns,'FactorName','Return','Date')
+
+            fct_returns <- fct_returns[c("Date", factors)]
+
+            return(fct_returns)
+          }
+)
+
+#' Get Risk Model Sector Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @param date_start "Date" start date of requested factor returns
+#' @param date_end "Date" end date of requested factor returns
+#' @export
+
+setGeneric("getRiskModelSectorFactorReturns", function(object,
+                                                       date_start,
+                                                       date_end
+){standardGeneric("getRiskModelSectorFactorReturns")})
+
+#' @describeIn getRiskModelSectorFactorReturns
+#' Get Risk Model Sector Factor returns
+#'
+#' Returns data.frame with daily returns of factors included in the model
+#'
+#' @inheritParams getRiskModelSectorFactorReturns
+#' @return \code{fct_returns} 'data.frame' with "Date" "FactorName" and "Return" columns
+#' @export
+setMethod("getRiskModelSectorFactorReturns",
+          signature(object = "VirtualRiskModel",
+                    date_start = "Date",
+                    date_end   = "Date"),
+          function(object, date_start, date_end){
+
+            factors <- getRiskModelSectorFactorNames(object)
+
+            fct_returns <- unique(get_sector_returns(date_start,date_end))
+
+            fct_returns <- pivot_frame(fct_returns,'FactorName','Return','Date')
+
+            fct_returns <- fct_returns[c("Date", factors)]
+
+            return(fct_returns)
+          }
+)
+
+
 ####################################
 #
 # RiskModel.DevelopedEurope Class

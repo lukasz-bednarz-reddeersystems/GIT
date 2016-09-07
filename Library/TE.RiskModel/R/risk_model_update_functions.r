@@ -146,6 +146,8 @@ get_betas_composite <- function(universe_betas){
 
     factors <- as.character(factor_info$sFactorName[factor_info$sFactorTypeName == type])
 
+    factors <- intersect(factors, colnames(universe_betas))
+
     betas_composite[[type]] <- universe_betas[c("Instrument", factors)]
 
   }
@@ -154,7 +156,11 @@ get_betas_composite <- function(universe_betas){
 }
 
 
-compute_risk_model_on_dates <- function(risk_model, rm_store, rm_date_start, date =  today() -1, force = TRUE) {
+compute_risk_model_on_dates <- function(risk_model,
+                                        rm_store,
+                                        rm_date_start,
+                                        date =  today() -1,
+                                        force = TRUE) {
 
   model_prefix <- getRiskModelPrefix(risk_model)
   lookback <- getRiskModelLookback(risk_model)
