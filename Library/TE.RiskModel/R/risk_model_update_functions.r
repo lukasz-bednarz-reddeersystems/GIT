@@ -1,14 +1,15 @@
 #' @include risk_model_load.r
 NULL
 
+.__DEFAULT_RISK_MODEL_NCORES__ <- as.integer(Sys.getenv("NUMBER_OF_PROCESSORS", 5L)) - 3L
+
 #' update missing risk model entries up to date
 #'
 #' checks existing risk model data and computes model values
 #' for entries up to specified date
 #'
-#' @param model_prefix "character" name of the model eg. "developed_europe_prototype"
+#' @param risk_model object of class "VirtualRiskModel" carrying parameters of the model
 #' @param date "Date" date of the model for which the entries should be computed
-#' @param lookback "integer" number of days over which the model is computed.
 #' These are callendar days therefore the model can actually contain less trading days.
 #' @param force "logical" should the values be replaced if already existing
 #' @param copy_history "logical" should we look for some components history in earlier
@@ -16,7 +17,10 @@ NULL
 #'
 #' @export
 
-update_risk_model_on_date <- function(model_prefix,date,lookback=150, force = FALSE, copy_history = FALSE) {
+update_risk_model_on_date <- function(risk_model,date, force = FALSE, copy_history = FALSE) {
+
+  model_prefix <- getRiskModelPrefix(risk_model)
+  lookback <- getRiskModelLookback(risk_model)
 
   name  <- paste(model_prefix,format(as.Date(date),'%Y-%m'),sep="_")
   rmstr_current <- risk_model_objectstore_factory(name,lookback)
@@ -76,15 +80,17 @@ update_risk_model_on_date <- function(model_prefix,date,lookback=150, force = FA
 
   }
 
-
-  compute_risk_model_on_dates(rmstr_current, as.Date(rm_date_start), date, lookback, force)
-  update_risk_model_db(model_prefix, rmstr_current, as.Date(rm_date_start), as.Date(date), lookback)
+  compute_risk_model_on_dates(risk_model, rmstr_current, as.Date(rm_date_start), date, force)
+  update_risk_model_db(risk_model, rmstr_current, as.Date(rm_date_start), as.Date(date))
 
   return(TRUE)
 }
 
 
-update_risk_model_db <- function(model_prefix, rmstr, date_start, date_end, lookback) {
+update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
+
+  model_prefix <- getRiskModelPrefix(risk_model)
+  lookback <- getRiskModelLookback(risk_model)
 
   # update betas and returns
   rm_type <- get_model_type_id(model_prefix, lookback)
@@ -148,7 +154,10 @@ get_betas_composite <- function(universe_betas){
 }
 
 
-compute_risk_model_on_dates <- function(rm_store, rm_date_start, date =  today() -1, lookback = 150, force = TRUE) {
+compute_risk_model_on_dates <- function(risk_model, rm_store, rm_date_start, date =  today() -1, force = TRUE) {
+
+  model_prefix <- getRiskModelPrefix(risk_model)
+  lookback <- getRiskModelLookback(risk_model)
 
   rm_name       <- getID(rm_store)
 
@@ -252,7 +261,7 @@ compute_risk_model_on_dates <- function(rm_store, rm_date_start, date =  today()
         message(paste("Time Start :", now()))
 
         # start betas computation
-        cl <- declare_local_cluster(5)
+        cl <- declare_local_cluster(.__DEFAULT_RISK_MODEL_NCORES__)
         prepare_cluster(cl)
         on.exit(function(){ if(nrow(showConnections())> 0) { stopCluster(cl); closeAllConnections();cl = NULL} } )
         universe_betas <- stock_betas(stk,beta_fct_frame,cl)

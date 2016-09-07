@@ -1,5 +1,77 @@
 ####################################
 #
+# VirtualBetaEstimator Class
+#
+####################################
+
+#' Virtual S4 class for handling Beta Estimator Properties.
+#'
+#'
+#' @slot est_method_name   "character"
+#'
+#' @export
+setClass(
+  Class     = "VirtualBetaEstimator",
+  slots     = c(
+    est_method_name      = "character"
+  ),
+  contains  = c("VIRTUAL")
+)
+
+#' Get Estimator method Name
+#'
+#' Returns name of Betas estimator
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+
+setGeneric("getRiskModelBetaEstimatorType", function(object){standardGeneric("getRiskModelBetaEstimatorType")})
+
+#' @describeIn getRiskModellBetaEstimator
+#' Get Risk Model Name
+#'
+#' Returns name of Risk Model
+#'
+#' @inheritParams getRiskModelBetaEstimator
+#' @return \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
+#' @export
+setMethod("getRiskModelBetaEstimatorType",
+          signature(object = "VirtualBetaEstimator"),
+          function(object){
+            return(object@beta_model)
+          }
+)
+
+
+#' Concrete S4 class for handling OLS computation of betas.
+#'
+#' Ordinary Least Squares Beta estimator
+#'
+#' @export
+setClass(
+  Class     = "BetaEstimator.OLS",
+  prototype     = list(
+    est_method_name      = "OLS"
+  ),
+  contains  = c("VirtualBetaEstimator")
+)
+
+#' Concrete S4 class for handling RLM computation of betas.
+#'
+#' Robust Linear Model Beta estimator
+#'
+#' @export
+setClass(
+  Class     = "BetaEstimator.RLM",
+  prototype     = list(
+    est_method_name      = "RLM"
+  ),
+  contains  = c("VirtualBetaEstimator")
+)
+
+
+####################################
+#
 # VirtualRiskModel Class
 #
 ####################################
@@ -11,6 +83,7 @@
 #' @slot lookback        "integer"
 #' @slot model_universe  "character"
 #' @slot model_factors   "character"
+#' @slot beta_estimator  "VirtualBetaEstimator"
 #'
 #' @export
 
@@ -20,7 +93,11 @@ setClass(
     model_prefix    = "character",
     lookback        = "integer",
     model_universe  = "character",
-    model_factors   = "character"
+    model_factors   = "character",
+    beta_estimator  = "VirtualBetaEstimator"
+  ),
+  prototype = list(
+    beta_model      = new("BetaEstimator.OLS")
   ),
   contains  = c("VIRTUAL")
 )
@@ -31,7 +108,32 @@ setClass(
 #' Returns name of Risk Model
 #'
 #' @param object object of class 'VirtualRiskModel'.
-#' @return \code{model_name} 'character', name of the model.
+#' @export
+
+setGeneric("getRiskModellBetaEstimator", function(object){standardGeneric("getRiskModellBetaEstimator")})
+
+#' @describeIn getRiskModellBetaEstimator
+#' Get Risk Model Name
+#'
+#' Returns name of Risk Model
+#'
+#' @inheritParams getRiskModellBetaEstimator
+#' @return \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
+#' @export
+setMethod("getRiskModellBetaEstimator",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+            return(object@beta_model)
+          }
+)
+
+
+
+#' Get Risk Model Name
+#'
+#' Returns name of Risk Model
+#'
+#' @param object object of class 'VirtualRiskModel'.
 #' @export
 
 setGeneric("getRiskModelName", function(object){standardGeneric("getRiskModelName")})
@@ -57,7 +159,6 @@ setMethod("getRiskModelName",
 #' Returns prefix of Risk Model used to construct model store querries
 #'
 #' @param object object of class 'VirtualRiskModel'.
-#' @return \code{model_prefix} 'character', model prefix.
 #' @export
 
 setGeneric("getRiskModelPrefix", function(object){standardGeneric("getRiskModelPrefix")})
@@ -85,7 +186,6 @@ setMethod("getRiskModelPrefix",
 #' calendar days over which model is calculated.
 #'
 #' @param object object of class 'VirtualRiskModel'.
-#' @return \code{lookback} 'integer'
 #' @export
 
 setGeneric("getRiskModelLookback", function(object){standardGeneric("getRiskModelLookback")})
@@ -112,7 +212,6 @@ setMethod("getRiskModelLookback",
 #' Returns name of universe for which model is computed.
 #'
 #' @param object object of class 'VirtualRiskModel'.
-#' @return \code{model_universe} 'character', name of the universe covered by the model
 #' @export
 
 setGeneric("getRiskModelUniverse", function(object){standardGeneric("getRiskModelUniverse")})
@@ -137,7 +236,6 @@ setMethod("getRiskModelUniverse",
 #' Returns names of factors included in the model
 #'
 #' @param object object of class 'VirtualRiskModel'.
-#' @return \code{model_factors} 'character', vector of factor names
 #' @export
 
 setGeneric("getRiskModelFactorNames", function(object){standardGeneric("getRiskModelFactorNames")})
@@ -154,6 +252,137 @@ setMethod("getRiskModelFactorNames",
           signature(object = "VirtualRiskModel"),
           function(object){
             return(object@model_factors)
+          }
+)
+
+#' Get Risk Model Sector Factor Names
+#'
+#' Returns names of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+
+setGeneric("getRiskModelSectorFactorNames", function(object){standardGeneric("getRiskModelSectorFactorNames")})
+
+#' @describeIn getRiskModelSectorFactorNames
+#' Get Risk Model Factor Names
+#'
+#' Returns names of sector factors included in the model
+#'
+#' @inheritParams getRiskModelSectorFactorNames
+#' @return \code{model_factors} 'character', vector of factor names
+#' @export
+setMethod("getRiskModelSectorFactorNames",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            factor_info <- get_factors()
+            factors <- getRiskModelFactorNames(object)
+
+            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Sector"]
+
+            model_factors <- intersect(sector_factors, factors)
+
+            return(model_factors)
+          }
+)
+
+
+#' Get Risk Model Currency Factor Names
+#'
+#' Returns names of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+
+setGeneric("getRiskModelCurrencyFactorNames", function(object){standardGeneric("getRiskModelCurrencyFactorNames")})
+
+#' @describeIn getRiskModelCurrencyFactorNames
+#' Get Risk Model Currency Factor Names
+#'
+#' Returns names of sector factors included in the model
+#'
+#' @inheritParams getRiskModelCurrencyFactorNames
+#' @return \code{model_factors} 'character', vector of factor names
+#' @export
+setMethod("getRiskModelCurrencyFactorNames",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            factor_info <- get_factors()
+            factors <- getRiskModelFactorNames(object)
+
+            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Currency"]
+
+            model_factors <- intersect(sector_factors, factors)
+
+            return(model_factors)
+          }
+)
+
+
+
+#' Get Risk Model Commodity Factor Names
+#'
+#' Returns names of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+
+setGeneric("getRiskModelCommodityFactorNames", function(object){standardGeneric("getRiskModelCommodityFactorNames")})
+
+#' @describeIn getRiskModelCommodityFactorNames
+#' Get Risk Model Commodity Factor Names
+#'
+#' Returns names of sector factors included in the model
+#'
+#' @inheritParams getRiskModelCommodityFactorNames
+#' @return \code{model_factors} 'character', vector of factor names
+#' @export
+setMethod("getRiskModelCommodityFactorNames",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            factor_info <- get_factors()
+            factors <- getRiskModelFactorNames(object)
+
+            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Oil"]
+
+            model_factors <- intersect(sector_factors, factors)
+
+            return(model_factors)
+          }
+)
+
+#' Get Risk Model Market Factor Names
+#'
+#' Returns names of factors included in the model
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+
+setGeneric("getRiskModelMarketFactorNames", function(object){standardGeneric("getRiskModelMarketFactorNames")})
+
+#' @describeIn getRiskModelMarketFactorNames
+#' Get Risk Model Market Factor Names
+#'
+#' Returns names of sector factors included in the model
+#'
+#' @inheritParams getRiskModelMarketFactorNames
+#' @return \code{model_factors} 'character', vector of factor names
+#' @export
+setMethod("getRiskModelMarketFactorNames",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            factor_info <- get_factors()
+            factors <- getRiskModelFactorNames(object)
+
+            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Market"]
+
+            model_factors <- intersect(sector_factors, factors)
+
+            return(model_factors)
           }
 )
 
@@ -201,6 +430,25 @@ setClass(
 )
 
 
+#' Virtual S4 class for Developed Europe Risk Models.
+#'
+#' Class implementing parameters for family of Developed
+#' Europe Risk Models version 1.1 excluding HKD and DKK
+#'
+#' Inherits from "VirtualRiskModel"
+
+setClass(
+  Class     = "RiskModel.DevelopedEurope.1.1",
+  prototype = list(
+    model_factors = c(risk_model_market_factors,
+                      setdiff(risk_model_currency_factors, c("HKD", "DKK")),
+                      risk_model_commodity_factors,
+                      risk_model_sector_factors),
+    model_universe = "developed_europe"
+  ),
+  contains  = c("VirtualRiskModel", "VIRTUAL")
+)
+
 ####################################
 #
 # RiskModel.DevelopedEuropePrototype150 Class
@@ -218,9 +466,25 @@ setClass(
 setClass(
   Class     = "RiskModel.DevelopedEuropePrototype150",
   prototype = list(
-    model_universe  = "developed_europe",
     lookback        = 150L,
     model_prefix    = "developed_europe_prototype"
   ),
   contains  = c("RiskModel.DevelopedEurope")
+)
+
+#' Concrete S4 class for Developed Europe Risk Model.
+#'
+#' Class implementing parameters for Prototype Developed
+#' Europe Risk Model with 150 days lookback
+#'
+#' Inherits from "RiskModel.DevelopedEurope.1.1"
+#' @export
+
+setClass(
+  Class     = "RiskModel.DevelopedEuropePrototype150.1.1",
+  prototype = list(
+    lookback        = 150L,
+    model_prefix    = "developed_europe_prototype.1.1"
+  ),
+  contains  = c("RiskModel.DevelopedEurope.1.1")
 )

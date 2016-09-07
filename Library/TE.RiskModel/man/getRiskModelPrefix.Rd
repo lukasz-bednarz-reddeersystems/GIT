@@ -15,8 +15,6 @@ getRiskModelPrefix(object)
 }
 \value{
 \code{model_prefix} 'character', model prefix.
-
-\code{model_prefix} 'character', model prefix.
 }
 \description{
 Returns prefix of Risk Model used to construct model store querries

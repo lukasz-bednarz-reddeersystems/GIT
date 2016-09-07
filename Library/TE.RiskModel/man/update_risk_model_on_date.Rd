@@ -4,15 +4,13 @@
 \alias{update_risk_model_on_date}
 \title{update missing risk model entries up to date}
 \usage{
-update_risk_model_on_date(model_prefix, date, lookback = 150, force = FALSE,
+update_risk_model_on_date(risk_model, date, force = FALSE,
   copy_history = FALSE)
 }
 \arguments{
-\item{model_prefix}{"character" name of the model eg. "developed_europe_prototype"}
+\item{risk_model}{object of class "VirtualRiskModel" carrying parameters of the model}
 
-\item{date}{"Date" date of the model for which the entries should be computed}
-
-\item{lookback}{"integer" number of days over which the model is computed.
+\item{date}{"Date" date of the model for which the entries should be computed
 These are callendar days therefore the model can actually contain less trading days.}
 
 \item{force}{"logical" should the values be replaced if already existing}

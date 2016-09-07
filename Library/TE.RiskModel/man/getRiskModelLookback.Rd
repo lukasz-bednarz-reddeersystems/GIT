@@ -15,8 +15,6 @@ getRiskModelLookback(object)
 }
 \value{
 \code{lookback} 'integer'
-
-\code{lookback} 'integer'
 }
 \description{
 Returns model lookback value in days. Lookback is number of

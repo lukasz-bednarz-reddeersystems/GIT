@@ -15,8 +15,6 @@ getRiskModelName(object)
 }
 \value{
 \code{model_name} 'character', name of the model.
-
-\code{model_name} 'character', name of the model.
 }
 \description{
 Returns name of Risk Model

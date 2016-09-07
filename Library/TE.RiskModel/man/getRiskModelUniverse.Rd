@@ -15,8 +15,6 @@ getRiskModelUniverse(object)
 }
 \value{
 \code{model_universe} 'character', name of the universe covered by the model
-
-\code{model_universe} 'character', name of the universe covered by the model
 }
 \description{
 Returns name of universe for which model is computed.

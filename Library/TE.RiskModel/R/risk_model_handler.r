@@ -1,4 +1,4 @@
-#' @include risk_model.r
+#' @include risk_model_handler.r
 NULL
 
 ####################################
