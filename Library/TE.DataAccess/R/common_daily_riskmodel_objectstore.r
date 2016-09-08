@@ -322,7 +322,7 @@ setMethod("getMostRecentRiskModelDate",
 
 setGeneric("getEarliestRiskModelDate",function(object,
                                                  name,
-                                                 lookback=150L){standardGeneric("getEarliestRiskModelDate")})
+                                                 lookback){standardGeneric("getEarliestRiskModelDate")})
 
 #' @describeIn getEarliestRiskModelDate
 #' Get earliest risk model date stored in object
@@ -338,7 +338,7 @@ setMethod("getEarliestRiskModelDate",
           signature(object = "DailyRiskModelObjectStore",
                     name = "character",
                     lookback = "integer"),
-          function(object,name,lookback=150){
+          function(object,name,lookback){
             comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
             if(nrow(comp@data)>0){
               dates <- unique(comp@data$Date)
@@ -446,10 +446,10 @@ setMethod("reInitializeRiskModelComponents",
              object@risk_model_q <- updateStoredRiskModelKeys(object@risk_model_q,key)
              #Need to handle differences in key columns more formally
              if(component%in%c('ResidualReturns','Betas')){
-               ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=TRUE)
+               ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=FALSE)
              }
              else{
-               ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=TRUE)
+               ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=FALSE)
              }
              object <- placeInObjectStore(object,ds,getIdentifier(object@risk_model_q))
           }
@@ -563,10 +563,10 @@ risk_model_objectstore_factory <- function(name,lookback=150){
 			rmstr@risk_model_q <- updateStoredRiskModelKeys(rmstr@risk_model_q,key)
 			#Need to handle differences in key columns more formally
 			if(component%in%c('ResidualReturns','Betas')){
-				ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=TRUE)
+				ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=FALSE)
 			}
 			else{
-				ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=TRUE)
+				ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=FALSE)
 			}
 			rmstr <- placeInObjectStore(rmstr,ds,getIdentifier(rmstr@risk_model_q))
 		}
@@ -612,10 +612,10 @@ get_risk_model_component_on_date <- function(model_prefix,date,component,lookbac
 #' object of class "DailyRiskModelObjectStore" otherwise NULL
 #' @export
 
-get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lookback = 150) {
+get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lookback = 150L) {
 
   date <- as.Date(date)
-  months <- unique(format(seq(from = date, by = -1, length.out = 150),'%Y-%m' ))
+  months <- unique(format(seq(from = date, by = "-1 months", length.out = 150L),'%Y-%m' ))
   retv <- NULL
 
   for (month in months) {

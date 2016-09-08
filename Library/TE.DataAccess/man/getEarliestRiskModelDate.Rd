@@ -6,11 +6,11 @@
 \alias{getEarliestRiskModelDate,DailyRiskModelObjectStore,character,integer-method}
 \title{Get earliest risk model date stored in object}
 \usage{
-getEarliestRiskModelDate(object, name, lookback = 150L)
+getEarliestRiskModelDate(object, name, lookback)
 
 
   \S4method{getEarliestRiskModelDate}{DailyRiskModelObjectStore,character,integer}(object,
-  name, lookback = 150)
+  name, lookback)
 }
 \arguments{
 \item{object}{object of class "DailyRiskModelObjectStore"}

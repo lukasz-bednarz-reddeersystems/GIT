@@ -5,7 +5,7 @@
 \title{Get most recent risk model store}
 \usage{
 get_most_recent_model_objectstore(model_prefix, date = today() - 1,
-  lookback = 150)
+  lookback = 150L)
 }
 \arguments{
 \item{model_prefix}{character}
