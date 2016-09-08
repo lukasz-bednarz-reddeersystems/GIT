@@ -148,6 +148,8 @@ get_FX_returns <- function(start,end){
   new_nmes <- gsub(".USD","",nmes)
   rtn <- fx
   rtn <- rtn[order(rtn$Date),]
+  rtn <- rtn[wday(rtn$Date)!=7&wday(rtn$Date)!=1, ]
+
   for(n in 1:length(new_nmes)){
     rtn[new_nmes[n]] <- c(NA,(rtn[2:nrow(rtn),nmes[n]]/rtn[1:(nrow(rtn)-1),nmes[n]])-1)
   }
