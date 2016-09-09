@@ -9,48 +9,6 @@ NULL
 # Pulls data required for computation and adds required columns.
 ###############################################################################
 
-#' List of portfolio decomposition market factors
-portfolio_decomposition_market_factors <- c('Earnings','Growth','PriceMomentum12M','PriceMomentum1M','Size','StreetSentiment','Strength','TrendExtension','Value','Volatility')
-
-#' List of portfolio decomposition currency factors
-portfolio_decomposition_currency_factors <- c('JPY','GBP','EUR','CNY','RUB','ZAR','HKD','AUD','DKK','NOK','SEK','CHF','ILS','PLN','HUF','TRY')
-
-#' List of portfolio decomposition commodity factors
-portfolio_decomposition_commodity_factors <- c('WTI')
-
-#' List of portfolio decomposition sector factors
-portfolio_decomposition_sector_factors <- c('SX3P','SX4P','SX6P','SX7P','SX86P','SX8P','SXAP','SXDP','SXEP','SXFP','SXKP','SXMP','SXNP','SXOP','SXPP','SXQP','SXRP','SXTP')
-
-#' List of all portfolio decomposition factors
-portfolio_decomposition_all_factors <- c(portfolio_decomposition_market_factors,
-                                         portfolio_decomposition_currency_factors,
-                                         portfolio_decomposition_commodity_factors,
-                                         portfolio_decomposition_sector_factors)
-
-#' List of all portfolio decomposition composed factors
-portfolio_decomposition_composition_factors <- c('TotalSystematic',
-                                                 'MarketFactor',
-                                                 'Currency',
-                                                 'Commodity',
-                                                 'Sector')
-
-#' List of all portfolio decomposition factor groups
-portfolio_decomposition_factor_groups <- list(Composition = portfolio_decomposition_composition_factors,
-                                              Market = portfolio_decomposition_market_factors,
-                                              Currency = portfolio_decomposition_currency_factors,
-                                              Commodity = portfolio_decomposition_commodity_factors,
-                                              Sector= portfolio_decomposition_sector_factors)
-
-
-# devtools::use_data(portfolio_decomposition_market_factors,
-#                    portfolio_decomposition_currency_factors,
-#                    portfolio_decomposition_commodity_factors,
-#                    portfolio_decomposition_sector_factors,
-#                    portfolio_decomposition_all_factors,
-#                    portfolio_decomposition_composition_factors,
-#                    portfolio_decomposition_factor_groups,
-#                    overwrite = TRUE)
-
 
 #' PortfolioVarianceFactorDecompositionData Reference Data class.
 #'
@@ -64,7 +22,7 @@ portfolio_decomposition_factor_groups <- list(Composition = portfolio_decomposit
 setClass(
   Class             = "PortfolioVarianceFactorDecompositionData",
   prototype         = list(
-    required_colnms = c("Date", portfolio_decomposition_all_factors)
+    required_colnms = c("Date")
   ),
   contains          = c("VirtualFactorVarianceData")
 )
@@ -132,6 +90,13 @@ setMethod("setRiskModelObject",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            req_factors <- getRiskModelFactorNames(risk_model)
+            output_obj <- getOutputObject(object)
+
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
+                                                                       req_factors))
+            object <- .setOutputObject(object, output_obj)
+
             return(object)
           }
 )
@@ -238,6 +203,18 @@ setMethod("Process",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock"),
           function(object){
 
+            # risk model
+            risk_model <- getRiskModelObject(object)
+
+            # Lists for factor names
+            market_factors    <- getRiskModelMarketFactorNames(risk_model)
+            currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
+            commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
+            sector_factors    <- getRiskModelSectorFactorNames(risk_model)
+
+            # List of all portfolio decomposition factor groups
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             # retrieve data
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
@@ -282,16 +259,11 @@ setMethod("Process",
                   #fct_cov <- 365*3/5*factor_covariance(fct_cor, sqrt(fct_sd))/150
                   market_risk <- portfolio_variance_decomposition(wt,bt,fct_cov)
                   total_sys_var <- sum(market_risk)
-                  factor_var <- sum(market_risk[portfolio_decomposition_market_factors,])
-                  currency_var <- sum(market_risk[portfolio_decomposition_currency_factors,])
-                  commodity_var <- sum(market_risk[portfolio_decomposition_commodity_factors,])
-                  sector_var <- sum(market_risk[portfolio_decomposition_sector_factors,])
+                  factor_var <- sum(market_risk[market_factors,])
+                  currency_var <- sum(market_risk[currency_factors,])
+                  commodity_var <- sum(market_risk[commodity_factors,])
+                  sector_var <- sum(market_risk[sector_factors,])
 
-                  # total_sys_var <- portfolio_variance_decomposition(wt,bt,fct_cov)
-                  # factor_var <- portfolio_variance_decomposition(wt,bt,fct_cov,portfolio_decomposition_market_factors)
-                  # currency_var <- portfolio_variance_decomposition(wt,bt,fct_cov,portfolio_decomposition_currency_factors)
-                  # commodity_var <- portfolio_variance_decomposition(wt,bt,fct_cov,portfolio_decomposition_commodity_factors)
-                  # sector_var <- portfolio_variance_decomposition(wt,bt,fct_cov,portfolio_decomposition_sector_factors)
                   vd <- data.frame(Date=rm_date,TotalSystematicVar=total_sys_var[1],MarketFactorVar=factor_var[1],CurrencyVar=currency_var[1],CommodityVar=commodity_var[1],SectorVar=sector_var[1])
                   vd.tot <- cbind(data.frame(Date = rm_date), as.data.frame(t(market_risk)/sum(market_risk)*100))
                   if(first){

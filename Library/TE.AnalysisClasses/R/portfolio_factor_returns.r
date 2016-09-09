@@ -1,4 +1,5 @@
 #' @include analysis_block.r
+#' @include portfolio_variance_decomposition_functions.r
 NULL
 
 ################################################################################
@@ -22,7 +23,7 @@ NULL
 setClass(
   Class             = "PortfolioFactorReturnsData",
   prototype         = list(
-    required_colnms = c("Date", portfolio_decomposition_all_factors)
+    required_colnms = c("Date")
   ),
   contains          = c("VirtualImpliedFactorReturnsData")
 )
@@ -89,6 +90,12 @@ setMethod("setRiskModelObject",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            req_factors <- getRiskModelFactorNames(risk_model)
+            output_obj <- getOutputObject(object)
+
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
+                                                                       req_factors))
+            object <- .setOutputObject(object, output_obj)
             return(object)
           }
 )
@@ -230,6 +237,16 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            risk_model <- getRiskModelObject(object)
+            all_factors <- getRiskModelFactorNames(object)
+
+            market_factors    <- getRiskModelMarketFactorNames(risk_model)
+            currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
+            commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
+            sector_factors    <- getRiskModelSectorFactorNames(risk_model)
+
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
 
@@ -267,10 +284,10 @@ setMethod("Process",
                                  rm_date, cond))
                   })
                   total_sys_ret <- sum(market_ret)
-                  factor_ret <- sum(market_ret[portfolio_decomposition_market_factors,])
-                  currency_ret <- sum(market_ret[portfolio_decomposition_currency_factors,])
-                  commodity_ret <- sum(market_ret[portfolio_decomposition_commodity_factors,])
-                  sector_ret <- sum(market_ret[portfolio_decomposition_sector_factors,])
+                  factor_ret <- sum(market_ret[market_factors,])
+                  currency_ret <- sum(market_ret[currency_factors,])
+                  commodity_ret <- sum(market_ret[commodity_factors,])
+                  sector_ret <- sum(market_ret[sector_factors,])
 
                   rd <- data.frame(Date=rm_date,TotalSystematic=total_sys_ret[1],
                                                 MarketFactor=factor_ret[1],
@@ -283,7 +300,7 @@ setMethod("Process",
                     rd.tot[,-1] <- returns_decomposition.tot[nrow(returns_decomposition.tot),-1] + rd.tot[,-1]
                   }
 
-                  plot_data <- stack(rd.tot, select = c(portfolio_decomposition_all_factors,
+                  plot_data <- stack(rd.tot, select = c(all_factors,
                                                         'TotalSystematic',
                                                         'MarketFactor',
                                                         'Currency',
@@ -293,7 +310,7 @@ setMethod("Process",
 
                   colnames(plot_data) <- c("Value", "RiskType")
                   plot_data$RiskGroup <- plot_data$RiskType
-                  levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
+                  levels(plot_data$RiskGroup) <- factor_groups
                   plot_data <- data.frame(Date = rm_date, plot_data)
 
                   if(first){
@@ -313,23 +330,7 @@ setMethod("Process",
               }
             }
 
-
-            # x <- stack(returns_decomposition.tot, select = c(portfolio_decomposition_all_factors,
-            #                                                  'TotalSystematic',
-            #                                                  'MarketFactor',
-            #                                                  'Currency',
-            #                                                  'Commodity',
-            #                                                  'Sector')
-            #            )
-            #
-            # ret_plot_data <- rbind(data.frame(Date=returns_decomposition$Date,RiskType='TotalSystematic',Value=sqrt(returns_decomposition$TotalSystematicVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='MarketRiskFactor',Value=sqrt(returns_decomposition$MarketFactorVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Currency',Value=sqrt(returns_decomposition$CurrencyVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Commodity',Value=sqrt(returns_decomposition$CommodityVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Sector',Value=sqrt(returns_decomposition$SectorVar)*100))
-
-
-            for( group in names(portfolio_decomposition_factor_groups)) {
+            for( group in names(factor_groups)) {
               ret_plot_data$Colour[ret_plot_data$RiskGroup == group] <- as.integer(as.factor(as.character(ret_plot_data$RiskType[ret_plot_data$RiskGroup == group] )))
             }
 

@@ -95,6 +95,8 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            all_factors <- getRiskModelFactorNames(object)
+
             market_style <- getMarketStyleDataObject(object)
 
             all_market_st <- getReferenceData(market_style)
@@ -110,7 +112,7 @@ setMethod("Process",
 
                 market_st <- all_market_st[all_market_st$Date==rm_date,setdiff(colnames(all_market_st),'Date')]
 
-                plot_data <- stack(market_st, select = c(portfolio_decomposition_all_factors))
+                plot_data <- stack(market_st, select = c(all_factors))
 
                 colnames(plot_data) <- c("Value", "RiskType")
 
