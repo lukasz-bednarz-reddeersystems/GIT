@@ -30,6 +30,7 @@ setClass(
     results_parser = "function"
   ),
   prototype = list(
+    query_parser   = pass_thru_parser,
     results_parser = pass_thru_parser
   ),
   contains  = c("VIRTUAL")
