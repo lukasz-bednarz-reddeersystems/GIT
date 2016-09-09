@@ -75,38 +75,6 @@ setClass(
 )
 
 
-#' Copy risk model object with parameters to children
-#'
-#' @param .Object, object of class "PortfolioVarianceFactorDecompositionData"
-#' @return \code{.Object} object of class "PortfolioVarianceFactorDecompositionData"
-setMethod(".copyRiskModelToChildren",
-          signature(object = "PortfolioVarianceFactorDecompositionData"),
-          function(object){
-            risk_model <- getRiskModelObject(object)
-
-            instrument_betas <- getInstrumentBetasDataObject(object)
-            instrument_betas <- setRiskModelObject(instrument_betas, risk_model)
-            object <- setInstrumentBetasDataObject(object, instrument_betas)
-
-            return(object)
-          })
-
-#' Copy risk model object with parameters to children
-#'
-#' @param .Object, object of class "PortfolioVarianceFactorDecompositionData"
-#' @return \code{.Object} object of class "PortfolioVarianceFactorDecompositionData"
-setMethod(".copyRiskModelToChildren",
-          signature(object = "PortfolioVarianceFactorDecompositionData"),
-          function(object){
-            risk_model <- getRiskModelObject(object)
-
-            factor_correlation
-
-            return(object)
-          })
-
-
-
 #' Initialize method for "PortfolioVarianceFactorDecompositionData" class
 #' copies risk model values to respective objects.
 #'
@@ -143,6 +111,9 @@ setMethod("setRiskModelObject",
             output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
                                                                        req_factors))
             object <- .setOutputObject(object, output_obj)
+
+
+            object <- .copyRiskModelToChildren(object)
 
             return(object)
           }

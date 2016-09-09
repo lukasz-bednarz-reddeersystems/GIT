@@ -200,6 +200,7 @@ setMethod("Process",
           signature(object = "PortfolioFactorExposuresAnalysisBlock"),
           function(object){
 
+            browser()
             # retrieve data
             risk_model <- getRiskModelObject(object)
             all_factors <- getRiskModelFactorNames(object)

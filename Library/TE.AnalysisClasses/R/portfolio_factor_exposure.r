@@ -55,7 +55,9 @@ setMethod("dataRequest",
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
-            trader <- unique(key_values$TraderID)[1]
+            id <- unique(key_values[,1])[1]
+            start <- min(key_values$start)
+            end <- max(key_values$end)
 
             portf_data <- new("StrategyPortfolio")
 
@@ -65,7 +67,7 @@ setMethod("dataRequest",
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(portf_data)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, stop))
+              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, stop))
               stop(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(portf_data), cond))
             })
 
@@ -87,7 +89,7 @@ setMethod("dataRequest",
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(fct_exp_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, stop))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, stop))
                 stop(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(fct_exp_data), cond))
               })
 
