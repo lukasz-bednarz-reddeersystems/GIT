@@ -1,4 +1,5 @@
 #' @include referencedata.r
+#' @include risk_model_component.r
 #' @include risk_model_objectstore_client.r
 NULL
 
@@ -41,6 +42,6 @@ setClass(
 
     ),
 
-  contains = c("VirtualFactorCorrelationData", "VirtualRiskModelObjectstoreClient")
+  contains = c( "VirtualFactorCorrelationData", "VirtualRiskModelObjectstoreClient")
 )
 

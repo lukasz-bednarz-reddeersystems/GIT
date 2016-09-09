@@ -28,3 +28,9 @@ get_portfolio_decomposition_factor_groups <- function(risk_model) {
 
  return(factor_groups)
 }
+
+
+abs_sqrt <- function(x){
+  ret <- sign(x)*sqrt(abs(x))
+  return(ret)
+}

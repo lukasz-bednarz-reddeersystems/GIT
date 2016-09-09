@@ -116,8 +116,8 @@ setMethod("dataRequest",
 
             object <- setReferenceData(object, data_adj)
 
-            object <- setStartDate(object,start = key_values$start)
-            object <- setEndDate(object, end = key_values$end)
+            object <- setStartDate(object,start = min(key_values$start))
+            object <- setEndDate(object, end = max(key_values$end))
 
             return(object)
           }

@@ -79,3 +79,35 @@ setMethod(".setImpliedFactorReturnsDataObject",
             return(object)
           }
 )
+
+
+#' Update implied_factor_returns risk model
+#'
+#' Trigger update of risk model of implied_factor_returns object
+#'
+#' @param object object of class "VirtualImpliedFactorReturnsDataHandler"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @export
+
+setGeneric("updateImpliedFactorReturnsDataRiskModel",
+           function(object, risk_model){standardGeneric("updateImpliedFactorReturnsDataRiskModel")})
+
+
+#' @describeIn updateImpliedFactorReturnsDataRiskModel
+#' Update implied_factor_returns risk model
+#'
+#' Trigger update of risk model of implied_factor_returns object
+#'
+#' @inheritParams updateImpliedFactorReturnsDataRiskModel
+#' @return \code{implied_factor_returns} object of class "VirtualImpliedFactorReturnsData"
+#' @export
+setMethod("updateImpliedFactorReturnsDataRiskModel",
+          signature(object = "VirtualImpliedFactorReturnsDataHandler",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            implied_factor_returns <- getImpliedFactorReturnsDataObject(object)
+            implied_factor_returns <- setRiskModelObject(implied_factor_returns, risk_model)
+            object <- .setImpliedFactorReturnsDataObject(object, implied_factor_returns)
+            return(object)
+          }
+)

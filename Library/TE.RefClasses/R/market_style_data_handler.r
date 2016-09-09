@@ -82,3 +82,36 @@ setMethod(".setMarketStyleDataObject",
             return(object)
           }
 )
+
+
+
+#' Update market_style risk model
+#'
+#' Trigger update of risk model of market_style object
+#'
+#' @param object object of class "VirtualMarketStyleDataHandler"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @export
+
+setGeneric("updateMarketStyleDataRiskModel",
+           function(object, risk_model){standardGeneric("updateMarketStyleDataRiskModel")})
+
+
+#' @describeIn updateMarketStyleDataRiskModel
+#' Update market_style risk model
+#'
+#' Trigger update of risk model of market_style object
+#'
+#' @inheritParams updateMarketStyleDataRiskModel
+#' @return \code{market_style} object of class "VirtualMarketStyleData"
+#' @export
+setMethod("updateMarketStyleDataRiskModel",
+          signature(object = "VirtualMarketStyleDataHandler",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            market_style <- getMarketStyleDataObject(object)
+            market_style <- setRiskModelObject(market_style, risk_model)
+            object <- .setMarketStyleDataObject(object, market_style)
+            return(object)
+          }
+)

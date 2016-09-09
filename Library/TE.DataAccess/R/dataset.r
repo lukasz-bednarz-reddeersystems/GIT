@@ -11,7 +11,7 @@
 
 setClass(
   Class          = "DataSet",
-  representation = representation(
+  slots = c(
     key_cols     = "character",
     data_cols    = "character",
     data         = "data.frame",
@@ -20,7 +20,7 @@ setClass(
     pad          = "data.frame",
     unique_rows  = "logical"
   ),
-  prototype      = prototype(
+  prototype      = list(
     indexed      = FALSE,
     unique_rows  = FALSE
   )
@@ -32,15 +32,17 @@ setClass(
 #' @param data  data.frame.
 #' @return \code{object} object of class 'DataSet'.
 
-
 setGeneric("checkUnique", function(object,data){standardGeneric("checkUnique")})
+
 setMethod("checkUnique", "DataSet",
           function(object,data){
+
             unique_rows <- tryCatch({
                   object@unique_rows
               },error=function(cond){
                   return(FALSE)
               })
+
             if(unique_rows){
               ud <- unique(data)
               if(nrow(ud)!=nrow(data)){

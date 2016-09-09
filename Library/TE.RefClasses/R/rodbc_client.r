@@ -232,10 +232,12 @@ setMethod("executeSQLQuery",
               })
 
               if (is(ret, "data.frame")) {
-                ret_df <- ret
-                first <- FALSE
-              } else {
-                ret_df <- rbind(ret_df, ret)
+                if (first) {
+                  ret_df <- ret
+                  first <- FALSE
+                } else {
+                  ret_df <- rbind(ret_df, ret)
+                }
               }
 
             }

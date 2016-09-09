@@ -237,10 +237,12 @@ test_that("Can dataRequest", {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  start <- as.Date("2016-05-01")
-  end <- as.Date("2016-05-04")
+  valid.keys <- dated_three_monthly_lookback(valid.ticker, "2016-06-30")
 
-  valid.keys <- data.frame(IndexTicker = getIndexTicker(object), start, end)
+  colnames(valid.keys) <- c("IndexTicker", "start", "end")
+
+  start <- min(valid.keys$start)
+  end <- max(valid.keys$end)
 
   object <- dataRequest(object, valid.keys)
 

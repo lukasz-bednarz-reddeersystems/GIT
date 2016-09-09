@@ -80,3 +80,35 @@ setMethod(".setFactorVarianceDataObject",
             return(object)
           }
 )
+
+
+#' Update factor_variance risk model
+#'
+#' Trigger update of risk model of factor_variance object
+#'
+#' @param object object of class "VirtualFactorVarianceDataHandler"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @export
+
+setGeneric("updateFactorVarianceDataRiskModel",
+           function(object, risk_model){standardGeneric("updateFactorVarianceDataRiskModel")})
+
+
+#' @describeIn updateFactorVarianceDataRiskModel
+#' Update factor_variance risk model
+#'
+#' Trigger update of risk model of factor_variance object
+#'
+#' @inheritParams updateFactorVarianceDataRiskModel
+#' @return \code{factor_variance} object of class "VirtualFactorVarianceData"
+#' @export
+setMethod("updateFactorVarianceDataRiskModel",
+          signature(object = "VirtualFactorVarianceDataHandler",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            factor_variance <- getFactorVarianceDataObject(object)
+            factor_variance <- setRiskModelObject(factor_variance, risk_model)
+            object <- .setFactorVarianceDataObject(object, factor_variance)
+            return(object)
+          }
+)

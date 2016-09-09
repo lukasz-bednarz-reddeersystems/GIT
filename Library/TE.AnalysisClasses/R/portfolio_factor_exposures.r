@@ -39,7 +39,7 @@ setClass(
 setClass(
   Class             = "PortfolioFactorExposuresAnalysisBlock",
   slots             = c(
-    portfolio              = "StrategyPortfolio",
+    portfolio              = "Portfolio",
     instrument_betas       = "InstrumentBetasData",
     output                 = "PortfolioFactorExposuresData"
   ),
@@ -139,7 +139,7 @@ setMethod("dataRequest",
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
-            trader <- unique(key_values$TraderID)[1]
+            id <- unique(key_values[,1])[1]
             start <- min(key_values$start)
             end <- max(key_values$end)
 
@@ -153,7 +153,7 @@ setMethod("dataRequest",
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(portf_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, end))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(portf_data), cond))
               })
 
@@ -177,7 +177,7 @@ setMethod("dataRequest",
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, end))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(betas_data), cond))
               })
 
@@ -321,6 +321,54 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, ret_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
 
+            return(object)
+          }
+)
+
+
+################################################################################
+#
+# IndexPortfolioFactorExposuresAnalysisBlock Class
+#
+# Computation block class to pull data required for portfolio factor exposure.
+###############################################################################
+
+#' Analyser for Index Portfolio risk factors exposure
+#'
+#' Computation block class to pull data required for portfolio factor exposure.
+#'
+#' Inherits from "PortfolioFactorExposuresAnalysisBlock"
+#'
+#' @export
+setClass(
+  Class             = "IndexPortfolioFactorExposuresAnalysisBlock",
+  prototype         = list(
+    key_cols        = c("IndexTicker", "start", "end"),
+    key_values      = data.frame(IndexTicker = character(),
+                                 start    = as.Date(character()),
+                                 end    = as.Date(character())),
+    column_name_map = hash(c("IndexTicker", "start", "end"),
+                           c("id", "start", "end")),
+    portfolio       = new("IndexPortfolio.BE500")
+  ),
+  contains          = c("PortfolioFactorExposuresAnalysisBlock"
+  )
+)
+
+#' Set portfolio object in object slot
+#'
+#' Public method to set portfolio slot with "VirtualIndexPortfolio"
+#' class object
+#'
+#' @rdname setPortfolioDataObject-IndexPortfolioFactorExposuresAnalysisBlock-method
+#' @param object object of class "IndexPortfolioFactorExposuresAnalysisBlock"
+#' @param portfolio object of class "VirtualIndexPortfolio"
+#' @return \code{object} object of class "IndexPortfolioFactorExposuresAnalysisBlock"
+#' @export
+setMethod("setPortfolioDataObject",
+          signature(object = "IndexPortfolioFactorExposuresAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
+          function(object, portfolio){
+            object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
           }
 )
