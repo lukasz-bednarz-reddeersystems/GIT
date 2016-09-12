@@ -134,10 +134,19 @@ setMethod("writeToConnection","ProcessSocket",
 #' \code{readConnection(object)}
 #'
 #' @param object object of class 'ProcessSocket'.
+#' @export
+setGeneric("getDataFromSocket",function(object){standardGeneric("getDataFromSocket")})
+
+#' @describeIn getDataFromSocket
+#' Get data read from socket
+#'
+#' Retrieve data previously read from socket using
+#' \code{readConnection(object)}
+#'
+#' @inheritParams getDataFromSocket
 #' @return \code{data} character, data read from socket..
 #' @export
-
-setMethod("getData","ProcessSocket",
+setMethod("getDataFromSocket","ProcessSocket",
           function(object){
             return(object@data)
           }

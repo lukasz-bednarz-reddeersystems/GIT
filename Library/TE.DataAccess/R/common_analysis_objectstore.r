@@ -76,8 +76,26 @@ setMethod("initialiseAnalysisStore","AnalysisObjectStore",
           }
 )
 
+#' Query objectstore for given set of parameters
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param key "data.frame" wiht query keys
+#'
+#' @export
+
 setGeneric("queryAnalysisStore",function(object,key){standardGeneric("queryAnalysisStore")})
-setMethod("queryAnalysisStore","AnalysisObjectStore",
+
+#' @describeIn queryAnalysisStore
+#' Query objectstore for given set of parameters
+#'
+#' @importParams queryAnalysisStore
+#' @return \code{rval} object of class "AnalysisObjectStore" if query sucessfull,
+#' otherwise NULL
+#'
+#' @export
+setMethod("queryAnalysisStore",
+          signature(object = "AnalysisObjectStore",
+                    key = "data.frame"),
           function(object,key){
             if(isAnalysisStored(object@warehouse_q,key)){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in analysis store."))
@@ -94,8 +112,29 @@ setMethod("queryAnalysisStore","AnalysisObjectStore",
           }
 )
 
+
+#' Update Analysis Store with new AnalysisObject
+#'
+#' @param object object of class "AnalysisObjectStore"
+#' @param analysis_object object of class "VirtualAnalysisBlock"
+#' @param key "data.frame" with query keys
+#' @param force "logical" should store be forced if object for given keys exists
+#'
+#' @export
 setGeneric("updateAnalysisStore",function(object,analysis_object,key,force=FALSE){standardGeneric("updateAnalysisStore")})
-setMethod("updateAnalysisStore","AnalysisObjectStore",
+
+#' @describeIn updateAnalysisStore
+#' Update Analysis Store with new AnalysisObject
+#'
+#' @inheritParams updateAnalysisStore
+#' @return \code{object} object of class "AnalysisObjectStore"
+#'
+#' @export
+setMethod("updateAnalysisStore",
+          signature(object = "AnalysisObjectStore",
+                    analysis_object = "VirtualAnalysisObject",
+                    key = "data.frame",
+                    force = "logical"),
           function(object,analysis_object,key,force=FALSE){
             if(isAnalysisStored(object@warehouse_q,key) && !force){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in analysis store."))
@@ -113,7 +152,20 @@ setMethod("updateAnalysisStore","AnalysisObjectStore",
           }
 )
 
+#' Commit AnalysisObjecstore to nonvolatile memory
+#'
+#' @param object object of class "AnalysisObjectStore"
+#'
+#' @export
 setGeneric("commitAnalysisStore",function(object){standardGeneric("commitAnalysisStore")})
+
+#' @describeIn commitAnalysisStore
+#' Commit AnalysisObjecstore to nonvolatile memory
+#'
+#' @inheritParams commitAnalysisStore
+#' @return \code{object} object of class "AnalysisObjectStore"
+#'
+#' @export
 setMethod("commitAnalysisStore","AnalysisObjectStore",
           function(object){
             saveObject(object)
@@ -129,6 +181,29 @@ setMethod("getAnalysisStoreContents","AnalysisObjectStore",
           }
 )
 
+
+#' get analysis objectstore for keys and trader
+#'
+#' @param keys "data.frame" with query keys
+#' @param trader_col "character" name of the column in key to be used as
+#' identifier. Default is 'TraderID'
+#' @return \code{rv} "character" hashed name of the objectstore
+#'
+#' @export
+get_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
+  date_hash <- digest(sort(as.character(c(keys$start,keys$end))),serialize=FALSE)
+  trader_prefix <- paste(sort(unique(keys[[trader_col]])),collapse="_")
+  rv <- paste("analysis",trader_prefix,date_hash,sep='_')
+  return(rv)
+}
+
+
+#' get analysis objectstore for given name
+#'
+#' @param name "character" hashed name of the objectstore
+#' @return \code{anstr} object of class "AnalysisObjectStore"
+#'
+#' @export
 analysis_objectstore_factory <- function(name){
   message("Initialising analysis store ...")
   anstr <- new("AnalysisObjectStore",id=name)

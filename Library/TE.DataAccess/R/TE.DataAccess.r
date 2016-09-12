@@ -21,5 +21,6 @@
 #' @importFrom RODBC odbcConnect sqlQuery
 #' @importFrom grDevices dev.off
 #' @importFrom graphics plot title
+#' @importFrom digest digest
 NULL
 ## NULL

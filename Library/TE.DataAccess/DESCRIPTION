@@ -21,6 +21,7 @@ Imports:
     moments,
     grDevices,
     graphics,
+    digest,
 Collate:
     'TE.DataAccess.r'
     'visualisation_functions.r'

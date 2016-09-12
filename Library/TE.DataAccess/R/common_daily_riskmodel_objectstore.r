@@ -48,7 +48,7 @@ setClass(
 	),
 	prototype       = prototype(
 		components  = c('ImpliedFactorReturns','ResidualReturns','Betas','FactorCorrelation','FactorVariance','MarketStyle'),
-		data_path   = model_defaults@data_path,
+		data_path   = model_defaults@risk_models,
 		risk_model_q= new("DailyRiskModelQuery")
 	),
 	contains = c("VirtualObjectStore")
