@@ -82,8 +82,9 @@ setMethod("setRiskModelObject",
             req_factors <- getRiskModelFactorNames(risk_model)
             output_obj <- getOutputObject(object)
 
-            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
-                                                                       req_factors))
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
+                                                                     c("Date",
+                                                                        req_factors))
             object <- .setOutputObject(object, output_obj)
             return(object)
           }
@@ -167,10 +168,11 @@ setMethod("dataRequest",
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
             risk_model <- getRiskModelObject(object)
+            # important step to copy risk_model info
+            betas_data <- setRiskModelObject(betas_data, risk_model)
 
             if (getStoredNRows(betas_data) == 0) {
-              # important step to copy risk_model info
-              betas_data <- TE.RiskModel:::.setRiskModelObject(betas_data, risk_model)
+
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)
@@ -200,7 +202,6 @@ setMethod("Process",
           signature(object = "PortfolioFactorExposuresAnalysisBlock"),
           function(object){
 
-            browser()
             # retrieve data
             risk_model <- getRiskModelObject(object)
             all_factors <- getRiskModelFactorNames(object)

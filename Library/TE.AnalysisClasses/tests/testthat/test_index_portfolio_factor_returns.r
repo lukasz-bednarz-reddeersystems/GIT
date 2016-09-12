@@ -1,15 +1,17 @@
-context("Testing PortfolioFactorExposuresAnalysisBlock")
+context("Testing IndexPortfolioFactorReturnsAnalysisBlock")
 
-#############################################
+
+##############################################
 #
-# PortfolioFactorExposuresAnalysisBlock Tests
+# PortfolioFactorReturnsAnalysisBlock Tests
 #
-#############################################
+##############################################
 # pre computed data
 if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
   portf.var.an <- new("IndexPortfolioVarianceDecompositionAnalysisBlock")
 
   valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-05-30")
+  #valid.key_values <- dated_full_month("BE500 Index", "2016-05-30")
   colnames(valid.key_values) <- c("IndexTicker", "start", "end")
 
   portf.var.an <- dataRequest(portf.var.an, valid.key_values)
@@ -18,9 +20,8 @@ if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
   betas_data <- getInstrumentBetasDataObject(portf.var.an)
 }
 
-
 # test vectors
-tested.class          <-  "IndexPortfolioFactorExposuresAnalysisBlock"
+tested.class          <-  "IndexPortfolioFactorReturnsAnalysisBlock"
 valid.column_name_map <- hash(c("IndexTicker", "start", "end"), c("id", "start", "end"))
 init.key_values       <- data.frame(IndexTicker = character(),
                                     start    = as.Date(character()),
@@ -43,7 +44,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
   expect_is(getOutputGGPlotData(object), "data.frame")
   expect_is(getOutputFrontendData(object), "data.frame")
-  expect_is(getOutputObject(object), "PortfolioFactorExposuresData")
+  expect_is(getOutputObject(object), "PortfolioFactorReturnsData")
 
   expect_equal(getDataSourceClientColumnNameMap(object), valid.column_name_map)
 
@@ -150,6 +151,11 @@ test_that("Can dataRequest() with valid key_values and previous data set", {
   expect_gt(getStoredNRows(ins_betas_data), 0)
   expect_equal(ins_betas_data, betas_data)
 
+  # factor variance data verification
+  fct_ret_data <- getImpliedFactorReturnsDataObject(object)
+  expect_is(fct_ret_data, "ImpliedFactorReturnsData")
+  expect_gt(getStoredNRows(fct_ret_data), 0)
+
 
 })
 
@@ -159,7 +165,7 @@ test_that("Can dataRequest() with valid key_values and no previous data set", {
 
   object <- new(tested.class)
 
-  valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-05-30")
+  valid.key_values <- dated_full_month("BE500 Index", "2016-05-30")
   colnames(valid.key_values) <- c("IndexTicker", "start", "end")
 
   object <- dataRequest(object, valid.key_values)
@@ -177,6 +183,12 @@ test_that("Can dataRequest() with valid key_values and no previous data set", {
   expect_is(ins_betas_data, "InstrumentBetasData")
   expect_gt(getStoredNRows(ins_betas_data), 0)
 
+  # factor variance data verification
+  fct_ret_data <- getImpliedFactorReturnsDataObject(object)
+  expect_is(fct_ret_data, "ImpliedFactorReturnsData")
+  expect_gt(getStoredNRows(fct_ret_data), 0)
+
+
 })
 
 
@@ -191,10 +203,11 @@ test_that(paste("Can Process() on", tested.class), {
   # instrument betas data verification
   object <- setInstrumentBetasDataObject(object, betas_data)
 
-  valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-06-30")
+  valid.key_values <- dated_full_month("BE500 Index", "2016-05-30")
   colnames(valid.key_values) <- c("IndexTicker", "start", "end")
 
   object <- dataRequest(object, valid.key_values)
+
 
   expect_equal(getDataSourceQueryKeyValues(object), valid.key_values)
 
@@ -210,6 +223,11 @@ test_that(paste("Can Process() on", tested.class), {
   expect_gt(getStoredNRows(ins_betas_data), 0)
   expect_equal(ins_betas_data, betas_data)
 
+  # factor variance data verification
+  fct_ret_data <- getImpliedFactorReturnsDataObject(object)
+  expect_is(fct_ret_data, "ImpliedFactorReturnsData")
+  expect_gt(getStoredNRows(fct_ret_data), 0)
+
 
   object <- Process(object)
 
@@ -217,7 +235,7 @@ test_that(paste("Can Process() on", tested.class), {
   expect_is(getOutputGGPlotData(object), "data.frame")
 
   output <- getOutputObject(object)
-  expect_is(output, "PortfolioFactorExposuresData")
+  expect_is(output, "PortfolioFactorReturnsData")
   expect_gt(getStoredNRows(output), 0)
 
 })

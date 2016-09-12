@@ -75,20 +75,6 @@ setClass(
 )
 
 
-#' Initialize method for "PortfolioVarianceFactorDecompositionData" class
-#' copies risk model values to respective objects.
-#'
-#' @param .Object, object of class "PortfolioVarianceFactorDecompositionData"
-#' @return \code{.Object} object of class "PortfolioVarianceFactorDecompositionData"
-#' @export
-setMethod("initialize",
-          signature(.Object = "PortfolioVarianceFactorDecompositionData"),
-          function(.Object){
-            .Object <- dataRequest(.Object, data.frame(symbol = "^SX5P", start, end))
-
-            return(.Object)
-          })
-
 
 #' Set risk_model object in object slot
 #'
@@ -108,12 +94,13 @@ setMethod("setRiskModelObject",
             req_factors <- getRiskModelFactorNames(risk_model)
             output_obj <- getOutputObject(object)
 
-            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
+                                                                     c("Date",
                                                                        req_factors))
             object <- .setOutputObject(object, output_obj)
-
-
-            object <- .copyRiskModelToChildren(object)
+#
+#
+#             object <- .copyRiskModelToChildren(object)
 
             return(object)
           }
@@ -159,7 +146,7 @@ setMethod("dataRequest",
             betas_data <- getInstrumentBetasDataObject(object)
             # important step to copy risk_model info
             risk_model <- getRiskModelObject(object)
-            betas_data <- TE.RiskModel:::.setRiskModelObject(betas_data, risk_model)
+            betas_data <- setRiskModelObject(betas_data, risk_model)
 
             betas_data <- tryCatch({
               dataRequest(betas_data, query_keys)
@@ -176,7 +163,7 @@ setMethod("dataRequest",
             # getting Factor Correlation data
             factor_corr <- getFactorCorrelationDataObject(object)
             # important step to copy risk_model info
-            factor_corr <- TE.RiskModel:::.setRiskModelObject(factor_corr, risk_model)
+            factor_corr <- setRiskModelObject(factor_corr, risk_model)
 
             query_keys <- unique(query_keys["Date"])
             factor_corr <- tryCatch({
@@ -194,7 +181,7 @@ setMethod("dataRequest",
             # getting Factor Variance data
             factor_var <- getFactorVarianceDataObject(object)
             # important step to copy risk_model info
-            factor_var <- TE.RiskModel:::.setRiskModelObject(factor_var, risk_model)
+            factor_var <- setRiskModelObject(factor_var, risk_model)
 
             factor_var <- tryCatch({
               dataRequest(factor_var, query_keys)

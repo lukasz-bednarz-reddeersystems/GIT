@@ -47,7 +47,7 @@ setClass(
 setClass(
   Class             = "PortfolioFactorReturnsAnalysisBlock",
   slots             = c(
-    portfolio              = "StrategyPortfolio",
+    portfolio              = "Portfolio",
     instrument_betas       = "InstrumentBetasData",
     implied_factor_returns = "ImpliedFactorReturnsData",
     output                 = "PortfolioFactorReturnsData"
@@ -93,7 +93,8 @@ setMethod("setRiskModelObject",
             req_factors <- getRiskModelFactorNames(risk_model)
             output_obj <- getOutputObject(object)
 
-            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(c("Date",
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
+                                                                     c("Date",
                                                                        req_factors))
             object <- .setOutputObject(object, output_obj)
             return(object)
@@ -154,6 +155,8 @@ setMethod("dataRequest",
           signature(object = "PortfolioFactorReturnsAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
+            browser()
+
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             trader <- unique(key_values$TraderID)[1]
@@ -184,10 +187,10 @@ setMethod("dataRequest",
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
             risk_model <- getRiskModelObject(object)
+            # important step to copy risk_model info
+            betas_data <- setRiskModelObject(betas_data, risk_model)
 
             if (getStoredNRows(betas_data) == 0) {
-              # important step to copy risk_model info
-              betas_data <- TE.RiskModel:::.setRiskModelObject(betas_data, risk_model)
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)
@@ -204,7 +207,7 @@ setMethod("dataRequest",
             # getting Implied Factor Returns data
             factor_ret <- getImpliedFactorReturnsDataObject(object)
             # important step to copy risk_model info
-            factor_ret <- TE.RiskModel:::.setRiskModelObject(factor_ret, risk_model)
+            factor_ret <- setRiskModelObject(factor_ret, risk_model)
 
             query_keys <- unique(query_keys["Date"])
             factor_ret <- tryCatch({
@@ -376,6 +379,62 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, ret_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
 
+            return(object)
+          }
+)
+
+
+
+################################################################################
+#
+# IndexPortfolioFactorReturnsAnalysisBlock Class
+#
+# Computation block class to pull data required for portfolio returns decomposition
+# Pulls data required for computation and adds required columns.
+###############################################################################
+
+#' Analysis Module for computation of Index Portfolio Returns Decomposition
+#'
+#' Computation block class to pull data required for portfolio
+#' returns decomposition. Pulls data required for computation
+#' and adds required columns. Generates ggplot with returns
+#' decomposition to factors.
+#'
+#' Inherits from "PortfolioFactorReturnsAnalysisBlock"
+#'
+#' @export
+
+setClass(
+  Class             = "IndexPortfolioFactorReturnsAnalysisBlock",
+  prototype         = list(
+    key_cols        = c("IndexTicker", "start", "end"),
+    key_values      = data.frame(IndexTicker = character(),
+                                 start    = as.Date(character()),
+                                 end    = as.Date(character())),
+    column_name_map = hash(c("IndexTicker", "start", "end"),
+                           c("id", "start", "end")),
+    portfolio       = new("IndexPortfolio.BE500")
+
+  ),
+  contains          = c("PortfolioFactorReturnsAnalysisBlock"
+  )
+)
+
+
+#' Set portfolio object in object slot
+#'
+#' Public method to set portfolio slot with "VirtualIndexPortfolio"
+#' class object
+#'
+#' @rdname setPortfolioDataObject-IndexPortfolioFactorReturnsAnalysisBlock-method
+#' @param object object of class "IndexPortfolioFactorReturnsAnalysisBlock"
+#' @param portfolio object of class "VirtualIndexPortfolio"
+#' @return \code{object} object of class "IndexPortfolioFactorReturnsAnalysisBlock"
+#' @export
+setMethod("setPortfolioDataObject",
+          signature(object = "IndexPortfolioFactorReturnsAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
+          function(object, portfolio){
+            object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
           }
 )
