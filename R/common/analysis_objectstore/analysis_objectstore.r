@@ -125,10 +125,10 @@ setMethod("getAnalysisStoreContents","AnalysisObjectStore",
           }
 )
 
-get_analysis_objectstore_name <- function(keys) {
+get_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
   date_hash <- digest(sort(as.character(c(keys$start,keys$end))),serialize=FALSE)
-  trader_prefix <- paste(sort(unique(keys$TraderID)),collapse="_")
-  rv <- paste("analysis",trader_prefix,date_hash,collapse='_')
+  trader_prefix <- paste(sort(unique(keys[[trader_col]])),collapse="_")
+  rv <- paste("analysis",trader_prefix,date_hash,sep='_')
   return(rv)
 }
 

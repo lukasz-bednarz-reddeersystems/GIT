@@ -1,21 +1,18 @@
 library(shiny)
-source("../common/te_shiny_app_functions.r")
-# This automatically configures a small shiny app using 
-# a ggplot object and its associated data as built
-# by analysis modules
+library(R.utils)
+options(modifiedOnlySource=TRUE)
+sourceTo("te_shiny_app_factories.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
-#NB analysis modules appear to be saving to an object store
-#so the object in question could be loaded here....
-#[X] 1. Write an objectstore for the analysis block
-#[X] 2. Write a client for the above object store
-#[ ] 3. dataRequest from the client here
+#get test data
+block_client   <- tryCatch({new(paste(module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",module_name,cond)))
+key_function   <- tryCatch({lookback},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
+key_values     <- tryCatch({key_function(trader, date)},error=function(cond)stop(paste("Failed to set key values on date",date,"for trader",trader,":",cond)))
+block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
+block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
+analysis_ggplot<- getOutputGGPlot(block)
+analysis_data  <- getOutputGGPlotData(block)
 
-#The client would wrap the analysis module functions in the dataplex 
-#In effect this would simplify/cutout the step of building
-#the key function
-
-#These are going to need the ability to take other arguments, or perhaps
-#better.... an object that handles the module options. 
-ui    <- shinyUIFactory(analysis_ggplot,analysis_data)
-server<- shinyServerFactory(analysis_ggplot,analysis_data)
-shinyApp(ui = ui, server = server)
+factory <- new("ShinyFactory")
+factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("UI factory failed:",cond)))
+factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+shinyApp(ui = getUI(factory), server = getServer(factory))
