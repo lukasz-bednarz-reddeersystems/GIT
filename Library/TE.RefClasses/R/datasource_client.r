@@ -404,10 +404,10 @@ setMethod(".removeNAReferenceData",
 #'
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'VirtualDataSourceClient'.
+#' @param ... any additional parameters added by inherited methods
 #' @export
 
-setGeneric("dataRequest", function(object, key_values){standardGeneric("dataRequest")})
+setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
 
 
 #' Get factorized columns names
