@@ -29,7 +29,7 @@ test_that(sprintf("Can dataRequest on %s class", tested.class),{
 
   object <- dataRequest(object, valid.key_values)
 
-  block_data <- getReferenceData(block_client)
+  block_data <- getReferenceData(object)
 
   expect_is(block_data, "data.frame")
 })
@@ -39,12 +39,12 @@ test_that(sprintf("Can getAnalysisBlock on %s class", tested.class),{
   object <- new(client.class)
   object <- dataRequest(object, valid.key_values)
 
-  block_data <- getReferenceData(block_client)
+  block_data <- getReferenceData(object)
 
   expect_is(block_data, "data.frame")
 
 
-  block <- getAnalysisBlock(block_client)
+  block <- getAnalysisBlock(object)
   block_refdata <- getOutputObject(block)
   block_plot <- getOutputGGPlot(block)
   block_plot_data <- getOutputGGPlotData(block)

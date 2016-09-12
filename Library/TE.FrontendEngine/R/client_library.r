@@ -1,5 +1,5 @@
 #' @include analysis_client.r
-
+NULL
 
 #Convention is to name the client classes with the Client suffix so that the engine
 #can specify analysis modules to load by class name.

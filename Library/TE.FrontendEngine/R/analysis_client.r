@@ -58,13 +58,13 @@ setMethod("getAnalysisClass",
 #'
 #' @param object : object of type "VirtualAnalysisObjectstoreClient"
 #' @export
-setGeneric("getAnalysisBlock", function(object,...){standardGeneric("getAnalysisBlock")})
+setGeneric("getAnalysisBlock", function(object){standardGeneric("getAnalysisBlock")})
 
 #' @describeIn getAnalysisBlock
 #' Returns contained analysis block object
 #'
 #' @inheritParams getAnalysisBlock
-#' @return \code{analysis_class} "character" name of the analysis class
+#' @return \code{analysis_block} object of class "VirtualAnalysisBlock"
 #'
 #' @export
 setMethod("getAnalysisBlock",
@@ -75,17 +75,38 @@ setMethod("getAnalysisBlock",
 )
 
 
+#' Sets contained analysis block object to new value
+#'
+#' @param object : object of type "VirtualAnalysisObjectstoreClient"
+#' @param analysis_block object of class "VirtualAnalysisBlock"
+#'
+#' @return \code{object} object of type "VirtualAnalysisObjectstoreClient"
+setGeneric(".setAnalysisBlock", function(object, analysis_block){standardGeneric(".setAnalysisBlock")})
+
+setMethod(".setAnalysisBlock",
+          signature(object = "VirtualAnalysisObjectstoreClient",
+                    analysis_block = "VirtualAnalysisBlock"),
+          function(object, analysis_block){
+            object@analysis_block <- analysis_block
+
+            return(object)
+          }
+)
+
+
 #' Request data from data source
 #'
 #' Generic method to request data from data source.
 #' Needs to be implemented in derived classes to work
 #'
 #' @param object object of class 'VirtualAnalysisObjectstoreClient'.
-#' @param key_values data.frame with keys specifying data query.
+#' @param key_values "data.frame" with keys specifying data query.
+#' @param force "logical" should the block be computed for given keys if not present in store.
 #' @return \code{object} object of class 'VirtualAnalysisObjectstoreClient'.
 #' @export
 setMethod("dataRequest",
-          signature(object = "VirtualAnalysisObjectstoreClient", key_values = "data.frame"),
+          signature(object = "VirtualAnalysisObjectstoreClient",
+                    key_values = "data.frame"),
           function(object, key_values, force=FALSE){
 
             key <- key_values
@@ -105,29 +126,26 @@ setMethod("dataRequest",
                 analysis_block <- dataRequest(analysis_block,key)
                 analysis_store <- updateAnalysisStore(analysis_store,analysis_block,key)
                 analysis_store <- commitAnalysisStore(analysis_store)
-                query_data     <- getOutputlGGPlotData(analysis_block)
+                query_data     <- getOutputGGPlotData(analysis_block)
               }
               else{
                 stop(message(paste("No instance of",analysis,"found in store, either build it, check the key, or run with force=TRUE.")))
               }
             } else {
               query_data <- getOutputGGPlotData(analysis_block)
-              object@analysis_block <- analysis_block
+              object <- .setAnalysisBlock(object, analysis_block)
             }
 
-            if (nrow(query_data) == 0) {
-              query_data <- .generateDataFilledWithNA(object, trader, start, end)
-            }
 
             if (0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
-              message(paste("Query sent to", datastore, "returned zero row data.frame"))
-              stop(paste("Query sent to", datastore, "returned zero row data.frame"))
+              message(paste("Query sent to", store_id, "returned zero row data.frame"))
+              stop(paste("Query sent to", store_id, "returned zero row data.frame"))
             }
 
             # forcing new variables set
-            object <- .setRequiredVariablesNames(object, colnames(query_data))
-            object <- .setStoredVariablesNames(object, colnames(query_data))
+            object <- TE.RefClasses:::.setRequiredVariablesNames(object, colnames(query_data))
+            object <- TE.RefClasses:::.setStoredVariablesNames(object, colnames(query_data))
 
             # storing Reference data internaly
             object <- setReferenceData(object, query_data)

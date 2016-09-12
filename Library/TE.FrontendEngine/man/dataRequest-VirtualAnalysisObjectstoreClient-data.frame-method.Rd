@@ -11,7 +11,9 @@
 \arguments{
 \item{object}{object of class 'VirtualAnalysisObjectstoreClient'.}
 
-\item{key_values}{data.frame with keys specifying data query.}
+\item{key_values}{"data.frame" with keys specifying data query.}
+
+\item{force}{"logical" should the block be computed for given keys if not present in store.}
 }
 \value{
 \code{object} object of class 'VirtualAnalysisObjectstoreClient'.

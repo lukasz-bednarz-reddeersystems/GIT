@@ -8,10 +8,12 @@
 #' @docType package
 #' @name TE.FrontendEngine
 #'
+#' @import TE.DataAccess
 #' @import TE.RefClasses
 #' @import TE.AnalysisClasses
 #' @import methods
 #' @import lubridate
+#' @importFrom hashFunction cityhash.64 murmur3.32
 #
 NULL
 ## NULL

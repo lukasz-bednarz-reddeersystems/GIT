@@ -6,7 +6,7 @@
 \alias{getAnalysisBlock,VirtualAnalysisObjectstoreClient-method}
 \title{Returns contained analysis block object}
 \usage{
-getAnalysisBlock(object, ...)
+getAnalysisBlock(object)
 
 \S4method{getAnalysisBlock}{VirtualAnalysisObjectstoreClient}(object)
 }
@@ -14,7 +14,7 @@ getAnalysisBlock(object, ...)
 \item{object}{: object of type "VirtualAnalysisObjectstoreClient"}
 }
 \value{
-\code{analysis_class} "character" name of the analysis class
+\code{analysis_block} object of class "VirtualAnalysisBlock"
 }
 \description{
 Returns contained analysis block object

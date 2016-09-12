@@ -10,9 +10,11 @@ Description: Pakckage is implementing functions and classes for front end
     visualization engine.
 Depends:
     R (>= 3.3.0),
+    TE.DataAccess(>= 0.1.0),
     TE.RefClasses (>= 0.1.0),
     TE.AnalysisClasses (>= 0.1.0),
     methods,
+    hashFunction,
 License: file LICENSE
 LazyData: TRUE
 Imports:
