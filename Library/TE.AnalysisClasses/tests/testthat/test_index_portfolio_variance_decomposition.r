@@ -151,7 +151,11 @@ test_that(paste("Can Process() on", tested.class), {
 test_that(paste("Can Process() on", tested.class, "With non - default risk model"), {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
+  valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
+  valid.risk_model_obj  <- new(valid.risk_model)
+
   object <- new(tested.class)
+  object <- setRiskModelObject(object, valid.risk_model_obj)
 
   valid.key_values <- dated_three_monthly_lookback(valid.ticker, "2016-08-30")
   #valid.key_values <- dated_full_month(valid.ticker, "2016-05-30")

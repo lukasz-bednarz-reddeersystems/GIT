@@ -286,22 +286,22 @@ setMethod("Process",
 
             risk_plot_data <- rbind(data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'TotalSystematic',
-                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1e4),
+                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1e2),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'MarketRiskFactor',
-                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1e4),
+                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1e2),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e4),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Commodity',
-                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1e4),
+                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1e2),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e4),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Sector',
-                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1e4))
+                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1e2))
             plt_risk <- ggplot(data=risk_plot_data,aes_string(x="Date",y="Value",colour="RiskType")) +
               geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type")
 

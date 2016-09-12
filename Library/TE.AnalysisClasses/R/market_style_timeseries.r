@@ -44,6 +44,27 @@ setClass(
 )
 
 
+#' Set risk_model object in object slot
+#'
+#' Public method to set trade_data slot with "VirtualRiskModel"
+#' class object
+#'
+#' @rdname setRiskModelObject-MarketStyleAnalysisBlock-method
+#' @param object object of class "MarketStyleAnalysisBlock"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @return \code{object} object of class "MarketStyleAnalysisBlock"
+#' @export
+
+setMethod("setRiskModelObject",
+          signature(object = "MarketStyleAnalysisBlock",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            return(object)
+          }
+)
+
+
 #' Request data from data source
 #'
 #' @param object object of class 'MarketStyleAnalysisBlock'.
@@ -58,6 +79,7 @@ setMethod("dataRequest",
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             market_style <- getMarketStyleDataObject(object)
+            market_style <- setRiskModelObject(market_style, getRiskModelObject(object))
 
             # getting marketStyle data
 
