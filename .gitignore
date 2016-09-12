@@ -7,3 +7,4 @@ R/model_data/**
 **/*.png
 **/*.wmf
 **/*.emf
+.Rproj.user
