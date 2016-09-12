@@ -40,6 +40,7 @@ setClass(
 #'
 #' Returns character name of dB schema to be used for queries.
 #'
+#' @rdname private_getSQLQuerySchemaName
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{db_schema} character
 
@@ -56,6 +57,7 @@ setMethod(".getSQLQuerySchemaName",
 #'
 #' Returns character vector of constructed SQL query strings.
 #'
+#' @rdname private_getSQLQueryStrings
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{sql_query} character vector of constructed SQL query strings.
 
@@ -72,6 +74,7 @@ setMethod(".getSQLQueryStrings",
 #'
 #' Private method to set character vector of constructed SQL query strings.
 #'
+#' @rdname private_setSQLQueryStrings
 #' @param object object of class 'VirtualSQLQuery'.
 #' @param queries character vector of constructed SQL query strings.
 #' @return \code{object} object of class 'VirtualSQLQuery'.
@@ -107,6 +110,7 @@ setMethod("getSQLQueryKeyColumnNames",
 #' Private method to set values of key values datatable
 #' with keys that will be matched in datastore query
 #'
+#' @rdname private_setSQLQueryKeyValues
 #' @param object object of class 'VirtualSQLQuery'.
 #' @param key_values  data.frame with columns matching key column names()
 #' @return \code{object} object of class 'VirtualSQLQuery'.
@@ -155,6 +159,7 @@ setMethod("getSQLQueryKeyValues",
 #' Returns function that will be used to parse
 #' query key values to SQL querry string(s).
 #'
+#' @rdname private_getSQLQueryKeyValuesParser
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{parser} function used to parse the query keys
 
@@ -171,6 +176,7 @@ setMethod(".getSQLQueryKeyValuesParser",
 #'
 #' Returns function that will be used to parse results of SQL query.
 #'
+#' @rdname private_getSQLQueryResultsParser
 #' @param object object of class 'VirtualSQLQuery'.
 #' @return \code{results_parser} function used to parse the data
 
@@ -293,6 +299,7 @@ setClass(
 #'
 #' Returns names of arguments used by procedure(s).
 #'
+#' @rdname private_getSQLProcedureArgumentNames
 #' @param object object of class 'VirtualSQLProcedureCall'.
 #' @return \code{arguments} character vector of names of procedure arguments
 
@@ -309,6 +316,7 @@ setMethod(".getSQLProcedureArgumentNames",
 #'
 #' Returns name of the stored procedure that needs to be executed.
 #'
+#' @rdname private_getSQLProcedureName
 #' @param object object of class 'VirtualSQLProcedureCall'.
 #' @return \code{procedure} character procedure name
 
@@ -370,6 +378,7 @@ setClass(
 #'
 #' Returns stored SQL query object that encapsulates query to DB
 #'
+#' @rdname private_getSQLQueryObject
 #' @param object object of class 'VirtualRODBCClient'.
 #' @return \code{sql_query} object of type "VirtualSQLQuery"
 
@@ -386,6 +395,7 @@ setMethod(".getSQLQueryObject",
 #'
 #' Sets stored SQL query object that encapsulates query to DB
 #'
+#' @rdname private_setSQLQueryObject
 #' @param object object of class 'VirtualRODBCClient'.
 #' @param sql_query bject of type "VirtualSQLQuery"
 #' @return \code{object} object of class 'VirtualRODBCClient'.

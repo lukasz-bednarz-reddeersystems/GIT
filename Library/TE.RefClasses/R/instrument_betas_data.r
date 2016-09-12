@@ -38,7 +38,7 @@ setClass(
     key_cols        = c(risk_model_objectstore_keys, "InstrumentID"),
     key_values      = data.frame(Date = as.Date(character()),
                                  InstrumentID = integer()),
-    values             = c("Date", "Instrument"), # columns that neeed to be returned from datastore
+    values             = c("Date", "InstrumentID"), # columns that neeed to be returned from datastore
     column_name_map = hash(c("Instrument", "InstrumentID"),
                            c("InstrumentID","Instrument"))
 

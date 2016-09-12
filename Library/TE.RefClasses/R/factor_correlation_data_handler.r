@@ -64,6 +64,7 @@ setGeneric("setFactorCorrelationDataObject", function(object,factor_correlation)
 #'
 #' Private method to set factor_correlation slot with "VirtualFactorCorrelationData"
 #'
+#' @rdname private_setFactorCorrelationDataObject
 #' @param object object of class "VirtualFactorCorrelationDataHandler"
 #' @param factor_correlation object of class "VirtualFactorCorrelationData"
 #' @return \code{object} object of class "VirtualFactorCorrelationDataHandler"

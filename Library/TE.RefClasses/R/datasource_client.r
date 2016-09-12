@@ -46,6 +46,7 @@ setClass(
 #'
 #' Private method to handle cleaning of raw data from datasource
 #'
+#' @rdname private_PostProcessResultsData
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
@@ -63,6 +64,7 @@ setMethod(".PostProcessResultsData",
 #' Private method to fill data for missing keys with NA's
 #' has to be implemented in derived classes if it is to be used
 #'
+#' @rdname private_generateDataFilledWithNA
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param ... any parameters passed to specific methods implemented by
 #' inheriting classes
@@ -130,6 +132,7 @@ setMethod("getDataSourceReturnColumnNames",
 #'
 #' Private method to set column names returned by datasource
 #'
+#' @rdname private_setDataSourceReturnColumnNames
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param values "character" vector with list of returned source column names
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
@@ -204,6 +207,7 @@ setMethod("hasNonNAColumnNames",
 #' Private method to set values of key values datatable
 #' with keys that will be matched in datastore query
 #'
+#' @rdname private_setDataSourceQueryKeyValues
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param key_values data.frame with columns matching key column names()
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
@@ -323,6 +327,7 @@ setMethod("getDataSourceClientColumnNameMap",
 #' Private method to translate raw data column names
 #' to required output names
 #'
+#' @rdname private_translateDataSourceColumnNames
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @param colnames character vector with list of raw data column names
 #' @return \code{ret_colnames} data source column names translated to
@@ -335,11 +340,19 @@ setMethod(".translateDataSourceColumnNames",
 
             colnames_map <- getDataSourceClientColumnNameMap(object)
 
-            names_to_translate <- intersect(colnames, names(colnames_map))
-            idx <- (colnames %in% names_to_translate)
+            if (length(colnames_map) > 0)
+            {
 
-            ret_colnames <- colnames
-            ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate]
+              names_to_translate <- intersect(colnames, names(colnames_map))
+              idx <- (colnames %in% names_to_translate)
+
+              ret_colnames <- colnames
+              ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate]
+
+            }
+            else {
+              ret_colnames <- colnames
+            }
 
             return(ret_colnames)
           }
@@ -351,6 +364,7 @@ setMethod(".translateDataSourceColumnNames",
 #' Private method to remove rows in reference data
 #' where non-NA column names are NA
 #'
+#' @rdname private_removeNAReferenceData
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 
@@ -500,6 +514,7 @@ setMethod("getFactorizationKeyColumnNames",
 #' Expands internal factor columns to logical columns
 #' with factor levels as column names
 #'
+#' @rdname private_transformReferenceData
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{object} object of class 'VirtualDataSourceClient'.
 

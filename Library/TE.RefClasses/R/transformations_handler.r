@@ -41,6 +41,7 @@ setMethod("getTransformations",
 #'
 #' Private method to add transformation to list of attached transformations
 #'
+#' @rdname private_addTransformation
 #' @param object object of class 'VirtualTransformationHandler'.
 #' @param transformation object of class "VirtualReferenceDataTransformation"
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
@@ -61,6 +62,7 @@ setMethod(".addTransformation",
 #'
 #' Private method to set transformation list of attached transformations
 #'
+#' @rdname private_setTransformations
 #' @param object object of class 'VirtualTransformationHandler'.
 #' @param transformations list of objects of class "VirtualReferenceDataTransformation"
 #' @return \code{object} object of class 'VirtualTransformationHandler'.

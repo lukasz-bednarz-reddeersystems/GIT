@@ -68,6 +68,7 @@ setGeneric("setExtendedTradeDataObject", function(object,ex_trade_data){standard
 #'
 #' Private method to set ex_trade_data slot with "VirtualExtendedTradeData"
 #'
+#' @rdname private_setExtendedTradeDataObject
 #' @param object object of class "VirtualExtendedTradeDataHandler"
 #' @param ex_trade_data object of class "VirtualExtendedTradeData"
 #' @return \code{object} object of class "VirtualExtendedTradeDataHandler"

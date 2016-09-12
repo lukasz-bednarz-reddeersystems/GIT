@@ -66,6 +66,7 @@ setGeneric("setImpliedFactorReturnsDataObject", function(object,implied_factor_r
 #'
 #' Private method to set implied_factor_returns slot with "VirtualImpliedFactorReturnsData"
 #'
+#' @rdname private_setImpliedFactorReturnsDataObject
 #' @param object object of class "VirtualImpliedFactorReturnsDataHandler"
 #' @param implied_factor_returns object of class "VirtualImpliedFactorReturnsData"
 #' @return \code{object} object of class "VirtualImpliedFactorReturnsDataHandler"

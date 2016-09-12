@@ -67,6 +67,7 @@ setGeneric("setFactorVarianceDataObject", function(object,factor_variance){stand
 #'
 #' Private method to set factor_variance slot with "VirtualFactorVarianceData"
 #'
+#' @rdname private_setFactorVarianceDataObject
 #' @param object object of class "VirtualFactorVarianceDataHandler"
 #' @param factor_variance object of class "VirtualFactorVarianceData"
 #' @return \code{object} object of class "VirtualFactorVarianceDataHandler"

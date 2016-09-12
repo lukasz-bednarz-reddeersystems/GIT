@@ -50,12 +50,6 @@ setMethod("initialize",
 
             .Object <- callNextMethod()
 
-            # retrieve factor names from specific_risk model
-            ret_values <- getRequiredVariablesNames(.Object)
-
-
-            .Object <- .setDataSourceReturnColumnNames(.Object, ret_values)
-
             return(.Object)
           }
 )
@@ -90,6 +84,7 @@ setMethod("getRiskModelObjectstoreComponentName",
 #'
 #' Transforms original query key values to risk model objectstore specific keys
 #'
+#' @rdname private_generateQueryKeyValues
 #' @param object object of class 'VirtualRiskModelObjectstoreClient'.
 #' @param key_values 'data.frame' with original query keys to be transformed .
 #' @return \code{query_key_values} 'data.frame', transformed, component specific query keys.
@@ -180,7 +175,7 @@ setMethod("dataRequest",
                 first <- FALSE
               }
               else {
-                
+
                 ret_data <- rbind(ret_data, query_data[!(query_data$Date %in% unique(ret_data$Date)), ])
               }
 

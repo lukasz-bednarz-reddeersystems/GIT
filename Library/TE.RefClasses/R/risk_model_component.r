@@ -14,10 +14,12 @@ setMethod(".initializeRiskModelDependentValues",
             # retrieve factor names from specific_risk model
             factor_names <- getRiskModelFactorNames(object)
 
-            # make these required colnames
-            req_cols <- getRequiredVariablesNames(object)
+            key_cols <- getDataSourceQueryKeyColumnNames(object)
 
-            object <- .setRequiredVariablesNames(object, c(req_cols, factor_names))
+            # make these required colnames
+            object <- .setRequiredVariablesNames(object, c(key_cols, factor_names))
+
+            object <- .setDataSourceReturnColumnNames(object, unique(c(key_cols, factor_names)))
 
             return(object)
           }
@@ -54,6 +56,7 @@ setMethod("setRiskModelObject",
           signature(object = "VirtualRiskModelFactorDependentComponent",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
+
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
             object <- .initializeRiskModelDependentValues(object)
             return(object)

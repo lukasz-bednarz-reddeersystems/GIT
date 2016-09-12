@@ -69,6 +69,7 @@ setGeneric("setMarketStyleDataObject", function(object,market_style){standardGen
 #'
 #' Private method to set market_style slot with "VirtualMarketStyleData"
 #'
+#' @rdname private_setMarketStyleDataObject
 #' @param object object of class "VirtualMarketStyleDataHandler"
 #' @param market_style object of class "VirtualMarketStyleData"
 #' @return \code{object} object of class "VirtualMarketStyleDataHandler"
