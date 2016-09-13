@@ -15,8 +15,7 @@ setClass(
   Class                = "VirtualAnalysisClient",
   slots                = c(analysis_class = "character", analysis_block = "VirtualAnalysisBlock"),
   prototype = list(
-    key_cols = c("analysis_class", "id", "start", "end")
-
+    key_cols = c("analysis_class", "TraderID", "start", "end")
   ),
   contains = c("VirtualDataSourceClient", "VIRTUAL")
 )
@@ -57,21 +56,26 @@ setMethod("dataRequest",
             key <- key_values
             analysis <- getAnalysisClass(object)
             key_with_class <- cbind(data.frame(analysis_class = analysis), key_values)
+            colnames(key_with_class) <- getDataSourceQueryKeyColumnNames(object)
             object <- .setDataSourceQueryKeyValues(object,key_with_class)
-            
-            store_id <- get_analysis_objectstore_name(key_with_class,trader_col='id')
+
+            store_id <- get_analysis_objectstore_name(key_with_class)
             
             analysis_store <- analysis_objectstore_factory(store_id)
             kh <- as.character(murmur3.32(as.character(key_values)))
             analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
             
+
+
             if (is.null(analysis_block)) { 
               if(force){
                 analysis_block <- new(analysis)
-                analysis_block <- dataRequest(analysis_block,key)
-                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,key)
+                analysis_block <- dataRequest(analysis_block,key_with_class[colnames(key_with_class)!='analysis_class'])
+                analysis_block <- Process(analysis_block)
+                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,data.frame(key_hash=kh,analysis_module=object@analysis_class))
                 analysis_store <- commitAnalysisStore(analysis_store)
-                query_data     <- getOutputlGGPlotData(analysis_block)
+                query_data     <- getOutputGGPlotData(analysis_block)
+                object@analysis_block <- analysis_block
               }
               else{
                 stop(message(paste("No instance of",analysis,"found in store, either build it, check the key, or run with force=TRUE.")))

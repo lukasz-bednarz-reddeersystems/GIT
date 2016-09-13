@@ -5,7 +5,7 @@ library(R.utils)
 options(modifiedOnlySource=TRUE)
 sourceTo("engine.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
-test <- FALSE
+test <- TRUE
 if(test){
   working_path <- "C:/Development/TradingEnhancementEngine/R/engine"
   host <- 'localhost'
