@@ -112,21 +112,27 @@ setMethod("dataRequest",
             key <- key_values
             analysis <- getAnalysisClass(object)
             key_with_class <- cbind(data.frame(analysis_class = analysis), key_values)
+            colnames(key_with_class) <- getDataSourceQueryKeyColumnNames(object)
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_with_class)
 
-            store_id <- get_analysis_objectstore_name(key_with_class,trader_col='id')
+            store_id <- get_analysis_objectstore_name(key_with_class,trader_col=colnames(key_with_class)[2])
 
             analysis_store <- analysis_objectstore_factory(store_id)
             kh <- as.character(murmur3.32(as.character(key_values)))
             analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
 
+            analysis_key <- key_with_class[setdiff(colnames(key_with_class), "analysis_class")]
+            objstr_key <- data.frame(key_hash = kh, analysis_module = getAnalysisClass(object))
+
             if (is.null(analysis_block)) {
               if(force){
                 analysis_block <- new(analysis)
-                analysis_block <- dataRequest(analysis_block,key)
-                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,key)
+                analysis_block <- dataRequest(analysis_block,analysis_key)
+                analysis_block <- Process(analysis_block)
+                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,objstr_key, TRUE)
                 analysis_store <- commitAnalysisStore(analysis_store)
                 query_data     <- getOutputGGPlotData(analysis_block)
+                object <- .setAnalysisBlock(object, analysis_block)
               }
               else{
                 stop(message(paste("No instance of",analysis,"found in store, either build it, check the key, or run with force=TRUE.")))
