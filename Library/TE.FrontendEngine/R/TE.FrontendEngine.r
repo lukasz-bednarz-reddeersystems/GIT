@@ -13,7 +13,11 @@
 #' @import TE.AnalysisClasses
 #' @import methods
 #' @import lubridate
+#' @import shiny
 #' @importFrom hashFunction cityhash.64 murmur3.32
+#' @importFrom functional Curry
+#' @importFrom stats filter
+#' @importFrom dplyr %>%
 #
 NULL
 ## NULL

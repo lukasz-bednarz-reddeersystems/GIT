@@ -13,16 +13,21 @@ Depends:
     TE.DataAccess(>= 0.1.0),
     TE.RefClasses (>= 0.1.0),
     TE.AnalysisClasses (>= 0.1.0),
-    methods,
-    hashFunction,
 License: file LICENSE
 LazyData: TRUE
 Imports:
     lubridate,
+    shiny,
+    methods,
+    hashFunction,
+    functional,
+    dplyr,
 Collate:
     'TE.FrontendEngine.r'
     'analysis_client.r'
     'client_library.r'
+    'shiny_app_factories.r'
+    'engine.r'
 RoxygenNote: 5.0.1
 Suggests:
     testthat

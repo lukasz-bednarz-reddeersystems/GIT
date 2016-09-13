@@ -9,6 +9,6 @@ Implements methods to access analysis objectstore
 for StrategyBreakdownAnalysisBlock class
 }
 \details{
-Inherits from: "VirtualAnalysisClient"
+Inherits from: "VirtualAnalysisObjectstoreClient"
 }
 
