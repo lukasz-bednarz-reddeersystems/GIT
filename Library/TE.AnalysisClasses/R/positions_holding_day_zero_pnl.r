@@ -189,7 +189,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, day_0_focus)
             object <- .setOutputGGPlot(object, d0_plt)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL", "MarketValue")))
 
             return(object)
           }

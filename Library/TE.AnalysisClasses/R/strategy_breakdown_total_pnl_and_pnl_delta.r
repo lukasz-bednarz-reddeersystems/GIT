@@ -85,6 +85,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, pl_data)
 
             object <- .setOutputGGPlot(object, pl_smmry)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value", "lbls")))
 
             return(object)
           }

@@ -165,6 +165,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value.Abs")))
 
             return(object)
           }

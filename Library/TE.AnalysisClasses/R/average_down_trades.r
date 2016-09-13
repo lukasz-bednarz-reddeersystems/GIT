@@ -224,7 +224,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, adown_plt)
             object <- .setOutputGGPlot(object, adown_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TradeCount","PL","Num.Trades")))
 
             return(object)
           }

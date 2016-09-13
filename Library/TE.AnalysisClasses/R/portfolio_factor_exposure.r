@@ -151,6 +151,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, fct_smmry)
             object <- .setOutputGGPlot(object, exprs_smmry)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TotalExposure")))
 
             return(object)
           }

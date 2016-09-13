@@ -125,7 +125,7 @@ setMethod("Process",
             # set processed data as an output
             object <- .setOutputGGPlotData(object, adown_focus)
             object <- .setOutputGGPlot(object, adown_focus_plt)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("ValueUSD","TodayPL")))
 
             return(object)
           }

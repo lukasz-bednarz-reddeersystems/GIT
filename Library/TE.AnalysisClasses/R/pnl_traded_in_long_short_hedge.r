@@ -117,6 +117,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, ttl_pl_smrry)
 
             object <- .setOutputGGPlot(object, pl_plot)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL")))
 
             return(object)
           }
