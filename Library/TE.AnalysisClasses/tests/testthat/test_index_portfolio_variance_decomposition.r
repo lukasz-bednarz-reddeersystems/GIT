@@ -12,7 +12,7 @@ init.key_values       <- data.frame(IndexTicker = character(),
                                     end    = as.Date(character()))
 
 valid.ticker          <- "BE500 Index"
-
+default.risk_model <- "RiskModel.DevelopedEuropePrototype150.1.1"
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)
 })
@@ -25,7 +25,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(object, tested.class)
 
   expect_is(getPortfolioDataObject(object), "IndexPortfolio.BE500")
-  expect_is(getRiskModelObject(object), "RiskModel.DevelopedEuropePrototype150")
+  expect_is(getRiskModelObject(object), default.risk_model)
   expect_is(getInstrumentBetasDataObject(object), "InstrumentBetasData")
   expect_is(getFactorCorrelationDataObject(object), "FactorCorrelationData")
   expect_is(getFactorVarianceDataObject(object), "FactorVarianceData")

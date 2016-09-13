@@ -26,7 +26,7 @@ valid.column_name_map <- hash(c("IndexTicker", "start", "end"), c("id", "start",
 init.key_values       <- data.frame(IndexTicker = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character()))
-
+default.risk_model <- "RiskModel.DevelopedEuropePrototype150.1.1"
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)
 })
@@ -39,7 +39,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(object, tested.class)
 
   expect_is(getPortfolioDataObject(object), "IndexPortfolio.BE500")
-  expect_is(getRiskModelObject(object), "RiskModel.DevelopedEuropePrototype150")
+  expect_is(getRiskModelObject(object), default.risk_model)
   expect_is(getInstrumentBetasDataObject(object), "InstrumentBetasData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")

@@ -35,7 +35,8 @@ setClass(
                                  end    = as.Date(character())),
     column_name_map = hash(c("start", "end"),
                            c("start", "end")),
-    market_style       = new("MarketStyleData")
+    market_style    = new("MarketStyleData"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualRiskModelHandler",

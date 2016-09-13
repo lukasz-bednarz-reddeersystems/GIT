@@ -92,6 +92,49 @@ setMethod("setMarketDataObject",
 )
 
 
+#' Request data from data source
+#'
+#' @param object object of class 'MarketReturnAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'MarketReturnAnalysisBlock'.
+#' @export
+
+setMethod("dataRequest",
+          signature(object = "MarketReturnAnalysisBlock", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
+
+            #
+            trade_data <- getTradeDataObject(object)
+
+            if (getStoredNRows(trade_data) == 0) {
+
+              ext.stock.an <- new("ExtendedTradesAnalysisBlock")
+
+              ext.stock.an <- dataRequest(ext.stock.an, key_values)
+              ext.stock.an <- Process(ext.stock.an)
+
+              ext.stock.rd <- getOutputObject(ext.stock.an)
+
+              object <- TE.RefClasses:::.setTradeDataObject(object, ext.stock.rd)
+            }
+
+            market_data <- getMarketDataObject(object)
+
+            if (is.null(market_data) || getStoredNRows(market_data) == 0) {
+              index.rd     <- new("MarketDataSX5E",
+                                  min(key_values$start),
+                                  max(key_values$end))
+
+              object <- TE.RefClasses:::.setMarketDataObject(object, index.rd)
+            }
+
+            return(object)
+          }
+)
+
+
 #' Trigger computation of analysis data.
 #'
 #' @param object object of class "MarketReturnAnalysisBlock"

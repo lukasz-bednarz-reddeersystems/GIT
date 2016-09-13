@@ -155,8 +155,6 @@ setMethod("dataRequest",
           signature(object = "PortfolioFactorReturnsAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
-            browser()
-
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             trader <- unique(key_values$TraderID)[1]
@@ -413,7 +411,8 @@ setClass(
                                  end    = as.Date(character())),
     column_name_map = hash(c("IndexTicker", "start", "end"),
                            c("id", "start", "end")),
-    portfolio       = new("IndexPortfolio.BE500")
+    portfolio       = new("IndexPortfolio.BE500"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
 
   ),
   contains          = c("PortfolioFactorReturnsAnalysisBlock"

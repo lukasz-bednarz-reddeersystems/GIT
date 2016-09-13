@@ -207,7 +207,7 @@ setMethod("dataRequest",
 setMethod("Process",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock"),
           function(object){
-            browser()
+
             # risk model
             risk_model <- getRiskModelObject(object)
 
@@ -343,7 +343,9 @@ setClass(
                                  end    = as.Date(character())),
     column_name_map = hash(c("IndexTicker", "start", "end"),
                            c("id", "start", "end")),
-    portfolio       = new("IndexPortfolio.BE500")
+    portfolio       = new("IndexPortfolio.BE500"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
+
   ),
   contains          = c("PortfolioVarianceDecompositionAnalysisBlock")
 )

@@ -55,6 +55,40 @@ setMethod("setTradeDataObject",
 )
 
 
+#' Request data from data source
+#'
+#' @param object object of class 'AverageDownTradesFocusAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'AverageDownTradesFocusAnalysisBlock'.
+#' @export
+
+setMethod("dataRequest",
+          signature(object = "AverageDownTradesFocusAnalysisBlock", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
+
+            trader <- unique(key_values$TraderID)[1]
+            start <- min(key_values$start)
+            end <- max(key_values$end)
+
+            #
+            trade_data <- getTradeDataObject(object)
+
+            if (getStoredNRows(trade_data) == 0) {
+
+              # using AverageDownTradesAnalysisBlock to retrieve and process input data
+              avg.dwn.trd.an <- new("AverageDownTradesAnalysisBlock")
+              avg.dwn.trd.an <- dataRequest(avg.dwn.trd.an, key_values)
+              avg.dwn.trd.an <- Process(avg.dwn.trd.an)
+              avg.dwn.trd.rd <- getOutputObject(avg.dwn.trd.an)
+              object <- TE.RefClasses:::.setTradeDataObject(object, avg.dwn.trd.rd)
+            }
+
+            return(object)
+          }
+)
+
 #' Trigger computation of analysis data.
 #'
 #' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
