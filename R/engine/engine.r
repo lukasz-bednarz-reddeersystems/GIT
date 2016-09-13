@@ -4,7 +4,7 @@ library(dplyr)
 sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/sockets.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/frame_to_xml.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules_legacy/analysis_module.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+#sourceTo("../analysis_modules_legacy/analysis_module.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../models/key_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/analysis_client/client_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
@@ -216,6 +216,7 @@ setClass(
 		app        = "function",
 		analysis_ggplot = "gg",
 		analysis_data   = "data.frame"
+		ui_options      = "data.frame"
 	),
 	prototype    = prototype(
 		interpreter= new("EngineCommandInterpreter"),
@@ -376,9 +377,9 @@ setMethod("scrambleData","Engine",
 		}
 	}
 )
-sub_column(data,col_name,generic=NULL){
+sub_column <- function(data,col_name,generic=NULL){
 	type <- class(data[col_name])[[1]]
-	if(type='character'){
+	if(type=='character'){
 		vals <- data[col_name]
 		remapper <- sample(letters,length(unique(vals)))
 		names(remapper) <- unique(vals)
