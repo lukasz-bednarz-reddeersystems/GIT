@@ -11,8 +11,11 @@ block_client   <- tryCatch({dataRequest(block_client, key_values)},error=functio
 block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
 analysis_ggplot<- getOutputGGPlot(block)
 analysis_data  <- getOutputGGPlotData(block)
+omit <- getFrontendData(block)
+omit <- omit$omit
+ui_options <- list(omit=unique(c('Value','PL',omit)))
 
 factory <- new("ShinyFactory")
-factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("UI factory failed:",cond)))
+factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data,ui_options=ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
 factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
 shinyApp(ui = getUI(factory), server = getServer(factory))

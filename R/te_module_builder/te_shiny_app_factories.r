@@ -63,9 +63,9 @@ setClass(
 		main_content = plotOutput
 	)
 )
-setGeneric("shinyUIFactory",function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value'))){standardGeneric("shinyUIFactory")})
+setGeneric("shinyUIFactory",function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value','PL'))){standardGeneric("shinyUIFactory")})
 setMethod("shinyUIFactory","ShinyFactory",
-	function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value'))){
+	function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value','PL'))){
 		object@plot_name <- gsub(" ","",analysis_ggplot$labels$title)
 		object <- buildContent(object,analysis_ggplot,analysis_data,ui_options)
 		object@ui[[1]] <- shinyUI(object@page_type(
