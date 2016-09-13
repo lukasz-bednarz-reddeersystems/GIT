@@ -4,6 +4,8 @@
 #' @param name character name
 #' @param tree_name name of the xml tree, default is 'Root'
 #' @return \code{xml} character xml string
+#'
+#' @export
 FrameToXML <- function(df,name,tree_name="Root")
 {
   name <- gsub(' ','_',name)
