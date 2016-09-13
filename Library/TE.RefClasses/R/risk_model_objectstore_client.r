@@ -1,5 +1,5 @@
 #' @include datasource_client.r
-#' @include risk_model_handler.r
+#' @include risk_model_component.r
 NULL
 
 #########################################
@@ -32,9 +32,27 @@ setClass(
     key_cols        = risk_model_objectstore_keys,
     key_values      = data.frame(Date = as.Date(character()))
   ),
-  contains = c("VirtualDataSourceClient","VirtualRiskModelHandler", "VIRTUAL")
+  contains = c("VirtualDataSourceClient","VirtualRiskModelFactorDependentComponent", "VIRTUAL")
 )
 
+
+
+#' initialize method for "VirtualRiskModelObjectstoreClient" derived classes
+#'
+#' initializes required column names from the values obtained from contained risk model
+#'
+#' @param .Object object of class derived from "VirtualRiskModelObjectstoreClient"
+#' @export
+
+setMethod("initialize",
+          "VirtualRiskModelObjectstoreClient",
+          function(.Object){
+
+            .Object <- callNextMethod()
+
+            return(.Object)
+          }
+)
 
 #' Get Risk Model Component Name
 #'
@@ -66,6 +84,7 @@ setMethod("getRiskModelObjectstoreComponentName",
 #'
 #' Transforms original query key values to risk model objectstore specific keys
 #'
+#' @rdname private_generateQueryKeyValues
 #' @param object object of class 'VirtualRiskModelObjectstoreClient'.
 #' @param key_values 'data.frame' with original query keys to be transformed .
 #' @return \code{query_key_values} 'data.frame', transformed, component specific query keys.
@@ -139,6 +158,10 @@ setMethod("dataRequest",
 
               rm_str       <- get_most_recent_model_objectstore(model_prefix, end, lookback)
 
+              if (is.null(rm_str)) {
+                next
+                }
+
               name         <- getID(rm_str)
 
               query_data   <- queryDailyRiskModelObjectStore(rm_str,name,lookback,component)
@@ -152,7 +175,8 @@ setMethod("dataRequest",
                 first <- FALSE
               }
               else {
-                ret_data <- rbind(ret_data, query_data)
+
+                ret_data <- rbind(ret_data, query_data[!(query_data$Date %in% unique(ret_data$Date)), ])
               }
 
             }

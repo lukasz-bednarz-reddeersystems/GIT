@@ -9,10 +9,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-setwd("C:/Development/AllRaid/branches/dev_lukasz.bednarz/Services/Raid.Services.TradingEnhancementEngine/R/reports")
-setOption("modifiedOnlySource", TRUE)
-source("../analysis_modules/risk_review_report/risk_review_report.r")
-source("../models/key_library.r")
+library(TE.Report)
 library(devEMF)
 
 library(lubridate)

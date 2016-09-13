@@ -1,4 +1,5 @@
 #' @include analysis_block.r
+#' @include portfolio_variance_decomposition_functions.r
 NULL
 
 ################################################################################
@@ -22,7 +23,7 @@ NULL
 setClass(
   Class             = "PortfolioFactorReturnsData",
   prototype         = list(
-    required_colnms = c("Date", portfolio_decomposition_all_factors)
+    required_colnms = c("Date")
   ),
   contains          = c("VirtualImpliedFactorReturnsData")
 )
@@ -46,7 +47,7 @@ setClass(
 setClass(
   Class             = "PortfolioFactorReturnsAnalysisBlock",
   slots             = c(
-    portfolio              = "StrategyPortfolio",
+    portfolio              = "Portfolio",
     instrument_betas       = "InstrumentBetasData",
     implied_factor_returns = "ImpliedFactorReturnsData",
     output                 = "PortfolioFactorReturnsData"
@@ -88,7 +89,14 @@ setMethod("setRiskModelObject",
           signature(object = "PortfolioFactorReturnsAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
-            object <- TE.RefClasses:::.setRiskModelObject(object, risk_model)
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            req_factors <- getRiskModelFactorNames(risk_model)
+            output_obj <- getOutputObject(object)
+
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
+                                                                     c("Date",
+                                                                       req_factors))
+            object <- .setOutputObject(object, output_obj)
             return(object)
           }
 )
@@ -147,6 +155,8 @@ setMethod("dataRequest",
           signature(object = "PortfolioFactorReturnsAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
+            browser()
+
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             trader <- unique(key_values$TraderID)[1]
@@ -177,10 +187,10 @@ setMethod("dataRequest",
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
             risk_model <- getRiskModelObject(object)
+            # important step to copy risk_model info
+            betas_data <- setRiskModelObject(betas_data, risk_model)
 
             if (getStoredNRows(betas_data) == 0) {
-              # important step to copy risk_model info
-              betas_data <- TE.RefClasses:::.setRiskModelObject(betas_data, risk_model)
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)
@@ -197,7 +207,7 @@ setMethod("dataRequest",
             # getting Implied Factor Returns data
             factor_ret <- getImpliedFactorReturnsDataObject(object)
             # important step to copy risk_model info
-            factor_ret <- TE.RefClasses:::.setRiskModelObject(factor_ret, risk_model)
+            factor_ret <- setRiskModelObject(factor_ret, risk_model)
 
             query_keys <- unique(query_keys["Date"])
             factor_ret <- tryCatch({
@@ -230,6 +240,16 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            risk_model <- getRiskModelObject(object)
+            all_factors <- getRiskModelFactorNames(object)
+
+            market_factors    <- getRiskModelMarketFactorNames(risk_model)
+            currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
+            commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
+            sector_factors    <- getRiskModelSectorFactorNames(risk_model)
+
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
 
@@ -258,12 +278,19 @@ setMethod("Process",
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
 
-                  market_ret <- portfolio_returns_decomposition(wt,bt,fct_ir)
+                  market_ret <- tryCatch({
+                    portfolio_returns_decomposition(wt,bt,fct_ir)
+                  }, error = function(cond){
+                    message(sprintf("Error when calculating portfolio returns  decomposition for day : %s",
+                                    rm_date))
+                    stop(sprintf("Error when calculating portfolio returns  decomposition for day : %s, error: %s.",
+                                 rm_date, cond))
+                  })
                   total_sys_ret <- sum(market_ret)
-                  factor_ret <- sum(market_ret[portfolio_decomposition_market_factors,])
-                  currency_ret <- sum(market_ret[portfolio_decomposition_currency_factors,])
-                  commodity_ret <- sum(market_ret[portfolio_decomposition_commodity_factors,])
-                  sector_ret <- sum(market_ret[portfolio_decomposition_sector_factors,])
+                  factor_ret <- sum(market_ret[market_factors,])
+                  currency_ret <- sum(market_ret[currency_factors,])
+                  commodity_ret <- sum(market_ret[commodity_factors,])
+                  sector_ret <- sum(market_ret[sector_factors,])
 
                   rd <- data.frame(Date=rm_date,TotalSystematic=total_sys_ret[1],
                                                 MarketFactor=factor_ret[1],
@@ -276,7 +303,7 @@ setMethod("Process",
                     rd.tot[,-1] <- returns_decomposition.tot[nrow(returns_decomposition.tot),-1] + rd.tot[,-1]
                   }
 
-                  plot_data <- stack(rd.tot, select = c(portfolio_decomposition_all_factors,
+                  plot_data <- stack(rd.tot, select = c(all_factors,
                                                         'TotalSystematic',
                                                         'MarketFactor',
                                                         'Currency',
@@ -286,7 +313,7 @@ setMethod("Process",
 
                   colnames(plot_data) <- c("Value", "RiskType")
                   plot_data$RiskGroup <- plot_data$RiskType
-                  levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
+                  levels(plot_data$RiskGroup) <- factor_groups
                   plot_data <- data.frame(Date = rm_date, plot_data)
 
                   if(first){
@@ -306,23 +333,7 @@ setMethod("Process",
               }
             }
 
-
-            # x <- stack(returns_decomposition.tot, select = c(portfolio_decomposition_all_factors,
-            #                                                  'TotalSystematic',
-            #                                                  'MarketFactor',
-            #                                                  'Currency',
-            #                                                  'Commodity',
-            #                                                  'Sector')
-            #            )
-            #
-            # ret_plot_data <- rbind(data.frame(Date=returns_decomposition$Date,RiskType='TotalSystematic',Value=sqrt(returns_decomposition$TotalSystematicVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='MarketRiskFactor',Value=sqrt(returns_decomposition$MarketFactorVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Currency',Value=sqrt(returns_decomposition$CurrencyVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Commodity',Value=sqrt(returns_decomposition$CommodityVar)*100),
-            #                         data.frame(Date=returns_decomposition$Date,RiskType='Sector',Value=sqrt(returns_decomposition$SectorVar)*100))
-
-
-            for( group in names(portfolio_decomposition_factor_groups)) {
+            for( group in names(factor_groups)) {
               ret_plot_data$Colour[ret_plot_data$RiskGroup == group] <- as.integer(as.factor(as.character(ret_plot_data$RiskType[ret_plot_data$RiskGroup == group] )))
             }
 
@@ -368,6 +379,62 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, ret_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
 
+            return(object)
+          }
+)
+
+
+
+################################################################################
+#
+# IndexPortfolioFactorReturnsAnalysisBlock Class
+#
+# Computation block class to pull data required for portfolio returns decomposition
+# Pulls data required for computation and adds required columns.
+###############################################################################
+
+#' Analysis Module for computation of Index Portfolio Returns Decomposition
+#'
+#' Computation block class to pull data required for portfolio
+#' returns decomposition. Pulls data required for computation
+#' and adds required columns. Generates ggplot with returns
+#' decomposition to factors.
+#'
+#' Inherits from "PortfolioFactorReturnsAnalysisBlock"
+#'
+#' @export
+
+setClass(
+  Class             = "IndexPortfolioFactorReturnsAnalysisBlock",
+  prototype         = list(
+    key_cols        = c("IndexTicker", "start", "end"),
+    key_values      = data.frame(IndexTicker = character(),
+                                 start    = as.Date(character()),
+                                 end    = as.Date(character())),
+    column_name_map = hash(c("IndexTicker", "start", "end"),
+                           c("id", "start", "end")),
+    portfolio       = new("IndexPortfolio.BE500")
+
+  ),
+  contains          = c("PortfolioFactorReturnsAnalysisBlock"
+  )
+)
+
+
+#' Set portfolio object in object slot
+#'
+#' Public method to set portfolio slot with "VirtualIndexPortfolio"
+#' class object
+#'
+#' @rdname setPortfolioDataObject-IndexPortfolioFactorReturnsAnalysisBlock-method
+#' @param object object of class "IndexPortfolioFactorReturnsAnalysisBlock"
+#' @param portfolio object of class "VirtualIndexPortfolio"
+#' @return \code{object} object of class "IndexPortfolioFactorReturnsAnalysisBlock"
+#' @export
+setMethod("setPortfolioDataObject",
+          signature(object = "IndexPortfolioFactorReturnsAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
+          function(object, portfolio){
+            object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
           }
 )

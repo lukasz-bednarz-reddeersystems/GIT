@@ -69,6 +69,7 @@ setGeneric("setMarketStyleDataObject", function(object,market_style){standardGen
 #'
 #' Private method to set market_style slot with "VirtualMarketStyleData"
 #'
+#' @rdname private_setMarketStyleDataObject
 #' @param object object of class "VirtualMarketStyleDataHandler"
 #' @param market_style object of class "VirtualMarketStyleData"
 #' @return \code{object} object of class "VirtualMarketStyleDataHandler"
@@ -79,6 +80,39 @@ setMethod(".setMarketStyleDataObject",
           signature(object = "VirtualMarketStyleDataHandler", market_style = "VirtualMarketStyleData"),
           function(object, market_style){
             object@market_style <- market_style
+            return(object)
+          }
+)
+
+
+
+#' Update market_style risk model
+#'
+#' Trigger update of risk model of market_style object
+#'
+#' @param object object of class "VirtualMarketStyleDataHandler"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @export
+
+setGeneric("updateMarketStyleDataRiskModel",
+           function(object, risk_model){standardGeneric("updateMarketStyleDataRiskModel")})
+
+
+#' @describeIn updateMarketStyleDataRiskModel
+#' Update market_style risk model
+#'
+#' Trigger update of risk model of market_style object
+#'
+#' @inheritParams updateMarketStyleDataRiskModel
+#' @return \code{market_style} object of class "VirtualMarketStyleData"
+#' @export
+setMethod("updateMarketStyleDataRiskModel",
+          signature(object = "VirtualMarketStyleDataHandler",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            market_style <- getMarketStyleDataObject(object)
+            market_style <- setRiskModelObject(market_style, risk_model)
+            object <- .setMarketStyleDataObject(object, market_style)
             return(object)
           }
 )

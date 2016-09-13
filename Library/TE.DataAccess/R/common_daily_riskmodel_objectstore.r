@@ -54,8 +54,21 @@ setClass(
 	contains = c("VirtualObjectStore")
 )
 
+#' Get list of storable components
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 
 setGeneric("getRiskModelComponents",function(object){standardGeneric("getRiskModelComponents")})
+
+#' @describeIn getRiskModelComponents
+#' Get list of storable components
+#'
+#' @inheritParams getRiskModelComponents
+#' @return \code{components} "character" vector of storable components
+#'
+#' @export
 setMethod("getRiskModelComponents","DailyRiskModelObjectStore",
           function(object){
             return(object@components)
@@ -78,7 +91,6 @@ setMethod("generateRiskModelKey","DailyRiskModelObjectStore",
 #' @param name "character" name of objectstore
 #' @param lookback "integer" lookback value for model
 #' @param component "character" name of the risk model component
-#' @return \code{rm} "DataSet" object with component if present otherwise NULL
 #'
 #' @export
 setGeneric("queryDailyRiskModelObjectStore",function(object,name,lookback,component){standardGeneric("queryDailyRiskModelObjectStore")})
@@ -111,7 +123,30 @@ setMethod("queryDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  }
 )
 
+
+#' Push component into risk model objectsotre
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param data "data.frame" with data that will be appended to existing data
+#' @param name "character" name of objectstore
+#' @param lookback "integer" lookback value for model
+#' @param component "character" name of the component of the risk model, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param force "logical" if TRUE the existing values will be replaced if the same
+#'
+#' @export
+
 setGeneric("pushRiskModelComponent",function(object,data,name,lookback,component,force=FALSE){standardGeneric("pushRiskModelComponent")})
+
+#' @describeIn pushRiskModelComponent
+#' Push component into risk model objectsotre
+#'
+#' @inheritParams pushRiskModelComponent
+#' @return \code{rm} "DataSet" object with component if present otherwise NULL
+#'
+#' @export
+
 setMethod("pushRiskModelComponent","DailyRiskModelObjectStore",
 		  function(object,data,name,lookback,component){
 			  key    <- generateRiskModelKey(object,name,lookback,component)
@@ -146,7 +181,22 @@ setMethod("getRiskModelQueryID","DailyRiskModelObjectStore",
 	      }
 )
 
+
+#' Commit object to store and save
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
+
 setGeneric("commitDailyRiskModelObjectStore",function(object){standardGeneric("commitDailyRiskModelObjectStore")})
+
+#' @describeIn commitDailyRiskModelObjectStore
+#' Commit object to store and save
+#'
+#' @inheritParams commitDailyRiskModelObjectStore
+#' @return \code{object} object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("commitDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  function(object){
 		  	object <- placeInObjectStore(object,object@risk_model_q,getRiskModelQueryID(object))
@@ -154,46 +204,150 @@ setMethod("commitDailyRiskModelObjectStore","DailyRiskModelObjectStore",
 		  }
 )
 
+
+#' Get most recent risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param component "character" name of the component of the risk model, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param date "Date" date of the risk model for which it was computed.
+#' @param lookback "integer" number of lookback horizon of the model
+#'
+#' @export
 setGeneric("getRiskModelComponentOnDate",function(object,name,component,date,lookback=150){standardGeneric("getRiskModelComponentOnDate")})
-setMethod("getRiskModelComponentOnDate","DailyRiskModelObjectStore",
+
+#' @describeIn getRiskModelComponentOnDate
+#' Get most recent risk model date stored in object
+#'
+#' @inheritParams getRiskModelComponentOnDate
+#' @return \code{rdata} "data.frame with risk component
+#'
+#' @export
+setMethod("getRiskModelComponentOnDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    component = "character",
+                    date = "Date",
+                    lookback = "integer"),
 		  function(object,name,component,date,lookback=150){
 		    risk_comp <- queryDailyRiskModelObjectStore(object,name,lookback,component)
-		  	if(component%in%c('ImpliedFactorReturns','ResidualReturns','Betas')){
-		  		rdata <- risk_comp@data[risk_comp@data$Date>=(as.Date(date)-lookback)&risk_comp@data$Date<=as.Date(date),]
-		  	}
-		  	else{
-		  		rdata <- risk_comp@data[risk_comp@data$Date==as.Date(date),]
-		  	}
-		  	if(nrow(rdata)==0){
-		  		message(paste("No risk model data found for component",component,'on date',date))
-		  	}
+
+		    if(is.null(risk_comp)){
+		      message(paste("No risk model data found for component",component))
+		      message(paste("Looks like remote store", name, "is not initialized."))
+          object <- reInitializeRiskModelComponents(object, name, lookback, component)
+          risk_comp <- queryDailyRiskModelObjectStore(object,name,lookback,component)
+          rdata <- risk_comp@data
+		    }
+		    else {
+  		  	if(component%in%c('ImpliedFactorReturns','ResidualReturns','Betas')){
+  		  		rdata <- risk_comp@data[risk_comp@data$Date>=(as.Date(date)-lookback)&risk_comp@data$Date<=as.Date(date),]
+  		  	}
+  		  	else{
+  		  		rdata <- risk_comp@data[risk_comp@data$Date==as.Date(date),]
+  		  	}
+  		  	if(nrow(rdata)==0){
+  		  		message(paste("No risk model data found for component",component,'on date',date))
+  		  	}
+		    }
+
 		  	return(rdata)
 		  }
 )
 
+setClassUnion("NullableDate", c("Date", "NULL", "missing"))
 
-setGeneric("getMostRecentRiskModelDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelDate")})
-setMethod("getMostRecentRiskModelDate","DailyRiskModelObjectStore",
-		  function(object,name,lookback=150){
+#' Get most recent risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#' @param date "Date" the latest date for which we should look.
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
+#'
+#' @export
+
+setGeneric("getMostRecentRiskModelDate",function(object,
+                                                 name,
+                                                 lookback=150L,
+                                                 date = NULL){standardGeneric("getMostRecentRiskModelDate")})
+
+#' @describeIn getMostRecentRiskModelDate
+#' Get most recent risk model date stored in object
+#'
+#' @inheritParams getMostRecentRiskModelDate
+#' @return \code{date} "Date" date of the most recent risk model.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
+
+setMethod("getMostRecentRiskModelDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer",
+                    date = "NullableDate"),
+		  function(object,name,lookback=150, date = NULL){
 		  	comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
 		  	if(nrow(comp@data)>0){
-		  		date <- max(comp@data$Date)
+		  	  dates <- unique(comp@data$Date)
+		  	  if (!is.null(date)) {
+		  	    dates <- dates[dates<=date]
 		  	}
-		  	else{
+		  	  if (length(dates) > 0) {
+		  		date <- max(dates)
+		  	  } else {
+		  	    date <- NULL
+		  	  }
+		  	} else {
 		  		date <- NULL
 		  	}
 		  	return(date)
 		  }
 )
 
-setGeneric("getMostRecentRiskModelBetasDate",function(object,name,lookback=150){standardGeneric("getMostRecentRiskModelBetasDate")})
-setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
-          function(object,name,lookback=150){
-            comp <- queryDailyRiskModelObjectStore(object,name,lookback,'Betas')
+
+#' Get earliest risk model date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
+#'
+#' @export
+
+setGeneric("getEarliestRiskModelDate",function(object,
+                                                 name,
+                                                 lookback){standardGeneric("getEarliestRiskModelDate")})
+
+#' @describeIn getEarliestRiskModelDate
+#' Get earliest risk model date stored in object
+#'
+#' @inheritParams getEarliestRiskModelDate
+#' @return \code{date} "Date" date of the most recent risk model.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
+
+setMethod("getEarliestRiskModelDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer"),
+          function(object,name,lookback){
+            comp <- queryDailyRiskModelObjectStore(object,name,lookback,'FactorCorrelation')
             if(nrow(comp@data)>0){
-              date <- max(comp@data$Date)
-            }
-            else{
+              dates <- unique(comp@data$Date)
+              if (length(dates) > 0) {
+                date <- min(dates)
+              } else {
+                date <- NULL
+              }
+            } else {
               date <- NULL
             }
             return(date)
@@ -201,10 +355,81 @@ setMethod("getMostRecentRiskModelBetasDate","DailyRiskModelObjectStore",
 )
 
 
-setGeneric("reInitializeRiskModelComponents",function(object, name, lookback = 150,
-                                           components = NULL){standardGeneric("reInitializeRiskModelComponents")})
+#' Get most recent betas date stored in object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model
+#' @param date "Date" the latest date for which we should look.
+#' Method will return latest model date not later than this parameter if not NULL.
+#' This is provided to be able to query gaps in model dates.
+#'
+#' @export
+
+setGeneric("getMostRecentRiskModelBetasDate",function(object,
+                                                      name,
+                                                      lookback=150,
+                                                      date = NULL){standardGeneric("getMostRecentRiskModelBetasDate")})
+
+#' @describeIn getMostRecentRiskModelBetasDate
+#' Get most recent betas date stored in object
+#'
+#' @inheritParams getMostRecentRiskModelBetasDate
+#' @return \code{date} "Date" date of the most recent betas and factor variances.
+#' Returns "NULL" if nothing is stored
+#' or only components that are not model specific are stored.
+#'
+#' @export
+setMethod("getMostRecentRiskModelBetasDate",
+          signature(object = "DailyRiskModelObjectStore",
+                    name = "character",
+                    lookback = "integer",
+                    date = "NullableDate"),
+          function(object,name,lookback=150, date = NULL){
+            comp <- queryDailyRiskModelObjectStore(object,name,lookback,'Betas')
+            if(nrow(comp@data)>0){
+              dates <- unique(comp@data$Date)
+              if (!is.null(date)) {
+                dates <- dates[dates<=date]
+            }
+              if (length(dates) > 0) {
+                date <- max(dates)
+              } else {
+                date <- NULL
+              }
+            } else {
+              date <- NULL
+            }
+            return(date)
+          }
+)
+
+#' Reinitialize components to empty datasets
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model, defaults to 150
+#' @param components "character" name of the components of the risk model to be
+#' re-initialized, possible values are:
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#'
+#' @export
+
+setGeneric("reInitializeRiskModelComponents",function(object,
+                                                      name,
+                                                      lookback = 150,
+                                                      components = NULL){standardGeneric("reInitializeRiskModelComponents")})
+
+#' @describeIn reInitializeRiskModelComponents
+#' Reinitialize components to empty datasets
+#'
+#' @inheritParams reInitializeRiskModelComponents
+#' @return \code{object} object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("reInitializeRiskModelComponents",
-          signature(object = "DailyRiskModelObjectStore", name = "character", lookback = "numeric"),
+          signature(object = "DailyRiskModelObjectStore", name = "character", lookback = "integer"),
           function(object, name, lookback = 150, components = NULL){
 
           if (is.null(name)) {
@@ -221,10 +446,10 @@ setMethod("reInitializeRiskModelComponents",
              object@risk_model_q <- updateStoredRiskModelKeys(object@risk_model_q,key)
              #Need to handle differences in key columns more formally
              if(component%in%c('ResidualReturns','Betas')){
-               ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=TRUE)
+               ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=FALSE)
              }
              else{
-               ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=TRUE)
+               ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=FALSE)
              }
              object <- placeInObjectStore(object,ds,getIdentifier(object@risk_model_q))
           }
@@ -233,14 +458,48 @@ setMethod("reInitializeRiskModelComponents",
           })
 
 
+#' Copy risk model data from one store to current object
+#'
+#' @param object object of class "DailyRiskModelObjectStore"
+#' @param source_rmstr object of class "DailyRiskModelObjectStore" from which the data will be copied
+#' @param name_in_source "character" name of the store from which the data will be copied
+#' @param date "Date" latest date of data from source "DailyRiskModelObjectStore"
+#' @param lookback "integer" number of lookback horizon of the model, default is 150L
+#' @param cmp_to_update "character" vector of components to update, default is
+#' c('ImpliedFactorReturns', 'ResidualReturns', 'Betas',
+#'   'FactorCorrelation', 'FactorVariance', 'MarketStyle')
+#' @param force "logical" if TRUE existing values will be overwritten
+#' @export
 
-setGeneric("copyRiskModelHistory",function(object, source_rmstr, name_in_source, date, lookback = 150,
-                                          cmp_to_update = c('ImpliedFactorReturns','ResidualReturns','Betas','FactorCorrelation','FactorVariance','MarketStyle'),
+setGeneric("copyRiskModelHistory",function(object, source_rmstr, name_in_source, date, lookback = 150L,
+                                          cmp_to_update = c('ImpliedFactorReturns',
+                                                            'ResidualReturns',
+                                                            'Betas',
+                                                            'FactorCorrelation',
+                                                            'FactorVariance',
+                                                            'MarketStyle'),
                                           force = FALSE){standardGeneric("copyRiskModelHistory")})
+
+#' @describeIn copyRiskModelHistory
+#' Copy risk model data from one store to current object
+#'
+#' @inheritParams copyRiskModelHistory
+#' @return \code{object} object object of class "DailyRiskModelObjectStore"
+#'
+#' @export
 setMethod("copyRiskModelHistory",
-          signature(object = "DailyRiskModelObjectStore", source_rmstr = "DailyRiskModelObjectStore", name_in_source = "character", date = "Date", lookback = "numeric"),
-          function(object, source_rmstr, name_in_source, date, lookback = 150,
-                  cmp_to_update = c('ImpliedFactorReturns','ResidualReturns','Betas','FactorCorrelation','FactorVariance','MarketStyle'),
+          signature(object = "DailyRiskModelObjectStore",
+                    source_rmstr = "DailyRiskModelObjectStore",
+                    name_in_source = "character",
+                    date = "Date",
+                    lookback = "integer"),
+          function(object, source_rmstr, name_in_source, date, lookback = 150L,
+                  cmp_to_update = c('ImpliedFactorReturns',
+                                    'ResidualReturns',
+                                    'Betas',
+                                    'FactorCorrelation',
+                                    'FactorVariance',
+                                    'MarketStyle'),
                   force = FALSE) {
 
             updated = FALSE
@@ -277,6 +536,16 @@ setMethod("copyRiskModelHistory",
             return(object)
           })
 
+#' Risk Model Objectstore factory
+#'
+#' Factory to create Risk Model Objectstore objects and load data if
+#' stored in file
+#'
+#' @param name "character" name of the model eg: "developed_europe_prototype"
+#' @param lookback "integer" number of lookback horizon of the model, defaults to 150
+#' @return \code{rmstr} object of class "DailyRiskModelObjectstore"
+#'
+#' @export
 
 risk_model_objectstore_factory <- function(name,lookback=150){
 	message("Initialising risk model store...")
@@ -294,10 +563,10 @@ risk_model_objectstore_factory <- function(name,lookback=150){
 			rmstr@risk_model_q <- updateStoredRiskModelKeys(rmstr@risk_model_q,key)
 			#Need to handle differences in key columns more formally
 			if(component%in%c('ResidualReturns','Betas')){
-				ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=TRUE)
+				ds <- new("DataSet",key_cols=c('Date','Instrument'),unique_rows=TRUE,indexed=FALSE)
 			}
 			else{
-				ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=TRUE)
+				ds <- new("DataSet",key_cols=c('Date'),unique_rows=TRUE,indexed=FALSE)
 			}
 			rmstr <- placeInObjectStore(rmstr,ds,getIdentifier(rmstr@risk_model_q))
 		}
@@ -343,10 +612,10 @@ get_risk_model_component_on_date <- function(model_prefix,date,component,lookbac
 #' object of class "DailyRiskModelObjectStore" otherwise NULL
 #' @export
 
-get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lookback = 150) {
+get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lookback = 150L) {
 
   date <- as.Date(date)
-  months <- unique(format(seq(from = date, by = -1, length.out = 150),'%Y-%m' ))
+  months <- unique(format(seq(from = date, by = "-1 months", length.out = 150L),'%Y-%m' ))
   retv <- NULL
 
   for (month in months) {
@@ -359,6 +628,46 @@ get_most_recent_model_objectstore <- function(model_prefix,date = today()-1,  lo
       rmstr <- loadObject(rmstr)
       rmstr@risk_model_q <- getFromObjectStore(rmstr,getRiskModelQueryID(rmstr))
       rm_date_last <- getMostRecentRiskModelDate(rmstr,rm_name,lookback)
+
+      if (length(rm_date_last)==0) {
+        next()
+      } else {
+        retv <- rmstr
+        break()
+      }
+    }
+  }
+
+  return(retv)
+
+}
+
+
+#' Get earliest risk model store
+#'
+#' Finds earliest risk model objectstore containg model
+#' on querried date or earlier
+#'
+#' @param model_prefix character
+#' @param lookback integer lookback of model in days
+#' @return \code{rm_str} if risk model objectstore found returns
+#' object of class "DailyRiskModelObjectStore" otherwise NULL
+#' @export
+get_earliest_model_objectstore <- function(model_prefix, lookback = 150) {
+
+  months <- sort(format(seq(from = today(), by = "-1 month", length.out = 150),'%Y-%m' ))
+  retv <- NULL
+
+  for (month in months) {
+    rm_name  <- paste(model_prefix,month,sep="_")
+    rmstr <- new("DailyRiskModelObjectStore",id=rm_name)
+    pth <- getPath(rmstr)
+
+    if(file.exists(pth) ){
+      message(paste("Found risk model store at",pth))
+      rmstr <- loadObject(rmstr)
+      rmstr@risk_model_q <- getFromObjectStore(rmstr,getRiskModelQueryID(rmstr))
+      rm_date_last <- getEarliestRiskModelDate(rmstr,rm_name,lookback)
 
       if (length(rm_date_last)==0) {
         next()

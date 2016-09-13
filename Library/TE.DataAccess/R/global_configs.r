@@ -186,9 +186,16 @@ setClass(
 #' @return \code{.Object} object of class "ModelDefaults"
 
 setMethod("initialize", "ModelDefaults", function(.Object){
-  r_root <- gsub('\\\\', '/',Sys.getenv("R_RAID_ROOT"))
+
+  r_root <- gsub('\\\\', '/',Sys.getenv("R_RISK_MODEL_DATA_ROOT"))
   if(file.exists(r_root) & (r_root != "")) {
-    .Object@data_path <- paste0(r_root, '/Services/Raid.Services.TradingEnhancementEngine/R/model_data')
+    .Object@data_path <- r_root
+  }
+  else {
+    r_root <- gsub('\\\\', '/',Sys.getenv("R_RAID_ROOT"))
+    if(file.exists(r_root) & (r_root != "")) {
+      .Object@data_path <- paste0(r_root, '/Services/Raid.Services.TradingEnhancementEngine/R/model_data')
+    }
   }
   return(.Object)
 })

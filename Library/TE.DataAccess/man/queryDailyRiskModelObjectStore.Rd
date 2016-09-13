@@ -22,8 +22,6 @@ queryDailyRiskModelObjectStore(object, name, lookback, component)
 }
 \value{
 \code{rm} "DataSet" object with component if present otherwise NULL
-
-\code{rm} "DataSet" object with component if present otherwise NULL
 }
 \description{
 Query objectstore for given set of parameters

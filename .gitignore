@@ -1,4 +1,5 @@
 R/model_data/**
+R/scripts/**
 **/*.Rhistory
 **/*.RData
 **/*.docx
@@ -7,4 +8,9 @@ R/model_data/**
 **/*.png
 **/*.wmf
 **/*.emf
+**/*.log
+**/*.sql
+**/*.RDS
+**/*.pdf
+**/*.bak
 .Rproj.user

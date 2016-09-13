@@ -11,9 +11,6 @@ setFactorCorrelationDataObject(object, factor_correlation)
 
 \item{factor_correlation}{object of class "VirtualFactorCorrelationData"}
 }
-\value{
-\code{object} object of class "VirtualFactorCorrelationDataHandler"
-}
 \description{
 Public method to set factor_correlation slot with "VirtualFactorCorrelationData"
 class object to be implemented in derived

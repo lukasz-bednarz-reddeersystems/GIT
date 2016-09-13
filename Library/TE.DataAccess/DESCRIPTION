@@ -9,10 +9,10 @@ Description: Pakckage is implementing functions and classes for data access,
     Analytics Engine.
 Depends:
     R (>= 3.3.0),
+    methods,
 License: file LICENSE
 LazyData: TRUE
 Imports:
-    methods,
     lubridate,
     RODBC,
     hashFunction,

@@ -127,6 +127,28 @@ dated_twelve_monthly_lookback <- function(trader,date){
   return(key_generator(trader,end,1,12))
 }
 
+#' Generate keys for eighteen months lookback for specific date
+#'
+#' Generate eighteen months lookback keys for user with
+#' last day of previous month with regards to date as last date
+#' and one month interval.
+#'
+#' @param trader integer, the user id
+#' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+dated_eighteen_monthly_lookback <- function(trader,date){
+  tryCatch({
+    rdate <- as.Date(date)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_eighteen_monthly_lookback module key function for date value",date,":",cond))
+  })
+  days_this_month <- as.numeric(format(rdate,'%d'))
+  end <- rdate - days_this_month
+  return(key_generator(trader,end,1,18))
+}
+
 
 #' Generate keys for three days lookback for specific date
 #'

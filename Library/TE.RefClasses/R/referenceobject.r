@@ -48,7 +48,9 @@ setMethod("getRequiredVariablesNames", "VirtualReferenceObject",
 
 #' Private function to set required variable names only to be used by derived classes
 #'
+#' @rdname private_setRequiredVariablesNames
 #' @param object object extending VirtualReferenceObject
+#' @param names "character" vector with names of required variables
 #' @return \code{object} object extending VirtualReferenceObject
 setGeneric(".setRequiredVariablesNames", function(object, names){standardGeneric(".setRequiredVariablesNames")})
 

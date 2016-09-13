@@ -44,6 +44,27 @@ setClass(
 )
 
 
+#' Set risk_model object in object slot
+#'
+#' Public method to set trade_data slot with "VirtualRiskModel"
+#' class object
+#'
+#' @rdname setRiskModelObject-MarketStyleAnalysisBlock-method
+#' @param object object of class "MarketStyleAnalysisBlock"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @return \code{object} object of class "MarketStyleAnalysisBlock"
+#' @export
+
+setMethod("setRiskModelObject",
+          signature(object = "MarketStyleAnalysisBlock",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            return(object)
+          }
+)
+
+
 #' Request data from data source
 #'
 #' @param object object of class 'MarketStyleAnalysisBlock'.
@@ -58,6 +79,7 @@ setMethod("dataRequest",
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             market_style <- getMarketStyleDataObject(object)
+            market_style <- setRiskModelObject(market_style, getRiskModelObject(object))
 
             # getting marketStyle data
 
@@ -95,6 +117,8 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            all_factors <- getRiskModelFactorNames(object)
+
             market_style <- getMarketStyleDataObject(object)
 
             all_market_st <- getReferenceData(market_style)
@@ -110,7 +134,7 @@ setMethod("Process",
 
                 market_st <- all_market_st[all_market_st$Date==rm_date,setdiff(colnames(all_market_st),'Date')]
 
-                plot_data <- stack(market_st, select = c(portfolio_decomposition_all_factors))
+                plot_data <- stack(market_st, select = c(all_factors))
 
                 colnames(plot_data) <- c("Value", "RiskType")
 

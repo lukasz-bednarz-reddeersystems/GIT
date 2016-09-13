@@ -43,6 +43,26 @@ setClass(
   )
 )
 
+#' Set risk_model object in object slot
+#'
+#' Public method to set trade_data slot with "VirtualRiskModel"
+#' class object
+#'
+#' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
+#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @export
+
+setMethod("setRiskModelObject",
+          signature(object = "MarketStyleFactorStatisticAnalysisBlock",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            return(object)
+          }
+)
+
 #' Request data from data source
 #'
 #' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
@@ -57,6 +77,8 @@ setMethod("dataRequest",
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             market_style <- getMarketStyleDataObject(object)
+
+            market_style <- setRiskModelObject(market_style, getRiskModelObject(object))
 
             # getting marketStyle data
 
@@ -93,9 +115,14 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            risk_model <- getRiskModelObject(object)
+            all_factors <- getRiskModelFactorNames(risk_model)
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             market_style <- getMarketStyleDataObject(object)
 
             all_market_st <- getReferenceData(market_style)
+
 
             first <- TRUE
 
@@ -108,14 +135,14 @@ setMethod("Process",
 
                 market_st <- all_market_st[all_market_st$Date==rm_date,setdiff(colnames(all_market_st),'Date')]
 
-                plot_data <- stack(market_st, select = c(portfolio_decomposition_all_factors))
+                plot_data <- stack(market_st, select = c(all_factors))
 
                 colnames(plot_data) <- c("Value", "RiskType")
 
                 plot_data <- data.frame(Date = rm_date, plot_data)
 
                 plot_data$RiskGroup <- plot_data$RiskType
-                levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
+                levels(plot_data$RiskGroup) <- factor_groups
                 plot_data <- data.frame(Date = rm_date, plot_data)
 
                 if(first){

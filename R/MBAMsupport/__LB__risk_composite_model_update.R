@@ -1,13 +1,12 @@
-sourceTo("risk_model_update_functions.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("risk_model_load.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+library(TE.RiskModel)
 library(gtools)
 library(lubridate)
 
 ###### Update Object Store
 
 lookback      <- 150
-start         <- as.Date('2015-01-01') 
-end        <-as.Date('2015-12-31') 
+start         <- as.Date('2015-01-01')
+end        <-as.Date('2015-12-31')
 comp_date     <- today()
 model_prefix       <- 'developed_europe_prototype'
 
@@ -30,7 +29,7 @@ for (month in dates) {
   } else {
     copy_history <- !copy_history
   }
-    
+
 }
 
 #Rprof(NULL)
@@ -47,7 +46,7 @@ store_name <- getID(dwh)
 rm <- list()
 
 for (cmp_name in dwh@components) {
-  
+
   rm[[cmp_name]] <- queryDailyRiskModelObjectStore(dwh,store_name, lookback,cmp_name)
 }
 
@@ -59,7 +58,7 @@ for (cmp_name in dwh@components) {
   rm_day[[cmp_name]] <- getRiskModelComponentOnDate(dwh,store_name,cmp_name, today() -3, lookback)
 }
 
-     
+
 
 ###### Get or Generate Model ID from the database
 
@@ -120,13 +119,13 @@ bulk_load_residual_returns(rm_day$ResidualReturns, model_id)
 
 rm_type <- get_model_type_id(model_prefix, lookback)
 for (day in seq(from= start, to = today(), by = '5 months')) {
-  
+
   dwh <- get_most_recent_model_objectstore(model_prefix, day, lookback)
   store_name <- getID(dwh)
-  
+
   betas <- getData(queryDailyRiskModelObjectStore(dwh,getID(dwh), lookback,'Betas'))
   bulk_load_factor_betas(betas, rm_type)
-  
+
   returns <- getData(queryDailyRiskModelObjectStore(dwh,getID(dwh), lookback,'ImpliedFactorReturns'))
   bulk_load_implied_factor_returns(returns, rm_type)
 }
@@ -139,38 +138,38 @@ days <- days[wday(days)!=7&wday(days)!=1]
 first <-TRUE
 
 for (day in days) {
-  
+
   day <- as.Date(day)
-  
+
   name  <- paste(model_prefix,format(day,'%Y-%m'),sep="_")
-  
+
   if (first) {
     dwh <- get_most_recent_model_objectstore(model_prefix, day, lookback)
     first <- FALSE
   } else if(name != getID(dwh)) {
     dwh <- get_most_recent_model_objectstore(model_prefix, day, lookback)
   }
-  
+
   insert_model_definition(as.Date(day), today(), lookback, model_prefix)
-  
+
   model_id <- query_model_id(rm_type, as.Date(day), today() )
-  
-  
-  
+
+
+
   store_name <- getID(dwh)
-  
+
   data <- getRiskModelComponentOnDate(dwh,store_name, 'FactorVariance', day, lookback)
   bulk_load_factor_variances(data, model_id)
-  
+
   data <- getRiskModelComponentOnDate(dwh,store_name, 'FactorCorrelation', day, lookback)
   bulk_load_factor_correlations(data, model_id)
-  
+
   data <- getRiskModelComponentOnDate(dwh,store_name, 'MarketStyle', day, lookback)
   bulk_load_market_style(data, model_id)
-  
+
   data <- getRiskModelComponentOnDate(dwh,store_name, 'ResidualReturns', day, lookback)
   bulk_load_residual_returns(data, model_id)
-  
+
 }
 
 ###### push all components to database for one day only:
@@ -178,6 +177,6 @@ for (day in days) {
 day <- today() -1
 dwh <- get_most_recent_model_objectstore(model_prefix, day, lookback)
 
-update_risk_model_db(model_prefix, dwh, day, day, lookback) 
-  
+update_risk_model_db(model_prefix, dwh, day, day, lookback)
+
 

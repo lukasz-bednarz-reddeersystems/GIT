@@ -68,6 +68,7 @@ setGeneric("setStrategyDataObject", function(object,strategy_data){standardGener
 #'
 #' Private method to set strategy_data slot with "VirtualStrategyData"
 #'
+#' @rdname private_setStrategyDataObject
 #' @param object object of class "VirtualStrategyDataHandler"
 #' @param strategy_data object of class "VirtualStrategyData"
 #' @return \code{object} object of class "VirtualStrategyDataHandler"

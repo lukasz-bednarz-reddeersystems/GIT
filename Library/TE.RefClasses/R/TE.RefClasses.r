@@ -7,6 +7,7 @@
 #' @docType package
 #' @name TE.RefClasses
 #'
+#' @import TE.RiskModel
 #' @import TE.DataAccess
 #' @import methods
 #' @importClassesFrom TE.DataAccess DailyRiskModelQuery
