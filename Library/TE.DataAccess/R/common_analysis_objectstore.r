@@ -131,7 +131,7 @@ setGeneric("updateAnalysisStore",function(object,analysis_object,key,force=FALSE
 #' @export
 setMethod("updateAnalysisStore",
           signature(object = "AnalysisObjectStore",
-                    analysis_object = "VirtualAnalysisObject",
+                    analysis_object = "ANY",
                     key = "data.frame",
                     force = "logical"),
           function(object,analysis_object,key,force=FALSE){

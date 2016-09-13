@@ -3,13 +3,13 @@
 \docType{methods}
 \name{updateAnalysisStore}
 \alias{updateAnalysisStore}
-\alias{updateAnalysisStore,AnalysisObjectStore,VirtualAnalysisObject,data.frame,logical-method}
+\alias{updateAnalysisStore,AnalysisObjectStore,ANY,data.frame,logical-method}
 \title{Update Analysis Store with new AnalysisObject}
 \usage{
 updateAnalysisStore(object, analysis_object, key, force = FALSE)
 
 
-  \S4method{updateAnalysisStore}{AnalysisObjectStore,VirtualAnalysisObject,data.frame,logical}(object,
+  \S4method{updateAnalysisStore}{AnalysisObjectStore,ANY,data.frame,logical}(object,
   analysis_object, key, force = FALSE)
 }
 \arguments{
@@ -29,6 +29,6 @@ Update Analysis Store with new AnalysisObject
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{object = AnalysisObjectStore,analysis_object = VirtualAnalysisObject,key = data.frame,force = logical}: Update Analysis Store with new AnalysisObject
+\item \code{object = AnalysisObjectStore,analysis_object = ANY,key = data.frame,force = logical}: Update Analysis Store with new AnalysisObject
 }}
 
