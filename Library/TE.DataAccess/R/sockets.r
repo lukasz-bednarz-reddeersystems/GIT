@@ -34,9 +34,20 @@ setClass(
 #' open socket connection
 #'
 #' @param object object of class 'ProcessSocket'.
-#' @return \code{object} object of class 'ProcessSocket'.
+#'
+#' @export
 
 setGeneric("openConnection",function(object){standardGeneric("openConnection")})
+
+
+#' @describeIn openConnection
+#' open socket connection
+#'
+#' @inheritParams openConnection
+#' @return \code{object} object of class 'ProcessSocket'.
+#'
+#' @export
+
 setMethod("openConnection","ProcessSocket",
           function(object){
             if(object@server){

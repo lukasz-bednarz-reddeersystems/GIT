@@ -82,13 +82,12 @@ setMethod("initialiseAnalysisStore","AnalysisObjectStore",
 #' @param key "data.frame" wiht query keys
 #'
 #' @export
-
 setGeneric("queryAnalysisStore",function(object,key){standardGeneric("queryAnalysisStore")})
 
 #' @describeIn queryAnalysisStore
 #' Query objectstore for given set of parameters
 #'
-#' @importParams queryAnalysisStore
+#' @inheritParams  queryAnalysisStore
 #' @return \code{rval} object of class "AnalysisObjectStore" if query sucessfull,
 #' otherwise NULL
 #'

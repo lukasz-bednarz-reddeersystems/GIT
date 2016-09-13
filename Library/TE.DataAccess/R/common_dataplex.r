@@ -323,60 +323,70 @@ warehouse_push_summary <- function(name,warehouse){
 }
 
 
-
-if(exists("analysis_store_created")==FALSE){
-
-  analysis_store_request <- function(key_function){
-    key_hash <- as.character(murmur3.32(as.character(key_function())))
-    kv <- key_function()
-    hrname <- paste(kv[[1,1]],"_",as.character(min(kv[['start']])),"_",as.character(max(kv[['end']])),sep="")
-    name <- paste("analysis_store_",hrname,sep="")
-    return(analysis_objectstore_factory(name))
-  }
-
-  analysis_module_request <- function(key_function,name_or_builder,force=FALSE){
-    if(class(name_or_builder)=='character'){
-      analysis_name <- name_or_builder
-    }
-    else{
-      module_class <- tryCatch({createAnalysisModule(name_or_builder,key_function)},error=function(cond){stop(paste("Error getting analysis object:",cond[['message']]))})
-      analysis_name <- class(module_class)[[1]]
-    }
-    store <- analysis_store_request(key_function)
-    key_hash <- as.character(murmur3.32(as.character(key_function())))
-    key <- data.frame(key_hash=key_hash,analysis_module=analysis_name)
-    already_stored <- isAnalysisStored(store@warehouse_q,key)
-    error_free <- tryCatch({
-                              message("Query:")
-                              analysis <- queryAnalysisStore(store,key)
-                              if(length(analysis)>0){
-                                message("Update:")
-                                store <- updateAnalysisStore(store,analysis,key,force=force)
-                                TRUE
-                              }
-                              else{
-                                message("Analysis query returned NULL object, no commit made.")
-                                FALSE
-                              }
-                           },error=function(cond){
-                              message(paste('Analysis store: Error during query/update:',cond[['message']]))
-                              return(FALSE)
-                           })
-    message("Commit:")
-    if(!already_stored){
-      if(error_free){
-        commitAnalysisStore(store)
-      }
-      else{
-        message("Error during analysis store query, no commit made.")
-      }
-    }
-    else{
-      message("No new data built, no commit made.")
-    }
-    return(analysis)
-  }
+#' get analysis store for given key function
+#'
+#' @param key_function "function" generating key
+#' @return \code{an_store} object of class "AnalysisObjectStore"
+#' @export
+analysis_store_request <- function(key_function){
+  key_hash <- as.character(murmur3.32(as.character(key_function())))
+  kv <- key_function()
+  hrname <- paste(kv[[1,1]],"_",as.character(min(kv[['start']])),"_",as.character(max(kv[['end']])),sep="")
+  name <- paste("analysis_store_",hrname,sep="")
+  return(analysis_objectstore_factory(name))
 }
+
+
+#' query for analysis module for specific set of parameters
+#'
+#' @param key_function "function" generating key
+#' @param name_or_builder "character" name of the objectstore or "function" builder of the objectstore
+#' @param force "logical" should Analysis be create if not existing in store
+#' @return \code{an_store} object of class "AnalysisObjectStore"
+#' @export
+analysis_module_request <- function(key_function,name_or_builder,force=FALSE){
+  if(class(name_or_builder)=='character'){
+    analysis_name <- name_or_builder
+  }
+  else{
+    module_class <- tryCatch({createAnalysisModule(name_or_builder,key_function)},error=function(cond){stop(paste("Error getting analysis object:",cond[['message']]))})
+    analysis_name <- class(module_class)[[1]]
+  }
+  store <- analysis_store_request(key_function)
+  key_hash <- as.character(murmur3.32(as.character(key_function())))
+  key <- data.frame(key_hash=key_hash,analysis_module=analysis_name)
+  already_stored <- isAnalysisStored(store@warehouse_q,key)
+  error_free <- tryCatch({
+                            message("Query:")
+                            analysis <- queryAnalysisStore(store,key)
+                            if(length(analysis)>0){
+                              message("Update:")
+                              store <- updateAnalysisStore(store,analysis,key,force=force)
+                              TRUE
+                            }
+                            else{
+                              message("Analysis query returned NULL object, no commit made.")
+                              FALSE
+                            }
+                         },error=function(cond){
+                            message(paste('Analysis store: Error during query/update:',cond[['message']]))
+                            return(FALSE)
+                         })
+  message("Commit:")
+  if(!already_stored){
+    if(error_free){
+      commitAnalysisStore(store)
+    }
+    else{
+      message("Error during analysis store query, no commit made.")
+    }
+  }
+  else{
+    message("No new data built, no commit made.")
+  }
+  return(analysis)
+}
+
 
 #' Load and bind analysis output from multiple stores
 #'
