@@ -10,6 +10,7 @@ sourceTo("../analysis_modules/offside_positions/offside_positions.r", modifiedOn
 sourceTo("../analysis_modules/offside_positions_cumulative_pnl/offside_positions_cumulative_pnl.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../analysis_modules/pnl_traded_in_long_short_hedge/pnl_traded_in_long_short_hedge.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../analysis_modules/portfolio_factor_exposure/portfolio_factor_exposure.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../analysis_modules/position_revisits/position_revisits.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 #Convention is to name the client classes with the Client suffix so that the engine
 #can specify analysis modules to load by class name.

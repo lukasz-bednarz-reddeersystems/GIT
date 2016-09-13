@@ -3,7 +3,13 @@ options(modifiedOnlySource=TRUE)
 sourceTo("../common/analysis_client/analysis_client.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/analysis_client/client_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
-block_client <- new("OffsidePositionsAnalysisBlockClient")
-keys <- dated_twelve_monthly_lookback(11, '2016-01-01')
-#colnames(keys)[colnames(keys)=='id'] <- 'TraderID'
-block_client <- dataRequest(block_client,keys,force=TRUE)
+load_only  <- TRUE
+block_name <- "AverageDownTradesAnalysisBlock"
+id         <- 11
+date       <- '2016-09-01'
+fn         <- dated_three_monthly_lookback
+
+block_client <- new(paste(block_name,"Client",sep=""))
+keys <- fn(id, date)
+block_client <- dataRequest(block_client,keys,force=!load_only)
+data <- block_client@analysis_block@ggplot_data

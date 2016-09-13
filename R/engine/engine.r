@@ -215,7 +215,7 @@ setClass(
 		module     = "list",
 		app        = "function",
 		analysis_ggplot = "gg",
-		analysis_data   = "data.frame"
+		analysis_data   = "data.frame",
 		ui_options      = "data.frame"
 	),
 	prototype    = prototype(
