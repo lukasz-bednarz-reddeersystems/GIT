@@ -50,7 +50,41 @@ setMethod("setTradeDataObject",
           }
 )
 
+#' Request data from data source
+#'
+#' @param object object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
+#' @export
 
+setMethod("dataRequest",
+          signature(object = "PnLTradedInLongShortHedgeAnalysisBlock", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
+
+            trader <- unique(key_values$TraderID)[1]
+            start <- min(key_values$start)
+            end <- max(key_values$end)
+
+            #
+            trade_data <- getTradeDataObject(object)
+
+            if (getStoredNRows(trade_data) == 0) {
+
+              # using AverageDownTradesAnalysisBlock to retrieve and process input data
+              val.traded.an <- new("ValueTradedInLongShortHedgeAnalysisBlock")
+              val.traded.an <- dataRequest(val.traded.an, key_values)
+              val.traded.an <- Process(val.traded.an)
+
+              val.traded.rd <- getOutputObject(val.traded.an)
+
+              object <- TE.RefClasses:::.setTradeDataObject(object, val.traded.rd)
+            }
+
+            return(object)
+          }
+)
 
 #' Trigger computation of analysis data.
 #'
