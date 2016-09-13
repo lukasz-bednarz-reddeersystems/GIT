@@ -349,9 +349,9 @@ setMethod("startEngine","Engine",
 		  }
 )
 
-setGeneric("importAppData",function(object){standardGeneric("importAppData")})
+setGeneric("importAppData",function(object,scramble=TRUE){standardGeneric("importAppData")})
 setMethod("importAppData","Engine",
-	      function(object){
+	      function(object,scramble=TRUE){
 	      	block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
 			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
 			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
@@ -362,6 +362,35 @@ setMethod("importAppData","Engine",
 			return(object)
 	      }
 )
+
+#Should create a new class to do this
+setGeneric("scrambleData",function(object){standardGeneric("scrambleData")})
+setMethod("scrambleData","Engine",
+	function(object){
+		data_cols <- colnames(object@analysis_data)
+		if('Trader' %in% data_cols){
+			traders <- unique(data[col_name])
+		}
+		if('TraderID' %in% data_cols){
+			traders <- unique(data[col_name])
+		}
+	}
+)
+sub_column(data,col_name,generic=NULL){
+	type <- class(data[col_name])[[1]]
+	if(type='character'){
+		vals <- data[col_name]
+		remapper <- sample(letters,length(unique(vals)))
+		names(remapper) <- unique(vals)
+		if(length(generic)>0){
+			new_vals <- paste(generic,remapper[vals])
+		} else {
+			new_vals <- remapper[vals]
+		}
+		data[col_name] <- new_vals
+	}
+	return(data)
+}
 
 setGeneric("shutdownEngine",function(object){standardGeneric("shutdownEngine")})
 setMethod("shutdownEngine","Engine",
