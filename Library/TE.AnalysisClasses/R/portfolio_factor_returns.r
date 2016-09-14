@@ -376,7 +376,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, ret_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Value")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value", "Colour")))
 
             return(object)
           }

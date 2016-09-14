@@ -9,7 +9,7 @@ context("Testing PortfolioFactorExposuresAnalysisBlock")
 if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
   portf.var.an <- new("IndexPortfolioVarianceDecompositionAnalysisBlock")
 
-  valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-05-30")
+  valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
   colnames(valid.key_values) <- c("IndexTicker", "start", "end")
 
   portf.var.an <- dataRequest(portf.var.an, valid.key_values)
