@@ -156,7 +156,7 @@ setMethod("Process",
             #Create plot
 
             mrkt_plot_data$Value.Abs <- abs(mrkt_plot_data$Value)
-
+            mrkt_plot_data <- mrkt_plot_data[c("Date", "Value", "Value.Abs", "RiskType")]
             plt_risk <- ggplot(data=mrkt_plot_data,aes_string(x="Date",
                                                               y="Value.Abs",
                                                               color="RiskType")) +
@@ -165,7 +165,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Value.Abs")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value.Abs", "Value")))
 
             return(object)
           }

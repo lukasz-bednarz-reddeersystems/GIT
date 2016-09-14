@@ -144,7 +144,6 @@ setMethod("Process",
 
                 plot_data$RiskGroup <- plot_data$RiskType
                 levels(plot_data$RiskGroup) <- factor_groups
-                plot_data <- data.frame(Date = rm_date, plot_data)
 
                 if(first){
                   mrkt_plot_data <- plot_data
@@ -165,6 +164,7 @@ setMethod("Process",
             mrkt_plot_data$RiskType <- factor(as.character(mrkt_plot_data$RiskType),
                                                  levels = as.character(ord_frm$RiskType))
 
+            mrkt_plot_data <- mrkt_plot_data[c("Date", "Value", "RiskType", "RiskGroup")]
             #Create plot
             plt_risk <- ggplot(data=mrkt_plot_data,aes_string(x="RiskType",
                                                               y="Value",
