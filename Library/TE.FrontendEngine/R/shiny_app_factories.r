@@ -75,8 +75,7 @@ setClass(
 #'
 #' @export
 
-setGeneric("shinyUIFactory",function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value'))){standardGeneric("shinyUIFactory")})
-
+setGeneric("shinyUIFactory",function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value','PL'))){standardGeneric("shinyUIFactory")})
 
 #' @describeIn shinyUIFactory
 #' generate UI Object
@@ -87,9 +86,20 @@ setGeneric("shinyUIFactory",function(object,analysis_ggplot,analysis_data,ui_opt
 #' @export
 
 setMethod("shinyUIFactory","ShinyFactory",
-	function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value'))){
-		object@plot_name <- gsub(" ","",analysis_ggplot$labels$title)
-		object <- buildContent(object,analysis_ggplot,analysis_data,ui_options)
+	function(object,analysis_ggplot,analysis_data,ui_options=list(omit=c('Value','PL'))){
+
+	  plot_name <- gsub(" ","",analysis_ggplot$labels$title)
+
+	  if (length(plot_name) == 0) {
+	    plot_name <- analysis_ggplot$labels$y
+
+	    if (length(plot_name) == 0) {
+	      plot_name <- "Analysis Plot"
+	    }
+	  }
+
+	  object@plot_name <- plot_name
+	  object <- buildContent(object,analysis_ggplot,analysis_data,ui_options)
 		object@ui[[1]] <- shinyUI(object@page_type(
 					object@title(object@plot_name),
 					object@body_function(object@control_type(object@content),
@@ -157,8 +167,9 @@ setMethod("dataFilter","ShinyFactory",
 		reactive_data_callbacks <- list()
 		for(i in object@inputIds){
 			type <- getUIType(object@entity_mapper,analysis_data[[i]])
+
 			if(type=='Date' || type=='Real'){
-				reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
+			  reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
 																						data %>%
 																                              filter(data[[i]] >= input[[i]][1],
 																                                     data[[i]] <= input[[i]][2]
@@ -171,7 +182,8 @@ setMethod("dataFilter","ShinyFactory",
 																                             },i=i)
 			} else if(type == 'Categorical') {
 				reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
-																						data %>%
+				                                    data %>%
+
 																                              filter(data[[i]] %in% input[[i]])
 																                             },i=i)
 			} else if(type == 'Boolean') {
@@ -233,7 +245,7 @@ setMethod("shinyServerFactory","ShinyFactory",
 		reactive_data <- dataFilter(object,analysis_data)
 		update_plot <- Curry(updatePlot,object=object,analysis_ggplot=analysis_ggplot,reactive_data=reactive_data)
 		object@server <- Curry(function(input,output,updater,plotname){
-									plt_fn <- updater(input)
+		              plt_fn <- updater(input)
 									output[[plotname]] <- renderPlot(plt_fn())},updater=update_plot,plotname=object@plot_name)
 		return(object)
 	}

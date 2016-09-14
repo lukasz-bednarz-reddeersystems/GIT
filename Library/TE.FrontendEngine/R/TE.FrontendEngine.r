@@ -12,12 +12,10 @@
 #' @import TE.RefClasses
 #' @import TE.AnalysisClasses
 #' @import methods
-#' @import lubridate
 #' @import shiny
+#' @importFrom dplyr filter %>%
 #' @importFrom hashFunction cityhash.64 murmur3.32
 #' @importFrom functional Curry
-#' @importFrom stats filter
-#' @importFrom dplyr %>%
 #
 NULL
 ## NULL

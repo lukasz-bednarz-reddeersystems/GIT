@@ -7,10 +7,10 @@
 \title{generate UI Object}
 \usage{
 shinyUIFactory(object, analysis_ggplot, analysis_data, ui_options = list(omit
-  = c("Value")))
+  = c("Value", "PL")))
 
 \S4method{shinyUIFactory}{ShinyFactory}(object, analysis_ggplot, analysis_data,
-  ui_options = list(omit = c("Value")))
+  ui_options = list(omit = c("Value", "PL")))
 }
 \arguments{
 \item{object}{object of class "ShinyFactory"}

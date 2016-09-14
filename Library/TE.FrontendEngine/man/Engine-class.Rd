@@ -21,7 +21,7 @@ from client via socket
 
 \item{\code{app_store}}{"BasicAppClient",}
 
-\item{\code{trader}}{"numeric",}
+\item{\code{trader}}{"NumericOrCharacter",}
 
 \item{\code{module_date}}{"character",}
 
@@ -43,8 +43,10 @@ from client via socket
 
 \item{\code{app}}{"function",}
 
-\item{\code{analysis_ggplot}}{"gg",}
+\item{\code{analysis_ggplot}}{"ANY",}
 
 \item{\code{analysis_data}}{"data.frame"}
+
+\item{\code{ui_options}}{"list"}
 }}
 

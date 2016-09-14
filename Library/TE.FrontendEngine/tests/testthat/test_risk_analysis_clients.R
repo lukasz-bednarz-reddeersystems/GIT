@@ -11,7 +11,7 @@ analysis.class <- "IndexPortfolioFactorExposuresAnalysisBlock"
 context(sprintf("Testing %s class.", tested.class))
 
 valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
-
+#valid.key_values <- dated_twelve_monthly_lookback("BE500 Index", "2016-09-01")
 
 test_that(sprintf("can instantiate %s class", tested.class), {
 
@@ -68,7 +68,7 @@ analysis.class <- "IndexPortfolioFactorReturnsAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
+# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
 
 
 test_that(sprintf("can instantiate %s class", tested.class), {
@@ -127,7 +127,7 @@ analysis.class <- "IndexPortfolioVarianceDecompositionAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
+# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
 
 
 test_that(sprintf("can instantiate %s class", tested.class), {
@@ -184,8 +184,7 @@ analysis.class <- "MarketStyleFactorStatisticAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
-
+# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
 
 test_that(sprintf("can instantiate %s class", tested.class), {
 

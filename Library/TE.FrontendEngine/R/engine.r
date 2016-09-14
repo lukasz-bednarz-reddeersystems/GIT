@@ -3,6 +3,12 @@
 NULL
 
 
+.__R_DEFAULT_TE_APP_ROOT__ <- gsub("\\\\",
+                                   "/",
+                                   paste0(Sys.getenv("R_TE_DEVEL_ROOT", "C:/Development/TradingEnhancementEngine"),
+                                          "/R/te_module_builder")
+                                   )
+
 #' Class inmplementing Frontend Engine Command Interpreter
 #'
 #' Implements Server opening port and accepting commands
@@ -93,7 +99,9 @@ setMethod("setAppHostCallback","EngineCommandInterpreter",
 setGeneric("setTraderCallback",function(object){standardGeneric("setTraderCallback")})
 setMethod("setTraderCallback","EngineCommandInterpreter",
 	      function(object){
-	      	object <- setEngineSlotCallback(object,'trader',function(engine)as.numeric(engine@interpreter@cmmd_lst[2]))
+	      	object <- setEngineSlotCallback(object,'trader',function(engine){ifelse(grepl("^[0-9]+$", engine@interpreter@cmmd_lst[2]),
+	      	                                                                       as.numeric(engine@interpreter@cmmd_lst[2]),
+	      	                                                                       as.character(engine@interpreter@cmmd_lst[2]))})
 	      	return(object)
 	      }
 )
@@ -131,10 +139,11 @@ setMethod("runAppCallback","EngineCommandInterpreter",
                             library(TE.FrontendEngine)
                             analysis_ggplot <- engine@analysis_ggplot
         										analysis_data <- engine@analysis_data
+        										ui_options <- engine@ui_options
         										factory <- new("ShinyFactory")
-												factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("UI factory failed:",cond)))
+												factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data, ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
 												factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
-        										shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
+        										  shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
         										}
         object <- setEngineSlotCallback(object,'app',fn,TRUE,FALSE,TRUE)
         return(object)
@@ -188,7 +197,7 @@ setClass(
     app_store    = "list"
   ),
   prototype      = prototype(
-    app_store    = list(builder="C:/Development/TradingEnhancementEngine/R/te_module_builder")
+    app_store    = list(builder=.__R_DEFAULT_TE_APP_ROOT__)
   )
 )
 
@@ -204,6 +213,9 @@ setMethod("getAppPath","BasicAppClient",
 
 
 
+setClassUnion("NumericOrCharacter", c("numeric", "integer", "character"))
+
+
 #' Class inmplementing Frontend Engine Server
 #'
 #' Implements Server opening port and accepting commands
@@ -214,7 +226,7 @@ setMethod("getAppPath","BasicAppClient",
 #' @slot store_name  "character",
 #' @slot analys_str  "AnalysisObjectStore",
 #' @slot app_store   "BasicAppClient",
-#' @slot trader      "numeric",
+#' @slot trader      "NumericOrCharacter",
 #' @slot module_date "character",
 #' @slot lookback    "character",
 #' @slot key_hash    "character",
@@ -225,8 +237,9 @@ setMethod("getAppPath","BasicAppClient",
 #' @slot response    "character",
 #' @slot module      "list",
 #' @slot app         "function",
-#' @slot analysis_ggplot  "gg",
+#' @slot analysis_ggplot  "ANY",
 #' @slot analysis_data    "data.frame"
+#' @slot ui_options  "list"
 #'
 #' @export
 
@@ -238,7 +251,7 @@ setClass(
 		store_name = "character",
 		analys_str = "AnalysisObjectStore",
 		app_store  = "BasicAppClient",
-		trader     = "numeric",
+		trader     = "NumericOrCharacter",
 		module_date= "character",
 		lookback   = "character",
 		key_hash   = "character",
@@ -250,31 +263,36 @@ setClass(
 		module     = "list",
 		app        = "function",
 		analysis_ggplot = "ANY",
-		analysis_data   = "data.frame"
+		analysis_data   = "data.frame",
+		ui_options = "list"
 	),
 	prototype    = prototype(
 		interpreter= new("EngineCommandInterpreter"),
 		socket     = new("ProcessSocket"),
-		store_name = TE.DataAccess:::engine_defaults@store_name_prefix
+		store_name = TE.DataAccess:::engine_defaults@store_name_prefix,
+		ui_options = list(omit = "Value", "PL")
 	)
 )
 
 setGeneric("initialiseEngine",function(object){standardGeneric("initialiseEngine")})
 setMethod("initialiseEngine","Engine",
 		  function(object){
-		  	if(length(object@trader)>0 && length(object@lookback)>0 && length(object@module_date)){
+
+		    ready <- (length(object@trader) > 0 &&
+		                length(object@lookback) > 0 &&
+		                  length(object@module_date) > 0 &&
+		                    length(object@module_name) > 0)
+
+
+		  	if( ready ){
 		  		#This depends in the implementation of how analysis data is located.
 		  		#Currently based on a key function, may also prove to be useful to
 		  		#use a date.
 		  		message("Setting analysis module data store ...")
-		  		kv 	   <- eval(parse(text=paste(object@lookback,"(",object@trader,",'",object@module_date,"')",sep="")))
-		  		hrname <- paste(kv[[1,1]],"_",as.character(min(kv[['start']])),"_",as.character(max(kv[['end']])),sep="")
-		  		object@key_hash <- as.character(murmur3.32(as.character(kv)))
-		  		tryCatch({
-		  				object@analys_str <- analysis_store_request(paste(object@store_name,hrname,sep=""))
-		  			}, error = function(cond){
-		  				message("Warning, could not setup the analysis data source.")
-		  			})
+		  		trader <- ifelse(is.numeric(object@trader), object@trader, paste0( '"',object@trader, '"'))
+		  	  kv 	   <- eval(parse(text=paste(object@lookback,"(",trader,",'",object@module_date,"')",sep="")))
+
+		  	  object@key_hash <- as.character(murmur3.32(as.character(kv)))
 		  	}
 		    object@app_store <- new("BasicAppClient")
 		  	return(object)
@@ -400,13 +418,20 @@ setMethod("startEngine","Engine",
 setGeneric("importAppData",function(object){standardGeneric("importAppData")})
 setMethod("importAppData","Engine",
 	      function(object){
-	      	block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
+	        block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
 			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
 			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
 			block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
 			block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
 			object@analysis_ggplot<- getOutputGGPlot(block)
 			object@analysis_data  <- getOutputGGPlotData(block)
+			omit <- getOutputFrontendData(block)
+
+			browser()
+			if (length(omit$omit) > 0) {
+			  object@ui_options[['omit']] <- unique(c(object@ui_options[['omit']], as.character(omit$omit)))
+			}
+
 			return(object)
 	      }
 )
