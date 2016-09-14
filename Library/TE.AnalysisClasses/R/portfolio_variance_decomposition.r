@@ -59,7 +59,7 @@ setClass(
     column_name_map = hash(c("TraderID", "start", "end"),
                            c("id", "start", "end")),
     portfolio       = new("StrategyPortfolio"),
-    risk_model      = new("RiskModel.DevelopedEuropePrototype150"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
     instrument_betas = new("InstrumentBetasData"),
     factor_correlation = new("FactorCorrelationData"),
     factor_variance = new("FactorVarianceData"),
