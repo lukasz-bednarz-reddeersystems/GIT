@@ -4,6 +4,7 @@ NULL
 #Determine how plotted quantities should be handled by the UI.
 #Simplest case is just to go on the basis of type
 entity_map <- list(Date = list("Date"),
+           Interval = list("difftime"),
 				   Real = list("numeric"),
 				   Integer = list("integer"),
 				   Categorical = list("character","factor"),
@@ -134,6 +135,8 @@ setMethod("buildInputControl","ShinyFactory",
 		type <- getUIType(object@entity_mapper,analysis_data[[input]])
 		if(type=="Date"){
 			cntrl <- sliderInput(input,label,min=min(analysis_data[[input]],na.rm=TRUE),max=max(analysis_data[[input]],na.rm=TRUE),value=c(min(analysis_data[[input]],na.rm=TRUE),max(analysis_data[[input]],na.rm=TRUE)))
+		} else if(type == "Interval"){
+		  cntrl <- sliderInput(input,label,min=min(as.numeric(analysis_data[[input]]),na.rm=TRUE),max=max(as.numeric(analysis_data[[input]]),na.rm=TRUE),value=c(min(as.numeric(analysis_data[[input]]),na.rm=TRUE),max(as.numeric(analysis_data[[input]]),na.rm=TRUE)))
 		} else if(type == "Real"){
 			cntrl <- sliderInput(input,label,min=min(analysis_data[[input]],na.rm=TRUE),max=max(analysis_data[[input]],na.rm=TRUE),value=c(min(analysis_data[[input]],na.rm=TRUE),max(analysis_data[[input]],na.rm=TRUE)))
 		} else if(type == "Integer"){
@@ -175,6 +178,13 @@ setMethod("dataFilter","ShinyFactory",
 																                                     data[[i]] <= input[[i]][2]
 																                                    )
 																                             },i=i)
+			} else if(type == 'Interval') {
+			  reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
+                                    			   data %>%
+                                    			      filter(data[[i]] >= input[[i]][1],
+                                    			             data[[i]] <= input[[i]][2]
+                                    			      )
+                                    			    },i=i)			
 			} else if(type == 'Integer') {
 				reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
 																						data %>%

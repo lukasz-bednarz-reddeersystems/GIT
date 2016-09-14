@@ -415,25 +415,70 @@ setMethod("startEngine","Engine",
 		  }
 )
 
-setGeneric("importAppData",function(object){standardGeneric("importAppData")})
+setGeneric("importAppData",function(object,scramble=TRUE){standardGeneric("importAppData")})
 setMethod("importAppData","Engine",
-	      function(object){
+	function(object,scramble=TRUE){
 	        block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
 			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
 			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
 			block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
 			block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
-			object@analysis_ggplot<- getOutputGGPlot(block)
 			object@analysis_data  <- getOutputGGPlotData(block)
+			object@analysis_ggplot<- getOutputGGPlot(block)
 			omit <- getOutputFrontendData(block)
 
 			if (length(omit$omit) > 0) {
 			  object@ui_options[['omit']] <- unique(c(object@ui_options[['omit']], as.character(omit$omit)))
 			}
-
+			if(scramble){
+			  object@analysis_data  <-scrambleData(object)
+			  object@analysis_ggplot$data <- object@analysis_data
+			}
 			return(object)
 	      }
 )
+#Should create a new class to do this
+setGeneric("scrambleData",function(object){standardGeneric("scrambleData")})
+setMethod("scrambleData","Engine",
+	function(object){
+	  data <- object@analysis_data
+		data_cols <- colnames(object@analysis_data)
+		if('Trader' %in% data_cols){
+			data <- sub_column(data,'Trader',generic="Trader")
+		}
+		if('TraderID' %in% data_cols){
+		  data <- sub_column(data,'TraderID',generic="Trader")
+		}
+		if('Strategy' %in% data_cols){
+		  data <- sub_column(data,'Strategy',generic="Strategy")
+		}
+		return(data)
+	}
+)
+sub_column <- function(data,col_name,generic=NULL){
+	type <- class(data[[col_name]])[[1]]
+	vals <- data[[col_name]]
+	if(type=='character'||type=='factor'){
+		remapper <- sample(letters,length(unique(vals)),replace=FALSE)
+		names(remapper) <- as.character(unique(vals))
+		if(length(generic)>0){
+			new_vals <- paste(generic,remapper[vals])
+		} else {
+			new_vals <- remapper[vals]
+		}
+		data[[col_name]] <- new_vals
+	} else if (type=='numeric'){
+	  remapper <- 1:length(unique(vals))
+	  names(remapper) <- unique(vals)
+	  if(length(generic)>0){
+	    new_vals <- paste(generic,remapper[vals])
+	  } else {
+	    new_vals <- remapper[vals]
+	  }
+	  data[[col_name]] <- new_vals
+	}
+	return(data)
+}
 
 setGeneric("shutdownEngine",function(object){standardGeneric("shutdownEngine")})
 setMethod("shutdownEngine","Engine",
