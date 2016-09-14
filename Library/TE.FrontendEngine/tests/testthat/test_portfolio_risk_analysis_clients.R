@@ -1,17 +1,17 @@
 #################################################################
 #
-# Test IndexPortfolioFactorExposuresAnalysisBlockClient
+# Test PortfolioFactorExposuresAnalysisBlockClient
 #
 #################################################################
 
 
-tested.class <- "IndexPortfolioFactorExposuresAnalysisBlockClient"
-analysis.class <- "IndexPortfolioFactorExposuresAnalysisBlock"
+tested.class <- "PortfolioFactorExposuresAnalysisBlockClient"
+analysis.class <- "PortfolioFactorExposuresAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
-#valid.key_values <- dated_twelve_monthly_lookback("BE500 Index", "2016-09-01")
+valid.key_values <- dated_three_monthly_lookback(101, "2016-09-01")
+#valid.key_values <- dated_twelve_monthly_lookback(11, "2016-09-01")
 
 test_that(sprintf("can instantiate %s class", tested.class), {
 
@@ -58,17 +58,17 @@ test_that(sprintf("Can getAnalysisBlock on %s class", tested.class),{
 
 #################################################################
 #
-# Test IndexPortfolioFactorReturnsAnalysisBlockClient
+# Test PortfolioFactorReturnsAnalysisBlockClient
 #
 #################################################################
 
 
-tested.class <- "IndexPortfolioFactorReturnsAnalysisBlockClient"
-analysis.class <- "IndexPortfolioFactorReturnsAnalysisBlock"
+tested.class <- "PortfolioFactorReturnsAnalysisBlockClient"
+analysis.class <- "PortfolioFactorReturnsAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
+# valid.key_values <- dated_three_monthly_lookback(11, "2016-09-01")
 
 
 test_that(sprintf("can instantiate %s class", tested.class), {
@@ -117,17 +117,17 @@ test_that(sprintf("Can getAnalysisBlock on %s class", tested.class),{
 
 #################################################################
 #
-# Test IndexPortfolioVarianceDecompositionAnalysisBlockClientClient
+# Test PortfolioVarianceDecompositionAnalysisBlockClientClient
 #
 #################################################################
 
 
-tested.class <- "IndexPortfolioVarianceDecompositionAnalysisBlockClient"
-analysis.class <- "IndexPortfolioVarianceDecompositionAnalysisBlock"
+tested.class <- "PortfolioVarianceDecompositionAnalysisBlockClient"
+analysis.class <- "PortfolioVarianceDecompositionAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
+# valid.key_values <- dated_three_monthly_lookback(11, "2016-09-01")
 
 
 test_that(sprintf("can instantiate %s class", tested.class), {
@@ -184,7 +184,7 @@ analysis.class <- "MarketStyleFactorStatisticAnalysisBlock"
 
 context(sprintf("Testing %s class.", tested.class))
 
-# valid.key_values <- dated_three_monthly_lookback("BE500 Index", "2016-09-01")
+# valid.key_values <- dated_three_monthly_lookback(11, "2016-09-01")
 
 test_that(sprintf("can instantiate %s class", tested.class), {
 

@@ -427,7 +427,6 @@ setMethod("importAppData","Engine",
 			object@analysis_data  <- getOutputGGPlotData(block)
 			omit <- getOutputFrontendData(block)
 
-			browser()
 			if (length(omit$omit) > 0) {
 			  object@ui_options[['omit']] <- unique(c(object@ui_options[['omit']], as.character(omit$omit)))
 			}

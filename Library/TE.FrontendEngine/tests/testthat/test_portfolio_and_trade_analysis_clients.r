@@ -11,7 +11,7 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
+valid.id   <- 101
 valid.date <- "2016-09-01"
 valid.function <- dated_three_monthly_lookback
 # valid.function <- dated_twelve_monthly_lookback
@@ -76,8 +76,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -139,8 +139,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -201,8 +201,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -264,8 +264,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -328,8 +328,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -390,8 +390,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -451,8 +451,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -513,8 +513,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -575,8 +575,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 
@@ -637,8 +637,8 @@ context(sprintf("Testing %s class.", tested.class))
 
 client.class <- paste(tested.class,"Client",sep="")
 
-valid.id   <- 11
-valid.date <- "2016-09-01"
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
 # valid.function <- dated_three_monthly_lookback
 valid.key_values <- valid.function(valid.id, valid.date)
 

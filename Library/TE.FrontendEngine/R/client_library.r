@@ -209,6 +209,61 @@ setClass(
 
 
 
+#' Clas wrapping access to PortfolioFactorExposuresAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for PortfolioFactorExposuresAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "PortfolioFactorExposuresAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "PortfolioFactorExposuresAnalysisBlock"
+  ),
+  contains = c("VirtualStrategyPortfolioAnalysisBlockClient")
+)
+
+
+#' Clas wrapping access to PortfolioFactorReturnsAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for PortfolioFactorReturnsAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "PortfolioFactorReturnsAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "PortfolioFactorReturnsAnalysisBlock"
+  ),
+  contains = c("VirtualStrategyPortfolioAnalysisBlockClient")
+)
+
+
+#' Clas wrapping access to PortfolioVarianceDecompositionAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for PortfolioVarianceDecompositionAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "PortfolioVarianceDecompositionAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "PortfolioVarianceDecompositionAnalysisBlock"
+  ),
+  contains = c("VirtualStrategyPortfolioAnalysisBlockClient")
+)
+
+
+
 #############################################################
 #
 # Index Portfolio classes
