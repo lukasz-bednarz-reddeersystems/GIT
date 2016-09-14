@@ -141,7 +141,7 @@ setMethod("Process",
 
             fct_smmry$Label <- paste(round(fct_smmry$Delta),"%",sep="")
 
-            fct_smmry <- fctsmmry[c("Factor","TotalExposure", "Exposure", "Label")]
+            fct_smmry <- fct_smmry[c("Factor","TotalExposure", "Label")]
 
             exprs_smmry <- ggplot(data=fct_smmry, aes_string(x="Factor", fill="Factor" )) +
               geom_bar(aes_string(weight="TotalExposure")) +
@@ -153,7 +153,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, fct_smmry)
             object <- .setOutputGGPlot(object, exprs_smmry)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("TotalExposure", "Label", "Exposure")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Label", "Exposure")))
 
             return(object)
           }
