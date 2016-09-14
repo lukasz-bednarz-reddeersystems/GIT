@@ -1,8 +1,10 @@
 sourceTo("../common/datasource_client/datasource_client.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules/analysis_block/analysis_block.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../common/analysis_objectstore/analysis_objectstore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 library(lubridate)
 library(hash)
+library(digest)
+library(hashFunction)
 
 ####################################
 #
@@ -49,15 +51,15 @@ setMethod("getAnalysisBlock",
           }
 )
 
-setMethod("dataRequest",
-          signature(object = "VirtualAnalysisClient", key_values = "data.frame"),
-          function(object, key_values, force=FALSE){
+#setGeneric("blockRequest", function(object, key_values, force=FALSE){standardGeneric("blockRequest")})
+setMethod("dataRequest", signature(object = "VirtualAnalysisClient", key_values = "data.frame"),
+          function(object, key_values, force = FALSE){
 
             key <- key_values
             analysis <- getAnalysisClass(object)
             key_with_class <- cbind(data.frame(analysis_class = analysis), key_values)
             colnames(key_with_class) <- getDataSourceQueryKeyColumnNames(object)
-            object <- .setDataSourceQueryKeyValues(object,key_with_class)
+            object@key_values <- key_with_class[getDataSourceQueryKeyColumnNames(object)]
 
             store_id <- get_analysis_objectstore_name(key_with_class)
             
@@ -65,14 +67,12 @@ setMethod("dataRequest",
             kh <- as.character(murmur3.32(as.character(key_values)))
             analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
             
-
-
             if (is.null(analysis_block)) { 
               if(force){
                 analysis_block <- new(analysis)
                 analysis_block <- dataRequest(analysis_block,key_with_class[colnames(key_with_class)!='analysis_class'])
                 analysis_block <- Process(analysis_block)
-                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,data.frame(key_hash=kh,analysis_module=object@analysis_class))
+                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,data.frame(key_hash=kh,analysis_module=object@analysis_class),force=force)
                 analysis_store <- commitAnalysisStore(analysis_store)
                 query_data     <- getOutputGGPlotData(analysis_block)
                 object@analysis_block <- analysis_block

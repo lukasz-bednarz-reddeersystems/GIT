@@ -3,10 +3,10 @@ options(modifiedOnlySource=TRUE)
 sourceTo("../common/analysis_client/analysis_client.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/analysis_client/client_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
-load_only  <- TRUE
-block_name <- "AverageDownTradesAnalysisBlock"
+load_only  <- FALSE
+block_name <- "PositionRevisitsAnalysisBlock"
 id         <- 11
-date       <- '2016-09-01'
+date       <- '2016-07-01'
 fn         <- dated_three_monthly_lookback
 
 block_client <- new(paste(block_name,"Client",sep=""))

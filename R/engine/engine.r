@@ -4,7 +4,6 @@ library(dplyr)
 sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/sockets.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/frame_to_xml.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-#sourceTo("../analysis_modules_legacy/analysis_module.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../models/key_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/analysis_client/client_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
@@ -123,10 +122,23 @@ setMethod("runAppCallback","EngineCommandInterpreter",
         										setwd(engine@app_path)
         										sourceTo("te_shiny_app_factories.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
         										analysis_ggplot <- engine@analysis_ggplot
-        										analysis_data <- engine@analysis_data
+        										analysis_data   <- engine@analysis_data
+        										 if(engine@module_name=="PortfolioFactorExposureAnalysisBlock"){
+        										   omit <- c("Quarter.x","Quarter.y","TotalExposure.x","TotalExposure.y","Delta","TotalExposure")
+        										 } else if(engine@module_name=="AverageDownTradesAnalysisBlock"){
+        										   omit <- c("TradeCount","Num.Trades")
+        										 } else if(engine@module_name=="OffsidePositionsAnalysisBlock"){
+        										   omit <- c("Delta")
+        										 } else if(engine@module_name=="PositionRevisitsAnalysisBlock"){
+        										   omit <- c("TotalN","VisitN")
+        										 } else {
+        										   omit <- c()
+        										 }
+        										ui_options <- list(omit=unique(c('Value','PL',omit)))
+        										
         										factory <- new("ShinyFactory")
-												factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("UI factory failed:",cond)))
-												factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+												    factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data,ui_options=ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
+												    factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
         										shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
         										}
         object <- setEngineSlotCallback(object,'app',fn,TRUE,FALSE,TRUE)
@@ -352,43 +364,60 @@ setMethod("startEngine","Engine",
 
 setGeneric("importAppData",function(object,scramble=TRUE){standardGeneric("importAppData")})
 setMethod("importAppData","Engine",
-	      function(object,scramble=TRUE){
-	      	block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
+	function(object,scramble=TRUE){
+	    block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
 			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
 			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
 			block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
 			block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
+			object@analysis_data  <- getOutputGGPlotData(block)  
 			object@analysis_ggplot<- getOutputGGPlot(block)
-			object@analysis_data  <- getOutputGGPlotData(block)
+			if(scramble){
+			  object@analysis_data  <-scrambleData(object)
+			  object@analysis_ggplot$data <- object@analysis_data
+			}
 			return(object)
-	      }
+	 }
 )
-
 #Should create a new class to do this
 setGeneric("scrambleData",function(object){standardGeneric("scrambleData")})
 setMethod("scrambleData","Engine",
 	function(object){
+	  data <- object@analysis_data
 		data_cols <- colnames(object@analysis_data)
 		if('Trader' %in% data_cols){
-			traders <- unique(data[col_name])
+			data <- sub_column(data,'Trader',generic="Trader")
 		}
 		if('TraderID' %in% data_cols){
-			traders <- unique(data[col_name])
+		  data <- sub_column(data,'TraderID',generic="Trader")
 		}
+		if('Strategy' %in% data_cols){
+		  data <- sub_column(data,'Strategy',generic="Strategy")
+		}
+		return(data)
 	}
 )
 sub_column <- function(data,col_name,generic=NULL){
-	type <- class(data[col_name])[[1]]
-	if(type=='character'){
-		vals <- data[col_name]
-		remapper <- sample(letters,length(unique(vals)))
-		names(remapper) <- unique(vals)
+	type <- class(data[[col_name]])[[1]]
+	vals <- data[[col_name]]
+	if(type=='character'||type=='factor'){
+		remapper <- sample(letters,length(unique(vals)),replace=FALSE)
+		names(remapper) <- as.character(unique(vals))
 		if(length(generic)>0){
 			new_vals <- paste(generic,remapper[vals])
 		} else {
 			new_vals <- remapper[vals]
 		}
-		data[col_name] <- new_vals
+		data[[col_name]] <- new_vals
+	} else if (type=='numeric'){
+	  remapper <- 1:length(unique(vals))
+	  names(remapper) <- unique(vals)
+	  if(length(generic)>0){
+	    new_vals <- paste(generic,remapper[vals])
+	  } else {
+	    new_vals <- remapper[vals]
+	  }
+	  data[[col_name]] <- new_vals
 	}
 	return(data)
 }
