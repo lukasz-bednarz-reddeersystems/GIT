@@ -10,10 +10,12 @@ valid.column_name_map <- hash(c("TraderID", "start", "end"), c("id", "start", "e
 init.key_values       <- data.frame(TraderID = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character()))
+valid.risk_model_class <- "RiskModel.DevelopedEuropePrototype150.1.1"
 
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)
 })
+
 
 
 
@@ -23,7 +25,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(object, tested.class)
 
   expect_is(getPortfolioDataObject(object), "StrategyPortfolio")
-  expect_is(getRiskModelObject(object), "RiskModel.DevelopedEuropePrototype150")
+  expect_is(getRiskModelObject(object), valid.risk_model_class)
   expect_is(getInstrumentBetasDataObject(object), "InstrumentBetasData")
   expect_is(getFactorCorrelationDataObject(object), "FactorCorrelationData")
   expect_is(getFactorVarianceDataObject(object), "FactorVarianceData")

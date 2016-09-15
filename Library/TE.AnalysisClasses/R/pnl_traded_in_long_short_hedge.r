@@ -106,6 +106,7 @@ setMethod("Process",
                                       list(Strategy=trd_data$ST,Month=trd_data$Month),
                                       function(x)sum(x,na.rm=TRUE))
 
+            ttl_pl_smrry <- ttl_pl_smrry[c("Month", "TodayPL", "Strategy" )]
             # compute output
             pl_plot <- ggplot(data=ttl_pl_smrry,aes_string(x="Month",
                                                            y="TodayPL",

@@ -169,7 +169,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object,buy_sells)
             object <- .setOutputGGPlot(object, n_buys_sells)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Side", "Count")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Count")))
 
 
             return(object)

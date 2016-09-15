@@ -153,7 +153,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, fct_smmry)
             object <- .setOutputGGPlot(object, exprs_smmry)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Label", "Exposure")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Label", "TotalExposure")))
 
             return(object)
           }

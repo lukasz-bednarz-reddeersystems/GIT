@@ -134,7 +134,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, revisit_plt_data)
             object <- .setOutputGGPlot(object, revisit_smmry)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("VisitN", "Value")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("VisitN", "Value", "TotalN")))
 
 
             return(object)

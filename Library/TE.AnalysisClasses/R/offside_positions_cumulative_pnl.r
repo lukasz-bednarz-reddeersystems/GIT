@@ -161,7 +161,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, cum_pl_plt)
             object <- .setOutputGGPlot(object, cum_pl_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PL", "Days")))
 
             return(object)
           }
