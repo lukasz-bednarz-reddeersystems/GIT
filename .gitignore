@@ -14,3 +14,4 @@ R/scripts/**
 **/*.pdf
 **/*.bak
 .Rproj.user
+/Library/*.Rcheck
