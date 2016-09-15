@@ -683,3 +683,66 @@ test_that(sprintf("Can getAnalysisBlock on %s class", tested.class),{
 
 
 })
+
+
+
+####################################################
+#
+# PositionsHoldingPeriodAnalysisBlockClient Tests
+#
+####################################################
+
+tested.class <- "PositionsHoldingPeriodAnalysisBlockClient"
+analysis.class <- "PositionsHoldingPeriodAnalysisBlock"
+
+
+context(sprintf("Testing %s class.", tested.class))
+
+client.class <- paste(tested.class,"Client",sep="")
+
+# valid.id   <- 11
+# valid.date <- "2016-09-01"
+# valid.function <- dated_three_monthly_lookback
+valid.key_values <- valid.function(valid.id, valid.date)
+
+test_that(sprintf("Can instantiate on %s class", client.class),{
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+})
+
+
+test_that(sprintf("Can dataRequest on %s class", tested.class),{
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- dataRequest(object, valid.key_values, TRUE)
+
+  block_data <- getReferenceData(object)
+
+  expect_is(block_data, "data.frame")
+})
+
+
+test_that(sprintf("Can getAnalysisBlock on %s class", tested.class),{
+  object <- new(tested.class)
+  object <- dataRequest(object, valid.key_values)
+
+  block_data <- getReferenceData(object)
+
+  expect_is(block_data, "data.frame")
+
+
+  block <- getAnalysisBlock(object)
+  block_refdata <- getOutputObject(block)
+  block_plot <- getOutputGGPlot(block)
+  block_plot_data <- getOutputGGPlotData(block)
+
+  expect_is(block, analysis.class)
+  expect_is(block_plot, "ggplot")
+  expect_is(block_plot_data, "data.frame")
+
+
+})

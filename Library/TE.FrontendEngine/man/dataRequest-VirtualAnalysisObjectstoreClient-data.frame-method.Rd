@@ -6,7 +6,7 @@
 \title{Request data from data source}
 \usage{
 \S4method{dataRequest}{VirtualAnalysisObjectstoreClient,data.frame}(object,
-  key_values, force = FALSE)
+  key_values, force = FALSE, replace = FALSE)
 }
 \arguments{
 \item{object}{object of class 'VirtualAnalysisObjectstoreClient'.}
@@ -14,6 +14,8 @@
 \item{key_values}{"data.frame" with keys specifying data query.}
 
 \item{force}{"logical" should the block be computed for given keys if not present in store.}
+
+\item{replace}{"logical" should the block be replaced by new computed value}
 }
 \value{
 \code{object} object of class 'VirtualAnalysisObjectstoreClient'.

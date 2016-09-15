@@ -208,6 +208,23 @@ setClass(
 )
 
 
+#' Clas wrapping access to PositionsHoldingPeriodAnalysisBlockClient
+#'
+#' Implements methods to access analysis objectstore
+#' for PositionsHoldingPeriodAnalysisBlock class
+#'
+#' Inherits from: "VirtualStrategyPortfolioAnalysisBlockClient"
+#'
+#' @export
+setClass(
+  Class          = "PositionsHoldingPeriodAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "PositionsHoldingPeriodAnalysisBlock"
+  ),
+  contains = c("VirtualStrategyPortfolioAnalysisBlockClient")
+)
+
+
 
 #' Clas wrapping access to PortfolioFactorExposuresAnalysisBlock
 #'

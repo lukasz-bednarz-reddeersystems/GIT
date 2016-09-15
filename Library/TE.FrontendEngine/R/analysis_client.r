@@ -102,12 +102,13 @@ setMethod(".setAnalysisBlock",
 #' @param object object of class 'VirtualAnalysisObjectstoreClient'.
 #' @param key_values "data.frame" with keys specifying data query.
 #' @param force "logical" should the block be computed for given keys if not present in store.
+#' @param replace "logical" should the block be replaced by new computed value
 #' @return \code{object} object of class 'VirtualAnalysisObjectstoreClient'.
 #' @export
 setMethod("dataRequest",
           signature(object = "VirtualAnalysisObjectstoreClient",
                     key_values = "data.frame"),
-          function(object, key_values, force=FALSE){
+          function(object, key_values, force=FALSE, replace = FALSE){
 
             key <- key_values
             analysis <- getAnalysisClass(object)
@@ -124,8 +125,8 @@ setMethod("dataRequest",
             analysis_key <- key_with_class[setdiff(colnames(key_with_class), "analysis_class")]
             objstr_key <- data.frame(key_hash = kh, analysis_module = getAnalysisClass(object))
 
-            if (is.null(analysis_block)) {
-              if(force){
+            if (is.null(analysis_block) || replace) {
+              if(force || replace){
                 analysis_block <- new(analysis)
                 analysis_block <- dataRequest(analysis_block,analysis_key)
                 analysis_block <- Process(analysis_block)
