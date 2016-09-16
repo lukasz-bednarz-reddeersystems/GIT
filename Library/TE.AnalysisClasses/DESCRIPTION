@@ -63,4 +63,5 @@ Collate:
     'strategy_breakdown_pnl_on_trade_day_per_signal.r'
     'strategy_breakdown_signal_characteristic_and_effeciveness.r'
     'strategy_breakdown_total_pnl_and_pnl_delta.r'
+    'trades_performance_on_results_day.r'
 RoxygenNote: 5.0.1
