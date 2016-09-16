@@ -106,6 +106,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, sig_increases)
 
             object <- .setOutputGGPlot(object, sig_smmry)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Increase", "Value", "Rank", "Delta")))
 
             return(object)
           }

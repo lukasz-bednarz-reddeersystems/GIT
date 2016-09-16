@@ -158,7 +158,7 @@ setClass(
   )
 )
 
-model_data_switch  <- new("ConfigSwitcher",prod_value="//MBAM/main/MBAM/Trading Enhancements/data",dev_value="C:/Development/TradingEnhancementEngine/R/model_data")
+model_data_switch  <- new("ConfigSwitcher",prod_value="//londfs/raid/TEdata",dev_value="C:/Development/TradingEnhancementEngine/R/model_data")
 setClass(
   Class = "ModelDefaults",
   representation  = representation(

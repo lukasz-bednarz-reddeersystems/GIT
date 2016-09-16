@@ -217,7 +217,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, off_chrt_data)
             object <- .setOutputGGPlot(object, off_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value", "Delta")))
 
             return(object)
           }

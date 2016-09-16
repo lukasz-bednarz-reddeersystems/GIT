@@ -35,12 +35,33 @@ setClass(
                                  end    = as.Date(character())),
     column_name_map = hash(c("start", "end"),
                            c("start", "end")),
-    market_style       = new("MarketStyleData")
+    market_style    = new("MarketStyleData"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualRiskModelHandler",
                         "VirtualMarketStyleDataHandler"
   )
+)
+
+#' Set risk_model object in object slot
+#'
+#' Public method to set trade_data slot with "VirtualRiskModel"
+#' class object
+#'
+#' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
+#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @export
+
+setMethod("setRiskModelObject",
+          signature(object = "MarketStyleFactorStatisticAnalysisBlock",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            return(object)
+          }
 )
 
 #' Request data from data source
@@ -57,6 +78,8 @@ setMethod("dataRequest",
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
             market_style <- getMarketStyleDataObject(object)
+
+            market_style <- setRiskModelObject(market_style, getRiskModelObject(object))
 
             # getting marketStyle data
 
@@ -93,9 +116,14 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            risk_model <- getRiskModelObject(object)
+            all_factors <- getRiskModelFactorNames(risk_model)
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             market_style <- getMarketStyleDataObject(object)
 
             all_market_st <- getReferenceData(market_style)
+
 
             first <- TRUE
 
@@ -108,15 +136,14 @@ setMethod("Process",
 
                 market_st <- all_market_st[all_market_st$Date==rm_date,setdiff(colnames(all_market_st),'Date')]
 
-                plot_data <- stack(market_st, select = c(portfolio_decomposition_all_factors))
+                plot_data <- stack(market_st, select = c(all_factors))
 
                 colnames(plot_data) <- c("Value", "RiskType")
 
                 plot_data <- data.frame(Date = rm_date, plot_data)
 
                 plot_data$RiskGroup <- plot_data$RiskType
-                levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
-                plot_data <- data.frame(Date = rm_date, plot_data)
+                levels(plot_data$RiskGroup) <- factor_groups
 
                 if(first){
                   mrkt_plot_data <- plot_data
@@ -137,6 +164,7 @@ setMethod("Process",
             mrkt_plot_data$RiskType <- factor(as.character(mrkt_plot_data$RiskType),
                                                  levels = as.character(ord_frm$RiskType))
 
+            mrkt_plot_data <- mrkt_plot_data[c("Date", "Value", "RiskType", "RiskGroup")]
             #Create plot
             plt_risk <- ggplot(data=mrkt_plot_data,aes_string(x="RiskType",
                                                               y="Value",
@@ -150,6 +178,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value")))
 
             return(object)
           }

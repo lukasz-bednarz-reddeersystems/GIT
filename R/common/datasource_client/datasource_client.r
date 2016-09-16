@@ -1,5 +1,6 @@
 sourceTo("../lib/referencedata/referencedata.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../common/datasource_client/datasource_client_functions.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../models/key_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 library(plyr)
 library(hash)
 

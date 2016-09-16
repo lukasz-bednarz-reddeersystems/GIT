@@ -139,7 +139,7 @@ setMethod("Process",
             # set processed data as an output
             object <- .setOutputGGPlotData(object, track_offside)
             object <- .setOutputGGPlot(object, track_offside_plt)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("MarketValue", "Value", "Days")))
 
             return(object)
           }

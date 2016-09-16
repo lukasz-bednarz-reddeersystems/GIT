@@ -1,8 +1,11 @@
+library(ggplot2)
+library(shiny)
+library(dplyr)
 sourceTo("../common/global_configs.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/sockets.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 sourceTo("../lib/frame_to_xml.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-sourceTo("../analysis_modules_legacy/analysis_module.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
-#sourceTo("../analysis_modules_legacy/analysis_module_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../models/key_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+sourceTo("../common/analysis_client/client_library.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 setClass(
 	Class          = "EngineCommandInterpreter",
@@ -23,7 +26,7 @@ setGeneric("setEngineSlotCallback",function(object,slot_name,value_getter,snd_re
 setMethod("setEngineSlotCallback","EngineCommandInterpreter",
 		  function(object,slot_name,value_getter,snd_response=TRUE,snd_data=FALSE,run_app=FALSE){
 		  	object@callback     <- function(engine,get_value=value_getter){slot(engine,slot_name) <- get_value(engine)
-		  						                                                     return(engine)}
+		  						                                           return(engine)}
 		  	object@snd_respnse  <- snd_response
 		  	object@snd_data     <- snd_data
 		  	object@run_app      <- run_app
@@ -106,7 +109,7 @@ setMethod("setShutdownCallback","EngineCommandInterpreter",
 setGeneric("getModuleDataCallback",function(object){standardGeneric("getModuleDataCallback")})
 setMethod("getModuleDataCallback","EngineCommandInterpreter",
 		  function(object){
-			  fn <- function(engine){list(queryAnalysisStore(engine@analys_str,data.frame(key_hash=engine@key_hash,analysis_module=engine@module_name)))}		 
+			fn <- function(engine){list(queryAnalysisStore(engine@analys_str,data.frame(key_hash=engine@key_hash,analysis_module=engine@module_name)))}		 
 		  	object <- setEngineSlotCallback(object,'module',fn,TRUE,TRUE)
 		  	return(object) 
 		  }
@@ -115,8 +118,29 @@ setMethod("getModuleDataCallback","EngineCommandInterpreter",
 setGeneric("runAppCallback",function(object){standardGeneric("runAppCallback")})
 setMethod("runAppCallback","EngineCommandInterpreter",
       function(object){
-        fn <- function(engine){setwd(engine@app_path)
-                               list(shiny::runApp(engine@app_path,host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE))}
+        fn <- function(engine){function(engine){
+        										setwd(engine@app_path)
+        										sourceTo("te_shiny_app_factories.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+        										analysis_ggplot <- engine@analysis_ggplot
+        										analysis_data   <- engine@analysis_data
+        										 if(engine@module_name=="PortfolioFactorExposureAnalysisBlock"){
+        										   omit <- c("Quarter.x","Quarter.y","TotalExposure.x","TotalExposure.y","Delta","TotalExposure")
+        										 } else if(engine@module_name=="AverageDownTradesAnalysisBlock"){
+        										   omit <- c("TradeCount","Num.Trades")
+        										 } else if(engine@module_name=="OffsidePositionsAnalysisBlock"){
+        										   omit <- c("Delta")
+        										 } else if(engine@module_name=="PositionRevisitsAnalysisBlock"){
+        										   omit <- c("TotalN","VisitN")
+        										 } else {
+        										   omit <- c()
+        										 }
+        										ui_options <- list(omit=unique(c('Value','PL',omit)))
+        										
+        										factory <- new("ShinyFactory")
+												    factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data,ui_options=ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
+												    factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+        										shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
+        										}
         object <- setEngineSlotCallback(object,'app',fn,TRUE,FALSE,TRUE)
         return(object)
       }          
@@ -169,7 +193,7 @@ setClass(
     app_store    = "list"
   ),
   prototype      = prototype(
-    app_store    = list(test="C:/Development/TradingEnhancementEngine/R/te_dashboard_app")
+    app_store    = list(builder="C:/Development/TradingEnhancementEngine/R/te_module_builder")
   )
 )
 
@@ -201,7 +225,10 @@ setClass(
 		app_host   = "character",
 		response   = "character",
 		module     = "list",
-		app        = "list"
+		app        = "function",
+		analysis_ggplot = "gg",
+		analysis_data   = "data.frame",
+		ui_options      = "data.frame"
 	),
 	prototype    = prototype(
 		interpreter= new("EngineCommandInterpreter"),
@@ -224,7 +251,7 @@ setMethod("initialiseEngine","Engine",
 		  		tryCatch({
 		  				object@analys_str <- analysis_store_request(paste(object@store_name,hrname,sep=""))		
 		  			}, error = function(cond){
-		  				stop("Fatal error, could not setup the analysis data source.")
+		  				message("Warning, could not setup the analysis data source.")
 		  			})
 		  	}
 		    object@app_store <- new("BasicAppClient")
@@ -238,11 +265,11 @@ setMethod("startEngine","Engine",
 		  	message("Starting trading enhancement engine ...")
 		  	message(paste("Attempting to establish socket on port",object@socket@port))
 		  	object@socket <- openConnection(object@socket)
-		  	request <- "";
+		  	request <- ""
 		  	while(request != "STOP"){
 		  		object <- initialiseEngine(object)
 		  		object@response <- 'GOT' #Default reponse, sent if callback specifies to send response
-		  								             #and does not reset the response
+		  								 #and does not reset the response
 		  		skct <- tryCatch({
 		  					readConnection(object@socket)
 		  				}, error = function(cond){
@@ -310,10 +337,11 @@ setMethod("startEngine","Engine",
 		  						message("No data sent.")
 		  					}
 		  					if(object@interpreter@run_app){
-		  					  #If engine state set to un an app, the engine
+		  					  #If engine state set to run an app, the engine
 		  					  #attempts to execute the callback to launch the app
 		  					  #which will block engine exceution and make an HTTP service
 		  					  #available.
+		  					  object <- importAppData(object)
 		  					  tryCatch({
 		  					    object@app(object)
 		  					  },error=function(cond){
@@ -333,6 +361,66 @@ setMethod("startEngine","Engine",
 		  	shutdownEngine(object)
 		  }
 )
+
+setGeneric("importAppData",function(object,scramble=TRUE){standardGeneric("importAppData")})
+setMethod("importAppData","Engine",
+	function(object,scramble=TRUE){
+	    block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
+			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
+			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
+			block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
+			block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
+			object@analysis_data  <- getOutputGGPlotData(block)  
+			object@analysis_ggplot<- getOutputGGPlot(block)
+			if(scramble){
+			  object@analysis_data  <-scrambleData(object)
+			  object@analysis_ggplot$data <- object@analysis_data
+			}
+			return(object)
+	 }
+)
+#Should create a new class to do this
+setGeneric("scrambleData",function(object){standardGeneric("scrambleData")})
+setMethod("scrambleData","Engine",
+	function(object){
+	  data <- object@analysis_data
+		data_cols <- colnames(object@analysis_data)
+		if('Trader' %in% data_cols){
+			data <- sub_column(data,'Trader',generic="Trader")
+		}
+		if('TraderID' %in% data_cols){
+		  data <- sub_column(data,'TraderID',generic="Trader")
+		}
+		if('Strategy' %in% data_cols){
+		  data <- sub_column(data,'Strategy',generic="Strategy")
+		}
+		return(data)
+	}
+)
+sub_column <- function(data,col_name,generic=NULL){
+	type <- class(data[[col_name]])[[1]]
+	vals <- data[[col_name]]
+	if(type=='character'||type=='factor'){
+		remapper <- sample(letters,length(unique(vals)),replace=FALSE)
+		names(remapper) <- as.character(unique(vals))
+		if(length(generic)>0){
+			new_vals <- paste(generic,remapper[vals])
+		} else {
+			new_vals <- remapper[vals]
+		}
+		data[[col_name]] <- new_vals
+	} else if (type=='numeric'){
+	  remapper <- 1:length(unique(vals))
+	  names(remapper) <- unique(vals)
+	  if(length(generic)>0){
+	    new_vals <- paste(generic,remapper[vals])
+	  } else {
+	    new_vals <- remapper[vals]
+	  }
+	  data[[col_name]] <- new_vals
+	}
+	return(data)
+}
 
 setGeneric("shutdownEngine",function(object){standardGeneric("shutdownEngine")})
 setMethod("shutdownEngine","Engine",

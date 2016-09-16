@@ -24,5 +24,6 @@
 #' @importFrom grDevices dev.off
 #' @importFrom graphics plot title
 #' @importFrom R.utils copyFile
+#' @importFrom digest digest
 NULL
 ## NULL

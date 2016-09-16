@@ -70,6 +70,7 @@ setGeneric("setFactorExposureDataObject", function(object,factor_exposure_data){
 #'
 #' Private method to set factor_exposure_data slot with "VirtualFactorExposureData"
 #'
+#' @rdname private_setFactorExposureDataObject
 #' @param object object of class "VirtualFactorExposureDataHandler"
 #' @param factor_exposure_data object of class "VirtualFactorExposureData"
 #' @return \code{object} object of class "VirtualFactorExposureDataHandler"

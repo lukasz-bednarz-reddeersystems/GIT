@@ -11,8 +11,12 @@ setClass(
 
 setMethod("hashKey","AnalysisQuery",
           function(object,key){
-            hash <- murmur3.32(paste(key[object@fields[2]],key[object@fields[3]],sep=""))
-            hashedkey <- cbind(data.frame(hash=hash),key)
+            hashedkey <- tryCatch({
+                            hash <- murmur3.32(paste(key[object@fields[2]],key[object@fields[3]],sep=""))
+                            cbind(data.frame(hash=hash),key)
+                         }, error = function(cond){
+                            stop(paste("Hash failure in analysis objectstore:",cond))
+                         })
             return(hashedkey)
           }
 )
@@ -38,7 +42,12 @@ setMethod("updateStoredAnalysisKeys","AnalysisQuery",
 setGeneric("isAnalysisStored",function(object,key){standardGeneric("isAnalysisStored")})
 setMethod("isAnalysisStored","AnalysisQuery",
           function(object,key){
-            hash <- murmur3.32(paste(key[object@fields[2]],key[object@fields[3]],sep=""))
+            
+            hash <- tryCatch({
+                               murmur3.32(paste(key[object@fields[2]],key[object@fields[3]],sep=""))
+                             }, error = function(cond){
+                               stop(paste("Hash failure in analysis objectstore:",cond))
+                             })   
             if(length(object@known_keys)==0){
               rval <- FALSE
             }
@@ -125,10 +134,10 @@ setMethod("getAnalysisStoreContents","AnalysisObjectStore",
           }
 )
 
-get_analysis_objectstore_name <- function(keys) {
+get_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
   date_hash <- digest(sort(as.character(c(keys$start,keys$end))),serialize=FALSE)
-  trader_prefix <- paste(sort(unique(keys$TraderID)),collapse="_")
-  rv <- paste("analysis",trader_prefix,date_hash,collapse='_')
+  trader_prefix <- paste(sort(unique(keys[[trader_col]])),collapse="_")
+  rv <- paste("analysis",trader_prefix,date_hash,sep='_')
   return(rv)
 }
 

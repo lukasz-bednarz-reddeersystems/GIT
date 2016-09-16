@@ -103,6 +103,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, sd)
 
             object <- .setOutputGGPlot(object, pie_smmry)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("angle", "breaks", "identity", "lbels")))
 
             return(object)
           }

@@ -172,6 +172,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, trd_pl_smrry)
 
             object <- .setOutputGGPlot(object, turn_plot)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("ValueUSD",'TodayPL')))
 
             return(object)
           }

@@ -7,6 +7,7 @@
 #' @docType package
 #' @name TE.RefClasses
 #'
+#' @import TE.RiskModel
 #' @import TE.DataAccess
 #' @import TE.SQLQuery
 #' @import methods

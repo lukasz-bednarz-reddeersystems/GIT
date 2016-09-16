@@ -68,6 +68,7 @@ setGeneric("setInstrumentBetasDataObject", function(object,instrument_betas){sta
 #'
 #' Private method to set instrument_betas slot with "VirtualInstrumentBetasData"
 #'
+#' @rdname private_setInstrumentBetasDataObject
 #' @param object object of class "VirtualInstrumentBetasDataHandler"
 #' @param instrument_betas object of class "VirtualInstrumentBetasData"
 #' @return \code{object} object of class "VirtualInstrumentBetasDataHandler"
@@ -78,6 +79,38 @@ setMethod(".setInstrumentBetasDataObject",
           signature(object = "VirtualInstrumentBetasDataHandler", instrument_betas = "VirtualInstrumentBetasData"),
           function(object, instrument_betas){
               object@instrument_betas <- instrument_betas
+            return(object)
+          }
+)
+
+
+#' Update instrument_betas risk model
+#'
+#' Trigger update of risk model of instrument_betas object
+#'
+#' @param object object of class "VirtualInstrumentBetasDataHandler"
+#' @param risk_model object of class "VirtualRiskModel"
+#' @export
+
+setGeneric("updateInstrumentBetasDataRiskModel",
+           function(object, risk_model){standardGeneric("updateInstrumentBetasDataRiskModel")})
+
+
+#' @describeIn updateInstrumentBetasDataRiskModel
+#' Update instrument_betas risk model
+#'
+#' Trigger update of risk model of instrument_betas object
+#'
+#' @inheritParams updateInstrumentBetasDataRiskModel
+#' @return \code{instrument_betas} object of class "VirtualInstrumentBetasData"
+#' @export
+setMethod("updateInstrumentBetasDataRiskModel",
+          signature(object = "VirtualInstrumentBetasDataHandler",
+                    risk_model = "VirtualRiskModel"),
+          function(object, risk_model){
+            instrument_betas <- getInstrumentBetasDataObject(object)
+            instrument_betas <- setRiskModelObject(instrument_betas, risk_model)
+            object <- .setInstrumentBetasDataObject(object, instrument_betas)
             return(object)
           }
 )

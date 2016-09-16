@@ -15,8 +15,6 @@ getTraderID(object)
 }
 \value{
 \code{trader_id} integer.
-
-\code{trader_id} integer.
 }
 \description{
 Returns TraderID

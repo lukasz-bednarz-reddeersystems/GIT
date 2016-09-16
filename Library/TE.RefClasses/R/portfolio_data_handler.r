@@ -70,6 +70,7 @@ setGeneric("setPortfolioDataObject", function(object,portfolio){standardGeneric(
 #'
 #' Private method to set portfolio slot with "Portfolio"
 #'
+#' @rdname private_setPortfolioDataObject
 #' @param object object of class "VirtualPortfolioDataHandler"
 #' @param portfolio object of class "Portfolio"
 #' @return \code{object} object of class "VirtualPortfolioDataHandler"

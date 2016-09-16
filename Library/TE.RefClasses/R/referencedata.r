@@ -133,6 +133,7 @@ setMethod("getStoredNRows", "VirtualReferenceData",
 #'
 #' Private method to set Number of rows of stored data in given ReferenceData class instance.
 #'
+#' @rdname private_setStoredNRows
 #' @param object object of class 'VirtualReferenceData'.
 #' @param nrows integer number of stored rows.
 #' @return \code{object} object of class 'VirtualReferenceData'.
@@ -150,6 +151,7 @@ setMethod(".setStoredNRows",
 #'
 #' Private method to set stored variable names only to be used by derived classes
 #'
+#' @rdname private_setStoredVariablesNames
 #' @param object object of class 'VirtualReferenceData'.
 #' @param names character vector of new Stored Variable names.
 #' @return \code{object} object of class 'VirtualReferenceData'.
@@ -167,8 +169,8 @@ setMethod(".setStoredVariablesNames",
 #'
 #' Private method to update variable names only to be used by derived classes
 #'
+#' @rdname private_updateStoredVariablesNames
 #' @param object object of class 'VirtualReferenceData'.
-#' @param names character vector of new Stored Variable names.
 #' @return \code{object} object of class 'VirtualReferenceData'.
 
 setGeneric(".updateStoredVariablesNames", function(object){standardGeneric(".updateStoredVariablesNames")})

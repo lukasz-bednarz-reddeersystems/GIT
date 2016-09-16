@@ -1,0 +1,33 @@
+Package: TE.FrontendEngine
+Type: Package
+Title: Front End visualisation Engine for RedDeer Trading Enhancement module
+Version: 0.1.0
+Authors@R: person("Guy", "Billings", email = "guy.billings@reddeersystems.com",
+                  role = c("cre"))
+           person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
+                  role = c("aut", "cre"))
+Description: Pakckage is implementing functions and classes for front end
+    visualization engine.
+Depends:
+    R (>= 3.3.0),
+    TE.DataAccess(>= 0.1.0),
+    TE.RefClasses (>= 0.1.0),
+    TE.AnalysisClasses (>= 0.1.0),
+License: file LICENSE
+LazyData: TRUE
+Imports:
+    lubridate,
+    shiny,
+    methods,
+    hashFunction,
+    functional,
+    dplyr,
+Collate:
+    'TE.FrontendEngine.r'
+    'analysis_client.r'
+    'client_library.r'
+    'shiny_app_factories.r'
+    'engine.r'
+RoxygenNote: 5.0.1
+Suggests:
+    testthat

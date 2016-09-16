@@ -70,6 +70,7 @@ setGeneric("setEventDataObject", function(object,event_data){standardGeneric("se
 #'
 #' Private method to set event_data slot with "VirtualEventData"
 #'
+#' @rdname private_setEventDataObject
 #' @param object object of class "VirtualEventDataHandler"
 #' @param event_data object of class "VirtualEventData"
 #' @return \code{object} object of class "VirtualEventDataHandler"

@@ -108,6 +108,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object,mnthly_pl)
             object <- .setOutputGGPlot(object, mpl)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Key", "PL")))
 
 
             return(object)

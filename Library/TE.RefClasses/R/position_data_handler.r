@@ -73,6 +73,7 @@ setGeneric("setPositionDataObject", function(object,position_data){standardGener
 #'
 #' Private method to set position_data slot with "VirtualPositionData"
 #'
+#' @rdname private_setPositionDataObject
 #' @param object object of class "VirtualPositionDataHandler"
 #' @param position_data object of class "VirtualPositionData"
 #' @return \code{object} object of class "VirtualPositionDataHandler"

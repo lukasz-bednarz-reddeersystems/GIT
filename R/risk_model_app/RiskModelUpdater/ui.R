@@ -44,15 +44,20 @@ shinyUI(fluidPage(
       latestModelDateUI("latest_model_date_text"),
       latestUpdateInfoUI("latest_update_text"),
       autoUpdateInfoUI("auto_update_text"),
-      selectInput("select_lookback", label = h3("Select Lookback"), 
-                  choices = list("150" = 150), 
-                  selected = 1),
       # model selection
       selectInput("select_model", label = h3("Select Model"), 
-                  choices = list("Developed Europe (Prototype)" = "developed_europe_prototype"), 
+                  choices = list("Developed Europe (Prototype 1.1)" = "RiskModel.DevelopedEuropePrototype150.1.1",
+                                 "Developed Europe (Prototype 1.0)" = "RiskModel.DevelopedEuropePrototype150"
+                                 ), 
                   selected = 1),
-      actionButton("update_now_button", "Update Now", icon = icon("refresh"))
+      actionButton("update_now_button", "Update Now", icon = icon("refresh")),
       
+      dateRangeInput('date_range',
+                     label = 'DateRange of the model: yyyy-mm-dd',
+                     start = "", end = ""
+      ),
+
+      actionButton("build_now_button", "(Re)Build Now", icon = icon("gears"))
     ),
     # Show a plot of the generated distribution
     mainPanel(

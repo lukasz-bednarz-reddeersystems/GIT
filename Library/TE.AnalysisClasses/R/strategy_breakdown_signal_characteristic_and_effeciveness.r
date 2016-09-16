@@ -130,6 +130,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, sig_to)
 
             object <- .setOutputGGPlot(object, sig_strat)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value", "Quarter")))
 
             return(object)
           }

@@ -143,7 +143,7 @@ setMethod("Process",
                           ylab("") + xlab("") + ggtitle('Stock extension')
 
             object <- .setOutputGGPlot(object, extension)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Measure")))
 
 
             return(object)
