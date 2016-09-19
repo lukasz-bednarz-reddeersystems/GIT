@@ -2,57 +2,153 @@
 title: "TE.RefClasses package guide."
 author: "Lukasz Bednarz"
 date: "`r Sys.Date()`"
-output: rmarkdown::word_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+"TE.RefClasses" is a library developed in RedDeer Systems to faciliate access to Trade, Position, Instrument and other data from various sources (internal private data and external publicly available data like prices). This document describes basic functions and classes available with this package that allow access to data via standardized interface.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
 
-## Vignette Info
+## Loading the package
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+To load the "TE.RefClasses" package please execute in RStudio:
 
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r, loading_the_package}
+# load the package
+library("TE.RefClasses")
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+Please note that dependent packages are also loaded.
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+## Basic Classes available
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+This is list of basic classes available via package:
 
-## More Examples
+- `DealerData`
+- `EventData`
+- `FactorCorrelationData`
+- `FactorExposureData`
+- `FactorVarianceData`
+- `ImpliedFactorReturnsData`
+- `IndexPortfolio.BE500`
+- `InstrumentBetasData`
+- `MarketData`
+- `MarketDataSX5E`
+- `MarketDataSX5P`
+- `MarketStyleData`
+- `PositionData`
+- `PriceData`
+- `StrategyPortfolio`
+- `TradeData`
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+To instantiate new object of the class in R please execute:
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+```{r, TE.RefClasses_use_example}
+# create an instance of "TradeData" class
+trade_data <- new("TradeData")
+
 ```
 
-Also a quote using `>`:
+For help on any of the classes please type in R console:
+
+```{r, getting_help, eval = FALSE}
+# display help in help window
+? `TradeData-class`
+```
+
+
+## Typical workflow to retrieve the data:
+
+To retrieve the data one has to generate query via query syntax. Query is just a "data.frame" with set of values that discriminate the data like trader id and start/end dates.
+
+To faciliate generation of the keys special key-generating functions are available from "TE.DataAccess" package classes:
+
+- `dated_eighteen_monthly_lookback`
+- `dated_four_monthly_lookback`
+- `dated_full_month`
+- `dated_one_year_lookback`
+- `dated_three_day_lookback`
+- `dated_three_monthly_lookback`
+- `dated_three_year_lookback`
+- `dated_twelve_monthly_lookback`
+- `dated_whole_year_lookback`
+
+"TE.DataAccess" package is loaded together with "TE.RefClasses".
+
+To generate set of keys please execute in R command line:
+
+```{r generate_query_key}
+# display help on function
+? dated_three_monthly_lookback
+
+# trader ID
+trader <- 11
+
+# generate the key
+keys <- dated_three_monthly_lookback(trader, "2016-09-01")
+
+# display the keys
+keys
+
+```
+
+To retrieve the data and populate internal object storage please use "dataRequest()" method (this might last up to few mins depending of data type and timespan):
+
+```{r, data_request, message = FALSE}
+# request trade data from data source
+trade_data <- dataRequest(trade_data, keys)
+
+# check if data has been populated (number of stored rows has to be greater than 0)
+getStoredNRows(trade_data)
+
+# retrieve internaly stored data.frame
+trade_df <- getReferenceData(trade_data)
+
+# display column names available in data.frame
+colnames(trade_df)
+
+# display top 5 rows of the data
+head(trade_df)
+
+```
+
+
+## Saving data to Excel
+
+to save data.frame to Excell please execute:
+
+```{r, save_to_excel}
+# load "xlsx" library
+library(xlsx)
+```
+
+If you see an error "Error in library(xlsx) : there is no package called ‘xlsx’" please execute:
+
+```{r, install_xlsx, eval = FALSE}
+# install rJava package
+install.packages("rJava")
+
+# install xlsx package
+install.packages("xlsx", method = "libcurl", dependencies = TRUE)
+
+# try to load library again
+library(xlsx)
+
+```
+
+If there is an error with rJava you need to install JDK from here:
+(http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+
+Save file to chosen location:
+```{r, save_file, eval = FALSE}
+write.xlsx2(trade_df, "c:/temp/TradeData.xlsx")
+
+```
+
+
 
 > "He who gives up [code] safety for [code] speed deserves neither."
 ([via](https://twitter.com/hadleywickham/status/504368538874703872))
