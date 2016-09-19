@@ -21,7 +21,9 @@ Imports:
     stats,
 Suggests:
     testthat,
-    plyr,
+    plyr,,
+    knitr,
+    rmarkdown
 Collate:
     'TE.RefClasses.r'
     'datasource_client_functions.r'
@@ -77,3 +79,4 @@ Collate:
     'trade_data_handler.r'
     'trade_data_simple.r'
 RoxygenNote: 5.0.1
+VignetteBuilder: knitr

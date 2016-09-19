@@ -252,10 +252,10 @@ setMethod("Process",
           signature(object = "TradesPerformanceOnResultsDayAnalysisBlock"),
           function(object){
 
-
             trade_data    <- getTradeDataObject(object)
             position_data <- getPositionDataObject(object)
             event_data    <- getEventDataObject(object)
+            price_data    <- getPriceDataObject(object)
 
 
             # retrieve needed ref_data
@@ -278,6 +278,12 @@ setMethod("Process",
             trades <- merge(trades, events[c("Date", "InstrumentID", numbers_col)],
                                    by = c("Date", "InstrumentID"))
 
+            # merge in price info
+            trades <- merge(trades,
+                            prices[c("Date", "InstrumentID", setdiff(colnames(prices), colnames(trades)))],
+                            by = c("Date", "InstrumentID"))
+
+
             # traded indexes
             trades_idx <- !is.na(trades$TradeID)
 
@@ -285,17 +291,20 @@ setMethod("Process",
             new_trades_idx <- trades_idx & trades$Results & (trades$Age == 0)
 
             trades$Category[new_trades_idx] <- "New Position"
+            trades$Classification[new_trades_idx] <- "All Trades"
 
             # trades where position is increased on results day
             incr_trades_idx <- trades_idx & trades$Results & (trades$Age > 0) & !xor(trades$Long, trades$PsnLong)
 
             trades$Category[incr_trades_idx] <- "Increase Position"
+            trades$Classification[incr_trades_idx] <- "All Trades"
 
-            # trades where position is decreased on results day
-            # decr_trades_idx <- trades_idx & trades$Results & (trades$Age > 0) & xor(trades$Long, trades$PsnLong)
-            #
-            # trades$Category[decr_trades_idx] <- "Decrease Position"
+            # trades where the position is increased and the buy price was close to closing price.
+            # (less than daily volatility)
+            low_trades_idx <- (trades_idx & trades$Results &
+                              abs(log(trades$MidOnEntry/trades$Low)) < trades$DailyN/trades$ClosePrice)
 
+            trades$Classification[low_trades_idx] <- "Near Low Trades"
 
             # trades where position is held on results day
             # hold_psn_idx <- !trades_idx & trades$Results & (trades$Age > 0)
@@ -305,68 +314,30 @@ setMethod("Process",
             trades$Quarter <- quarter(trades$Date, with_year = TRUE)
 
 
-            trades_ON <- aggregate(cbind(TodayPL, Age)~ Quarter + Category + TraderID , data = trades, mean)
+            trades_mean <- aggregate(cbind(TodayPL, Age)~ Quarter + Category + TraderID + Classification,
+                                   data = trades, mean)
+            trades_mean$Quantity <- "Average"
 
+            trades_sum <- aggregate(cbind(TodayPL, Age)~ Quarter + Category + TraderID + Classification,
+                                   data = trades, sum)
+            trades_sum$Quantity <- "Total"
 
-            # # generate stock classifiers
-            # x <- (trades$MidOnEntry-trades$PriceMavg)/(trades$MidOnEntry*trades$VolInto/10000)
-            # trades$NFromMAVG20 <- clean_data(x, rm.outliers = "lofactor", scale = TRUE)
-            #
-            # x <- (trades$MidOnEntry-trades$MavgPrice50)/(trades$MidOnEntry*trades$DailyN/100)
-            # trades$NFromMAVG50 <- clean_data(x, rm.outliers = "lofactor", scale = TRUE)
-            #
-            # trades$RSI14 <- clean_data(trades$RSI14, scale = TRUE)
-            # trades$RelativeRSI14 <- clean_data(trades$RelativeRSI14, scale = TRUE)
-            #
-            # trades$Return <- clean_data(trades$TodayPL/trades$MarketValue)
-            #
-            # # save trades for future use
-            # trade_rd <- setReferenceData(trade_rd, trades)
-            # object <- TE.RefClasses:::.setTradeDataObject(object,trade_rd)
-            #
-            # # compute extended trades
-            # distance_measure <- 'NFromMAVG20'
-            # rsi_measure <- 'RSI14'
-            # thr <- 1
-            #
-            # trd <- trades[!is.na(trades[distance_measure])&!is.na(trades[rsi_measure]),]
-            # extended_trades <- trd[trd$Long==1&(trd[distance_measure]>thr|trd[rsi_measure]>thr),]
-            # extended_trades <- rbind(extended_trades,trd[trd$Long==0&(trd[distance_measure]<(-thr)|trd[rsi_measure]<(-thr)),])
-            #
-            # outp_object <- getOutputObject(object)
-            # outp_object <- setReferenceData(outp_object, extended_trades)
-            #
-            # object <- .setOutputObject(object, outp_object)
-            #
-            # plot_trades <- rbind(cbind(Measure='NFromMAVG20',trades[c('Strategy','Long')],Value=trades$NFromMAVG20),
-            #                      cbind(Measure='NFromMAVG50',trades[c('Strategy','Long')],Value=trades$NFromMAVG50),
-            #                      cbind(Measure='RSI14',trades[c('Strategy','Long')],Value=trades$RSI14),
-            #                      cbind(Measure='RelativeRSI14',trades[c('Strategy','Long')],Value=trades$RelativeRSI14))
-
-            browser()
-
-            # trades_pl <- ggplot(data=trades, aes_string(x="Category",
-            #                                                   y="TodayPL",
-            #                                                   color="Category"
-            # )
-            # ) +
-            #   geom_boxplot() +
-            #   coord_flip() +
-            #   guides(color = FALSE)
+            trades_ON <- rbind(trades_mean, trades_sum)
 
             trades_pl <- ggplot(data=trades_ON, aes_string(x="as.character(Quarter)",
                                                            fill="Category"
-            )
-            ) +
-              geom_bar(aes_string(weight = "TodayPL"), position= "dodge") +
-              ylab("Average PnL (USD)") +
-                xlab("Quarter") +
-                ggtitle(sprintf('Average PnL on Results day for trader ID: %s', unique(trades$TraderID)))
+                                                          )
+                                ) +
+                        geom_bar(aes_string(weight = "TodayPL"), position= "dodge") +
+                        facet_grid(Quantity ~ Classification, scales = "free_y") +
+                        ylab("PnL (USD)") +
+                        xlab("Quarter") +
+                        ggtitle(sprintf('PnL on Results day for trader ID: %s', na.omit(unique(trades$TraderName))))
 
 
             object <- .setOutputGGPlotData(object, trades_ON)
             object <- .setOutputGGPlot(object, trades_pl)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL", "Age")))
 
 
             return(object)
