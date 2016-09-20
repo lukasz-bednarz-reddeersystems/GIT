@@ -1,15 +1,29 @@
-context("Testing TradesPerformanceOnResultsDayAnalysisBlock")
+context("Testing TradesPnLOutOfOnResultsDayAnalysisBlock")
 
 #####################################
 #
-# TradesPerformanceOnResultsDayAnalysisBlock Tests
+# TradesPnLOutOfOnResultsDayAnalysisBlock Tests
 #
 #####################################
-tested.class          <-  "TradesPerformanceOnResultsDayAnalysisBlock"
+
+tested.class          <-  "TradesPnLOutOfOnResultsDayAnalysisBlock"
 valid.column_name_map <- hash(c("TraderID", "start", "end"), c("id", "start", "end"))
 init.key_values       <- data.frame(TraderID = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character()))
+
+
+
+if(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
+  valid.key_values <- dated_twelve_monthly_lookback(11, today())
+  colnames(valid.key_values) <- c("TraderID", "start", "end")
+  trades_on_numbers.an <- new("TradesPerformanceOnResultsDayAnalysisBlock")
+  trades_on_numbers.an <- dataRequest(trades_on_numbers.an, valid.key_values)
+
+  trades_on_numbers.an <- Process(trades_on_numbers.an)
+
+  trades_on_numbers.rd <- getOutputObject(trades_on_numbers.an)
+}
 
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)
@@ -22,9 +36,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  expect_is(getTradeDataObject(object), "TradeData")
-  expect_is(getPriceDataObject(object), "PriceData")
-  expect_is(getEventDataObject(object), "EventData")
+  expect_is(getTradeDataObject(object), "TradesOnResultsDayData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
   expect_is(getOutputFrontendData(object), "data.frame")
@@ -56,7 +68,22 @@ test_that("Cannot dataRequest() with invalid key_values", {
 
 
 
-test_that("Can dataRequest() with valid key_values", {
+test_that("Can set TradeData with externally processed result", {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
+  object <- new(tested.class)
+
+  # trade data verification
+  object <- setTradeDataObject(object, trades_on_numbers.rd)
+  trade_data <- getTradeDataObject(object)
+  expect_is(trade_data, "TradesOnResultsDayData")
+  expect_equal(trade_data, trades_on_numbers.rd)
+
+
+})
+
+
+test_that("Can dataRequest() with valid key_values and no trade data set", {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
@@ -70,24 +97,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   # trade data verification
   trade_data <- getTradeDataObject(object)
-  expect_is(trade_data, "TradeData")
+  expect_is(trade_data, "TradesOnResultsDayData")
   expect_gt(nrow(getReferenceData(trade_data)), 0)
-
-  # position data verification
-  position_data <- getPositionDataObject(object)
-  expect_is(position_data, "PositionData")
-  expect_gt(nrow(getReferenceData(position_data)), 0)
-
-
-  # price data verification
-  price_data <- getPriceDataObject(object)
-  expect_is(price_data, "PriceData")
-  expect_gt(nrow(getReferenceData(price_data)), 0)
-
-  # event data verification
-  event_data <- getEventDataObject(object)
-  expect_is(event_data, "EventData")
-  expect_gt(nrow(getReferenceData(event_data)), 0)
 
 
 })
@@ -107,30 +118,15 @@ test_that(paste("Can Process() on", tested.class), {
 
   # trade data verification
   trade_data <- getTradeDataObject(object)
-  expect_is(trade_data, "TradeData")
+  expect_is(trade_data, "TradesOnResultsDayData")
   expect_gt(nrow(getReferenceData(trade_data)), 0)
-
-  # position data verification
-  position_data <- getPositionDataObject(object)
-  expect_is(position_data, "PositionData")
-  expect_gt(nrow(getReferenceData(position_data)), 0)
-
-  # price data verification
-  price_data <- getPriceDataObject(object)
-  expect_is(price_data, "PriceData")
-  expect_gt(nrow(getReferenceData(price_data)), 0)
-
-  # event data verification
-  event_data <- getEventDataObject(object)
-  expect_is(event_data, "EventData")
-  expect_gt(nrow(getReferenceData(event_data)), 0)
 
 
   object <- Process(object)
 
   expect_is(getOutputGGPlot(object), "ggplot")
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputObject(object), "TradesOnResultsDayData")
+  expect_is(getOutputObject(object), "NULL")
 
 })
 

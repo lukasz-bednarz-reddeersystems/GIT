@@ -22,7 +22,7 @@ trd_num_cols <- c("Date"          , "InstrumentID"      , "TradeID"            ,
                   "Gm.PsnReturn"  , "PsnReturn"         , "InitialValue"       , "StockReturn"   ,
                   "RelativeReturn", "MarketValue"       , "TodayPL"            , "DeltaSwing"    ,
                   "DeltaSkew"     , "DeltaPL"           , "Age"                , "Category"      ,
-                  "Quarter")
+                  "Quarter"       , "Classification")
 #' Trades on Results Reference Data class.,
 #'
 #' Concrete S4 class storing data trades happening on Results day
@@ -32,7 +32,7 @@ trd_num_cols <- c("Date"          , "InstrumentID"      , "TradeID"            ,
 #' @export
 
 setClass(
-  Class             = "TradesOnResulsData",
+  Class             = "TradesOnResultsDayData",
   prototype         = list(
     required_colnms = trd_num_cols
   ),
@@ -53,13 +53,16 @@ setClass(
 
 setClass(
   Class             = "TradesPerformanceOnResultsDayAnalysisBlock",
+  slots             = c(
+    output          = "TradesOnResultsDayData"
+  ),
   prototype         = list(
     key_cols        = c("TraderID", "start", "end"),
     key_values      = data.frame(TraderID = character(),
                               start    = as.Date(character()),
                               end    = as.Date(character())),
     column_name_map = hash(c("TraderID", "start", "end"), c("id", "start", "end")),
-    output          = trd_num_cols
+    output          = new("TradesOnResultsDayData")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualTradeDataHandler",
@@ -264,7 +267,6 @@ setMethod("Process",
             events    <- getReferenceData(event_data)
             prices    <- getReferenceData(price_data)
 
-
             trades <- merge(trades, positions[c("Date", "InstrumentID", "Age", "TraderID")])
 
             numbers_col <- c("Results")
@@ -287,22 +289,23 @@ setMethod("Process",
             # traded indexes
             trades_idx <- !is.na(trades$TradeID)
 
+            trades <- trades[trades_idx & trades$Results,]
+
             # trades where the position is new on results day
-            new_trades_idx <- trades_idx & trades$Results & (trades$Age == 0)
+            new_trades_idx <- (trades$Age == 0)
 
             trades$Category[new_trades_idx] <- "New Position"
             trades$Classification[new_trades_idx] <- "All Trades"
 
             # trades where position is increased on results day
-            incr_trades_idx <- trades_idx & trades$Results & (trades$Age > 0) & !xor(trades$Long, trades$PsnLong)
+            incr_trades_idx <- (trades$Age > 0) & !xor(trades$Long, trades$PsnLong)
 
             trades$Category[incr_trades_idx] <- "Increase Position"
             trades$Classification[incr_trades_idx] <- "All Trades"
 
             # trades where the position is increased and the buy price was close to closing price.
             # (less than daily volatility)
-            low_trades_idx <- (trades_idx & trades$Results &
-                              abs(log(trades$MidOnEntry/trades$Low)) < trades$DailyN/trades$ClosePrice)
+            low_trades_idx <- abs(log(trades$MidOnEntry/trades$Low)) < trades$DailyN/trades$ClosePrice
 
             trades$Classification[low_trades_idx] <- "Near Low Trades"
 
@@ -313,23 +316,33 @@ setMethod("Process",
 
             trades$Quarter <- quarter(trades$Date, with_year = TRUE)
 
+            output_obj <- getOutputObject(object)
+            output_obj <- setReferenceData(output_obj, trades)
+            object <- .setOutputObject(object, output_obj)
 
-            trades_mean <- aggregate(cbind(TodayPL, Age)~ Quarter + Category + TraderID + Classification,
+
+            trades_mean <- aggregate(TodayPL~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, mean)
             trades_mean$Quantity <- "Average"
 
-            trades_sum <- aggregate(cbind(TodayPL, Age)~ Quarter + Category + TraderID + Classification,
+            trades_sum <- aggregate(TodayPL~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, sum)
             trades_sum$Quantity <- "Total"
 
             trades_ON <- rbind(trades_mean, trades_sum)
 
+            trades_ON$Direction[trades_ON$Long] <- "Long"
+            trades_ON$Direction[!trades_ON$Long] <- "Short"
+
             trades_pl <- ggplot(data=trades_ON, aes_string(x="as.character(Quarter)",
-                                                           fill="Category"
+                                                           fill="paste(Category , Direction)"
                                                           )
                                 ) +
                         geom_bar(aes_string(weight = "TodayPL"), position= "dodge") +
                         facet_grid(Quantity ~ Classification, scales = "free_y") +
+                        theme_dark() +
+                        #theme(plot.background  = element_rect(fill = "black", colour = "black")) +
+                        guides(fill = guide_legend(title = "Category")) +
                         ylab("PnL (USD)") +
                         xlab("Quarter") +
                         ggtitle(sprintf('PnL on Results day for trader ID: %s', na.omit(unique(trades$TraderName))))
@@ -337,7 +350,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, trades_ON)
             object <- .setOutputGGPlot(object, trades_pl)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL", "Age")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL", "Long")))
 
 
             return(object)
