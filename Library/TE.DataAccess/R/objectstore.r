@@ -18,6 +18,23 @@ setClass(
 setGeneric("hashKey",function(object,key){standardGeneric("hashKey")})
 
 
+
+setGeneric("getQueryKeyColumnNames",function(object,key){standardGeneric("getQueryKeyColumnNames")})
+setMethod("getQueryKeyColumnNames","ObjectQuery",
+          function(object,key){
+            return(object@fields)
+          }
+)
+
+
+setGeneric("getQueryKeyValues",function(object,key){standardGeneric("getQueryKeyValues")})
+setMethod("getQueryKeyValues","ObjectQuery",
+          function(object,key){
+            return(object@fields)
+          }
+)
+
+
 setGeneric("setQueryValuesFromKey",function(object,key){standardGeneric("setQueryValuesFromKey")})
 setMethod("setQueryValuesFromKey","ObjectQuery",
           function(object,key){

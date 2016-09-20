@@ -437,12 +437,13 @@ warehouse_objectstore_factory <- function(name){
 	whstr <- .setObjectStoreKeyMap(whstr,
 	                               new("KeyMap",key_columns=c('id','date'),key_generator=date_trader_kgen_fn))
 
+	query <- getObjectStoreQuery(whstr)
 	pth <- getPath(whstr)
 
 	if (!file.exists(pth)) {
-	  message(paste("File initially not found in local path. Checking remote store",pth))
+	  message(sprintf("File initially not found in local path %s. Checking remote store",pth))
 	  key <- key_from_name(basename(pth))
-	  is_known <- isKeyKnownInRemoteStore(whstr, key)
+	  is_known <- isKeyKnownInRemoteStore(query, key)
 
 	  if (is_known) {
 	    whstr <- updateLocalStoreFile(whstr,key)
@@ -494,6 +495,7 @@ update_warehouse_remote_storage <- function(){
   wh_str.files <- rds.files[sapply(rds.files, wh.cond.fn)]
 
   for (name in wh_str.files) {
+    name <- gsub("_objectstore.rds", "", name)
     whstr <- warehouse_objectstore_factory(name)
     whstr <- saveObjectInRemoteStore(whstr)
 
