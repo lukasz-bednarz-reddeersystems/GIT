@@ -109,8 +109,6 @@ setMethod("Process",
             # retrieve needed ref_data
             trades    <- getReferenceData(trade_data)
 
-            browser()
-
             trades_mean <- aggregate(PnLOutof ~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, mean)
             trades_mean$Quantity <- "Average"
