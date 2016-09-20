@@ -10,7 +10,10 @@ NULL
 #' Inherits from "VirtualSQLProcedureCall"
 setClass(
   Class     = "BlobStorage.VirtualSQLProcedureCall",
-  contains  = c("VirtualSQLProcedureCall", "VIRTUAL")
+  contains  = c("VirtualSQLProcedureCall", "VIRTUAL"),
+  prototype = list(
+    results_parser = TE.SQLQuery:::convert_column_class
+  )
 )
 
 #' Initialize method for "BlobStorage.VirtualSQLProcedureCall"
@@ -102,17 +105,21 @@ setClass(
                    "@dtStartDate",
                    "@dtEndDate"
                    ),
-    column_name_map = hash(c("@sJointTableName",
-                             "@lTraderID",
-                             "@dtStartDate",
-                             "@dtEndDate",
-                             "@sFileName"
-                              ),
-                           c("@JointTableName",
-                             "@TraderID",
-                             "@StartDate",
-                             "@EndDate",
-                             "@FileName")),
+    column_name_map = hash(c("sJointTableName",
+                             "lTraderID",
+                             "dtStartDate",
+                             "dtEndDate",
+                             "dtCreatedDate",
+                             "sCreatedByUserID",
+                             "sFileName"
+                             ),
+                           c("JointTableName",
+                             "TraderID",
+                             "StartDate",
+                             "EndDate",
+                             "CreatedDate",
+                             "CreatedByUserID",
+                             "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
   ),
   contains  = c("BlobStorage.VirtualSQLProcedureCall")
@@ -176,21 +183,21 @@ setClass(
                    "@sCreatedByUserID",
                    "@sFileName"),
 
-    column_name_map = hash(c("@sJointTableName",
-                             "@lTraderID",
-                             "@dtStartDate",
-                             "@dtEndDate",
-                             "@dtCreatedDate",
-                             "@sCreatedByUserID",
-                             "@sFileName"
+    column_name_map = hash(c("sJointTableName",
+                             "lTraderID",
+                             "dtStartDate",
+                             "dtEndDate",
+                             "dtCreatedDate",
+                             "sCreatedByUserID",
+                             "sFileName"
                              ),
-                           c("@JointTableName",
-                             "@TraderID",
-                             "@StartDate",
-                             "@EndDate",
-                             "@CreatedDate",
-                             "@CreatedByUserID",
-                             "@FileName")),
+                           c("JointTableName",
+                             "TraderID",
+                             "StartDate",
+                             "EndDate",
+                             "CreatedDate",
+                             "CreatedByUserID",
+                             "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
   ),
   contains  = c("BlobStorage.VirtualSQLProcedureCall")

@@ -79,10 +79,10 @@ valid.schema  <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
 valid.keys    <- data.frame(TraderID  = 11,
                             StartDate = as.Date("2016-01-01"),
                             EndDate   = as.Date("2016-01-01"))
-valid.ret     <- data.frame(lTraderID  = 11,
-                            dtStartDate = "2016-01-01",
-                            dtEndDate   = "2016-01-01",
-                            dtCreatedDate = "2016-08-01",
+valid.ret     <- data.frame(lTraderID  = 11L,
+                            dtStartDate = as.Date("2016-01-01"),
+                            dtEndDate   = as.Date("2016-01-01"),
+                            dtCreatedDate = as.Date("2016-07-31"),
                             sCreatedByUserID = "Lukasz.Bednarz",
                             sFileName  = "temp.txt",
                             stringsAsFactors = FALSE)

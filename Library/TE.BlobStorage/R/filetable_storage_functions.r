@@ -112,6 +112,27 @@ check_file_exists <- function(filename,
 #' check if file is stored in database
 #'
 #' @param filename "character" filename of file to be stored in filetable
+#' @param tb_name "character" name of the parent table
+#' @param db "character" ODBC alias name of database
+#' @param schema "character" name of DB schema
+#' @return \code{is_stored} "logical" TRUE if file is stored FALSE otherwise
+#'
+#' @export
+check_file_stored_in_referenced_filetable <- function(filename,
+                                                        tb_name,
+                                                        db = .__DEFAULT_ODBC_DB_NAME__.,
+                                                        schema = .__DEFAULT_FILE_DB_SCHEMA__.
+                                                    ) {
+  file_table <- get_referenced_filetable_name(tb_name, db, schema)
+  is_stored <- check_file_stored(filename, file_table, db, schema)
+
+  return(is_stored)
+}
+
+
+#' check if file is stored in database
+#'
+#' @param filename "character" filename of file to be stored in filetable
 #' @param tb_name "character" name of the filetable
 #' @param db "character" ODBC alias name of database
 #' @param schema "character" name of DB schema
@@ -119,10 +140,10 @@ check_file_exists <- function(filename,
 #'
 #' @export
 check_file_stored <- function(filename,
-                                  tb_name,
-                                  db = .__DEFAULT_ODBC_DB_NAME__.,
-                                  schema = .__DEFAULT_FILE_DB_SCHEMA__.
-                              ) {
+                              tb_name,
+                              db = .__DEFAULT_ODBC_DB_NAME__.,
+                              schema = .__DEFAULT_FILE_DB_SCHEMA__.
+) {
 
   query <- new("BlobStorage.SQLQuery.FileStoredInFileTable", db, schema, tb_name, filename)
 
@@ -156,10 +177,10 @@ check_file_stored <- function(filename,
 
   } else {
     message(sprintf("File name returned by query  for file: returned more than one row : ",
-                     filename, nrow(ret)))
+                    filename, nrow(ret)))
     message(paste(ret["name"]))
     stop(sprintf("File name returned by query  for file: returned more than one row : ",
-                         filename, nrow(ret)))
+                 filename, nrow(ret)))
   }
 
   return(is_stored)
@@ -310,7 +331,6 @@ remove_file_from_filetable <- function(filename,
 #' @return \code{status} "integer" status of saving:\cr
 #'  \code{0} - file has been removed\cr
 #'  \code{-1} - file has not been stored and couldn't be removed
-#'
 #' @export
 remove_file_from_referenced_filetable <- function(filename,
                                        tb_name,
