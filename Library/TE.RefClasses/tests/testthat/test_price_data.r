@@ -8,12 +8,15 @@ context("Testing PriceData")
 
 tested.class          <-  "PriceData"
 valid.key_cols        <- c("InstrumentID", "Date")
-valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                           ,"dblHigh","dblLow","dblPreviousClosePrice",
                            "dblVolume", "lOutstandingShares","dbl30DayAvgVol" )
 valid.required_colnms <- c('InstrumentID','Date','ClosePrice')
-valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                                ,"dblHigh","dblLow","dblPreviousClosePrice",
                                 "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-                              c('InstrumentID','Date','ClosePrice',"PreviousClosePrice",
+                              c('InstrumentID','Date','ClosePrice',"OpenPrice"
+                                ,"High","Low","PreviousClosePrice",
                                 "Volume", "OutstandingShares","AvgVol30Day"))
 init.key_values       <-  data.frame(InstrumentID = integer(),
                                      Date = as.Date(character()))

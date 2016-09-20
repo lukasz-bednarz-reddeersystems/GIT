@@ -42,11 +42,14 @@ setClass(
   Class             = "PriceData",
   prototype      = list(
     key_cols        = c("InstrumentID", "Date"),
-    values          = c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+    values          = c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                        ,"dblHigh","dblLow","dblPreviousClosePrice",
                         "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-    column_name_map = hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+    column_name_map = hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                             ,"dblHigh","dblLow","dblPreviousClosePrice",
                              "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-                           c('InstrumentID','Date','ClosePrice',"PreviousClosePrice",
+                           c('InstrumentID','Date','ClosePrice',"OpenPrice"
+                             ,"High","Low","PreviousClosePrice",
                              "Volume", "OutstandingShares","AvgVol30Day")),
     key_values      = data.frame(InstrumentID = integer(),
                                  Date = as.Date(character())),
