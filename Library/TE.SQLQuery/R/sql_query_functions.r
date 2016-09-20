@@ -68,13 +68,21 @@ convert_column_class <- function(df, classes = NULL) {
   setAs("POSIXct", "Date", function(from){ as.Date(from)}, where = environment())
 
   cols <- colnames(df)
+  curr_classes <- sapply(df, class)
 
   res <- sapply(paste0("^", names(class_map)), function(x){grepl(x, cols)})
-  class_names <- unlist(apply(res,1,function(x){class_map[x]} ) )
+  class_names <- unlist(apply(res,1,function(x){ifelse(any(x), class_map[x], NA)} ) )
+
+  class_names[is.na(class_names)] <- curr_classes[is.na(class_names)]
+
   names(class_names) <- cols
+
+  class_names <- unlist(class_names)
 
   ret_data <- as.data.frame(lapply(seq(length(class_names)),
                                    function(x) {as(df[,x], class_names[x])}), stringsAsFactors = FALSE)
+
+
   colnames(ret_data) <- cols
 
   return(ret_data)
