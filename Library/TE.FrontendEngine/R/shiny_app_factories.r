@@ -184,7 +184,7 @@ setMethod("dataFilter","ShinyFactory",
                                     			      filter(data[[i]] >= input[[i]][1],
                                     			             data[[i]] <= input[[i]][2]
                                     			      )
-                                    			    },i=i)			
+                                    			    },i=i)
 			} else if(type == 'Integer') {
 				reactive_data_callbacks[[length(reactive_data_callbacks)+1]] <- Curry(function(input,data,i){
 																						data %>%
@@ -254,9 +254,12 @@ setMethod("shinyServerFactory","ShinyFactory",
 	function(object,analysis_ggplot,analysis_data,ui_options=list()){
 		reactive_data <- dataFilter(object,analysis_data)
 		update_plot <- Curry(updatePlot,object=object,analysis_ggplot=analysis_ggplot,reactive_data=reactive_data)
-		object@server <- Curry(function(input,output,updater,plotname){
-		              plt_fn <- updater(input)
-									output[[plotname]] <- renderPlot(plt_fn())},updater=update_plot,plotname=object@plot_name)
+		object@server <- Curry(function(input,output,session,updater,plotname){
+		                          plt_fn <- updater(input)
+									            output[[plotname]] <- renderPlot(plt_fn())
+									            onSessionEnded(function() {stopApp()})
+									},
+									updater=update_plot,plotname=object@plot_name)
 		return(object)
 	}
 )

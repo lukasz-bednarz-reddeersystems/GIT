@@ -141,9 +141,9 @@ setMethod("runAppCallback","EngineCommandInterpreter",
         										analysis_data <- engine@analysis_data
         										ui_options <- engine@ui_options
         										factory <- new("ShinyFactory")
-												factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data, ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
-												factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
-        										  shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
+												    factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data, ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
+												    factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+        										shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
         										}
         object <- setEngineSlotCallback(object,'app',fn,TRUE,FALSE,TRUE)
         return(object)
@@ -264,7 +264,8 @@ setClass(
 		app        = "function",
 		analysis_ggplot = "ANY",
 		analysis_data   = "data.frame",
-		ui_options = "list"
+		ui_options = "list",
+		idle_time  = "numeric"
 	),
 	prototype    = prototype(
 		interpreter= new("EngineCommandInterpreter"),
@@ -322,7 +323,7 @@ setMethod("startEngine","Engine",
 		  	while(request != "STOP"){
 		  		object <- initialiseEngine(object)
 		  		object@response <- 'GOT' #Default reponse, sent if callback specifies to send response
-		  								 #and does not reset the response
+		  								             #and does not reset the response
 		  		skct <- tryCatch({
 		  					readConnection(object@socket)
 		  				}, error = function(cond){
@@ -401,7 +402,12 @@ setMethod("startEngine","Engine",
 		  					    message("Engine error on running application:",cond)
 		  					    object@response <- "ERROR"
 		  					    sendResponse(object)
+		  					    message("Engine exiting on application error")
+		  					    shutdownEngine(object)
 		  					  })
+		  					  message("App terminated by client.")
+		  					  message("Engine exiting.")
+		  					  shutdownEngine(object)
 		  					}
 		  					else{
 		  					  message("No application to run.")
@@ -418,7 +424,7 @@ setMethod("startEngine","Engine",
 setGeneric("importAppData",function(object,scramble=TRUE){standardGeneric("importAppData")})
 setMethod("importAppData","Engine",
 	function(object,scramble=TRUE){
-	        block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
+	    block_client   <- tryCatch({new(paste(object@module_name,"Client",sep=""))},error=function(cond)stop(paste("Failed to set module name:",object@module_name,cond)))
 			key_function   <- tryCatch({get(object@lookback)},error=function(cond)stop(paste("Failed to set lookback, exiting:",cond)))
 			key_values     <- tryCatch({key_function(object@trader, object@module_date)},error=function(cond)stop(paste("Failed to set key values on date",object@module_date,"for trader",object@trader,":",cond)))
 			block_client   <- tryCatch({dataRequest(block_client, key_values)},error=function(cond)stop(paste("Analysis data request failed:",cond)))
@@ -435,7 +441,7 @@ setMethod("importAppData","Engine",
 			  object@analysis_ggplot$data <- object@analysis_data
 			}
 			return(object)
-	      }
+	   }
 )
 #Should create a new class to do this
 setGeneric("scrambleData",function(object){standardGeneric("scrambleData")})
