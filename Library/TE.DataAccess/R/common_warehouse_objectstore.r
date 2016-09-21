@@ -34,13 +34,13 @@ setClass(
   contains =c("RemoteObjectQuery", "VirtualWarehouseQuery")
 )
 
-
 setMethod(".generateRemoteQueryKey",
-          signature(object = "RemoteObjectQuery",
+          signature(object = "RemoteWarehouseQuery",
                     key = "data.frame"),
           function(object,key){
-            key$date <- as.Date(key$date)
-            key <- data.frame(id = unique(key$id), start = min(key$date), end = max(key$date))
+
+            colnames(key) <- c("TraderID", "StartDate", "EndDate")
+
             return(key)
           }
 )

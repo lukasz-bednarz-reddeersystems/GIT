@@ -187,8 +187,7 @@ setMethod("getKnownRemoteKeys","RemoteObjectQuery",
 
             tb_name <- .getObjectQueryTableName(object)
 
-
-            colnames(key) <- c("TraderID", "StartDate", "EndDate")
+            key <- .generateRemoteQueryKey(object, key)
             key <- cbind(data.frame(TableName = tb_name), key)
 
             ret <- executeSQLQuery(sql_query, key)

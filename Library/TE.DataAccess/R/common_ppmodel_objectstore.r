@@ -1,4 +1,5 @@
-#' @include datastore.r global_configs.r
+#' @include ojbectstore.r
+#' @include global_configs.r
 NULL
 
 #' Generate PPModel objectstore name from keys
@@ -15,19 +16,32 @@ get_ppmodel_objectstore_name <- function(keys) {
   return(rv)
 }
 
-
-#' An S4 class handling queries to PPModelObjectstore.
+#' helper function to generate key from objectstore name
 #'
-#' @export
+#' @param name "character" name of the objectstore
+#' @return \code{key} "data.frame" with columns "id", "start", "end"
+key_from_ppmodel_objectstore_name <- function(name) {
+
+  str_keys <- strsplit(name, "_")
+
+  key <- data.frame(model_class = str_keys[[1]][1],
+                    id          = str_keys[[1]][2],
+                    start       = str_keys[[1]][3],
+                    end         = str_keys[[1]][4])
+  return(key)
+}
+
 
 setClass(
-  Class          = "PPModelQuery",
+  Class          = "VirtualPPModelQuery",
   prototype = prototype(
     fields       = c('hash', 'model_class','id','start', 'end')
-  ), contains = c("ObjectQuery")
+  ), contains = c("ObjectQuery", "VIRTUAL")
 )
 
-setMethod("hashKey","PPModelQuery",
+setMethod("hashKey",
+          signature(object = "PPModelQuery",
+                    key    = "data.frame"),
           function(object,key){
             hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
             hashedkey <- cbind(data.frame(hash=hash),key)
@@ -36,7 +50,9 @@ setMethod("hashKey","PPModelQuery",
 )
 
 setGeneric("setPPModelQuery",function(object,key){standardGeneric("setPPModelQuery")})
-setMethod("setPPModelQuery","PPModelQuery",
+setMethod("setPPModelQuery",
+          signature(object = "VirtualPPModelQuery",
+                    key    = "data.frame"),
           function(object,key){
             hashedkey <- hashKey(object,key)
             object <- setQueryValuesFromKey(object,hashedkey)
@@ -45,7 +61,9 @@ setMethod("setPPModelQuery","PPModelQuery",
 )
 
 setGeneric("updateStoredPPModelKeys",function(object,key){standardGeneric("updateStoredPPModelKeys")})
-setMethod("updateStoredPPModelKeys","PPModelQuery",
+setMethod("updateStoredPPModelKeys",
+          signature(object = "VirtualPPModelQuery",
+                    key    = "data.frame"),
           function(object,key){
             hashedkey <- hashKey(object,key)
             object <- updateKnownKeys(object,hashedkey)
@@ -54,7 +72,9 @@ setMethod("updateStoredPPModelKeys","PPModelQuery",
 )
 
 setGeneric("isPPModelStored",function(object,key){standardGeneric("isPPModelStored")})
-setMethod("isPPModelStored","PPModelQuery",
+setMethod("isPPModelStored",
+          signature(object = "VirtualPPModelQuery",
+                    key    = "data.frame"),
           function(object,key){
             hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
             if(length(object@known_keys)==0){
@@ -67,6 +87,42 @@ setMethod("isPPModelStored","PPModelQuery",
           }
 )
 
+
+
+
+#' An S4 class handling queries to PPModelObjectstore.
+#'
+#' @export
+
+setClass(
+  Class          = "PPModelQuery",
+  contains = c("VirtualPPModelQuery")
+)
+
+#' An S4 class handling queries to WarehouseObjectstore.
+
+setClass(
+  Class = "RemotePPModelQuery",
+  prototype = prototype(
+    #fields need to match column names
+    #of key data frame
+    tb_name = "tRDTE_WarehouseObjectstore"
+  ),
+  contains =c("RemoteObjectQuery", "VirtualPPModelQuery")
+)
+
+
+
+
+setMethod(".generateRemoteQueryKey",
+          signature(object = "RemotePPModelQuery",
+                    key = "data.frame"),
+          function(object,key){
+            key$date <- as.Date(key$date)
+            key <- data.frame(id = unique(key$id), start = min(key$date), end = max(key$date))
+            return(key)
+          }
+)
 
 #' An S4 class implementing of PPModel Objectstore.
 #'
@@ -246,6 +302,17 @@ ppmodel_objectstore_factory <- function(name){
   message("Initialising ppmodel store ...")
   anstr <- new("PPModelObjectStore",id=name)
   pth <- getPath(anstr)
+
+  # if (!file.exists(pth)) {
+  #   message(sprintf("File initially not found in local path %s. Checking remote store",pth))
+  #   key <- key_from_ppmodel_objectstore_name(basename(pth))
+  #   is_known <- isKeyKnownInRemoteStore(query, key)
+  #
+  #   if (is_known) {
+  #     whstr <- updateLocalStoreFile(whstr,key)
+  #   }
+  # }
+
   if(file.exists(pth)){
     message(paste("Found ppmodel store at",pth))
     anstr <- initialisePPModelStore(anstr)
