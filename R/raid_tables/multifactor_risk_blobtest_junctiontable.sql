@@ -1,14 +1,11 @@
 USE [FileTableDB]
 GO
 
-ALTER TABLE [dbo].[tMultiFactorRiskBlobTest] DROP CONSTRAINT [FK_FileTableDB_ModelTypeID_Betas_ModelType]
+IF EXISTS (SELECT * FROM sysobjects WHERE name = 'tRDTE_WarehouseObjectstore' AND type = 'U')
+		DROP TABLE [dbo].[tRDTE_WarehouseObjectstore]
 GO
 
-/****** Object:  Table [dbo].[tMultiFactorRiskBlobTest]    Script Date: 31/08/2016 14:14:05 ******/
-DROP TABLE [dbo].[tMultiFactorRiskBlobTest]
-GO
-
-/****** Object:  Table [dbo].[tMultiFactorRiskBlobTest]    Script Date: 31/08/2016 14:14:05 ******/
+/****** Object:  Table [dbo].[tRDTE_WarehouseObjectstore]    Script Date: 31/08/2016 14:14:05 ******/
 SET ANSI_NULLS ON
 GO
 
@@ -18,14 +15,14 @@ GO
 SET ANSI_PADDING ON
 GO
 
-CREATE TABLE [dbo].[tMultiFactorRiskBlobTest](
+CREATE TABLE [dbo].[tRDTE_WarehouseObjectstore](
 	[lTraderID] [bigint] NOT NULL,
 	[dtStartDate] [datetime] NOT NULL,
 	[dtEndDate] [datetime] NOT NULL,
 	[hPathLocator] [hierarchyid] NOT NULL,
 	[dtCreatedDate] [datetime] NULL,
 	[sCreatedByUserID] [varchar](50) NULL,
- CONSTRAINT [AK_FileTableDB_BlobTest_TraderIDStartEndCreatedUserFactor] UNIQUE NONCLUSTERED 
+ CONSTRAINT [AK_FileTableDB_WarehouseObjectstore_TraderIDStartEndCreatedUserFactor] UNIQUE NONCLUSTERED 
 (
 	[lTraderID] ASC,
 	[dtStartDate] ASC,
@@ -40,12 +37,12 @@ GO
 SET ANSI_PADDING OFF
 GO
 
-ALTER TABLE [dbo].[tMultiFactorRiskBlobTest]  WITH CHECK ADD  CONSTRAINT [FK_FileTableDB_PathLocator] FOREIGN KEY([hPathLocator])
-REFERENCES [dbo].[ftMultiFactorRiskBlobTest] ([path_locator])
+ALTER TABLE [dbo].[tRDTE_WarehouseObjectstore]  WITH CHECK ADD  CONSTRAINT [FK_ftWarehouseObjectstore_PathLocator] FOREIGN KEY([hPathLocator])
+REFERENCES [dbo].[ftRDTE_WarehouseObjectstore] ([path_locator])
 ON DELETE CASCADE
 GO
 
-ALTER TABLE [dbo].[tMultiFactorRiskBlobTest] CHECK CONSTRAINT [FK_FileTableDB_PathLocator]
+ALTER TABLE [dbo].[tRDTE_WarehouseObjectstore] CHECK CONSTRAINT [FK_FileTableDB_PathLocator]
 GO
 
 
