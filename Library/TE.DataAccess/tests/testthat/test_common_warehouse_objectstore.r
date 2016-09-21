@@ -129,6 +129,10 @@ test_that("Can load warehouse from remote store() ", {
   is_known <- TE.DataAccess:::isKeyKnownInLocalStore(query, local.key)
   expect_true(is_known)
 
+  is_known <- TE.DataAccess:::isKeyKnownInRemoteStore(query, valid.key)
+  expect_true(is_known)
+
+
   ret <- TE.DataAccess:::removeObjectFromRemoteStore(object)
   expect_true(ret %in% c(-1,0))
 

@@ -29,7 +29,7 @@ setClass(
   prototype = prototype(
     #fields need to match column names
     #of key data frame
-    tb_name = "tMultiFactorRiskBlobTest"
+    tb_name = "tRDTE_WarehouseObjectstore"
   ),
   contains =c("RemoteObjectQuery", "VirtualWarehouseQuery")
 )

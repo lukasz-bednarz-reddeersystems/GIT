@@ -328,9 +328,6 @@ setMethod("updateLocalStoreFile",
                     key    = "data.frame"),
           function(object, key){
 
-            browser()
-
-
             query <- getObjectStoreQuery(object)
 
             # select newest file if multiple stored remotely
