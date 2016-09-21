@@ -120,7 +120,7 @@ head(trade_df)
 
 to save data.frame to Excell please execute:
 
-```{r, save_to_excel}
+```{r, save_to_excel, eval = FALSE}
 # load "xlsx" library
 library(xlsx)
 ```

@@ -454,7 +454,6 @@ setMethod("removeObjectFromRemoteStore",
           }
 )
 
-setGeneric("saveObject",function(object){standardGeneric("saveObject")})
 setMethod("saveObject","VirtualRemoteObjectStore",
 		  function(object){
 		    pth <- getPath(object)
