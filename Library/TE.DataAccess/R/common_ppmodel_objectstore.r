@@ -1,4 +1,4 @@
-#' @include ojbectstore.r
+#' @include objectstore.r
 #' @include global_configs.r
 NULL
 
@@ -40,7 +40,7 @@ setClass(
 )
 
 setMethod("hashKey",
-          signature(object = "PPModelQuery",
+          signature(object = "VirtualPPModelQuery",
                     key    = "data.frame"),
           function(object,key){
             hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
@@ -160,11 +160,11 @@ setMethod(".generateRemoteQueryKey",
 setClass(
   Class          = "PPModelObjectStore",
   representation = representation(
-    warehouse_q  = "PPModelQuery",
+    warehouse_q  = "VirtualPPModelQuery",
     qry_store_nme= "character"
   ),
   prototype      = prototype(
-    warehouse_q  = new("RemotePPModelQuery"),
+    warehouse_q  = new("PPModelQuery"),
     data_path    = model_defaults@data_path,
     qry_store_nme= "ppmodel_queries",
     stored       = new.env(parent = emptyenv())

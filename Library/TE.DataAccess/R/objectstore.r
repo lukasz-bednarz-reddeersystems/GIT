@@ -30,7 +30,7 @@ setMethod("getQueryKeyColumnNames","ObjectQuery",
 setGeneric("getQueryKeyValues",function(object,key){standardGeneric("getQueryKeyValues")})
 setMethod("getQueryKeyValues","ObjectQuery",
           function(object,key){
-            return(object@fields)
+            return(object@values)
           }
 )
 

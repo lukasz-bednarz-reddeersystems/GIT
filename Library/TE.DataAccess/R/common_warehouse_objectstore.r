@@ -260,7 +260,7 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 
 		  	      query <- getObjectStoreQuery(object)
 		  	      query <- getCurrentKeyQuery(key_map,query)
-
+		  	      object <- .setObjectStoreQuery(object, query)
 
   	  	      trader_id  <- as.integer(getQueryValueByField(query,"id"))
 		  	      start_date <- as.Date(getQueryValueByField(query,"start"))
@@ -273,10 +273,9 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  	      	})
               object <- updateWarehouseStoreForKey(object,new_warehouse)
               key_map <- advanceCurrentKey(key_map)
+              object <- .setObjectStoreKeyMap(object, key_map)
 		    }
 
-		    object <- .setObjectStoreKeyMap(object, key_map)
-		    object <- .setObjectStoreQuery(object, query)
 		    return(object)
 		  }
 )

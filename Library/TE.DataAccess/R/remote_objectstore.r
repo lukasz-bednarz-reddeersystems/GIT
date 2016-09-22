@@ -31,8 +31,8 @@ setClass(
 	  db_name = "character",
 	  db_schema = "character",
 	  tb_name   = "character",
-	  sql_query = "BlobStorage.SQLProcedureCall",
-	  sql_insert = "BlobStorage.SQLProcedureCall"
+	  sql_query = "BlobStorage.VirtualSQLProcedureCall",
+	  sql_insert = "BlobStorage.VirtualSQLProcedureCall"
 	),
 	prototype = list(
 	  db_name = .__DEFAULT_OBJECTSTORE_ODBC_DB_NAME__.,
@@ -365,7 +365,6 @@ setMethod("saveObjectInRemoteStore",
           signature(object = "VirtualRemoteObjectStore"),
           function(object){
 
-            browser()
             filename <- paste0(getID(object),
                                "_objectstore_",
                                today(),

@@ -44,7 +44,7 @@ setClass(
 #Must ensure new environments created since they are passed
 #by reference.
 
-#' Initialize method for "PPModelObjectStore" class
+#' Initialize method for "CompositeWarehouse" class
 #'
 #' Prototype is made only once and then copied with each call to 'new'
 #' for objects along the same branch in the class hierachy.

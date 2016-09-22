@@ -3,7 +3,7 @@
 \docType{methods}
 \name{initialize,CompositeWarehouse-method}
 \alias{initialize,CompositeWarehouse-method}
-\title{Initialize method for "PPModelObjectStore" class}
+\title{Initialize method for "CompositeWarehouse" class}
 \usage{
 \S4method{initialize}{CompositeWarehouse}(.Object)
 }
