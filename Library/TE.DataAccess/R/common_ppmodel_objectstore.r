@@ -106,12 +106,33 @@ setClass(
   prototype = prototype(
     #fields need to match column names
     #of key data frame
-    tb_name = "tRDTE_WarehouseObjectstore"
+    tb_name = "tRDTE_PPModelObjectstore"
   ),
   contains =c("RemoteObjectQuery", "VirtualPPModelQuery")
 )
 
+#' Initialize method for "RemotePPModelQuery" class
+#'
+#' @param .Object, object of class "RemotePPModelQuery"
+#' @return \code{.Object} object of class "RemotePPModelQuery"
+setMethod("initialize", "RemotePPModelQuery",
+          function(.Object){
+            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate",
+                             .getObjectQueryDBName(.Object),
+                             .getObjectQuerySchemaName(.Object),
+                             .getObjectQueryTableName(.Object))
+            .Object <- setSQLQueryObject(.Object, sql_query)
 
+            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
+                              .getObjectQueryDBName(.Object),
+                              .getObjectQuerySchemaName(.Object),
+                              .getObjectQueryTableName(.Object))
+            .Object <- setSQLInsertObject(.Object, sql_insert)
+
+            return(.Object)
+
+          }
+)
 
 
 setMethod(".generateRemoteQueryKey",
@@ -143,7 +164,7 @@ setClass(
     qry_store_nme= "character"
   ),
   prototype      = prototype(
-    warehouse_q  = new("PPModelQuery"),
+    warehouse_q  = new("RemotePPModelQuery"),
     data_path    = model_defaults@data_path,
     qry_store_nme= "ppmodel_queries",
     stored       = new.env(parent = emptyenv())
@@ -321,4 +342,41 @@ ppmodel_objectstore_factory <- function(name){
     message(paste("No previous store data found at",pth,"new store created."))
   }
   return(anstr)
+}
+
+#' Copy PPModels from local objectstores to remote store.
+#'
+#' copies all locally stored ppmodels to remote store and updates keys
+#'
+#' @return \code{count} number of warehouses copied
+#' @export
+
+update_ppmodel_remote_storage <- function(){
+  message("Generating list of existing stores...")
+  pth <- model_defaults@data_path
+
+  # list of all objectstore files
+  rds.files <- list.files(pth, "ppmodel_store_.*_objectstore.rds")
+
+  # function fo find the store
+  wh.cond.fn <- function(x){
+    name.el <- strsplit(x, "_")[[1]]
+    if (length(name.el) != 7) return(FALSE)
+    if (!grepl("^[0-9]+$", name.el[4], perl = TRUE)) return(FALSE)
+    dates <- tryCatch({ as.Date(name.el[5:6])})
+    if (!is.Date(dates)) return(FALSE)
+    return(TRUE)
+  }
+
+  wh_str.files <- rds.files[sapply(rds.files, wh.cond.fn)]
+
+  for (name in wh_str.files) {
+    name <- gsub("_objectstore.rds", "", name)
+    whstr <- ppmodel_objectstore_factory(name)
+    whstr <- saveObjectInRemoteStore(whstr)
+
+  }
+
+
+  return(whstr)
 }
