@@ -122,6 +122,20 @@ setMethod("Process",
             trades_ON$Direction[trades_ON$Long] <- "Long"
             trades_ON$Direction[!trades_ON$Long] <- "Short"
 
+            trades_ON$Long <- NULL
+
+
+            panel <- expand.grid(Quarter        = unique(trades_ON$Quarter),
+                                 Category       = unique(trades_ON$Category),
+                                 TraderID       = unique(trades_ON$TraderID),
+                                 Classification = unique(trades_ON$Classification),
+                                 Quantity       = unique(trades_ON$Quantity),
+                                 Direction      = unique(trades_ON$Direction))
+
+            trades_ON <- merge(trades_ON, panel, all.y = TRUE)
+
+            trades_ON[is.na(trades_ON)] <- 0
+
             trades_pl <- ggplot(data=trades_ON, aes_string(x="as.character(Quarter)",
                                                            fill="paste(Category , Direction)"
                                                           )
@@ -138,7 +152,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, trades_ON)
             object <- .setOutputGGPlot(object, trades_pl)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("PnLOutof", "Long")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PnLOutof")))
 
 
             return(object)
