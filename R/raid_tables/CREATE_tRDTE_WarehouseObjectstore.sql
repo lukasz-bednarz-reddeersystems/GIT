@@ -16,20 +16,21 @@ SET ANSI_PADDING ON
 GO
 
 CREATE TABLE [dbo].[tRDTE_WarehouseObjectstore](
-	[lTraderID] [bigint] NOT NULL,
-	[dtStartDate] [datetime] NOT NULL,
-	[dtEndDate] [datetime] NOT NULL,
-	[hPathLocator] [hierarchyid] NOT NULL,
-	[dtCreatedDate] [datetime] NULL,
-	[sCreatedByUserID] [varchar](50) NULL,
- CONSTRAINT [AK_FileTableDB_WarehouseObjectstore_TraderIDStartEndCreatedUserFactor] UNIQUE NONCLUSTERED 
+	[bHashID] binary(64) NOT NULL,
+	[hPathLocator] hierarchyid NOT NULL,
+	[dtCreatedDate] datetime NOT NULL,
+	[sCreatedByUserID] varchar(50) NOT NULL,
+ CONSTRAINT [AK_FileTableDB_WarehouseObjectstore_HashIDPathLocator] UNIQUE NONCLUSTERED 
 (
-	[lTraderID] ASC,
-	[dtStartDate] ASC,
-	[dtEndDate] ASC,
+	[bHashID] ASC,
+	[hPathLocator] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
+ CONSTRAINT [AK_FileTableDB_WarehouseObjectstore_HashIDCreatedUser] UNIQUE NONCLUSTERED 
+(
+	[bHashID] ASC,
 	[dtCreatedDate] ASC,
 	[sCreatedByUserID] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
 ) ON [PRIMARY]
 
 GO

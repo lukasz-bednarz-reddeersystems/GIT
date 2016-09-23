@@ -80,13 +80,13 @@ setMethod("getRemoteObjectInsertKeyColumnNames",
 #' @return \code{.Object} object of class "RemoteObjectQuery"
 setMethod("initialize", "RemoteObjectQuery",
           function(.Object){
-            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate",
+            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID",
                              .getObjectQueryDBName(.Object),
                              .getObjectQuerySchemaName(.Object),
                              .getObjectQueryTableName(.Object))
             .Object <- setSQLQueryObject(.Object, sql_query)
 
-            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
+            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID",
                               .getObjectQueryDBName(.Object),
                               .getObjectQuerySchemaName(.Object),
                               .getObjectQueryTableName(.Object))
@@ -249,7 +249,18 @@ setMethod("updateKnownRemoteKeys","RemoteObjectQuery",
 
             tb_name <- .getObjectQueryTableName(object)
 
-            ret <- executeSQLQuery(sql_insert, key)
+
+            ret <- tryCatch({
+              executeSQLQuery(sql_insert, key)
+            }, error = function(cond){
+
+              message(sprintf("Error when executing SQL Query %s, : %s",
+                              class(sql_insert),
+                              cond))
+              stop(sprintf("Error when executing SQL Query %s, : %s",
+                              class(sql_insert),
+                              cond))
+            })
 
             message(sprintf("Result of Remote key insert into table: %s", tb_name))
             print(ret)
@@ -405,7 +416,9 @@ setMethod("saveObjectInRemoteStore",
             }
             else {
               key <- key_from_name(getID(object))
-              colnames(key) <- c("TraderID", "StartDate", "EndDate")
+
+              key <- .generateRemoteQueryKey(query, key)
+
               key <- cbind(data.frame(TableName = table),
                            key,
                            data.frame(CreatedDate = today(),

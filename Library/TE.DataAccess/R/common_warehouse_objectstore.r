@@ -39,7 +39,9 @@ setMethod(".generateRemoteQueryKey",
                     key = "data.frame"),
           function(object,key){
 
-            colnames(key) <- c("TraderID", "StartDate", "EndDate")
+            key_hash <- hash_data_frame(key)
+
+            key <- data.frame(HashID = key_hash)
 
             return(key)
           }
@@ -69,13 +71,29 @@ setClass(
 )
 
 
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualRemoteObjectStore",
+                     objectstore_q = "VirtualWarehouseQuery"),
+          function(object, objectstore_q){
+
+            # copy slots of Warehouse Query
+            new_query <- new("RemoteWarehouseQuery")
+
+            new_query@values <- objectstore_q@values
+            new_query@known_keys <- objectstore_q@known_keys
+
+            object <- callNextMethod(object, new_query)
+            return(object)
+          }
+)
+
 
 setMethod(".setObjectStoreQuery",
           signature( object = "VirtualRemoteObjectStore",
                      objectstore_q = "WarehouseQuery"),
           function(object, objectstore_q){
 
-            # copy slots of Warehouse Query
+             # copy slots of Warehouse Query
             new_query <- new("RemoteWarehouseQuery")
 
             new_query@values <- objectstore_q@values
@@ -495,7 +513,12 @@ update_warehouse_remote_storage <- function(){
 
   for (name in wh_str.files) {
     name <- gsub("_objectstore.rds", "", name)
+    # if (name == "101_2016-08-31_2016-09-30" ) {
+    #   browser()
+    # }
+    #
     whstr <- warehouse_objectstore_factory(name)
+
     whstr <- saveObjectInRemoteStore(whstr)
 
   }
