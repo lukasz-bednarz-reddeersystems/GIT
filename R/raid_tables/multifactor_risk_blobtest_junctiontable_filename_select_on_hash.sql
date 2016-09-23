@@ -46,7 +46,7 @@ N' INNER JOIN ' +
 N' ON jt.hPathLocator = ft.path_locator' + 
 N' WHERE ' + 
 --N' jt.bHashID = CONVERT( varbinary(64) , ' + QUOTENAME(@bHashID, '''')   +  ', 1)'
-N' jt.bHashID = CONVERT( varbinary(64) , ' + QUOTENAME(@bHashID, '''')   +  ', 1)'
+N' jt.bHashID = CONVERT( varbinary(64) , ' +  @bHashID   +  ', 1)'
 
 EXEC (@SQL)
 
