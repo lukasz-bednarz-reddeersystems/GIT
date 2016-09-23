@@ -2,6 +2,7 @@
 NULL
 
 
+
 serialize_data_frame <- function(df){
 
   df <- df[sort(colnames(df))]
@@ -25,11 +26,21 @@ serialize_data_frame <- function(df){
   return(ret)
 }
 
-hash_data_frame <- function(df){
+
+#' hash data frame
+#'
+#' Hashes
+#'
+#' @param df "data.frame" to be hashed
+#' @param algo "character" name of algorithm to be used as per "digest"
+#' default is "sha512
+#' @return \code{ret} "character" hash of the data.frame
+#' @export
+hash_data_frame <- function(df, algo  = "sha512"){
 
   txt_ret <- serialize_data_frame(df)
 
-  hashed_df<- digest(txt_ret, algo = "sha512")
+  hashed_df<- digest(txt_ret, algo = algo)
 
   hashed_df <- toupper(hashed_df)
 
