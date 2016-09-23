@@ -16,10 +16,14 @@ Imports:
     lubridate,
     R.utils,
     hash,
+    digest,
+    plyr,
+    XML,
 Collate:
     'TE.BlobStorage.r'
     'filetable_query.r'
     'filetable_storage_functions.r'
+    'hashing_functions.r'
     'junction_table_query.r'
 RoxygenNote: 5.0.1
 Suggests:
