@@ -101,8 +101,8 @@ setMethod("shinyUIFactory","ShinyFactory",
 
 	  object@plot_name <- plot_name
 	  object <- buildContent(object,analysis_ggplot,analysis_data,ui_options)
-		object@ui[[1]] <- shinyUI(object@page_type(
-					object@title(object@plot_name),
+		object@ui[[1]] <- shinyUI(object@page_type(theme = shinythemes::shinytheme("darkly"),
+					#object@title(object@plot_name),
 					object@body_function(object@control_type(object@content),
 						                 object@main_panel(object@main_content(object@plot_name)))
 				    ))
@@ -227,6 +227,10 @@ setMethod("updatePlot","ShinyFactory",
 	function(object,input,analysis_ggplot,reactive_data){
 		return(Curry(function(ggplot,input,reactive_data){
 						ggplot$data <- reactive_data(input)
+						ggplot <- ggplot +
+						          ggthemes::theme_hc(bgcolor = "darkunica") +
+						          ggplot2::theme(axis.title = ggplot2::element_text(face="bold")) +
+						          ggplot2::theme(axis.text  = ggplot2::element_text(colour = "white"))
 						return(ggplot)
 					 },input=input,ggplot=analysis_ggplot,reactive_data=reactive_data))
 	}
