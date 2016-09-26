@@ -106,6 +106,9 @@ test_that("Can load warehouse from remote store() ", {
   object <- new(tested.class, valid.name)
   expect_is(object, tested.class)
 
+  query <- getObjectStoreQuery(object)
+  expect_is(query, "RemoteWarehouseQuery")
+
   valid.path <- TE.DataAccess:::getPath(object)
 
   expect_true(file.exists(valid.path))

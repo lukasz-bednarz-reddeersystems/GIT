@@ -34,18 +34,7 @@ setClass(
   contains =c("RemoteObjectQuery", "VirtualWarehouseQuery")
 )
 
-setMethod(".generateRemoteQueryKey",
-          signature(object = "RemoteWarehouseQuery",
-                    key = "data.frame"),
-          function(object,key){
 
-            key_hash <- hash_data_frame(key)
-
-            key <- data.frame(HashID = key_hash)
-
-            return(key)
-          }
-)
 
 
 #' An S4 class for storing daily risk models.
@@ -103,7 +92,6 @@ setMethod(".setObjectStoreQuery",
             return(object)
           }
 )
-
 
 #' Get objectstore query object
 #'
@@ -513,10 +501,7 @@ update_warehouse_remote_storage <- function(){
 
   for (name in wh_str.files) {
     name <- gsub("_objectstore.rds", "", name)
-    # if (name == "101_2016-08-31_2016-09-30" ) {
-    #   browser()
-    # }
-    #
+
     whstr <- warehouse_objectstore_factory(name)
 
     whstr <- saveObjectInRemoteStore(whstr)

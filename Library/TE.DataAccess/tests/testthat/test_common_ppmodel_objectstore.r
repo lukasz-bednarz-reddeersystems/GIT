@@ -2,12 +2,22 @@ context("Test PPMOdel Objectstore")
 
 #############################
 #
-# Test WarehouseObjectStore
+# Test PPModelObjectStore
 #
 #############################
-tested.class <- "PPModeleObjectStore"
-valid.name <- "TradeHistorySimpleWithSummary_11_2016-03-29_2016-04-01"
-valid.key  <- TE.DataAccess:::key_from_ppmodel_objectstore_name(valid.name)
+tested.class <- "PPModelObjectStore"
+
+valid.key  <- data.frame(model_class = "TradeHistorySimpleWithSummary",
+                         id          = 11L,
+                         start       = as.Date("2016-03-29"),
+                         end         = as.Date("2016-04-01"))
+
+valid.name <- get_ppmodel_objectstore_name(valid.key)
+valid.key2  <- TE.DataAccess:::key_from_ppmodel_objectstore_name(valid.name)
+
+test_that("Key generators are working properly", {
+  expect_equivalent(valid.key, valid.key2)
+})
 
 
 test_that("Can move local objectstore files to Blob Objectstore", {
@@ -15,14 +25,14 @@ test_that("Can move local objectstore files to Blob Objectstore", {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   skip_if_not(FALSE)
 
-  object <- update_warehouse_remote_storage()
+  object <- update_ppmodel_remote_storage()
 
 })
 
 
-test_that("Can call warehouse_objectstore_factory() with locally existing file", {
+test_that("Can call ppmodel_objectstore_factory() with locally existing file", {
 
-  object <- warehouse_objectstore_factory(valid.name)
+  object <- ppmodel_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
 
@@ -30,18 +40,14 @@ test_that("Can call warehouse_objectstore_factory() with locally existing file",
 
 test_that("Can check for keys in remote store() ", {
 
-  object <- warehouse_objectstore_factory(valid.name)
+  object <- ppmodel_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
-  local.key <- TE.DataAccess:::generateKey(object,
-                                     valid.key$id,
-                                     valid.key$start,
-                                     valid.key$end)
-
 
   query <- getObjectStoreQuery(object)
-  expect_is(query, "RemoteWarehouseQuery")
+  expect_is(query, "RemotePPModelQuery")
 
+  local.key <- TE.DataAccess:::hashKey(query,valid.key)
 
 
   is_known <- TE.DataAccess:::isKeyKnown(query, local.key)
@@ -60,18 +66,14 @@ test_that("Can check for keys in remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
-  local.key <- TE.DataAccess:::generateKey(object,
-                                            valid.key$id,
-                                            valid.key$start,
-                                            valid.key$end)
-
-  object <- warehouse_objectstore_factory(valid.name)
+  object <- ppmodel_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
 
   query <- getObjectStoreQuery(object)
-  expect_is(query, "RemoteWarehouseQuery")
+  expect_is(query, "RemotePPModelQuery")
 
+  local.key <- TE.DataAccess:::hashKey(query,valid.key)
 
 
   is_known <- TE.DataAccess:::isKeyKnown(query, local.key)
@@ -99,13 +101,13 @@ test_that("Can load warehouse from remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
-  local.key <- TE.DataAccess:::generateKey(object,
-                                           valid.key$id,
-                                           valid.key$start,
-                                           valid.key$end)
-
   object <- new(tested.class, valid.name)
   expect_is(object, tested.class)
+
+  query <- getObjectStoreQuery(object)
+  expect_is(query, "RemotePPModelQuery")
+
+  local.key <- TE.DataAccess:::hashKey(query,valid.key)
 
   valid.path <- TE.DataAccess:::getPath(object)
 
@@ -115,13 +117,14 @@ test_that("Can load warehouse from remote store() ", {
 
   expect_false(file.exists(valid.path))
 
-  object <- warehouse_objectstore_factory(valid.name)
+  object <- ppmodel_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
 
   query <- getObjectStoreQuery(object)
-  expect_is(query, "RemoteWarehouseQuery")
+  expect_is(query, "RemotePPModelQuery")
 
+  local.key <- TE.DataAccess:::hashKey(query,valid.key)
 
 
   is_known <- TE.DataAccess:::isKeyKnown(query, local.key)

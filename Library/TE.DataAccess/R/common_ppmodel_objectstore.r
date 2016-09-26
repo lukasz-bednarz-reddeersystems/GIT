@@ -24,10 +24,10 @@ key_from_ppmodel_objectstore_name <- function(name) {
 
   str_keys <- strsplit(name, "_")
 
-  key <- data.frame(model_class = str_keys[[1]][1],
-                    id          = str_keys[[1]][2],
-                    start       = str_keys[[1]][3],
-                    end         = str_keys[[1]][4])
+  key <- data.frame(model_class = str_keys[[1]][3],
+                    id          = as.integer(str_keys[[1]][4]),
+                    start       = as.Date(str_keys[[1]][5]),
+                    end         = as.Date(str_keys[[1]][6]))
   return(key)
 }
 
@@ -117,13 +117,13 @@ setClass(
 #' @return \code{.Object} object of class "RemotePPModelQuery"
 setMethod("initialize", "RemotePPModelQuery",
           function(.Object){
-            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate",
+            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID",
                              .getObjectQueryDBName(.Object),
                              .getObjectQuerySchemaName(.Object),
                              .getObjectQueryTableName(.Object))
             .Object <- setSQLQueryObject(.Object, sql_query)
 
-            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
+            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID",
                               .getObjectQueryDBName(.Object),
                               .getObjectQuerySchemaName(.Object),
                               .getObjectQueryTableName(.Object))
@@ -131,17 +131,6 @@ setMethod("initialize", "RemotePPModelQuery",
 
             return(.Object)
 
-          }
-)
-
-
-setMethod(".generateRemoteQueryKey",
-          signature(object = "RemotePPModelQuery",
-                    key = "data.frame"),
-          function(object,key){
-            key$date <- as.Date(key$date)
-            key <- data.frame(id = unique(key$id), start = min(key$date), end = max(key$date))
-            return(key)
           }
 )
 
@@ -160,36 +149,89 @@ setMethod(".generateRemoteQueryKey",
 setClass(
   Class          = "PPModelObjectStore",
   representation = representation(
-    warehouse_q  = "VirtualPPModelQuery",
+    objectstore_q  = "VirtualPPModelQuery",
     qry_store_nme= "character"
   ),
   prototype      = prototype(
-    warehouse_q  = new("PPModelQuery"),
+    objectstore_q  = new("RemotePPModelQuery"),
     data_path    = model_defaults@data_path,
-    qry_store_nme= "ppmodel_queries",
-    stored       = new.env(parent = emptyenv())
+    qry_store_nme= "ppmodel_queries"
   ),
-  contains = c("VirtualObjectStore")
+  contains = c("VirtualRemoteObjectStore")
 )
 
-#' Initialize method for "PPModelObjectStore" class
-#'
-#' @param .Object, object of class "PPModelObjectStore"
-#' @param id id to set when initializing
-#' @return \code{.Object} object of class "PPModelObjectStore"
-#' @export
-setMethod("initialize", "PPModelObjectStore",
-          function(.Object,id){
-            .Object@id <- id
-            .Object
+
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualRemoteObjectStore",
+                     objectstore_q = "VirtualPPModelQuery"),
+          function(object, objectstore_q){
+
+            # copy slots of Warehouse Query
+            new_query <- new("RemotePPModelQuery")
+
+            new_query@values <- objectstore_q@values
+            new_query@known_keys <- objectstore_q@known_keys
+
+            object <- callNextMethod(object, new_query)
+            return(object)
           }
 )
+
+
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualRemoteObjectStore",
+                     objectstore_q = "PPModelQuery"),
+          function(object, objectstore_q){
+
+            # copy slots of Warehouse Query
+            new_query <- new("RemotePPModelQuery")
+
+            new_query@values <- objectstore_q@values
+            new_query@known_keys <- objectstore_q@known_keys
+
+            object <- callNextMethod(object, new_query)
+            return(object)
+          }
+)
+
+
+
+
+setMethod(".generateKeyFromID",
+          signature( object = "PPModelObjectStore"),
+          function(object){
+
+            id <- getID(object)
+
+            name <- key_from_ppmodel_objectstore_name(id)
+
+            return(name)
+          }
+)
+
+
+#' #' Initialize method for "PPModelObjectStore" class
+#' #'
+#' #' @param .Object, object of class "PPModelObjectStore"
+#' #' @param id id to set when initializing
+#' #' @return \code{.Object} object of class "PPModelObjectStore"
+#'
+#'
+#' setMethod("initialize", "PPModelObjectStore",
+#'           function(.Object,id){
+#'             .Object@id <- id
+#'             .Object
+#'           }
+#' )
 
 setGeneric("initialisePPModelStore",function(object){standardGeneric("initialisePPModelStore")})
 setMethod("initialisePPModelStore","PPModelObjectStore",
           function(object){
             object <- loadObject(object)
-            object@warehouse_q <- getFromObjectStore(object,object@qry_store_nme)
+
+            query <- getFromObjectStore(object,object@qry_store_nme)
+
+            object <- .setObjectStoreQuery(object, query)
             return(object)
           }
 )
@@ -321,27 +363,27 @@ setMethod("getPPModelStoreContents","PPModelObjectStore",
 
 ppmodel_objectstore_factory <- function(name){
   message("Initialising ppmodel store ...")
-  anstr <- new("PPModelObjectStore",id=name)
-  pth <- getPath(anstr)
+  ppmstr <- new("PPModelObjectStore",id=name)
+  pth <- getPath(ppmstr)
 
-  # if (!file.exists(pth)) {
-  #   message(sprintf("File initially not found in local path %s. Checking remote store",pth))
-  #   key <- key_from_ppmodel_objectstore_name(basename(pth))
-  #   is_known <- isKeyKnownInRemoteStore(query, key)
-  #
-  #   if (is_known) {
-  #     whstr <- updateLocalStoreFile(whstr,key)
-  #   }
-  # }
+  if (!file.exists(pth)) {
+    message(sprintf("File initially not found in local path %s. Checking remote store",pth))
+    key <- key_from_ppmodel_objectstore_name(basename(pth))
+    is_known <- isKeyKnownInRemoteStore(query, key)
+
+    if (is_known) {
+      ppmstr <- updateLocalStoreFile(ppmstr,key)
+    }
+  }
 
   if(file.exists(pth)){
     message(paste("Found ppmodel store at",pth))
-    anstr <- initialisePPModelStore(anstr)
+    ppmstr <- initialisePPModelStore(ppmstr)
   }
   else{
     message(paste("No previous store data found at",pth,"new store created."))
   }
-  return(anstr)
+  return(ppmstr)
 }
 
 #' Copy PPModels from local objectstores to remote store.
@@ -372,6 +414,7 @@ update_ppmodel_remote_storage <- function(){
 
   for (name in wh_str.files) {
     name <- gsub("_objectstore.rds", "", name)
+
     whstr <- ppmodel_objectstore_factory(name)
     whstr <- saveObjectInRemoteStore(whstr)
 

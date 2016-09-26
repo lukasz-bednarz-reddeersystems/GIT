@@ -5,21 +5,6 @@ NULL
 .__DEFAULT_OBJECTSTORE_DB_USER__.        <- Sys.info()["user"]
 .__DEFAULT_OBJECTSTORE_FILE_DB_SCHEMA__. <- "FileTableDB"
 
-#' helper function to generate key from objectstore name
-#'
-#' @param name "character" name of the objectstore
-#' @return \code{key} "data.frame" with columns "id", "start", "end"
-key_from_name <- function(name) {
-
-  str_keys <- strsplit(name, "_")
-
-  key <- data.frame(id    = str_keys[[1]][1],
-                    start = str_keys[[1]][2],
-                    end   = str_keys[[1]][3])
-  return(key)
-}
-
-
 
 #' An S4 class implementing handling queries to objectstores derived from VirtualRemoteObjectStore.
 #'
@@ -206,6 +191,11 @@ setMethod(".generateRemoteQueryKey",
           signature(object = "RemoteObjectQuery",
                     key = "data.frame"),
           function(object,key){
+
+            key_hash <- hash_data_frame(key)
+
+            key <- data.frame(HashID = key_hash)
+
             return(key)
           }
 )
@@ -314,8 +304,8 @@ setClass(
 
 setMethod("initialize", "VirtualRemoteObjectStore",
           function(.Object,id){
-            .Object@stored <- new.env(parent = emptyenv())
-            .Object@id <- id
+
+            .Object <- callNextMethod()
 
             query <- getObjectStoreQuery(.Object)
 
@@ -376,6 +366,7 @@ setMethod("saveObjectInRemoteStore",
           signature(object = "VirtualRemoteObjectStore"),
           function(object){
 
+
             filename <- paste0(getID(object),
                                "_objectstore_",
                                today(),
@@ -415,7 +406,7 @@ setMethod("saveObjectInRemoteStore",
               stop(sprintf("Object isn't stored in remote path: %s, code",pth))
             }
             else {
-              key <- key_from_name(getID(object))
+              key <- .generateKeyFromID(object)
 
               key <- .generateRemoteQueryKey(query, key)
 
@@ -445,12 +436,10 @@ setMethod("removeObjectFromRemoteStore",
           signature(object = "VirtualRemoteObjectStore"),
           function(object){
 
-            filename <- paste0(getID(object),
-                               "_objectstore_",
-                               today(),
-                               "_",
-                               .__DEFAULT_OBJECTSTORE_DB_USER__.,
-                               ".rds")
+
+            key <- .generateKeyFromID(object)
+
+            rsp <- (-1)
 
             # copy to remote file table
             query  <- getObjectStoreQuery(object)
@@ -458,7 +447,12 @@ setMethod("removeObjectFromRemoteStore",
             schema <- .getObjectQuerySchemaName(query)
             table  <- .getObjectQueryTableName(query)
 
-            rsp <- remove_file_from_referenced_filetable(filename, table, db, schema)
+            known_keys <- getKnownRemoteKeys(query, key )
+
+            for (filename in known_keys$FileName) {
+
+              rsp <- remove_file_from_referenced_filetable(filename, table, db, schema)
+            }
 
             return(rsp)
 

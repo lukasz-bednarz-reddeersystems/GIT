@@ -1,3 +1,18 @@
+#' helper function to generate key from objectstore name
+#'
+#' @param name "character" name of the objectstore
+#' @return \code{key} "data.frame" with columns "id", "start", "end"
+key_from_name <- function(name) {
+
+  str_keys <- strsplit(name, "_")
+
+  key <- data.frame(id    = str_keys[[1]][1],
+                    start = str_keys[[1]][2],
+                    end   = str_keys[[1]][3])
+  return(key)
+}
+
+
 #' An S4 class implementing handling queries to objectstores derived from VirtualObjectStore.
 #'
 #' @slot fields      "character",
@@ -205,6 +220,20 @@ setMethod(".setObjectStoreQuery",
           function(object, objectstore_q){
             object@objectstore_q <- objectstore_q
             return(object)
+          }
+)
+
+
+setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
+setMethod(".generateKeyFromID",
+          signature( object = "VirtualObjectStore"),
+          function(object){
+
+            id <- getID(object)
+
+            name <- key_from_name(id)
+
+            return(name)
           }
 )
 
