@@ -19,7 +19,7 @@ GO
 
 CREATE TABLE [dbo].[tMultiFactorRiskBlobTest](
 	[bHashID] binary(64)  NOT NULL,
-	[hPathLocator] hierarchyid(800) NOT NULL,
+	[hPathLocator] hierarchyid NOT NULL,
 	[dtCreatedDate] datetime NOT NULL,
 	[sCreatedByUserID] varchar(50) NOT NULL,
  CONSTRAINT [AK_FileTableDB_BlobTest_HashIDPathLocator] UNIQUE NONCLUSTERED 
