@@ -323,13 +323,19 @@ setMethod("Process",
 
             trades_mean <- aggregate(TodayPL~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, mean)
-            trades_mean$Quantity <- "Average"
+            trades_mean$Quantity <- "Average PnL ($)"
+
+            trades$Hit1D <- trades$TodayPL > 0
+            trades_hit_rate <- aggregate(Hit1D~ Quarter + Category + TraderID + Classification + Long,
+                                     data = trades, function(x)mean(x,na.rm=TRUE)*100)
+            colnames(trades_hit_rate)[colnames(trades_hit_rate)=='Hit1D'] <-'TodayPL'
+            trades_hit_rate$Quantity <- "Hit Rate %"
 
             trades_sum <- aggregate(TodayPL~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, sum)
-            trades_sum$Quantity <- "Total"
+            trades_sum$Quantity <- "Total PnL ($)"
 
-            trades_ON <- rbind(trades_mean, trades_sum)
+            trades_ON <- rbind(trades_mean, trades_sum, trades_hit_rate)
 
             trades_ON$Direction[trades_ON$Long] <- "Long"
             trades_ON$Direction[!trades_ON$Long] <- "Short"
@@ -343,7 +349,7 @@ setMethod("Process",
                         theme_dark() +
                         #theme(plot.background  = element_rect(fill = "black", colour = "black")) +
                         guides(fill = guide_legend(title = "Category")) +
-                        ylab("PnL (USD)") +
+                        ylab("") +
                         xlab("Quarter") +
                         ggtitle(sprintf('PnL on Results day for trader ID: %s', na.omit(unique(trades$TraderName))))
 
