@@ -109,7 +109,9 @@ test_that(paste("Can Process() on", tested.class), {
 
   object <- new(tested.class)
 
-  valid.key_values <- dated_twelve_monthly_lookback(101, today())
+  #valid.key_values <- dated_twelve_monthly_lookback(101, today())
+  valid.key_values <- dated_this_year(101L, today())
+
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 
   object <- dataRequest(object, valid.key_values)
