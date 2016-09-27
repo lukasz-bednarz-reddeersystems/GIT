@@ -110,7 +110,6 @@ setMethod("dataRequest",
                     key_values = "data.frame"),
           function(object, key_values, force=FALSE, replace = FALSE){
 
-            key <- key_values
             analysis <- getAnalysisClass(object)
             key_with_class <- cbind(data.frame(analysis_class = analysis), key_values)
             colnames(key_with_class) <- getDataSourceQueryKeyColumnNames(object)
@@ -119,8 +118,17 @@ setMethod("dataRequest",
             store_id <- get_analysis_objectstore_name(key_with_class,trader_col=colnames(key_with_class)[2])
 
             analysis_store <- analysis_objectstore_factory(store_id)
-            kh <- as.character(murmur3.32(as.character(key_values)))
+            kh <- hash_data_frame(key_values, algo = "murmur32")
+
             analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
+
+            # there is a bug in a way that kh is generated leading to non-unique hashes as
+            # applying as.character to data.frame will map
+            if (is.null(analysis_block)) {
+              kh <- as.character(murmur3.32(as.character(key_values)))
+              analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
+              kh <- hash_data_frame(key_values, algo = "murmur32")
+            }
 
             analysis_key <- key_with_class[setdiff(colnames(key_with_class), "analysis_class")]
             objstr_key <- data.frame(key_hash = kh, analysis_module = getAnalysisClass(object))

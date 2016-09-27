@@ -43,7 +43,7 @@ setMethod("hashKey",
           signature(object = "VirtualPPModelQuery",
                     key    = "data.frame"),
           function(object,key){
-            hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
+            hash <- hash_data_frame(key[object@fields[2:5]], algo = "murmur32")
             hashedkey <- cbind(data.frame(hash=hash),key)
             return(hashedkey)
           }
@@ -76,12 +76,21 @@ setMethod("isPPModelStored",
           signature(object = "VirtualPPModelQuery",
                     key    = "data.frame"),
           function(object,key){
-            hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
+
             if(length(object@known_keys)==0){
               rval <- FALSE
             }
             else{
+              hash <- hash_data_frame(key[object@fields[2:5]], algo = "murmur32")
+
               rval <- hash%in%object@known_keys[['hash']]
+
+              # this is to account for old way of hashing that had issues
+              if (!rval) {
+                hash <- murmur3.32(paste(key[object@fields[2:5]],sep=""))
+                rval <- hash%in%object@known_keys[['hash']]
+              }
+
             }
             return(rval)
           }

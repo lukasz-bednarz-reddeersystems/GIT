@@ -33,6 +33,13 @@ setClass(
 setGeneric("hashKey",function(object,key){standardGeneric("hashKey")})
 
 
+setGeneric("getKnownKeys",function(object,key){standardGeneric("getKnownKeys")})
+setMethod("getKnownKeys","ObjectQuery",
+          function(object,key){
+            return(object@known_keys)
+          }
+)
+
 
 setGeneric("getQueryKeyColumnNames",function(object,key){standardGeneric("getQueryKeyColumnNames")})
 setMethod("getQueryKeyColumnNames","ObjectQuery",
