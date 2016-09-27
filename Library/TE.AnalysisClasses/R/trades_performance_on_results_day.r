@@ -175,7 +175,7 @@ setMethod("dataRequest",
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(trade_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, stop))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 stop(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(trade_data), cond))
               })
 
@@ -307,7 +307,11 @@ setMethod("Process",
             # (less than daily volatility)
             low_trades_idx <- abs(log(trades$MidOnEntry/trades$Low)) < trades$DailyN/trades$ClosePrice
 
-            trades$Classification[low_trades_idx] <- "Near Low Trades"
+            trades_nl <- trades[low_trades_idx, ]
+
+            trades_nl$Classification <- "Near Low Trades"
+
+            trades <- rbind(trades, trades_nl)
 
             # trades where position is held on results day
             # hold_psn_idx <- !trades_idx & trades$Results & (trades$Age > 0)
@@ -315,6 +319,13 @@ setMethod("Process",
             # trades$Category[hold_psn_idx] <- "Hold Position"
 
             trades$Quarter <- quarter(trades$Date, with_year = TRUE)
+
+            # remove quarters with only sparse data
+            q_to_keep <- aggregate(Date ~ Quarter, trades, function(x){length(unique(x)) > 1})
+            q_to_keep <- q_to_keep$Quarter[q_to_keep$Date]
+
+            trades <- trades[trades$Quarter %in% q_to_keep,]
+
 
             output_obj <- getOutputObject(object)
             output_obj <- setReferenceData(output_obj, trades)
@@ -331,6 +342,8 @@ setMethod("Process",
             colnames(trades_hit_rate)[colnames(trades_hit_rate)=='Hit1D'] <-'TodayPL'
             trades_hit_rate$Quantity <- "Hit Rate %"
 
+
+
             trades_sum <- aggregate(TodayPL~ Quarter + Category + TraderID + Classification + Long,
                                    data = trades, sum)
             trades_sum$Quantity <- "Total PnL ($)"
@@ -339,6 +352,20 @@ setMethod("Process",
 
             trades_ON$Direction[trades_ON$Long] <- "Long"
             trades_ON$Direction[!trades_ON$Long] <- "Short"
+
+            trades_ON$Long <- NULL
+
+
+            panel <- expand.grid(Quarter        = unique(trades_ON$Quarter),
+                                 Category       = unique(trades_ON$Category),
+                                 TraderID       = unique(trades_ON$TraderID),
+                                 Classification = unique(trades_ON$Classification),
+                                 Quantity       = unique(trades_ON$Quantity),
+                                 Direction      = unique(trades_ON$Direction))
+
+            trades_ON <- merge(trades_ON, panel, all.y = TRUE)
+
+            trades_ON[is.na(trades_ON)] <- 0
 
             trades_pl <- ggplot(data=trades_ON, aes_string(x="as.character(Quarter)",
                                                            fill="paste(Category , Direction)"
@@ -356,7 +383,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, trades_ON)
             object <- .setOutputGGPlot(object, trades_pl)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL", "Long")))
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TodayPL")))
 
 
             return(object)
