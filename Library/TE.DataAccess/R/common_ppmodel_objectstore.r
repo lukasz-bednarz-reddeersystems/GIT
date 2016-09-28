@@ -271,7 +271,7 @@ setGeneric("queryPPModelStore",function(object,key){standardGeneric("queryPPMode
 setMethod("queryPPModelStore","PPModelObjectStore",
           function(object,key){
             query <- getObjectStoreQuery(object)
-            if(isPPModelStored(object@query,key)){
+            if(isPPModelStored(query,key)){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in ppmodel store."))
               query <- setPPModelQuery(query,key)
               object <- .setObjectStoreQuery(object, query)

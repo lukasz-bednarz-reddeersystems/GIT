@@ -388,7 +388,7 @@ setMethod("saveObjectInRemoteStore",
             table  <- .getObjectQueryTableName(query)
 
             message(paste("Object store saving to path:",pth))
-            rsp    <- store_file_in_referenced_filetable(pth, table, db, schema)
+            rsp    <- store_file_in_referenced_filetable(pth, table, db, schema, overwrite = TRUE)
 
             if (rsp != 0) {
               message(sprintf("Object hasn't been saved in remote path: %s, code : %s",

@@ -319,6 +319,10 @@ get_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
 
   keys <- keys[c("analysis_class", trader_col, "start", "end")]
 
+  keys <- cbind(unique(keys[setdiff(colnames(keys), c("start", "end"))]),
+                data.frame(start = min(keys$start), end = max(keys$end)))
+
+
   rv <- apply(keys, 1, function(x){paste0(c("analysis", unlist(x)), collapse = "_")})
   return(rv)
 }
