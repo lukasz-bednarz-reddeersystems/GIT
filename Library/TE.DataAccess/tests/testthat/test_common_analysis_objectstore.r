@@ -9,7 +9,7 @@ tested.class <- "AnalysisObjectStore"
 
 valid.key  <- data.frame(analysis_class = "AverageDownTradesFocusAnalysisBlock",
                          id             = as.character(11),
-                         start          = as.Date("2016-05-31"),
+                         start          = as.Date("2015-08-31"),
                          end            = as.Date("2016-08-31"))
 
 valid.name <- get_analysis_objectstore_name(valid.key, "id")

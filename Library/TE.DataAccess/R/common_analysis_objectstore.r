@@ -349,6 +349,20 @@ analysis_objectstore_factory <- function(name){
   message("Initialising analysis store ...")
   anstr <- new("AnalysisObjectStore",id=name)
   pth <- getPath(anstr)
+
+  key <- key_from_analysis_objectstore_name(basename(pth))
+
+  if (!file.exists(pth)) {
+    message(sprintf("File initially not found in local path %s. Checking remote store",pth))
+
+    query <- getObjectStoreQuery(anstr)
+    is_known <- isKeyKnownInRemoteStore(query, key)
+
+    if (is_known) {
+      anstr <- updateLocalStoreFile(anstr,key)
+    }
+  }
+
   if(file.exists(pth)){
     message(paste("Found analysis store at",pth))
     anstr <- initialiseAnalysisStore(anstr)
@@ -519,7 +533,7 @@ update_analysis_remote_storage <- function(){
 
       new_name <- get_analysis_objectstore_name(new_key, trader_col = "id")
 
-      new_anstr <- analysis_objectstore_factory(new_name, id = new_name)
+      new_anstr <- analysis_objectstore_factory(new_name)
 
       new_anstr <- tryCatch({
         updateAnalysisStore(new_anstr, analysis_block, new_key, TRUE)

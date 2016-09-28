@@ -59,12 +59,13 @@ test_that("Can check for keys in remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
+  object <- warehouse_objectstore_factory(valid.name)
   local.key <- TE.DataAccess:::generateKey(object,
                                             valid.key$id,
                                             valid.key$start,
                                             valid.key$end)
 
-  object <- warehouse_objectstore_factory(valid.name)
+
 
   expect_is(object, tested.class)
 
@@ -98,12 +99,13 @@ test_that("Can load warehouse from remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
+  object <- new(tested.class, valid.name)
+
   local.key <- TE.DataAccess:::generateKey(object,
                                            valid.key$id,
                                            valid.key$start,
                                            valid.key$end)
 
-  object <- new(tested.class, valid.name)
   expect_is(object, tested.class)
 
   query <- getObjectStoreQuery(object)
