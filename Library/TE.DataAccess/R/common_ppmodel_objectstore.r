@@ -150,7 +150,7 @@ setMethod("initialize", "RemotePPModelQuery",
 #'
 #' Inherits from "VirtualObjectStore"
 #'
-#' @slot warehouse_q      "PPModelQuery"
+#' @slot objectstore_q      "PPModelQuery"
 #' @slot qry_store_nme    "character",
 #'
 #' @export
@@ -270,10 +270,12 @@ setGeneric("queryPPModelStore",function(object,key){standardGeneric("queryPPMode
 
 setMethod("queryPPModelStore","PPModelObjectStore",
           function(object,key){
-            if(isPPModelStored(object@warehouse_q,key)){
+            query <- getObjectStoreQuery(object)
+            if(isPPModelStored(object@query,key)){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in ppmodel store."))
-              object@warehouse_q <- setPPModelQuery(object@warehouse_q,key)
-              name <- getIdentifier(object@warehouse_q)
+              query <- setPPModelQuery(query,key)
+              object <- .setObjectStoreQuery(object, query)
+              name <- getIdentifier(query)
               rval <- getFromObjectStore(object,name)
             }
             else{
@@ -311,17 +313,21 @@ setGeneric("updatePPModelStore",function(object,ppmodel_object,key,force=FALSE){
 
 setMethod("updatePPModelStore","PPModelObjectStore",
           function(object,ppmodel_object,key,force=FALSE){
-            if(isPPModelStored(object@warehouse_q,key) && !force){
+            query <- getObjectStoreQuery(object)
+            if(isPPModelStored(query,key) && !force){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in ppmodel store."))
               message("No update made.")
             }
             else{
               if(force)message("Force update flag set, data will be overwritten ...")
               message(paste("Updating ppmodel store for key",paste(unlist(Map(as.character,key)),collapse=", "),collapse=", "))
-              object@warehouse_q <- setPPModelQuery(object@warehouse_q,key)
-              object@warehouse_q <- updateStoredPPModelKeys(object@warehouse_q,key)
-              object <- placeInObjectStore(object,object@warehouse_q,object@qry_store_nme)
-              object <- placeInObjectStore(object,ppmodel_object,getIdentifier(object@warehouse_q))
+              query <- setPPModelQuery(query,key)
+              query <- updateStoredPPModelKeys(query,key)
+
+              object <- .setObjectStoreQuery(object, query)
+
+              object <- placeInObjectStore(object,query,object@qry_store_nme)
+              object <- placeInObjectStore(object,ppmodel_object,getIdentifier(query))
             }
             return(object)
           }
@@ -373,11 +379,13 @@ setMethod("getPPModelStoreContents","PPModelObjectStore",
 ppmodel_objectstore_factory <- function(name){
   message("Initialising ppmodel store ...")
   ppmstr <- new("PPModelObjectStore",id=name)
+
   pth <- getPath(ppmstr)
+  key <- key_from_ppmodel_objectstore_name(basename(pth))
 
   if (!file.exists(pth)) {
     message(sprintf("File initially not found in local path %s. Checking remote store",pth))
-    key <- key_from_ppmodel_objectstore_name(basename(pth))
+
     query <- getObjectStoreQuery(ppmstr)
     is_known <- isKeyKnownInRemoteStore(query, key)
 
@@ -390,6 +398,7 @@ ppmodel_objectstore_factory <- function(name){
     message(paste("Found ppmodel store at",pth))
     ppmstr <- initialisePPModelStore(ppmstr)
   }
+
   else{
     message(paste("No previous store data found at",pth,"new store created."))
   }
@@ -401,7 +410,6 @@ ppmodel_objectstore_factory <- function(name){
 #' copies all locally stored ppmodels to remote store and updates keys
 #'
 #' @return \code{count} number of warehouses copied
-#' @export
 
 update_ppmodel_remote_storage <- function(){
   message("Generating list of existing stores...")
@@ -422,14 +430,36 @@ update_ppmodel_remote_storage <- function(){
 
   wh_str.files <- rds.files[sapply(rds.files, wh.cond.fn)]
 
+  count <- 0
   for (name in wh_str.files) {
+
     name <- gsub("_objectstore.rds", "", name)
 
     whstr <- ppmodel_objectstore_factory(name)
-    whstr <- saveObjectInRemoteStore(whstr)
+
+    stored_name <- setdiff(getNamesFromStore(whstr), whstr@qry_store_nme)
+
+    stored_name <- grep(gsub("ppmodel_store_", "", name), stored_name, value = TRUE)
+
+    item <- tryCatch({
+      getFromObjectStore(whstr, stored_name)
+    }, error = function(cond) {
+
+     browser()
+    })
+
+    new_whstr <- new("PPModelObjectStore", id = name)
+
+    key <- key_from_ppmodel_objectstore_name(name)
+
+    new_whstr <- updatePPModelStore(new_whstr, item, key, TRUE)
+
+    saveObject(new_whstr)
+
+    count <- count + 1
 
   }
 
 
-  return(whstr)
+  return(count)
 }

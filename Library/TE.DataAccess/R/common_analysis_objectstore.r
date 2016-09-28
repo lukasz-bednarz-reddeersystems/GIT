@@ -519,7 +519,7 @@ update_analysis_remote_storage <- function(){
 
       new_name <- get_analysis_objectstore_name(new_key, trader_col = "id")
 
-      new_anstr <- analysis_objectstore_factory(new_name)
+      new_anstr <- analysis_objectstore_factory(new_name, id = new_name)
 
       new_anstr <- tryCatch({
         updateAnalysisStore(new_anstr, analysis_block, new_key, TRUE)

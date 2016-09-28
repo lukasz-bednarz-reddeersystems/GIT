@@ -14,7 +14,7 @@ Inherits from "VirtualObjectStore"
 \section{Slots}{
 
 \describe{
-\item{\code{warehouse_q}}{"PPModelQuery"}
+\item{\code{objectstore_q}}{"PPModelQuery"}
 
 \item{\code{qry_store_nme}}{"character",}
 }}

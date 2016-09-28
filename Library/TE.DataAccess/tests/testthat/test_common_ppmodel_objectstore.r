@@ -25,7 +25,7 @@ test_that("Can move local objectstore files to Blob Objectstore", {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   skip_if_not(FALSE)
 
-  object <- update_ppmodel_remote_storage()
+  object <- TE.DataAccess:::update_ppmodel_remote_storage()
 
 })
 
