@@ -1,16 +1,16 @@
 Package: TE.RefClasses
 Type: Package
 Title: Reference Classes for RedDeer Trading Enhancement Engine
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing Reference Classes for handling,
     of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RiskModel (>= 0.1.0),
-    TE.DataAccess (>= 0.1.0),
-    TE.SQLQuery (>= 0.1.0),
+    TE.RiskModel (>= 0.1.1),
+    TE.DataAccess (>= 0.1.1),
+    TE.SQLQuery (>= 0.1.1),
 License: file LICENSE
 LazyData: TRUE
 Imports:
