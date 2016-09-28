@@ -9,7 +9,7 @@
 #' @import TE.SQLQuery
 #' @import lubridate
 #' @import methods
-#' @imprt XML
+#' @import XML
 #' @importFrom R.utils copyFile
 #' @importFrom hash hash values names.hash keys
 #' @importFrom digest digest
