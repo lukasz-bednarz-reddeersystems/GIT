@@ -377,3 +377,42 @@ setClass(
   contains = c("VirtualAnalysisObjectstoreClient")
 )
 
+#' Clas wrapping access to MarketStyleFactorStatisticAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for MarketStyleFactorStatisticAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "MarketStyleFactorStatisticAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "MarketStyleFactorStatisticAnalysisBlock"
+
+  ),
+  contains = c("VirtualAnalysisObjectstoreClient")
+)
+
+#' Clas wrapping access to MarketStyleFactorStatisticAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for MarketStyleFactorStatisticAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "TradesPnLOutOfOnResultsDayAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "TradesPnLOutOfOnResultsDayAnalysisBlock"
+
+  ),
+  contains = c("VirtualAnalysisObjectstoreClient")
+)
+
+
+
+

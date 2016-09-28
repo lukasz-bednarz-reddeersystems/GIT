@@ -13,5 +13,7 @@ R/scripts/**
 **/*.RDS
 **/*.pdf
 **/*.bak
+**/*.tar.gz
+**/*.RData*
 .Rproj.user
 /Library/*.Rcheck
