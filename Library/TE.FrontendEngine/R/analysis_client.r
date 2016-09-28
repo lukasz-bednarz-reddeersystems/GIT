@@ -112,33 +112,36 @@ setMethod("dataRequest",
 
             analysis <- getAnalysisClass(object)
             key_with_class <- cbind(data.frame(analysis_class = analysis), key_values)
+
             colnames(key_with_class) <- getDataSourceQueryKeyColumnNames(object)
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_with_class)
 
             store_id <- get_analysis_objectstore_name(key_with_class,trader_col=colnames(key_with_class)[2])
 
             analysis_store <- analysis_objectstore_factory(store_id)
-            kh <- hash_data_frame(key_values, algo = "murmur32")
 
-            analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
+            store_key <- TE.DataAccess:::key_from_analysis_objectstore_name(store_id)
+
+            analysis_block <- queryAnalysisStore(analysis_store,store_key)
 
             # there is a bug in a way that kh is generated leading to non-unique hashes as
             # applying as.character to data.frame will map
             if (is.null(analysis_block)) {
               kh <- as.character(murmur3.32(as.character(key_values)))
-              analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_module=object@analysis_class))
+              analysis_block <- queryAnalysisStore(analysis_store,data.frame(key_hash=kh,analysis_class=object@analysis_class))
               kh <- hash_data_frame(key_values, algo = "murmur32")
             }
 
-            analysis_key <- key_with_class[setdiff(colnames(key_with_class), "analysis_class")]
-            objstr_key <- data.frame(key_hash = kh, analysis_module = getAnalysisClass(object))
+
 
             if (is.null(analysis_block) || replace) {
               if(force || replace){
+                analysis_key <- key_with_class[setdiff(colnames(key_with_class), "analysis_class")]
+
                 analysis_block <- new(analysis)
                 analysis_block <- dataRequest(analysis_block,analysis_key)
                 analysis_block <- Process(analysis_block)
-                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,objstr_key, TRUE)
+                analysis_store <- updateAnalysisStore(analysis_store,analysis_block,store_key, TRUE)
                 analysis_store <- commitAnalysisStore(analysis_store)
                 query_data     <- getOutputGGPlotData(analysis_block)
                 object <- .setAnalysisBlock(object, analysis_block)
