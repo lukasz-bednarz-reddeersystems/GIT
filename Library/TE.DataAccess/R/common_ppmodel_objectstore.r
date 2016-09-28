@@ -219,19 +219,19 @@ setMethod(".generateKeyFromID",
 )
 
 
-#' #' Initialize method for "PPModelObjectStore" class
-#' #'
-#' #' @param .Object, object of class "PPModelObjectStore"
-#' #' @param id id to set when initializing
-#' #' @return \code{.Object} object of class "PPModelObjectStore"
-#'
-#'
-#' setMethod("initialize", "PPModelObjectStore",
-#'           function(.Object,id){
-#'             .Object@id <- id
-#'             .Object
-#'           }
-#' )
+# #' Initialize method for "PPModelObjectStore" class
+# #'
+# #' @param .Object, object of class "PPModelObjectStore"
+# #' @param id id to set when initializing
+# #' @return \code{.Object} object of class "PPModelObjectStore"
+#
+#
+# setMethod("initialize", "PPModelObjectStore",
+#           function(.Object,id){
+#             .Object@id <- id
+#             .Object
+#           }
+# )
 
 setGeneric("initialisePPModelStore",function(object){standardGeneric("initialisePPModelStore")})
 setMethod("initialisePPModelStore","PPModelObjectStore",
@@ -378,6 +378,7 @@ ppmodel_objectstore_factory <- function(name){
   if (!file.exists(pth)) {
     message(sprintf("File initially not found in local path %s. Checking remote store",pth))
     key <- key_from_ppmodel_objectstore_name(basename(pth))
+    query <- getObjectStoreQuery(ppmstr)
     is_known <- isKeyKnownInRemoteStore(query, key)
 
     if (is_known) {

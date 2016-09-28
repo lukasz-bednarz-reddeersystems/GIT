@@ -1,10 +1,10 @@
-#' @include datastore.r global_configs.r objectstore.r
+#' @include datastore.r global_configs.r remote_objectstore.r
 NULL
 
 setClass(
   Class          = "VirtualAnalysisQuery",
   prototype = prototype(
-    fields       = c('hash','model_class','id','start', 'end')
+    fields       = c('hash','analysis_class','id','start', 'end')
   ), contains = c("ObjectQuery")
 )
 
@@ -218,7 +218,7 @@ setMethod("queryAnalysisStore",
               query <- setAnalysisQuery(query,key)
               object <- .setObjectStoreQuery(object, query)
 
-              name <- getIdentifier(object@warehouse_q)
+              name <- getIdentifier(query)
               rval <- getFromObjectStore(object,name)
             }
             else{
@@ -254,17 +254,24 @@ setMethod("updateAnalysisStore",
                     key = "data.frame",
                     force = "logical"),
           function(object,analysis_object,key,force=FALSE){
-            if(isAnalysisStored(object@warehouse_q,key) && !force){
+
+            query <- getObjectStoreQuery(object)
+
+            if(isAnalysisStored(query,key) && !force){
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in analysis store."))
               message("No update made.")
             }
             else{
               if(force)message("Force update flag set, data will be overwritten ...")
               message(paste("Updating analysis store for key",paste(unlist(Map(as.character,key)),collapse=", "),collapse=", "))
-              object@warehouse_q <- setAnalysisQuery(object@warehouse_q,key)
-              object@warehouse_q <- updateStoredAnalysisKeys(object@warehouse_q,key)
-              object <- placeInObjectStore(object,object@warehouse_q,object@qry_store_nme)
-              object <- placeInObjectStore(object,analysis_object,getIdentifier(object@warehouse_q))
+
+              query <- setAnalysisQuery(query,key)
+              query <- updateStoredAnalysisKeys(query,key)
+
+              object <- .setObjectStoreQuery(object, query)
+
+              object <- placeInObjectStore(object, query, object@qry_store_nme)
+              object <- placeInObjectStore(object, analysis_object, getIdentifier(query))
             }
             return(object)
           }
@@ -352,15 +359,18 @@ analysis_objectstore_factory <- function(name){
   return(anstr)
 }
 
+
+
 revert_hash <- function(hash, values, hash_function) {
 
+  browser()
   hashed_values <- sapply(values, hash_function)
 
   if (hash %in% hashed_values){
 
     idx <- which(hashed_values == hash)
 
-    ret <- values[[idx]]
+    ret <- values[idx]
   }
   else {
     ret <- NULL
@@ -369,6 +379,23 @@ revert_hash <- function(hash, values, hash_function) {
   return(ret)
 
 }
+
+
+#' helper function to generate key from objectstore name
+#'
+#' @param name "character" name of the objectstore
+#' @return \code{key} "data.frame" with columns "id", "start", "end"
+key_from_analysis_objectstore_name <- function(name) {
+
+  str_keys <- strsplit(name, "_")
+
+  key <- data.frame(analysis_class = str_keys[[1]][2],
+                    id          = str_keys[[1]][3],
+                    start       = as.Date(str_keys[[1]][4]),
+                    end         = as.Date(str_keys[[1]][5]))
+  return(key)
+}
+
 
 #' helper function to generate key from objectstore name
 #'
@@ -384,6 +411,10 @@ key_from_hashed_ppmodel_objectstore_name <- function(name) {
 
   # possible guess for reverting analysis store hash
   dates <- range_years_lookback(11, today() - 3650, today())[c("start", "end")]
+
+  dates <- expand.grid(start = dates$start, end = dates$end)
+
+  dates <- dates[dates$start <= dates$end,]
 
   keys_list <- split(dates,seq(nrow(dates)), list)
 
@@ -417,41 +448,95 @@ update_analysis_remote_storage <- function(){
   wh.cond.fn <- function(x){
     name.el <- strsplit(x, "_")[[1]]
     if (length(name.el) != 4) return(FALSE)
-    if (!grepl("^[0-9]+$", name.el[1], perl = TRUE)) return(FALSE)
-    dates <- tryCatch({ as.Date(name.el[2:3])})
-    if (!is.Date(dates)) return(FALSE)
     return(TRUE)
   }
 
   wh_str.files <- rds.files[sapply(rds.files, wh.cond.fn)]
 
+  ret <- 0
+
+
+
   for (name in wh_str.files) {
     name <- gsub("_objectstore.rds", "", name)
 
-    anstr <- warehouse_objectstore_factory(name)
+    anstr <- analysis_objectstore_factory(name)
 
-    query <- getObjectStoreQuery(anstr)
+    stored_names <- getNamesFromStore(anstr)
 
-    store_key <- key_from_hashed_ppmodel_objectstore_name(name)
 
-    known_keys <- getKnownKeys(query)
+    for (stored_name in setdiff(stored_names, anstr@qry_store_nme)) {
 
-    for (analysis in known_keys$analysis_module) {
+      analysis_block <- getFromObjectStore(anstr, stored_name)
+
+      analysis <- class(analysis_block)
+
+
+      key_values <- tryCatch({
+        analysis_block@key_values
+      }, error = function(cond){
+        browser()
+      })
+
+
+      if(!is.null(key_values) && nrow(key_values) > 0 && ncol(key_values) > 0){
+        analysis_key <- key_values
+        break()
+      }
+
+    }
+
+    for (stored_name in setdiff(stored_names, anstr@qry_store_nme)) {
+
+      analysis_block <- getFromObjectStore(anstr, stored_name)
+
+      analysis <- class(analysis_block)
+
+      key_values <- tryCatch({
+        analysis_block@key_values
+      }, error = function(cond){
+        browser()
+      })
+
+      if(!is.null(key_values) && nrow(key_values) > 0 && ncol(key_values) > 0){
+        analysis_key <- key_values
+      }
+
+      if(ncol(analysis_key) > 2){
+        id = unique(analysis_key[,1])
+      }
+      else {
+        id <- class(analysis_block@risk_model)
+        analysis_key <- cbind(data.frame(RiskModelName = id), analysis_key)
+        analysis_block@key_values <- analysis_key
+      }
+
+      store_key <- data.frame(id = unique(analysis_key[,1]),
+                              start = min(analysis_key$start),
+                              end   = max(analysis_key$end))
 
       new_key <- cbind(data.frame(analysis_class = analysis), store_key)
 
       new_name <- get_analysis_objectstore_name(new_key, trader_col = "id")
 
-      new_anstr <- analysis_objectstore_factory
+      new_anstr <- analysis_objectstore_factory(new_name)
 
-
+      new_anstr <- tryCatch({
+        updateAnalysisStore(new_anstr, analysis_block, new_key, TRUE)
+      }, error = function(cond){
+        browser()
+        message(sprintf("Error when storing block %s, for keys %s",
+                        analysis, store_key))
+      })
 
       new_anstr <- saveObject(new_anstr)
+
+      ret <- ret + 1
     }
 
 
   }
 
 
-  return(whstr)
+  return(ret)
 }

@@ -7,12 +7,12 @@ context("Test Analysis Objectstore")
 #############################
 tested.class <- "AnalysisObjectStore"
 
-valid.key  <- data.frame(model_class = "TradeHistorySimpleWithSummary",
-                         id          = 11L,
-                         start       = as.Date("2016-03-29"),
-                         end         = as.Date("2016-04-01"))
+valid.key  <- data.frame(analysis_class = "AverageDownTradesFocusAnalysisBlock",
+                         id             = as.character(11),
+                         start          = as.Date("2016-05-31"),
+                         end            = as.Date("2016-08-31"))
 
-valid.name <- get_analysis_objectstore_name(valid.key)
+valid.name <- get_analysis_objectstore_name(valid.key, "id")
 valid.key2  <- TE.DataAccess:::key_from_analysis_objectstore_name(valid.name)
 
 test_that("Key generators are working properly", {
