@@ -150,6 +150,7 @@ setMethod("Process",
 
             output_obj <- setReferenceData(output_obj, extended_return)
             object <- .setOutputObject(object, output_obj)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Return", "Value")))
 
 
             return(object)

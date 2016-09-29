@@ -34,9 +34,20 @@ setClass(
 #' open socket connection
 #'
 #' @param object object of class 'ProcessSocket'.
-#' @return \code{object} object of class 'ProcessSocket'.
+#'
+#' @export
 
 setGeneric("openConnection",function(object){standardGeneric("openConnection")})
+
+
+#' @describeIn openConnection
+#' open socket connection
+#'
+#' @inheritParams openConnection
+#' @return \code{object} object of class 'ProcessSocket'.
+#'
+#' @export
+
 setMethod("openConnection","ProcessSocket",
           function(object){
             if(object@server){
@@ -134,10 +145,19 @@ setMethod("writeToConnection","ProcessSocket",
 #' \code{readConnection(object)}
 #'
 #' @param object object of class 'ProcessSocket'.
+#' @export
+setGeneric("getDataFromSocket",function(object){standardGeneric("getDataFromSocket")})
+
+#' @describeIn getDataFromSocket
+#' Get data read from socket
+#'
+#' Retrieve data previously read from socket using
+#' \code{readConnection(object)}
+#'
+#' @inheritParams getDataFromSocket
 #' @return \code{data} character, data read from socket..
 #' @export
-
-setMethod("getData","ProcessSocket",
+setMethod("getDataFromSocket","ProcessSocket",
           function(object){
             return(object@data)
           }

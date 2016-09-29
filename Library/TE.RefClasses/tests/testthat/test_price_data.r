@@ -8,12 +8,15 @@ context("Testing PriceData")
 
 tested.class          <-  "PriceData"
 valid.key_cols        <- c("InstrumentID", "Date")
-valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                           ,"dblHigh","dblLow","dblPreviousClosePrice",
                            "dblVolume", "lOutstandingShares","dbl30DayAvgVol" )
 valid.required_colnms <- c('InstrumentID','Date','ClosePrice')
-valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblPreviousClosePrice",
+valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
+                                ,"dblHigh","dblLow","dblPreviousClosePrice",
                                 "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-                              c('InstrumentID','Date','ClosePrice',"PreviousClosePrice",
+                              c('InstrumentID','Date','ClosePrice',"OpenPrice"
+                                ,"High","Low","PreviousClosePrice",
                                 "Volume", "OutstandingShares","AvgVol30Day"))
 init.key_values       <-  data.frame(InstrumentID = integer(),
                                      Date = as.Date(character()))
@@ -162,15 +165,16 @@ test_that("Can dataRequest() with valid key_values", {
   values <- getDataSourceReturnColumnNames(object)
 
   # create valid return data.frame
-  proc_name      <- TE.RefClasses:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
-  proc_args       <- TE.RefClasses:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
-  query_string   <- TE.RefClasses:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
-  valid.ret_data <- TE.RefClasses:::execute_sql_query(query_string)
-  valid.ret_data <- TE.RefClasses:::convert_column_class(valid.ret_data)
+  query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
+  valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string)
+  valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
   valid.ret_data <- valid.ret_data[values]
   colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]
+  valid.ret_data           <- arrange(valid.ret_data, Date, InstrumentID)
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
 
   object <- dataRequest(object, valid.key_vals)
@@ -179,6 +183,9 @@ test_that("Can dataRequest() with valid key_values", {
   expect_equivalent(getDataSourceQueryKeyValues(object), valid.key_vals)
 
   ret_data <- getReferenceData(object)
+
+  ret_data <- arrange(ret_data, Date, InstrumentID)
+  rownames(ret_data) <- seq(nrow(ret_data))
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
 

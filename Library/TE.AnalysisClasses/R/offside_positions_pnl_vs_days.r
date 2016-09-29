@@ -126,7 +126,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, pl_bucket_plt)
             object <- .setOutputGGPlot(object, bucket_off_pl)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PL")))
 
             return(object)
           }

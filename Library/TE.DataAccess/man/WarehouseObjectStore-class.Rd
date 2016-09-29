@@ -12,6 +12,6 @@ Inherits from "VirtualObjectStore"
 \describe{
 \item{\code{key_map}}{"KeyMap"}
 
-\item{\code{warehouse_q}}{"WarehouseQuery"}
+\item{\code{objectstore_q}}{"WarehouseQuery"}
 }}
 

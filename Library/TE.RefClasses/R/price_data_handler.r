@@ -74,6 +74,7 @@ setGeneric("setPriceDataObject", function(object,price_data){standardGeneric("se
 #'
 #' Private method to set price_data slot with "VirtualPriceData"
 #'
+#' @rdname private_setPriceDataObject
 #' @param object object of class "VirtualPriceDataHandler"
 #' @param price_data object of class "VirtualPriceData"
 #' @return \code{object} object of class "VirtualPriceDataHandler"

@@ -59,6 +59,7 @@ setMethod("isComputed",
 
 #' Set value of computation status
 #'
+#' @rdname private_setIsComputed
 #' @param object object of class 'VirtualBaseTransformation'.
 #' @param state logical value to set.
 #' @return \code{object} object of class 'VirtualBaseTransformation'
@@ -237,6 +238,7 @@ setMethod("getInputData",
 #'
 #' Private method to set internal output datastore to new data
 #'
+#' @rdname private_setOutputData
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @param data data to store in.
 #' @return \code{object} object of class 'VirtualTransformationComputation'
@@ -470,6 +472,7 @@ setMethod("getComputation",
 #'
 #' Private method to set computation object encapsulated in Transformation .
 #'
+#' @rdname private_setComputation
 #' @param object object of class 'VirtualTransformationComputation'.
 #' @param computation object of type VirtualTransformationComputation
 #' @return \code{compute} function used for computation of specific transformation

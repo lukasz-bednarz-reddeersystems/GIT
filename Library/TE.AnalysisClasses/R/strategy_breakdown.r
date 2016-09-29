@@ -169,7 +169,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, strategy_data)
 
             object <- .setOutputGGPlot(object, plt_strat)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Quarter", "Value")))
 
 
             return(object)

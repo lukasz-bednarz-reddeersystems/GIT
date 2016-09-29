@@ -20,7 +20,7 @@ NULL
 setClass(
   Class             = "PortfolioFactorExposuresData",
   prototype         = list(
-    required_colnms = c("Date", portfolio_decomposition_all_factors)
+    required_colnms = c("Date")
   ),
   contains          = c("VirtualImpliedFactorReturnsData")
 )
@@ -39,7 +39,7 @@ setClass(
 setClass(
   Class             = "PortfolioFactorExposuresAnalysisBlock",
   slots             = c(
-    portfolio              = "StrategyPortfolio",
+    portfolio              = "Portfolio",
     instrument_betas       = "InstrumentBetasData",
     output                 = "PortfolioFactorExposuresData"
   ),
@@ -51,7 +51,7 @@ setClass(
     column_name_map = hash(c("TraderID", "start", "end"),
                            c("id", "start", "end")),
     portfolio       = new("StrategyPortfolio"),
-    risk_model      = new("RiskModel.DevelopedEuropePrototype150"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
     instrument_betas = new("InstrumentBetasData"),
     output          = new("PortfolioFactorExposuresData")
   ),
@@ -78,7 +78,14 @@ setMethod("setRiskModelObject",
           signature(object = "PortfolioFactorExposuresAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
-            object <- TE.RefClasses:::.setRiskModelObject(object, risk_model)
+            object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
+            req_factors <- getRiskModelFactorNames(risk_model)
+            output_obj <- getOutputObject(object)
+
+            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
+                                                                     c("Date",
+                                                                        req_factors))
+            object <- .setOutputObject(object, output_obj)
             return(object)
           }
 )
@@ -133,7 +140,7 @@ setMethod("dataRequest",
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
-            trader <- unique(key_values$TraderID)[1]
+            id <- unique(key_values[,1])[1]
             start <- min(key_values$start)
             end <- max(key_values$end)
 
@@ -147,7 +154,7 @@ setMethod("dataRequest",
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(portf_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, end))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(portf_data), cond))
               })
 
@@ -161,17 +168,18 @@ setMethod("dataRequest",
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
             risk_model <- getRiskModelObject(object)
+            # important step to copy risk_model info
+            betas_data <- setRiskModelObject(betas_data, risk_model)
 
             if (getStoredNRows(betas_data) == 0) {
-              # important step to copy risk_model info
-              betas_data <- TE.RefClasses:::.setRiskModelObject(betas_data, risk_model)
+
 
               betas_data <- tryCatch({
                 dataRequest(betas_data, query_keys)
 
               },error = function(cond){
                 message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
-                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, end))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(betas_data), cond))
               })
 
@@ -195,6 +203,16 @@ setMethod("Process",
           function(object){
 
             # retrieve data
+            risk_model <- getRiskModelObject(object)
+            all_factors <- getRiskModelFactorNames(object)
+
+            market_factors    <- getRiskModelMarketFactorNames(risk_model)
+            currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
+            commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
+            sector_factors    <- getRiskModelSectorFactorNames(risk_model)
+
+            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
+
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
 
@@ -217,10 +235,10 @@ setMethod("Process",
 
                 market_ret <- portfolio_factor_exposure(wt,bt)
                 total_sys_ret <- sum(market_ret)
-                factor_ret <- sum(market_ret[portfolio_decomposition_market_factors,])
-                currency_ret <- sum(market_ret[portfolio_decomposition_currency_factors,])
-                commodity_ret <- sum(market_ret[portfolio_decomposition_commodity_factors,])
-                sector_ret <- sum(market_ret[portfolio_decomposition_sector_factors,])
+                factor_ret <- sum(market_ret[market_factors,])
+                currency_ret <- sum(market_ret[currency_factors,])
+                commodity_ret <- sum(market_ret[commodity_factors,])
+                sector_ret <- sum(market_ret[sector_factors,])
 
                 rd <- data.frame(Date=rm_date,TotalSystematic=total_sys_ret[1],
                                               MarketFactor=factor_ret[1],
@@ -229,7 +247,7 @@ setMethod("Process",
                                               Sector=sector_ret[1])
                 rd.tot <- cbind(rd, as.data.frame(t(market_ret)))
 
-                plot_data <- stack(rd.tot, select = c(portfolio_decomposition_all_factors,
+                plot_data <- stack(rd.tot, select = c(all_factors,
                                                       'TotalSystematic',
                                                       'MarketFactor',
                                                       'Currency',
@@ -239,7 +257,7 @@ setMethod("Process",
 
                 colnames(plot_data) <- c("Value", "RiskType")
                 plot_data$RiskGroup <- plot_data$RiskType
-                levels(plot_data$RiskGroup) <- portfolio_decomposition_factor_groups
+                levels(plot_data$RiskGroup) <- factor_groups
                 plot_data <- data.frame(Date = rm_date, plot_data)
 
                 if(first){
@@ -259,7 +277,7 @@ setMethod("Process",
               }
             }
 
-            for( group in names(portfolio_decomposition_factor_groups)) {
+            for( group in names(factor_groups)) {
               ret_plot_data$Colour[ret_plot_data$RiskGroup == group] <- as.integer(as.factor(as.character(ret_plot_data$RiskType[ret_plot_data$RiskGroup == group] )))
             }
 
@@ -304,7 +322,57 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, ret_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Value", "Colour")))
 
+            return(object)
+          }
+)
+
+
+################################################################################
+#
+# IndexPortfolioFactorExposuresAnalysisBlock Class
+#
+# Computation block class to pull data required for portfolio factor exposure.
+###############################################################################
+
+#' Analyser for Index Portfolio risk factors exposure
+#'
+#' Computation block class to pull data required for portfolio factor exposure.
+#'
+#' Inherits from "PortfolioFactorExposuresAnalysisBlock"
+#'
+#' @export
+setClass(
+  Class             = "IndexPortfolioFactorExposuresAnalysisBlock",
+  prototype         = list(
+    key_cols        = c("IndexTicker", "start", "end"),
+    key_values      = data.frame(IndexTicker = character(),
+                                 start    = as.Date(character()),
+                                 end    = as.Date(character())),
+    column_name_map = hash(c("IndexTicker", "start", "end"),
+                           c("id", "start", "end")),
+    portfolio       = new("IndexPortfolio.BE500"),
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
+  ),
+  contains          = c("PortfolioFactorExposuresAnalysisBlock"
+  )
+)
+
+#' Set portfolio object in object slot
+#'
+#' Public method to set portfolio slot with "VirtualIndexPortfolio"
+#' class object
+#'
+#' @rdname setPortfolioDataObject-IndexPortfolioFactorExposuresAnalysisBlock-method
+#' @param object object of class "IndexPortfolioFactorExposuresAnalysisBlock"
+#' @param portfolio object of class "VirtualIndexPortfolio"
+#' @return \code{object} object of class "IndexPortfolioFactorExposuresAnalysisBlock"
+#' @export
+setMethod("setPortfolioDataObject",
+          signature(object = "IndexPortfolioFactorExposuresAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
+          function(object, portfolio){
+            object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
           }
 )

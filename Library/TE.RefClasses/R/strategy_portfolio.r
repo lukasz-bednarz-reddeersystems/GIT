@@ -53,7 +53,6 @@ setClass(
 #' Returns TraderID
 #'
 #' @param object object of class 'StrategyPortfolio'.
-#' @return \code{trader_id} integer.
 #' @export
 
 setGeneric("getTraderID", function(object){standardGeneric("getTraderID")})

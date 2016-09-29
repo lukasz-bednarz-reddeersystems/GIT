@@ -1,0 +1,6 @@
+packrat/**
+.Rhistory
+.RData
+**/*.txt
+
+

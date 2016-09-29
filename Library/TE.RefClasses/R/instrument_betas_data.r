@@ -17,11 +17,7 @@ NULL
 setClass(
   Class                = "VirtualInstrumentBetasData",
   prototype = list(
-    required_colnms = c('InstrumentID','Date',
-                        risk_model_market_factors,
-                        risk_model_currency_factors,
-                        risk_model_commodity_factors,
-                        risk_model_sector_factors)
+    required_colnms = c('Date','InstrumentID')
   ),
   contains = c("VirtualReferenceData", "VIRTUAL")
 )
@@ -42,11 +38,7 @@ setClass(
     key_cols        = c(risk_model_objectstore_keys, "InstrumentID"),
     key_values      = data.frame(Date = as.Date(character()),
                                  InstrumentID = integer()),
-    values             = c("Date", "Instrument",
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors), # columns that neeed to be returned from datastore
+    values             = c("Date", "InstrumentID"), # columns that neeed to be returned from datastore
     column_name_map = hash(c("Instrument", "InstrumentID"),
                            c("InstrumentID","Instrument"))
 

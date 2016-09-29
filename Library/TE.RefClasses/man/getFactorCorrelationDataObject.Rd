@@ -16,8 +16,6 @@ getFactorCorrelationDataObject(object)
 }
 \value{
 \code{factor_correlation} object of class "VirtualFactorCorrelationData"
-
-\code{factor_correlation} object of class "VirtualFactorCorrelationData"
 }
 \description{
 Returns factor_correlation object of class "VirtualFactorCorrelationData"

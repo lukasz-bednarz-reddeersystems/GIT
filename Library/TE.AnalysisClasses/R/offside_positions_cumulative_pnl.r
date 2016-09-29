@@ -74,6 +74,50 @@ setMethod("setPositionDataObject",
 )
 
 
+#' Request data from data source
+#'
+#' @param object object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
+#' @export
+
+setMethod("dataRequest",
+          signature(object = "OffsidePositionsCumulativePnLAnalysisBlock", key_values = "data.frame"),
+          function(object, key_values){
+
+            object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
+
+            trader <- unique(key_values$TraderID)[1]
+            start <- min(key_values$start)
+            end <- max(key_values$end)
+
+            req_key_vals <- data.frame(id = trader, start = start, end = end)
+
+            # retrieve position reference data for query key_values
+            position_data <- getPositionDataObject(object)
+
+            if (getStoredNRows(position_data) == 0) {
+
+              # using OffsidePositionsAnalysisBlock to retrieve and process input data
+              offside.pos.an <- new("OffsidePositionsAnalysisBlock")
+              offside.pos.an <- dataRequest(offside.pos.an, key_values)
+              offside.pos.an <- Process(offside.pos.an)
+              offside.pos.rd <- getOutputObject(offside.pos.an)
+
+              offside.gain.an <- new("OffsidePositionsGainVsDaysAnalysisBlock")
+
+              offside.gain.an <- setPositionDataObject(offside.gain.an, offside.pos.rd)
+
+              offside.gain.an <- Process(offside.gain.an)
+              offside.gain.rd <- getOutputObject(offside.gain.an)
+
+              object <- TE.RefClasses:::.setPositionDataObject(object, offside.gain.rd)
+            }
+
+            return(object)
+          }
+)
+
 #' Trigger computation of analysis data.
 #'
 #'
@@ -117,7 +161,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, cum_pl_plt)
             object <- .setOutputGGPlot(object, cum_pl_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PL", "Days")))
 
             return(object)
           }

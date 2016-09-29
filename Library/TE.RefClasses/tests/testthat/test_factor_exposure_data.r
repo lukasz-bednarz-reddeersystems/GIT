@@ -5,7 +5,8 @@ context("Testing FactorExposureData")
 # FactorExposureData Tests
 #
 #########################
-tested.class          <-  "FactorExposureData"
+tested.class          <- "FactorExposureData"
+valid.db_name         <- TE.RefClasses:::RISK_MODEL_DB()
 valid.key_cols        <- c("InstrumentID", "Date")
 valid.values          <- c("lInstrumentID","dtDateTime","lFactorRiskInstrumentID", "sFactorName",
                              "dblZScore", "dblValue")
@@ -161,12 +162,12 @@ test_that("Can dataRequest() with valid key_values", {
   values <- getDataSourceReturnColumnNames(object)
 
   # create valid return data.frame
-  proc_name      <- TE.RefClasses:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
-  proc_args       <- TE.RefClasses:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
-  query_string   <- TE.RefClasses:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
-  valid.ret_data <- TE.RefClasses:::execute_sql_query(query_string, "Razor")
-  valid.ret_data <- TE.RefClasses:::convert_column_class(valid.ret_data)
+  query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
+  valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string, valid.db_name, "Razor")
+  valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
   valid.ret_data <- valid.ret_data[values]
   colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]

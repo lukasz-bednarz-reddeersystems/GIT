@@ -127,6 +127,28 @@ dated_twelve_monthly_lookback <- function(trader,date){
   return(key_generator(trader,end,1,12))
 }
 
+#' Generate keys for eighteen months lookback for specific date
+#'
+#' Generate eighteen months lookback keys for user with
+#' last day of previous month with regards to date as last date
+#' and one month interval.
+#'
+#' @param trader integer, the user id
+#' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+dated_eighteen_monthly_lookback <- function(trader,date){
+  tryCatch({
+    rdate <- as.Date(date)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_eighteen_monthly_lookback module key function for date value",date,":",cond))
+  })
+  days_this_month <- as.numeric(format(rdate,'%d'))
+  end <- rdate - days_this_month
+  return(key_generator(trader,end,1,18))
+}
+
 
 #' Generate keys for three days lookback for specific date
 #'
@@ -188,16 +210,17 @@ dated_one_year_lookback <- function(trader,date){
   })
 
   end <- rdate
-  month(end) <- 12
-  day(end) <- 31
+  day(end) <- 1
+  end <- end - 1
 
-  if (end == rdate) {
-    n <- 1
-  } else {
-    n <- 2
-  }
+  # if (end == rdate) {
+  #   n <- 1
+  # } else {
+  #   n <- 2
+  # }
+  n <- 12
 
-  return(key_generator(trader,end,1,n,lookback_unit='years'))
+  return(key_generator(trader,end,1,n,lookback_unit='months'))
 }
 
 
@@ -227,7 +250,7 @@ dated_three_year_lookback <- function(trader,date){
     n <- 4
   }
 
-  return(key_generator(trader,end,1,n,lookback_unit='years'))
+  return(key_generator(trader,end,1,n,lookback_unit='months'))
 }
 
 
@@ -249,8 +272,9 @@ dated_whole_year_lookback <- function(trader, date){
   end <- rdate
   month(end) <- 12
   day(end) <- 31
+  num <- month(end)
 
-  return(key_generator(trader,end,1,1,lookback_unit='years'))
+  return(key_generator(trader,end,1,num,lookback_unit='months'))
 }
 
 
@@ -268,7 +292,8 @@ three_year_lookback <- function(trader){
   end <- today
   month(end) <- 12
   day(end) <- 31
-  return(key_generator(trader,end,1,3,lookback_unit='years'))
+  num <- 36
+  return(key_generator(trader,end,1,num,lookback_unit='months'))
 }
 
 #' Generate keys for last whole year lookback from begining to end of last year
@@ -285,8 +310,8 @@ last_year <- function(trader){
   end <- today %m-% years(1)
   month(end) <- 12
   day(end) <- 31
-
-  return(key_generator(trader,end,1,1,lookback_unit='years'))
+  num <- 12
+  return(key_generator(trader,end,1,num,lookback_unit='months'))
 }
 
 #' Generate keys for this whole year lookback from begining to end of today()'s year
@@ -303,8 +328,32 @@ this_year <- function(trader){
   end <- today
   month(end) <- 12
   day(end) <- 31
+  num <- 12
+  return(key_generator(trader,end,1,num,lookback_unit='months'))
+}
 
-  return(key_generator(trader,end,1,1,lookback_unit='years'))
+
+#' Generate keys for this whole year lookback from begining to date
+#'
+#' Generate key for whole year lookback from begining to the date month
+#'
+#' @param trader integer, the user id
+#' @param date  Date, the most recent time (included, i.e. not upto this date, but inclusive)
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+dated_this_year <- function(trader, date){
+  tryCatch({
+    rdate <- as.Date(date)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_three_day_lookback module key function for date value",date,":",cond))
+  })
+  end <- rdate
+  day(end) <- 1
+  end <- end -1
+  end <- end %m+% months(1)
+  num <- month(end)
+  return(key_generator(trader,end,1,num,lookback_unit='months'))
 }
 
 #' Generate keys for whole including years start and end years
@@ -333,7 +382,7 @@ range_years_lookback <- function(trader, start, end){
   month(end) <- 12
   day(end) <- 31
 
-  n <- year(end) - year(sdate) + 1
+  n <- 12*(year(end) - year(sdate)) + 1
 
-  return(key_generator(trader,end,1,n,lookback_unit='years'))
+  return(key_generator(trader,end,1,n,lookback_unit='months'))
 }

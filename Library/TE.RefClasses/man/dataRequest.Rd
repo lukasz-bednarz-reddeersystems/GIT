@@ -4,15 +4,14 @@
 \alias{dataRequest}
 \title{Request data from data source}
 \usage{
-dataRequest(object, key_values)
+dataRequest(object, key_values, ...)
 }
 \arguments{
 \item{object}{object of class 'VirtualDataSourceClient'.}
 
 \item{key_values}{data.frame with keys specifying data query.}
-}
-\value{
-\code{object} object of class 'VirtualDataSourceClient'.
+
+\item{...}{any additional parameters added by inherited methods}
 }
 \description{
 Generic method to request data from data source.

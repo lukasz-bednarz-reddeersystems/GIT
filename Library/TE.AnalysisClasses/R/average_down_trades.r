@@ -197,8 +197,6 @@ setMethod("Process",
 
               min_date <- min(pl_frame$Date[pl_frame$InstrumentID==ins],na.rm=TRUE)
 
-              if (is.infinite(min_date)) browser()
-
               pl_frame$PsnAge[pl_frame$InstrumentID==ins] <- as.numeric(pl_frame$Date[pl_frame$InstrumentID==ins] - min_date)
 
             }
@@ -226,7 +224,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, adown_plt)
             object <- .setOutputGGPlot(object, adown_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("TradeCount","PL","Num.Trades")))
 
             return(object)
           }

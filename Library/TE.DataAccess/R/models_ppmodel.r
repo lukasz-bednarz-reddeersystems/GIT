@@ -355,7 +355,7 @@ setGeneric("runPreProcessorModel",function(object){standardGeneric("runPreProces
 #' @export
 setMethod("runPreProcessorModel","PPModel",
 		  function(object){
-		  	if(length(object@queries)>0){
+		    if(length(object@queries)>0){
 		  		while(!hasBatchRun(object@queries)){
 		  			key <- getCurrentKey(object@queries)
 		  			object <- queryPreProcessorModel(object,key)
@@ -389,7 +389,7 @@ setGeneric("updateWarehouse",function(object,key){standardGeneric("updateWarehou
 setMethod("updateWarehouse","PPModel",
 		  function(object,key){
 		  	message(paste("Fetching data ... "))
-		  	object@warehouse_store_name <- name_from_key(key)
+		    object@warehouse_store_name <- name_from_key(key)
 		  	object@warehouse <- warehouse_request(object@warehouse_store_name,key[['id']],key[['start']],key[['end']])
             return(object)
 		  }

@@ -30,7 +30,7 @@ setMethod("updateStore", "DataStore",
           function(object,values,get_variables){
 
             message("Data not cached, updating datastore...")
-            #browser()
+
             data <- object@dataset@data
             object@key_map <- mapFields(object@key_map,values)
             num_key_values <- numberKeyValues(object@key_map)
@@ -108,7 +108,7 @@ setMethod("queryStore", "DataStore",
                 missing_keys <- values
               }
               if(nrow(missing_keys)>0){
-                #browser()
+
                 object <- updateStore(object,missing_keys,get_variables)
               }
 

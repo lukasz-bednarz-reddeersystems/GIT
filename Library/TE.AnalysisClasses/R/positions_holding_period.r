@@ -143,7 +143,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, plt_cum_pl_data)
             object <- .setOutputGGPlot(object, cum_tpl_smmry)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PL")))
 
             return(object)
           }

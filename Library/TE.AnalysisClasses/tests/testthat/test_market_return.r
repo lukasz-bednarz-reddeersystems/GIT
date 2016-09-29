@@ -2,7 +2,7 @@ context("Testing VirtualAnaExtendedTradesAnalysisBlocklysisBlock")
 
 ######################################
 #
-# ExtendedTradesAnalysisBlock Tests
+# MarketReturnAnalysisBlock Tests
 #
 ######################################
 

@@ -135,7 +135,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, rank_plt_data)
             object <- .setOutputGGPlot(object, off_rank)
-
+            object <- .setOutputFrontendData(object, data.frame(omit = c("PcntOffside", "Size", "WinLoss")))
 
             return(object)
           }

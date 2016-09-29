@@ -247,6 +247,7 @@ setMethod("Process",
             object <- .setOutputGGPlotData(object, all_sig)
 
             object <- .setOutputGGPlot(object, plt_sig_value)
+            object <- .setOutputFrontendData(object, data.frame(omit = c("Quarter", "ValueUSD",'TodayPL')))
 
             return(object)
           }

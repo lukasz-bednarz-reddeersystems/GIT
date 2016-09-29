@@ -26,6 +26,7 @@ valid.column_name_map <- hash(c("TraderID", "start", "end"), c("id", "start", "e
 init.key_values       <- data.frame(TraderID = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character()))
+valid.risk_model_class <- "RiskModel.DevelopedEuropePrototype150.1.1"
 
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)
@@ -39,7 +40,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(object, tested.class)
 
   expect_is(getPortfolioDataObject(object), "StrategyPortfolio")
-  expect_is(getRiskModelObject(object), "RiskModel.DevelopedEuropePrototype150")
+  expect_is(getRiskModelObject(object), valid.risk_model_class)
   expect_is(getInstrumentBetasDataObject(object), "InstrumentBetasData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
@@ -235,9 +236,48 @@ test_that(paste("Can Process() on", tested.class), {
   expect_is(getOutputGGPlotData(object), "data.frame")
 
   output <- getOutputObject(object)
-  expect_is(output, "PortfolioVarianceFactorDecompositionData")
+  expect_is(output, "PortfolioFactorReturnsData")
   expect_gt(getStoredNRows(output), 0)
 
 })
 
 
+test_that(paste("Can Process() on", tested.class, "With Different Model set"), {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+
+  object <- new(tested.class)
+
+  # set Different model
+  object <- setRiskModelObject(object, new("RiskModel.DevelopedEuropePrototype150.1.1"))
+
+  object <- dataRequest(object, valid.key_values)
+
+
+  expect_equal(getDataSourceQueryKeyValues(object), valid.key_values)
+
+  # portfolio data verification
+  ret_portf_data <- getPortfolioDataObject(object)
+  expect_is(ret_portf_data, "StrategyPortfolio")
+  expect_gt(getStoredNRows(portf_data), 0)
+
+  # instrument betas data verification
+  ins_betas_data <- getInstrumentBetasDataObject(object)
+  expect_is(ins_betas_data, "InstrumentBetasData")
+  expect_gt(getStoredNRows(ins_betas_data), 0)
+
+  # factor variance data verification
+  fct_ret_data <- getImpliedFactorReturnsDataObject(object)
+  expect_is(fct_ret_data, "ImpliedFactorReturnsData")
+  expect_gt(getStoredNRows(fct_ret_data), 0)
+
+
+  object <- Process(object)
+
+  expect_is(getOutputGGPlot(object), "ggplot")
+  expect_is(getOutputGGPlotData(object), "data.frame")
+
+  output <- getOutputObject(object)
+  expect_is(output, "PortfolioFactorReturnsData")
+  expect_gt(getStoredNRows(output), 0)
+
+})

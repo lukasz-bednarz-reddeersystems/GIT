@@ -157,7 +157,7 @@ setGeneric(".setOutputGGPlot", function(object,ggplot){standardGeneric(".setOutp
 setMethod(".setOutputGGPlot",
           signature(object = "VirtualAnalysisBlock", ggplot = "ANY"),
           function(object, ggplot){
-            object <- .checkSlotClass(object, "ggplot", class(ggplot), c("ggplot", "grob"))
+            object <- .checkSlotClass(object, "ggplot", class(ggplot), c("ggplot", "grob", "gg"))
             object@ggplot <- ggplot
             return(object)
           }

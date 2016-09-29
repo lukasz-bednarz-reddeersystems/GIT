@@ -58,6 +58,7 @@ test_that("Cannot dataRequest() with invalid key_values", {
 
 
 test_that("Can dataRequest() with valid key_values", {
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)
 

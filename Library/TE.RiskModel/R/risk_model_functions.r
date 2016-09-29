@@ -1,6 +1,9 @@
+#' @include TE.RiskModel.r
+NULL
 
-RISK_MODEL_DB <- new("RiskModelDefaults")@store_database
-RAID_DB_USER <- Sys.info()["user"]
+
+.__DEFAULT_RISK_MODEL_DB__ <- new("RiskModelDefaults")@store_database
+.__DEFAULT_RAID_DB_USER__ <- Sys.info()["user"]
 
 
 
@@ -10,13 +13,15 @@ declare_local_cluster <- function(ncores){
 
 prepare_cluster <- function(cl){
   clusterEvalQ(cl,library(functional))
-  clusterExport(cl,list('omit_value','rgr_kernel','instrument_regression', 'instrument_regression_on_cluster'))
+  clusterExport(cl,
+                list('omit_value','rgr_kernel','instrument_regression'),
+                envir  = as.environment("package:TE.RiskModel"))
   return(cl)
 }
 
 get_region_table <- function(){
   SQL <- 'SELECT [lRegionID],[sRegionName],[bMajorRegion] FROM [Research].[dbo].[tRegion]'
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   regions <- sqlQuery(cn,SQL)
   close(cn)
   return(regions)
@@ -24,7 +29,7 @@ get_region_table <- function(){
 
 get_instrument_region <- function(){
   SQL <- 'prInstrument_SelectRegionMappings'
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   ins_regions <- sqlQuery(cn,SQL)
   close(cn)
   return(ins_regions)
@@ -32,7 +37,7 @@ get_instrument_region <- function(){
 
 get_bulk_price_data <- function(start,end){
   message("Price data bulk fetch from DB...")
-  cn <- odbcConnect(RISK_MODEL_DB,uid=RAID_DB_USER)
+  cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__)
   SQL <- paste("prInstrumentHistory_SelectByDate '",start,"', '",end,"'",sep="")
   price_data <- sqlQuery(cn,SQL)
   close(cn)
@@ -92,7 +97,11 @@ get_region_stock_returns <- function(start,end,regions){
   return(rtn)
 }
 
-get_factor_returns <- function(start,end,factors){
+
+
+get_risk_factor_returns <- function(start,end){
+  factors <- c('rValue','rStrength','rGrowth','rSize','rStreetSentiment','rPriceMomentum1M','rPriceMomentum12M','rTrendExtension','rEarnings','rVolatility')
+
   ds <- seq(ymd(start),ymd(end),by='1 day')
   ds <- ds[wday(ds)!=7&wday(ds)!=1]
   factor_data <- data_request("risk_factor_returns",data.frame(dtDateTime=as.Date(ds)),c("sFactorName","dblChangePercent"))
@@ -102,19 +111,24 @@ get_factor_returns <- function(start,end,factors){
   factor_rtns$dtDateTime  <- as.Date(factor_rtns$dtDateTime)
   factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent/100
   colnames(factor_rtns) <- c('FactorName','Date','Return')
-  return(factor_rtns)
-}
-
-get_risk_factor_returns <- function(start,end){
-  factors <- c('rValue','rStrength','rGrowth','rSize','rStreetSentiment','rPriceMomentum1M','rPriceMomentum12M','rTrendExtension','rEarnings','rVolatility')
-  factor_rtns <- get_factor_returns(start,end,factors)
   factor_rtns$FactorName <- substr(factor_rtns$FactorName,2,nchar(factor_rtns$FactorName))
   return(factor_rtns)
 }
 
 get_sector_returns <- function(start,end){
   sectors <- c('SX3P','SX4P','SX6P','SX7P','SX86P','SX8P','SXAP','SXDP','SXEP','SXFP','SX1P','SXKP','SXMP','SXNP','SXOP','SXPP','SXQP','SXRP','SXTP')
-  return(get_factor_returns(start,end,sectors))
+
+  ds <- seq(ymd(start),ymd(end),by='1 day')
+  ds <- ds[wday(ds)!=7&wday(ds)!=1]
+  factor_data <- data_request("risk_factor_returns",data.frame(dtDateTime=as.Date(ds)),c("sFactorName","dblChangePercentAbsolute"))
+  factor_rtns <- factor_data@data
+  factor_rtns <- merge(factor_rtns,data.frame(sFactorName=sectors),by=c('sFactorName'))
+  factor_rtns$sFactorName <- as.character(factor_rtns$sFactorName)
+  factor_rtns$dtDateTime  <- as.Date(factor_rtns$dtDateTime)
+  factor_rtns$dblChangePercent <- factor_rtns$dblChangePercent
+  colnames(factor_rtns) <- c('FactorName','Date','Return')
+
+  return(factor_rtns)
 }
 
 get_FX <- function(start,end){
@@ -134,6 +148,8 @@ get_FX_returns <- function(start,end){
   new_nmes <- gsub(".USD","",nmes)
   rtn <- fx
   rtn <- rtn[order(rtn$Date),]
+  rtn <- rtn[wday(rtn$Date)!=7&wday(rtn$Date)!=1, ]
+
   for(n in 1:length(new_nmes)){
     rtn[new_nmes[n]] <- c(NA,(rtn[2:nrow(rtn),nmes[n]]/rtn[1:(nrow(rtn)-1),nmes[n]])-1)
   }
@@ -208,15 +224,30 @@ pivot_frame <- function(frame,pivot_on,value_col,date_col){
   return(rval)
 }
 
-#function to remove values that disrupt regression
+#' Remove values that disrupt regression
+#'
+#' Clears array from NA's, INF's and NAN's
+#'
+#' @param values_arr array of values to be cleared
+#' @return \code{values_arr} cleared array
+#'
+#' @export
 omit_value <- function(values_arr){
   values_arr <- unlist(values_arr)
   return(is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr))
 }
 
-#function to apply regression, but also to remove values that
-#will cause regression to fail.
-#using lm.fit because it is faster
+#' kernel function to run regression
+#'
+#' function to apply regression, but also to remove values that
+#' will cause regression to fail.
+#' using lm.fit because it is faster
+#'
+#' @param xi array with x values
+#' @param data array with values to be regressed
+#' @return \code{rval} list with components returned by lm.fit
+#'
+#' @export
 rgr_kernel <- function(xi,data){
   omit_rows <- omit_value(xi)|omit_value(data$Return)
   rval <- tryCatch({
@@ -227,7 +258,15 @@ rgr_kernel <- function(xi,data){
   return(rval)
 }
 
-#perform regressions for one instrument
+#' Perform regressions for one instrument
+#'
+#' function to apply regression for all factors
+#'
+#' @param ins "integer" instrument id
+#' @param all_data "data.frame" with all instruments returns
+#' @return \code{rval} "data.frame" with all instruments betas in columns named after factor names
+#'
+#' @export
 instrument_regression <- function(ins,all_data){
     data <- all_data[all_data$Instrument==ins,]
     data <- data[setdiff(colnames(data),'Date')]

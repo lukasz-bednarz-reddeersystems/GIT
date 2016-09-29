@@ -9,19 +9,16 @@ context("Testing Factor Correlation Data")
 tested.class          <-  "FactorCorrelationData"
 valid.component       <- "FactorCorrelation"
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
-valid.model_prefix    <- "developed_europe_prototype"
-valid.lookback        <- 150
+valid.risk_model_obj  <- new(valid.risk_model)
+valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
+valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
+valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
+
 valid.key_cols        <- c(risk_model_objectstore_keys)
 valid.values          <- c("Date",
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors)
+                           valid.model_factors)
 valid.required_colnms <- c('Date',
-                           risk_model_market_factors,
-                           risk_model_currency_factors,
-                           risk_model_commodity_factors,
-                           risk_model_sector_factors)
+                           valid.model_factors)
 valid.column_name_map <- hash()
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
@@ -36,6 +33,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
   object <- new(tested.class)
   expect_is(object, tested.class)
+
+  expect_equal(getRequiredVariablesNames(object), valid.required_colnms)
 
   expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
 

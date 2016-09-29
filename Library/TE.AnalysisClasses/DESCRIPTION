@@ -1,15 +1,15 @@
 Package: TE.AnalysisClasses
 Type: Package
 Title: Analysis Classes for RedDeer Trading Enhancement Engine
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Package is implementing Analysis and Report Classes for creating
     reports with data and graphs for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RefClasses (>= 0.1.0),
-    TE.RiskModel (>= 0.1.0),
+    TE.RefClasses (>= 0.1.1),
+    TE.RiskModel (>= 0.1.1),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -48,6 +48,7 @@ Collate:
     'pnl_traded_in_long_short_hedge.r'
     'portfolio_factor_exposure.r'
     'portfolio_factor_exposures.r'
+    'portfolio_variance_decomposition_functions.r'
     'portfolio_factor_returns.r'
     'position_revisits.r'
     'position_revisits_delta_prev_quarter.r'
@@ -62,4 +63,6 @@ Collate:
     'strategy_breakdown_pnl_on_trade_day_per_signal.r'
     'strategy_breakdown_signal_characteristic_and_effeciveness.r'
     'strategy_breakdown_total_pnl_and_pnl_delta.r'
+    'trades_performance_on_results_day.r'
+    'trades_pnl_outof_on_results_day.r'
 RoxygenNote: 5.0.1

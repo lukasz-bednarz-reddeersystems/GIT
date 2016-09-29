@@ -70,6 +70,7 @@ setGeneric("setTradeDataObject", function(object,trade_data){standardGeneric("se
 #'
 #' Private method to set trade_data slot with "VirtualTradeData"
 #'
+#' @rdname private_setTradeDataObject
 #' @param object object of class "VirtualTradeDataHandler"
 #' @param trade_data object of class "VirtualTradeData"
 #' @return \code{object} object of class "VirtualTradeDataHandler"
