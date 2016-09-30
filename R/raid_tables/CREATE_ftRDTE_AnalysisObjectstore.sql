@@ -1,7 +1,7 @@
 USE [FileTableDB]
 GO
 
-/****** Object:  Table [dbo].[ftRDTE_PPModelObjectstore]    Script Date: 21/09/2016 13:59:12 ******/
+/****** Object:  Table [dbo].[ftRDTE_AnalysisObjectstore]    Script Date: 21/09/2016 13:59:12 ******/
 SET ANSI_NULLS ON
 GO
 
