@@ -1,11 +1,6 @@
 #' @include objectstore.r
 NULL
 
-.__DEFAULT_OBJECTSTORE_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
-.__DEFAULT_OBJECTSTORE_DB_USER__.        <- Sys.info()["user"]
-.__DEFAULT_OBJECTSTORE_FILE_DB_SCHEMA__. <- "FileTableDB"
-
-
 #' An S4 class implementing handling queries to objectstores derived from VirtualRemoteObjectStore.
 #'
 #' Inherits from "ObjectQuery"
@@ -406,7 +401,7 @@ setMethod("saveObjectInRemoteStore",
               stop(sprintf("Object isn't stored in remote path: %s, code",pth))
             }
             else {
-              key <- .generateKeyFromID(object)
+              key <- getObjectstoreKey(object)
 
               key <- .generateRemoteQueryKey(query, key)
 
@@ -437,7 +432,7 @@ setMethod("removeObjectFromRemoteStore",
           function(object){
 
 
-            key <- .generateKeyFromID(object)
+            key <- getObjectstoreKey(object)
 
             rsp <- (-1)
 

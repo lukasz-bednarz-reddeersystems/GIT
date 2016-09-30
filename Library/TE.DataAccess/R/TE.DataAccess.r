@@ -25,5 +25,17 @@
 #' @importFrom graphics plot title
 #' @importFrom R.utils copyFile
 #' @importFrom digest digest
+#' @importFrom hash hash values names.hash keys
+#' @importClassesFrom hash hash
 NULL
 ## NULL
+
+
+
+.__DEFAULT_OBJECTSTORE_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
+.__DEFAULT_OBJECTSTORE_DB_USER__.        <- Sys.info()["user"]
+.__DEFAULT_OBJECTSTORE_FILE_DB_SCHEMA__. <- "FileTableDB"
+
+.__DEFAULT_ODBC_DB_NAME__.   <- "RAIDLIVEDB"
+.__DEFAULT_DB_USER__.        <- Sys.info()["user"]
+.__DEFAULT_DB_SCHEMA__. <- "Research"

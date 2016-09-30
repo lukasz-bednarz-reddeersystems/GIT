@@ -148,28 +148,18 @@ setMethod("isKeyKnownInLocalStore",
 setClass(
 	Class           = "VirtualObjectStore",
 	representation	= representation(
-		stored      = "environment",
-		id          = "character",
-		data_path   = "character",
-		objectstore_q = "ObjectQuery"
+		stored         = "environment",
+		id             = "character",
+		data_path       = "character",
+		objectstore_q   = "ObjectQuery",
+		objectstore_key = "data.frame"
 	),
 	contains = c("VIRTUAL")
 
 )
 
-#' Initialize method for "VirtualObjectStore" class
-#'
-#' @param .Object, object of class "VirtualObjectStore"
-#' @param id "character" name of the objectstore
-#' @return \code{.Object} object of class "VirtualObjectStore"
 
-setMethod("initialize", "VirtualObjectStore",
-          function(.Object,id){
-            .Object@stored <- new.env(parent = emptyenv())
-            .Object@id <- id
-            .Object
-          }
-)
+
 
 #' Get ID of the objectstore
 #'
@@ -190,6 +180,81 @@ setMethod("getID","VirtualObjectStore",
             return(object@id)
           }
 )
+
+#' Initialize method for "VirtualObjectStore" class
+#'
+#' @param .Object, object of class "VirtualObjectStore"
+#' @param id "character" name of the objectstore
+#' @return \code{.Object} object of class "VirtualObjectStore"
+
+setMethod("initialize", "VirtualObjectStore",
+          function(.Object,id){
+            .Object@stored <- new.env(parent = emptyenv())
+            .Object@id <- id
+            .Object
+          }
+)
+
+
+
+
+setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
+setMethod(".generateKeyFromID",
+          signature( object = "VirtualObjectStore"),
+          function(object){
+
+            id <- getID(object)
+
+            name <- key_from_name(id)
+
+            return(name)
+          }
+)
+
+
+#' Get key of the objectstore
+#'
+#' @param object object of class "VirtualObjectStore"
+
+setGeneric("getObjectstoreKey",function(object){standardGeneric("getObjectstoreKey")})
+
+#' @describeIn getObjectstoreKey Get ID of the objectstore
+#'
+#' @inheritParams getObjectstoreKey
+#'
+#' @return \code{key} "data.frame" with query defining store
+setMethod("getObjectstoreKey","VirtualObjectStore",
+          function(object){
+            slot_names <- slotNames(object)
+            if ("objectstore_key" %in% slot_names && nrow(object@objectstore_key) > 0) {
+              return(object@objectstore_key)
+            }
+            else {
+              return(.generateKeyFromID(object))
+            }
+
+          }
+)
+
+
+#' Set objectstore key
+#'
+#' Private method to store object key
+#'
+#' @rdname private_setObjectStoreKey
+#' @param object object of class "VirtualObjectStore"
+#' @param objectstore_key "data.frame" with key defining objectstore
+
+setGeneric(".setObjectStoreKey",function(object, objectstore_key){standardGeneric(".setObjectStoreKey")})
+setMethod(".setObjectStoreKey",
+          signature( object = "VirtualObjectStore",
+                     objectstore_key = "data.frame"),
+          function(object, objectstore_key){
+            object@objectstore_key <- objectstore_key
+            return(object)
+          }
+)
+
 
 #' Get objectstore query object
 #'
@@ -230,19 +295,6 @@ setMethod(".setObjectStoreQuery",
           }
 )
 
-
-setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
-setMethod(".generateKeyFromID",
-          signature( object = "VirtualObjectStore"),
-          function(object){
-
-            id <- getID(object)
-
-            name <- key_from_name(id)
-
-            return(name)
-          }
-)
 
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",
