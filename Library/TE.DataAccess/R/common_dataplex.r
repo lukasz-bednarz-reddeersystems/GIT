@@ -254,7 +254,6 @@ refresh <- function(name) {
   if(isWarehouseObjectstoreCacheItemPresent(wh_cache, name)==FALSE){
     message("Warehouse not stored, creating new store")
   }
-  eval_str <- paste("all_stores[['",name,"']]<<-warehouse_objectstore_factory('",name,"')",sep="")
   wh_cache <- setWarehouseObjectstoreCacheItemValue(wh_cache,
                                                     name,
                                                     warehouse_objectstore_factory(name))
@@ -355,7 +354,8 @@ analysis_module_request <- function(key_function,name_or_builder,force=FALSE){
   store <- analysis_store_request(key_function)
   key_hash <- as.character(murmur3.32(as.character(key_function())))
   key <- data.frame(key_hash=key_hash,analysis_module=analysis_name)
-  already_stored <- isAnalysisStored(store@warehouse_q,key)
+  query <- getObjectStoreQuery(store)
+  already_stored <- isAnalysisStored(query,key)
   error_free <- tryCatch({
                             message("Query:")
                             analysis <- queryAnalysisStore(store,key)

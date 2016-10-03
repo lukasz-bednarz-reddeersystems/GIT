@@ -11,11 +11,13 @@ NULL
 setClass(
   Class     = "PriceDataSQLQuery",
   prototype = list(
+    db_name        = RISK_MODEL_DB(),
+    db_schema      = "Research",
     key_cols       = c("InstrumentID", "Date"),
     key_values     = data.frame(InstrumentID = integer(),
                                 Date = as.Date(character())),
     query_parser   = parse_instrument_date_keys,
-    results_parser = convert_column_class,
+    results_parser = TE.SQLQuery:::convert_column_class,
     arguments    = c("@sInstrumentIDs", "@dtFrom", "@dtTo"),
     procedure    = "prInstrumentHistory_SelectByInstrList"
   ),

@@ -98,14 +98,23 @@ setMethod("shinyUIFactory","ShinyFactory",
 	      plot_name <- "Analysis Plot"
 	    }
 	  }
-
+	  columnar <- length(ui_options[['row_layout']])>0
 	  object@plot_name <- plot_name
 	  object <- buildContent(object,analysis_ggplot,analysis_data,ui_options)
-		object@ui[[1]] <- shinyUI(object@page_type(theme = shinythemes::shinytheme("darkly"),
-					#object@title(object@plot_name),
-					object@body_function(object@control_type(object@content),
-						                 object@main_panel(object@main_content(object@plot_name)))
-				    ))
+	  if(columnar){
+	    object@ui[[1]] <- shinyUI(object@page_type(theme = shinythemes::shinytheme("darkly"),
+	                                               #object@title(object@plot_name),
+	                                               object@body_function(object@main_content(object@plot_name),
+	                                                                    object@content)
+	                       ))
+
+	  } else {
+	    object@ui[[1]] <- shinyUI(object@page_type(theme = shinythemes::shinytheme("darkly"),
+	                                               #object@title(object@plot_name),
+	                                               object@body_function(object@control_type(object@content),
+	                                                                    object@main_panel(object@main_content(object@plot_name)))
+	                       ))
+	  }
 		return(object)
     }
  )
@@ -114,11 +123,26 @@ setGeneric("buildContent",function(object,analysis_ggplot,analysis_data,ui_optio
 setMethod("buildContent","ShinyFactory",
 	function(object,analysis_ggplot,analysis_data,ui_options){
 		content <- list()
-		cnt <- 1
-		#Automatically omit columns named 'Value' unless overidden
-		for(input in setdiff(colnames(analysis_data),ui_options[['omit']])){
-			object@inputIds <- c(object@inputIds,input)
-			content[[length(content)+1]] <- buildInputControl(object,analysis_data,input,ui_options)
+		columnar <- length(ui_options[['row_layout']])>0
+		if(columnar){
+		  #List specifying columnar control layout
+      for(control_row in ui_options[['row_layout']]){
+        if(length(setdiff(control_row,ui_options[['omit']]))>12){
+          stop("Cant place more than 12 controls on a single row")
+        }
+        width <- round(length(setdiff(control_row,ui_options[['omit']]))/12)
+        row_controls <- list()
+        for(input in setdiff(control_row,ui_options[['omit']])){
+          row_controls[[length(row_controls+1)]] <- buildInputControl(object,analysis_data,input,ui_options)
+        }
+        content[[length(content)+1]] <- fluidRow(column(width,tagList(row_controls)))
+      }
+		} else {
+		  #Automatically omit columns named 'Value' unless overidden
+		  for(input in setdiff(colnames(analysis_data),ui_options[['omit']])){
+		    object@inputIds <- c(object@inputIds,input)
+		    content[[length(content)+1]] <- buildInputControl(object,analysis_data,input,ui_options)
+		  }
 		}
 		object@content <- tagList(content)
 		return(object)

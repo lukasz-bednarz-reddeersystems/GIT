@@ -1,3 +1,18 @@
+#' helper function to generate key from objectstore name
+#'
+#' @param name "character" name of the objectstore
+#' @return \code{key} "data.frame" with columns "id", "start", "end"
+key_from_name <- function(name) {
+
+  str_keys <- strsplit(name, "_")
+
+  key <- data.frame(id    = str_keys[[1]][1],
+                    start = str_keys[[1]][2],
+                    end   = str_keys[[1]][3])
+  return(key)
+}
+
+
 #' An S4 class implementing handling queries to objectstores derived from VirtualObjectStore.
 #'
 #' @slot fields      "character",
@@ -16,6 +31,30 @@ setClass(
 
 
 setGeneric("hashKey",function(object,key){standardGeneric("hashKey")})
+
+
+setGeneric("getKnownKeys",function(object,key){standardGeneric("getKnownKeys")})
+setMethod("getKnownKeys","ObjectQuery",
+          function(object,key){
+            return(object@known_keys)
+          }
+)
+
+
+setGeneric("getQueryKeyColumnNames",function(object,key){standardGeneric("getQueryKeyColumnNames")})
+setMethod("getQueryKeyColumnNames","ObjectQuery",
+          function(object,key){
+            return(object@fields)
+          }
+)
+
+
+setGeneric("getQueryKeyValues",function(object,key){standardGeneric("getQueryKeyValues")})
+setMethod("getQueryKeyValues","ObjectQuery",
+          function(object,key){
+            return(object@values)
+          }
+)
 
 
 setGeneric("setQueryValuesFromKey",function(object,key){standardGeneric("setQueryValuesFromKey")})
@@ -69,6 +108,7 @@ setMethod("updateKnownKeys","ObjectQuery",
 	      }
 )
 
+
 setGeneric("isKeyKnown",function(object,key){standardGeneric("isKeyKnown")})
 setMethod("isKeyKnown","ObjectQuery",
 	      function(object,key){
@@ -79,6 +119,14 @@ setMethod("isKeyKnown","ObjectQuery",
 	      }
 )
 
+setGeneric("isKeyKnownInLocalStore",function(object,key){standardGeneric("isKeyKnownInLocalStore")})
+setMethod("isKeyKnownInLocalStore",
+          signature(object = "ObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+            return(isKeyKnown(object, key))
+          }
+)
 
 #' A VIRTUAL S4 class implementing basic functionalities of objectstore.
 #'
@@ -95,13 +143,15 @@ setMethod("isKeyKnown","ObjectQuery",
 #' @slot stored      "environment"
 #' @slot id          "character"
 #' @slot data_path   "character"
+#' @slot objectstore_q "ObjectQuery"
 
 setClass(
 	Class           = "VirtualObjectStore",
 	representation	= representation(
 		stored      = "environment",
 		id          = "character",
-		data_path   = "character"
+		data_path   = "character",
+		objectstore_q = "ObjectQuery"
 	),
 	contains = c("VIRTUAL")
 
@@ -141,6 +191,58 @@ setMethod("getID","VirtualObjectStore",
           }
 )
 
+#' Get objectstore query object
+#'
+#' @param object object of class "VirtualObjectStore"
+#' @export
+
+setGeneric("getObjectStoreQuery",function(object){standardGeneric("getObjectStoreQuery")})
+
+#' @describeIn getObjectStoreQuery
+#'
+#' Get ID of the objectstore
+#'
+#' @inheritParams getObjectStoreQuery
+#'
+#' @return \code{objectstore_q} "character" object of class "ObjectQuery"
+#' @export
+setMethod("getObjectStoreQuery","VirtualObjectStore",
+          function(object){
+            return(object@objectstore_q)
+          }
+)
+
+#' Set objectstore query object
+#'
+#' Private method to store objectquery object
+#'
+#' @rdname private_setObjectStoreQuery
+#' @param object object of class "VirtualObjectStore"
+#' @param objectstore_q object of class "ObjectQuery"
+
+setGeneric(".setObjectStoreQuery",function(object, objectstore_q){standardGeneric(".setObjectStoreQuery")})
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualObjectStore",
+                     objectstore_q = "ObjectQuery"),
+          function(object, objectstore_q){
+            object@objectstore_q <- objectstore_q
+            return(object)
+          }
+)
+
+
+setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
+setMethod(".generateKeyFromID",
+          signature( object = "VirtualObjectStore"),
+          function(object){
+
+            id <- getID(object)
+
+            name <- key_from_name(id)
+
+            return(name)
+          }
+)
 
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",

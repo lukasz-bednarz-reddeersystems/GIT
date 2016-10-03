@@ -1,4 +1,5 @@
 #' @include ppmodel_client.r
+#' @include data_validation_functions.r
 NULL
 
 ####################################
@@ -78,12 +79,12 @@ setClass(
                                    start = as.Date(character()),
                                    end = as.Date(character())),
     model_class       = "TradeHistorySimpleWithSummary",
-    unique_rows       = FALSE
+    unique_rows       = FALSE,
+    validation_function = basic_unique_data_validator,
+    argument_list = list(unique_on=c('Date','Strategy','ValueUSD','InstrumentID'))
     ),
-
   contains = c("VirtualTradeData", "VirtualPPModelClient")
 )
-
 
 setMethod(".generateDataFilledWithNA",
           signature(object = "TradeData"),

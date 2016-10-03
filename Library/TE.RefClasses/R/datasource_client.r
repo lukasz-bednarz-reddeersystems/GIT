@@ -1,5 +1,6 @@
 #' @include referencedata.r
 #' @include datasource_client_functions.r
+#' @include data_validator.r
 NULL
 
 ####################################
@@ -39,7 +40,7 @@ setClass(
     factorization_keys = character()
   ),
 
-  contains = c("VirtualReferenceData", "VIRTUAL")
+  contains = c("VirtualReferenceData", "VirtualDataValidator", "VIRTUAL")
 )
 
 #' Runs necessary postprocessing routines
@@ -409,6 +410,25 @@ setMethod(".removeNAReferenceData",
 
 setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dataRequest")})
 
+#' Validate data against client validation object
+#'
+#' Private method to apply the objects validation object against data.
+#' Typically would call this as part of the dataRequest implementation
+#'
+#' @param object object of class 'VirtualDataSourceClient'.
+#' @param dataset DataSet holding data retrieved by client.
+#' @return \code{object} client with validated reference data.
+
+setGeneric(".validateData", function(object){standardGeneric(".validateData")})
+setMethod(".validateData",
+          signature(object="VirtualDataSourceClient"),
+          function(object){
+            in_data <- getReferenceData(object)
+            out_data <- validateData(object,in_data)
+            object <- setReferenceData(object,out_data)
+            return(object)
+          }
+)
 
 #' Get factorized columns names
 #'

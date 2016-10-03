@@ -13,11 +13,13 @@ NULL
 setClass(
   Class     = "IndexPortfolioSQLQuery",
   prototype = list(
+    db_name        = RISK_MODEL_DB(),
+    db_schema      = "Research",
     key_cols       = c("IndexTicker", "start", "end"),
     key_values     = data.frame(IndexName = character(),
                                 start = as.Date(character()),
                                 DateEnd = as.Date(character())),
-    results_parser = convert_column_class,
+    results_parser = TE.SQLQuery:::convert_column_class,
     arguments    = c("@sIndexTicker", "@dtDateStart", "@dtDateEnd"),
     procedure    = "prMultiFactorRisk_IndexMemberHolding_SelectByTickerStartEndDate"
   ),

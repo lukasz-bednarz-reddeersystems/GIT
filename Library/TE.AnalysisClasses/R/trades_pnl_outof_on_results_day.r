@@ -78,6 +78,7 @@ setMethod("dataRequest",
 
               trades_on_numbers.an <- new("TradesPerformanceOnResultsDayAnalysisBlock")
               trades_on_numbers.an <- dataRequest(trades_on_numbers.an, key_values)
+              trades_on_numbers.an <- TE.RefClasses:::.validateData(trades_on_numbers.an)
 
               trades_on_numbers.an <- Process(trades_on_numbers.an)
 
