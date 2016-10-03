@@ -178,6 +178,7 @@ setMethod("dataRequest",
                 message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
                 stop(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(trade_data), cond))
               })
+              trade_data <- TE.RefClasses:::.validateData(trade_data)
 
               # get price data
               object <- TE.RefClasses:::.setTradeDataObject(object, trade_data)

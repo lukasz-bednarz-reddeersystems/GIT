@@ -26,6 +26,8 @@ Suggests:
     rmarkdown,
 Collate:
     'TE.RefClasses.r'
+    'data_validation_functions.r'
+    'data_validator.r'
     'datasource_client_functions.r'
     'referenceobject.r'
     'referencedata.r'
