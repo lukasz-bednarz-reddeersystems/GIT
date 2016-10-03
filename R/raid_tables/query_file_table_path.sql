@@ -1,0 +1,3 @@
+SELECT FileTableRootPath('ftMultiFactorRiskBlobTest') [Path]
+
+

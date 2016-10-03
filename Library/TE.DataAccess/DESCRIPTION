@@ -1,7 +1,7 @@
 Package: TE.DataAccess
 Type: Package
 Title: Basic package for RedDeer Trading Enhancement Engine
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions and classes for data access,
@@ -9,6 +9,8 @@ Description: Pakckage is implementing functions and classes for data access,
     Analytics Engine.
 Depends:
     R (>= 3.3.0),
+    TE.SQLQuery (>= 0.1.1),
+    TE.BlobStorage (>= 0.1.1),
     methods,
 License: file LICENSE
 LazyData: TRUE
@@ -21,6 +23,7 @@ Imports:
     moments,
     grDevices,
     graphics,
+    R.utils,
     digest,
 Collate:
     'TE.DataAccess.r'
@@ -49,6 +52,7 @@ Collate:
     'common_instrument_datastore.r'
     'common_trade_levels_datastore.r'
     'objectstore.r'
+    'remote_objectstore.r'
     'common_analysis_objectstore.r'
     'common_RAIDdata.r'
     'common_composite_datasets.r'

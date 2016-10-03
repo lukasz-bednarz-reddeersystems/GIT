@@ -10,12 +10,13 @@ NULL
 setClass(
   Class     = "FactorExposureDataSQLQuery",
   prototype = list(
+    db_name        = RISK_MODEL_DB(),
     db_schema      = "Razor",
     key_cols       = c("InstrumentID", "Date"),
     key_values     = data.frame(lInstrumentID = integer(),
                                 dtDateTime = as.Date(character())),
     query_parser   = parse_instrument_date_keys,
-    results_parser = convert_column_class,
+    results_parser = TE.SQLQuery:::convert_column_class,
     arguments    = c("@sInstrumentIDs", "@dtStart", "@dtEnd"),
     procedure    = "prFactorRisk_GetScores_TraderAnalytics_InstrumentList"
   ),

@@ -1,23 +1,40 @@
-#' @include objectstore.r
+#' @include remote_objectstore.r
 #' @include keymap.r
 #' @include global_configs.r
 #' @include common_composite_warehouse.r
 NULL
 
 
-#' An S4 class handling queries to WarehouseObjectstore.
-#'
-#' @export
 
 setClass(
-	Class = "WarehouseQuery",
+	Class = "VirtualWarehouseQuery",
 	prototype = prototype(
 		#fields need to match column names
 		#of key data frame
 		fields = c('id','start','end')
 	),
-	contains =c("ObjectQuery")
+	contains =c("ObjectQuery", "VIRTUAL")
 )
+
+#' An S4 class handling queries to WarehouseObjectstore.
+
+setClass(
+  Class = "WarehouseQuery",
+  contains =c("VirtualWarehouseQuery")
+)
+
+
+setClass(
+  Class = "RemoteWarehouseQuery",
+  prototype = prototype(
+    #fields need to match column names
+    #of key data frame
+    tb_name = "tRDTE_WarehouseObjectstore"
+  ),
+  contains =c("RemoteObjectQuery", "VirtualWarehouseQuery")
+)
+
+
 
 
 #' An S4 class for storing daily risk models.
@@ -25,7 +42,7 @@ setClass(
 #' Inherits from "VirtualObjectStore"
 #'
 #' @slot key_map  "KeyMap"
-#' @slot warehouse_q "WarehouseQuery"
+#' @slot objectstore_q "WarehouseQuery"
 #'
 #' @export
 
@@ -33,14 +50,87 @@ setClass(
 	Class = "WarehouseObjectStore",
 	representation  = representation(
 		key_map     = "KeyMap",
-		warehouse_q = "WarehouseQuery"
+		objectstore_q = "RemoteWarehouseQuery"
 	),
 	prototype       = prototype(
 		data_path   = model_defaults@data_path,
-		warehouse_q = new("WarehouseQuery")
+		objectstore_q = new("RemoteWarehouseQuery")
 	),
-	contains = c("VirtualObjectStore")
+	contains = c("VirtualRemoteObjectStore")
 )
+
+
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualRemoteObjectStore",
+                     objectstore_q = "VirtualWarehouseQuery"),
+          function(object, objectstore_q){
+
+            # copy slots of Warehouse Query
+            new_query <- new("RemoteWarehouseQuery")
+
+            new_query@values <- objectstore_q@values
+            new_query@known_keys <- objectstore_q@known_keys
+
+            object <- callNextMethod(object, new_query)
+            return(object)
+          }
+)
+
+
+setMethod(".setObjectStoreQuery",
+          signature( object = "VirtualRemoteObjectStore",
+                     objectstore_q = "WarehouseQuery"),
+          function(object, objectstore_q){
+
+             # copy slots of Warehouse Query
+            new_query <- new("RemoteWarehouseQuery")
+
+            new_query@values <- objectstore_q@values
+            new_query@known_keys <- objectstore_q@known_keys
+
+            object <- callNextMethod(object, new_query)
+            return(object)
+          }
+)
+
+#' Get objectstore query object
+#'
+#' @param object object of class "WarehouseObjectStore"
+#' @export
+
+setGeneric("getObjectStoreKeyMap",function(object){standardGeneric("getObjectStoreKeyMap")})
+
+#' @describeIn getObjectStoreKeyMap Get key map of the objectstore
+#'
+#' @inheritParams getObjectStoreKeyMap
+#'
+#' @return \code{key_map} "character" object of class "KeyMap"
+#' @export
+setMethod("getObjectStoreKeyMap","WarehouseObjectStore",
+          function(object){
+            return(object@key_map)
+          }
+)
+
+#' Set objectstore key_map object
+#'
+#' Private method to store object key map object
+#'
+#' @rdname private_setObjectStoreKeyMap
+#' @param object object of class "WarehouseObjectStore"
+#' @param key_map object of class "KeyMap"
+
+setGeneric(".setObjectStoreKeyMap",function(object, key_map){standardGeneric(".setObjectStoreKeyMap")})
+
+setMethod(".setObjectStoreKeyMap",
+          signature( object = "WarehouseObjectStore",
+                     key_map = "KeyMap"),
+          function(object, key_map){
+            object@key_map <- key_map
+            return(object)
+          }
+)
+
 
 setGeneric("generateKey",function(object,trader_id,start,end){standardGeneric("generateKey")})
 setMethod("generateKey","WarehouseObjectStore",
@@ -77,23 +167,33 @@ setGeneric("getWarehouseFromStore",function(object,trader_id,start,end){standard
 #' @inheritParams getWarehouseFromStore
 #' @return \code{wh} object of class "CompositeWarehouse" if present otherwise NULL
 #' @export
+
 setMethod("getWarehouseFromStore","WarehouseObjectStore",
-	      function(object,trader_id,start,end){
-	      	key <- generateKey(object,trader_id,start,end)
-	      	got_data <- isKeyKnown(object@warehouse_q,key)
-		  	if(got_data==FALSE){
-		  		message("Data item has not been stored, run a query first.")
-		  		wh <- NULL
-		  	}
-		  	else{
-		  		object@key_map <- mapFields(object@key_map,key)
-	      		object@warehouse_q <- getCurrentKeyQuery(object@key_map,object@warehouse_q)
-	      		nme <- getIdentifier(object@warehouse_q)
-	      		wh <- getWarehouse(getFromObjectStore(object,object@id),nme)
-		  	}
-	      	return(wh)
-	      }
+          function(object,trader_id,start,end){
+            key <- generateKey(object,trader_id,start,end)
+
+            query <- getObjectStoreQuery(object)
+
+            got_data <- isKeyKnown(query,key)
+            if(got_data==FALSE){
+              message("Data item has not been stored, run a query first.")
+              wh <- NULL
+            }
+            else{
+              key_map <- getObjectStoreKeyMap(object)
+              key_map <- mapFields(key_map,key)
+              object <- .setObjectStoreKeyMap(object, key_map)
+
+              query <- getCurrentKeyQuery(key_map,query)
+              object <- .setObjectStoreQuery(object, query)
+
+              nme <- getIdentifier(query)
+              wh <- getWarehouse(getFromObjectStore(object,object@id),nme)
+            }
+            return(wh)
+          }
 )
+
 
 
 #' Query WarehouseObjectstore for given keys
@@ -126,11 +226,16 @@ setMethod("queryWarehouseStore","WarehouseObjectStore",
 		  		   },error=function(cond){
 		  		   	stop(paste('Key generation failure during warehouse object store query:',cond))
 		  		   })
-		  	got_data <- isKeyKnown(object@warehouse_q,key)
+
+		    query <-getObjectStoreQuery(object)
+		  	got_data <- isKeyKnown(query,key)
 		  	if(got_data==FALSE){
 		  		message("Key not found, updating ...")
 		  		object <- updateWarehouseStore(object,key)
-		  		object@warehouse_q <- updateKnownKeys(object@warehouse_q,key)
+
+		  		query <- updateKnownKeys(query, key)
+		  		object <- .setObjectStoreQuery(object, query)
+
 		  		commitWarehouseStore(object)
 		  	}
 		  	else{
@@ -154,12 +259,18 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  function(object,keys){
 		  	message("Creating new warehouse objects... ")
 
-		    object@key_map <- mapFields(object@key_map,keys)
-		  	for(keys_row in 1:numberKeyValues(object@key_map)){
-		  	      object@warehouse_q <- getCurrentKeyQuery(object@key_map,object@warehouse_q)
-		  	      trader_id  <- as.integer(getQueryValueByField(object@warehouse_q,"id"))
-		  	      start_date <- as.Date(getQueryValueByField(object@warehouse_q,"start"))
-		  	      end_date <- as.Date(getQueryValueByField(object@warehouse_q,"end"))
+		    key_map <- getObjectStoreKeyMap(object)
+		    key_map <- mapFields(key_map,keys)
+
+		    for(keys_row in 1:numberKeyValues(key_map)){
+
+		  	      query <- getObjectStoreQuery(object)
+		  	      query <- getCurrentKeyQuery(key_map,query)
+		  	      object <- .setObjectStoreQuery(object, query)
+
+  	  	      trader_id  <- as.integer(getQueryValueByField(query,"id"))
+		  	      start_date <- as.Date(getQueryValueByField(query,"start"))
+		  	      end_date <- as.Date(getQueryValueByField(query,"end"))
 		  	      new_warehouse <- tryCatch({
 		  	          build_warehouse(trader_id,start_date,end_date)
 		  	      	},error=function(cond){
@@ -167,9 +278,11 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  	      		stop("Could not create required TradeWarehouse object.")
 		  	      	})
               object <- updateWarehouseStoreForKey(object,new_warehouse)
-              object@key_map <- advanceCurrentKey(object@key_map)
-        	}
-       		return(object)
+              key_map <- advanceCurrentKey(key_map)
+              object <- .setObjectStoreKeyMap(object, key_map)
+		    }
+
+		    return(object)
 		  }
 )
 
@@ -185,7 +298,7 @@ setMethod("updateWarehouseStoreForKey","WarehouseObjectStore",
 		  function(object,new_warehouse){
 		  	message("Updating warehouse store ...")
 		  	old_warehouse <- getFromObjectStore(object,object@id)
-		  	name <- getIdentifier(object@warehouse_q)
+		  	name <- getIdentifier(getObjectStoreQuery(object))
 		  	if(length(old_warehouse)==0){
 		  		cw <- new("CompositeWarehouse")
 		  		cw <- addWarehouse(cw,new_warehouse,name)
@@ -229,17 +342,16 @@ setMethod("getQueryID","WarehouseObjectStore",
 	      }
 )
 
-
-#' Get QueryID ID
-#'
-#' @param object object of class "WarehouseObjectStore"
-#' @return \code{objectquery_id} "character"
-
 setGeneric("commitWarehouseStore",function(object){standardGeneric("commitWarehouseStore")})
 setMethod("commitWarehouseStore","WarehouseObjectStore",
 		  function(object){
-		  	object <- placeInObjectStore(object,object@key_map,getKeyMapID(object))
-		  	object <- placeInObjectStore(object,object@warehouse_q,getQueryID(object))
+
+		  	object <- placeInObjectStore(object,
+		  	                             getObjectStoreKeyMap(object),
+		  	                             getKeyMapID(object))
+		  	object <- placeInObjectStore(object,
+		  	                             getObjectStoreQuery(object),
+		  	                             getQueryID(object))
 		  	saveObject(object)
 		  }
 )
@@ -327,16 +439,75 @@ setMethod("pushTradeFields","WarehouseObjectStore",
 warehouse_objectstore_factory <- function(name){
 	message("Initialising trade warehouse store...")
 	whstr <- new("WarehouseObjectStore",id=name)
-	whstr@key_map <- new("KeyMap",key_columns=c('id','date'),key_generator=date_trader_kgen_fn)
+	whstr <- .setObjectStoreKeyMap(whstr,
+	                               new("KeyMap",key_columns=c('id','date'),key_generator=date_trader_kgen_fn))
+
+	query <- getObjectStoreQuery(whstr)
 	pth <- getPath(whstr)
+
+	if (!file.exists(pth)) {
+	  message(sprintf("File initially not found in local path %s. Checking remote store",pth))
+	  key <- key_from_name(basename(pth))
+	  is_known <- isKeyKnownInRemoteStore(query, key)
+
+	  if (is_known) {
+	    whstr <- updateLocalStoreFile(whstr,key)
+	  }
+	}
+
 	if(file.exists(pth)){
 		message(paste("Found warehouse store at",pth))
 		whstr <- loadObject(whstr)
-		whstr@key_map <- getFromObjectStore(whstr,getKeyMapID(whstr))
-		whstr@warehouse_q <- getFromObjectStore(whstr,getQueryID(whstr))
+		whstr <- .setObjectStoreKeyMap(whstr,
+		                               getFromObjectStore(whstr,getKeyMapID(whstr))
+		                               )
+		whstr <- .setObjectStoreQuery(whstr,
+		                              getFromObjectStore(whstr,getQueryID(whstr)))
+
 	}
+
 	else{
 		message(paste("No previous store data found at",pth,"new store created."))
 	}
 	return(whstr)
+}
+
+
+#' Copy warehouses from local objectstores to remote store.
+#'
+#' copies all locally stored warehouses to remote store and updates keys
+#'
+#' @return \code{count} number of warehouses copied
+#' @export
+
+update_warehouse_remote_storage <- function(){
+  message("Generating list of existing stores...")
+  pth <- model_defaults@data_path
+
+  # list of all objectstore files
+  rds.files <- list.files(pth, "_objectstore.rds")
+
+  # function fo find the store
+  wh.cond.fn <- function(x){
+    name.el <- strsplit(x, "_")[[1]]
+    if (length(name.el) != 4) return(FALSE)
+    if (!grepl("^[0-9]+$", name.el[1], perl = TRUE)) return(FALSE)
+    dates <- tryCatch({ as.Date(name.el[2:3])})
+    if (!is.Date(dates)) return(FALSE)
+    return(TRUE)
+  }
+
+  wh_str.files <- rds.files[sapply(rds.files, wh.cond.fn)]
+
+  for (name in wh_str.files) {
+    name <- gsub("_objectstore.rds", "", name)
+
+    whstr <- warehouse_objectstore_factory(name)
+
+    whstr <- saveObjectInRemoteStore(whstr)
+
+  }
+
+
+  return(whstr)
 }

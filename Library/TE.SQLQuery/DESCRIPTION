@@ -1,0 +1,29 @@
+Package: TE.SQLQuery
+Type: Package
+Title: Class Interface to SQL Databases
+Version: 0.1.1
+Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
+                  role = c("aut", "cre"))
+Description: Package providing classes and functions for handling queries to SQL
+    databases.
+Depends:
+    R (>= 3.3.0),
+License: file LICENSE
+LazyData: TRUE
+Imports:
+    methods,
+    RODBC,
+    R.utils,
+    lubridate,
+    hash,
+Collate:
+    'TE.SQLQuery.r'
+    'sql_query_functions.r'
+    'sql_query.r'
+    'sql_insert_handler.r'
+    'sql_procedure_call_functions.r'
+    'sql_procedure_call.r'
+    'sql_query_handler.r'
+RoxygenNote: 5.0.1
+Suggests:
+    testthat

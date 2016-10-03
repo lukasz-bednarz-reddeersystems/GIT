@@ -1,15 +1,15 @@
 Package: TE.AnalysisClasses
 Type: Package
 Title: Analysis Classes for RedDeer Trading Enhancement Engine
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Package is implementing Analysis and Report Classes for creating
     reports with data and graphs for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RefClasses (>= 0.1.0),
-    TE.RiskModel (>= 0.1.0),
+    TE.RefClasses (>= 0.1.1),
+    TE.RiskModel (>= 0.1.1),
 License: file LICENSE
 LazyData: TRUE
 Imports:
