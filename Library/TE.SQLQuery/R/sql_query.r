@@ -270,11 +270,19 @@ setMethod(".translateSQLQueryColumnNames",
 
             colnames_map <- getSQLQueryColumnNameMap(object)
 
-            names_to_translate <- intersect(colnames, names(colnames_map))
-            idx <- (colnames %in% names_to_translate)
+            if (length(colnames_map) > 0)
+            {
 
-            ret_colnames <- colnames
-            ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate]
+              names_to_translate <- intersect(colnames, names(colnames_map))
+              idx <- (colnames %in% names_to_translate)
+
+              ret_colnames <- colnames
+              ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate, drop = TRUE]
+
+            }
+            else {
+              ret_colnames <- colnames
+            }
 
             return(ret_colnames)
           }
