@@ -900,39 +900,32 @@ setMethod("buildTrades","TradeWarehouse",
 #
 #####################################################
 
-#' DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class
-#'
-#' Implements handling querries for raw trade data for given trader_id and date range
-#'
-#' Inherits from "VirtualSQLProcedureCall"
-#' @rdname Query_HistoricalTrades_WithInstrumentIDAndOrderID-class
-#' @export
-setClass(
-  Class     = "DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID",
-  prototype = list(
-    db_name    = .__DEFAULT_ODBC_DB_NAME__.,
-    db_schema  = .__DEFAULT_DB_SCHEMA__.,
-    key_cols   = c("TraderID", "DateStart", "DateEnd"),
-    key_values = data.frame(TraderID = integer(),
-                            DateStart = as.Date(character()),
-                            DateStart = as.Date(character())),
-    arguments    = c("@sTraderIDs", "@dtFrom", "@dtTo"),
-    column_name_map = hash(c("dtCreated", "lOrderID", "dtTradeDate", "sTrader", "sStrategy", "sTicker", "lInstrumentID", "sUlyTicker", "sDirection", "dblValueUSD"),
-                          c("Created", "OrderID", "TradeDate", "Trader", "Strategy", "Ticker", "InstrumentID", "UlyTicker", "Direction", "ValueUSD")),
-    procedure    = "prQuery_HistoricalTrades_WithInstrumentIDAndOrderID",
-    results_parser = TE.SQLQuery:::convert_column_class
-  ),
-  contains  = c("VirtualSQLProcedureCall")
-)
 
+build_warehouse <- function(trader,start,end, source = .__DEFAULT_TRADE_HISTORY_DATA_SOURCE__.){
 
-build_warehouse <- function(trader,start,end){
-  trd_url_query <- new("TradeHistoryURL",user_ids=trader,start=start,end=end)
-  trd_data <- new("URLParser",parser_type = "XMLToFrame")
-  trd_data <- runURLs(trd_data,c(trd_url_query@url))
+  if (source == "DB") {
+    key <- data.frame(TraderID  = trader,
+                      DateStart = as.Date(start),
+                      DateEnd   = as.Date(end) )
 
-  trd_dataset <- new("TradeHistoryDataSet",trader_id=trd_url_query@user_ids,start_date=trd_url_query@start,end_date=trd_url_query@end)
-  trd_dataset <- setData(trd_dataset,getURLData(trd_data,1))
+    sql_query <- new("DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID")
+    trd_df <- executeSQLQuery(sql_query, key)
+    trd_dataset <- new("TradeHistoryDataSet",
+                       trader_id=unique(trd_df$TraderName)[1],
+                       start_date=start,
+                       end_date=end)
+
+  }
+  else {
+    trd_url_query <- new("TradeHistoryURL",user_ids=trader,start=start,end=end)
+    trd_data <- new("URLParser",parser_type = "XMLToFrame")
+    trd_data <- runURLs(trd_data,c(trd_url_query@url))
+    trd_df <- getURLData(trd_data,1)
+    trd_dataset <- new("TradeHistoryDataSet",trader_id=trd_url_query@user_ids,start_date=trd_url_query@start,end_date=trd_url_query@end)
+
+  }
+
+  trd_dataset <- setData(trd_dataset,trd_df)
 
   warehouse <- new("TradeWarehouse")
   warehouse <- tradeFactory(warehouse,trd_dataset,fill_price=TRUE,fill_positions=TRUE,fill_levels=TRUE)

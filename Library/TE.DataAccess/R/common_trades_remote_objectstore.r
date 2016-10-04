@@ -1,5 +1,6 @@
 #' @include objectstore.r
 #' @include global_configs.r
+#' @include data_access_sql_procedures.r
 NULL
 
 #' Generate Trade objectstore name from keys

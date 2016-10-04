@@ -38,4 +38,6 @@ NULL
 
 .__DEFAULT_ODBC_DB_NAME__.   <- "RAIDLIVEDB"
 .__DEFAULT_DB_USER__.        <- Sys.info()["user"]
-.__DEFAULT_DB_SCHEMA__. <- "Research"
+.__DEFAULT_DB_SCHEMA__.      <- "Research"
+
+.__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. <- "DB" # possible values: c("DB", "Middleware")

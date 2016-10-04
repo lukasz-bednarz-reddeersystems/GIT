@@ -1,19 +1,18 @@
-context("Test DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class")
+
+context("Test Trade Warehouse")
 
 ##############################################################################################
 #
-# Testing DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class
+# Testing TradeWarehouse
 #
 ##############################################################################################
+tested.class <- "TradeWarehouse"
+valid.trader <- 101L
+valid.start <- as.Date("2016-09-28")
+valid.end   <- as.Date("2016-09-28")
 
-tested.class     <- "DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID"
 
-valid.key_cols   <- c("TraderID", "DateStart", "DateEnd")
-valid.key_values <- data.frame(TraderID  = 101L,
-                               DateStart = as.Date("2016-09-28"),
-                               DateEnd   = as.Date("2016-09-28") )
-
-test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+test_that(sprintf("Can create instance of %", tested.class),{
 
   object <- new(tested.class)
 
@@ -21,34 +20,9 @@ test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
 })
 
 
-test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+test_that(sprintf("Can build_warehouse()", tested.class),{
 
-  object <- new(tested.class)
+  object <- TE.DataAccess:::build_warehouse(valid.trader, valid.start, valid.end)
 
-  expect_is(object, tested.class)
-
-  object <- prepareSQLQuery(object, valid.key_values)
-
-  expect_equal(getSQLQueryKeyValues(object), valid.key_values)
   expect_is(object, tested.class)
 })
-
-test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
-
-  object <- new(tested.class)
-
-  expect_is(object, tested.class)
-
-  ret <- executeSQLQuery(object, valid.key_values)
-
-  expect_is(ret, "data.frame")
-
-  expect_gt(nrow(ret), 0)
-})
-
-
-##############################################################################################
-#
-# Testing DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class
-#
-##############################################################################################
