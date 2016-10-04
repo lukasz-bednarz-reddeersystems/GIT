@@ -75,6 +75,31 @@ setClass(
   )
 )
 
+
+#' Initialize method for "VirtualTrade" class
+#'
+#' @param .Object, object of class "VirtualTrade"
+#' @return \code{.Object} object of class "VirtualTrade"
+setMethod("initialize", "VirtualTrade",
+          function(.Object,
+                   leg_start,
+                   leg_end,
+                   trader,
+                   instrument,
+                   strategy,
+                   long,
+                   value_usd,
+                   consolidation,
+                   status
+                   ){
+
+            .Object@trade_id <- murmur3.32(paste(leg_start,instrument,trader,value_usd,strategy,sep=""))
+
+            return(.Object)
+
+          }
+)
+
 setGeneric("bindData", function(object,dataset,aliases=NULL,keep_incoming=NULL,joinmode='inner',overlap_data=FALSE){standardGeneric("bindData")})
 setMethod("bindData","VirtualTrade",
           function(object,dataset,aliases=NULL,keep_incoming=NULL,joinmode='inner',overlap_data=FALSE){

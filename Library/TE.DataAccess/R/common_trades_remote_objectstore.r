@@ -12,7 +12,10 @@ NULL
 #' @export
 
 get_trade_objectstore_name <- function(keys) {
-  rv <- apply(keys, 1, function(x){paste0(c("trade_store", unlist(x)), collapse = "_")})
+
+  key_cols <- c('id', 'instrument', 'buysell', 'strategy', 'start')
+
+  rv <- apply(keys[key_cols], 1, function(x){paste0(c("trade_store", unlist(x)), collapse = "_")})
   return(rv)
 }
 
@@ -38,7 +41,7 @@ key_from_trade_objectstore_name <- function(name) {
 setClass(
   Class          = "VirtualTradeQuery",
   prototype = prototype(
-    fields       = c('hash', 'id', 'instrument', 'buysell', 'strategy', 'start', 'end')
+    fields       = c('hash', 'id', 'instrument', 'buysell', 'strategy', 'start', 'end', 'status')
   ), contains = c("ObjectQuery", "VIRTUAL")
 )
 
@@ -46,7 +49,7 @@ setMethod("hashKey",
           signature(object = "VirtualTradeQuery",
                     key    = "data.frame"),
           function(object,key){
-            hash <- hash_data_frame(key[object@fields[2:7]], algo = "murmur32")
+            hash <- hash_data_frame(key[object@fields[2:6]], algo = "murmur32")
             hashedkey <- cbind(data.frame(hash=hash),key)
             return(hashedkey)
           }
@@ -95,6 +98,51 @@ setMethod("isTradeStored",
 
 
 
+setClass(
+  Class          = "VirtualRemoteTradeQuery",
+  contains = c("RemoteObjectQuery", "VIRTUAL")
+)
+
+setMethod(".generateRemoteQueryKey",
+          signature(object = "VirtualRemoteTradeQuery",
+                    key = "data.frame"),
+          function(object,key){
+
+            sql_query <- getSQLQueryObject(object)
+
+            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'start', 'end')]
+
+
+            colnames(key) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(key))
+
+            return(key)
+          }
+)
+
+
+setMethod(".generateRemoteInsertKey",
+          signature(object = "RemoteObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+
+            sql <- getSQLInsertObject(object)
+
+            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'start', 'end', 'status')]
+
+            colnames(key) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql, colnames(key))
+
+            hash_col <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql, "hash")
+
+            hash_df <- data.frame(hash= hash_data_frame(key))
+
+            colnames(hash_df) <- hash_col
+
+            key <- cbind(hash_df, key)
+
+            return(key)
+          }
+)
+
 
 #' An S4 class handling queries to TradeObjectstore.
 #'
@@ -112,9 +160,9 @@ setClass(
   prototype = prototype(
     #fields need to match column names
     #of key data frame
-    tb_name = "tRDTE_TradeObjectstore"
+    tb_name = "tRDTE_TradesObjectstore"
   ),
-  contains =c("RemoteObjectQuery", "VirtualTradeQuery")
+  contains =c("VirtualRemoteTradeQuery", "VirtualTradeQuery")
 )
 
 #' Initialize method for "RemoteTradeQuery" class
@@ -123,13 +171,13 @@ setClass(
 #' @return \code{.Object} object of class "RemoteTradeQuery"
 setMethod("initialize", "RemoteTradeQuery",
           function(.Object){
-            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID",
+            sql_query <- new("BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate",
                              .getObjectQueryDBName(.Object),
                              .getObjectQuerySchemaName(.Object),
                              .getObjectQueryTableName(.Object))
             .Object <- setSQLQueryObject(.Object, sql_query)
 
-            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID",
+            sql_insert <- new("BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate",
                               .getObjectQueryDBName(.Object),
                               .getObjectQuerySchemaName(.Object),
                               .getObjectQueryTableName(.Object))
@@ -206,11 +254,7 @@ setMethod(".generateKeyFromID",
           signature( object = "TradeObjectStore"),
           function(object){
 
-            id <- getID(object)
-
-            name <- key_from_trade_objectstore_name(id)
-
-            return(name)
+            return(object@objectstore_key)
           }
 )
 
@@ -222,9 +266,10 @@ setMethod(".generateKeyFromID",
 #' @return \code{.Object} object of class "TradeObjectStore"
 
 setMethod("initialize", "TradeObjectStore",
-          function(.Object,id){
+          function(.Object,id, key){
             .Object@id <- id
-            .Object@path <- tempdir()
+            .Object@objectstore_key <- key
+            .Object@data_path <- tempdir()
             .Object
           }
 )
@@ -295,7 +340,7 @@ setMethod("queryTradeStore","TradeObjectStore",
 #'
 #' @export
 
-setGeneric("updateTradeStore",function(object,ppmodel_object,key,force=FALSE){standardGeneric("updateTradeStore")})
+setGeneric("updateTradeStore",function(object,trade_object,key,force=FALSE){standardGeneric("updateTradeStore")})
 
 
 #' @describeIn updateTradeStore
@@ -308,22 +353,22 @@ setGeneric("updateTradeStore",function(object,ppmodel_object,key,force=FALSE){st
 #' @export
 
 setMethod("updateTradeStore","TradeObjectStore",
-          function(object,ppmodel_object,key,force=FALSE){
+          function(object,trade_object,key,force=FALSE){
             query <- getObjectStoreQuery(object)
             if(isTradeStored(query,key) && !force){
-              message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in ppmodel store."))
+              message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"found in trade store."))
               message("No update made.")
             }
             else{
               if(force)message("Force update flag set, data will be overwritten ...")
-              message(paste("Updating ppmodel store for key",paste(unlist(Map(as.character,key)),collapse=", "),collapse=", "))
+              message(paste("Updating trades store for key",paste(unlist(Map(as.character,key)),collapse=", "),collapse=", "))
               query <- setTradeQuery(query,key)
               query <- updateStoredTradeKeys(query,key)
 
               object <- .setObjectStoreQuery(object, query)
 
               object <- placeInObjectStore(object,query,object@qry_store_nme)
-              object <- placeInObjectStore(object,ppmodel_object,getIdentifier(query))
+              object <- placeInObjectStore(object,trade_object,getIdentifier(query))
             }
             return(object)
           }
@@ -374,25 +419,28 @@ setMethod("getTradeStoreContents","TradeObjectStore",
 #' @export
 
 trade_objectstore_factory <- function(key){
-  message("Initialising ppmodel store ...")
+  message("Initialising trade store ...")
 
   name <- get_trade_objectstore_name(key)
 
-  trdstr <- new("TradeObjectStore",id=name)
+  trdstr <- new("TradeObjectStore",id=name, key = key)
 
   pth <- getPath(trdstr)
-  key <- key_from_ppmodel_objectstore_name(basename(pth))
 
-  query <- getObjectstoreQuery(trdstr)
+  query <- getObjectStoreQuery(trdstr)
   is_known <- isKeyKnownInRemoteStore(query, key)
 
   if (is_known) {
-    trdstr <- initialiseTradeStore(trdstr)
+    trdstr <- updateLocalStoreFile(trdstr, key)
   }
 
+  if (file.exists(pth)) {
+    trdstr <- initialiseTradeStore(trdstr)
+  }
   else{
     message(paste("No previous store data found at",pth,"new store created."))
   }
+
   return(trdstr)
 }
 
@@ -436,7 +484,7 @@ update_trade_remote_storage <- function(){
       getFromObjectStore(whstr, stored_name)
     }, error = function(cond) {
 
-     browser()
+     stop(cond)
     })
 
     new_whstr <- new("TradeObjectStore", id = name)

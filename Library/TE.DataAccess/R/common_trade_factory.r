@@ -847,7 +847,9 @@ setMethod("buildTrades","TradeWarehouse",
               leg_start      <-  trade_panel[i,'TradeDate']
               buysell        <-  trade_panel[i,'BuySell']
               value_usd      <-  trade_panel[i,'ValueUSD']
-              strategy       <-  trade_panel[i,'Strategy']
+              strategy       <-  ifelse(!is.na(trade_panel[i,'Strategy']),
+                                        trade_panel[i,'Strategy'],
+                                        "__UNKNOWN__")
               trader         <-  trade_panel[i,'Trader']
               instrument     <-  trade_panel[i,'InstrumentID']
 

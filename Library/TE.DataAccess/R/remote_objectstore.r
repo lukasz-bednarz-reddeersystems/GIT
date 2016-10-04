@@ -195,14 +195,27 @@ setMethod(".generateRemoteQueryKey",
           }
 )
 
+
+
+setGeneric(".generateRemoteInsertKey",function(object,key){standardGeneric(".generateRemoteInsertKey")})
+setMethod(".generateRemoteInsertKey",
+          signature(object = "RemoteObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+
+            key <- .generateRemoteQueryKey(object,key)
+
+            return(key)
+          }
+)
+
 setGeneric("isKeyKnownInRemoteStore",function(object,key){standardGeneric("isKeyKnownInRemoteStore")})
 setMethod("isKeyKnownInRemoteStore",
           signature(object = "RemoteObjectQuery",
                     key = "data.frame"),
           function(object,key){
-            rval <- FALSE
 
-            #key <- .generateRemoteQueryKey(object, key)
+            rval <- FALSE
 
             test <- getKnownRemoteKeys(object, key)
 
@@ -403,12 +416,12 @@ setMethod("saveObjectInRemoteStore",
             else {
               key <- getObjectstoreKey(object)
 
-              key <- .generateRemoteQueryKey(query, key)
+              key <- .generateRemoteInsertKey(query, key)
 
               key <- cbind(data.frame(TableName = table),
                            key,
                            data.frame(CreatedDate = today(),
-                                      CreatedBy = .__DEFAULT_OBJECTSTORE_DB_USER__. ,
+                                      CreatedByUserID = .__DEFAULT_OBJECTSTORE_DB_USER__. ,
                                       FileName = filename))
 
               ret <- updateKnownRemoteKeys(query, key)

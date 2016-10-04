@@ -7,14 +7,20 @@ context("Test Trade Objectstore")
 #############################
 tested.class <- "TradeObjectStore"
 
-valid.key  <- data.frame(id          = 1984L,
+valid.key  <- data.frame(id          = "1984",
                          instrument  = 4454L,
                          buysell     = "Buy",
                          strategy    = "LB_TEST",
                          start       = as.Date("2016-03-29"),
-                         end         = as.Date("2016-04-01"))
+                         end         = as.Date("2016-04-01"),
+                         status      = "Closed",
+                         stringsAsFactors = FALSE)
 
-test_that("Can create new trade") {
+valid.name <- get_trade_objectstore_name(valid.key)
+
+
+test_that("Can create new Trade", {
+  set.seed(1)
   valid.trade <<- new("Trade",
                       leg_start = valid.key$start,
                       leg_end = valid.key$start,
@@ -34,15 +40,28 @@ test_that("Can create new trade") {
                       status        = "Closed")
 
   expect_is(valid.trade, "Trade")
-}
+})
 
+test_that("Can call trade_objectstore_factory() with locally existing file", {
 
+  object <- trade_objectstore_factory(valid.key)
 
-valid.name <- get_trade_objectstore_name(valid.key)
-valid.key2  <- TE.DataAccess:::key_from_trade_objectstore_name(valid.name)
+  expect_is(object, tested.class)
 
-test_that("Key generators are working properly", {
-  expect_equivalent(valid.key, valid.key2)
+  object <- updateTradeStore(object, valid.trade, valid.key, TRUE)
+
+  ret <- commitTradeStore(object)
+
+  expect_true(ret)
+
+  query <- getObjectStoreQuery(object)
+
+  expect_is(query, "RemoteTradeQuery")
+
+  is_known <- TE.DataAccess:::isKeyKnownInRemoteStore(query, valid.key)
+
+  expect_true(is_known)
+
 })
 
 
@@ -56,17 +75,9 @@ test_that("Can move local objectstore files to Blob Objectstore", {
 })
 
 
-test_that("Can call trade_objectstore_factory() with locally existing file", {
-
-  object <- trade_objectstore_factory(valid.name)
-
-  expect_is(object, tested.class)
-
-})
-
 test_that("Can check for keys in remote store() ", {
 
-  object <- trade_objectstore_factory(valid.name)
+  object <- trade_objectstore_factory(valid.key)
 
   expect_is(object, tested.class)
 
@@ -92,7 +103,7 @@ test_that("Can check for keys in remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
-  object <- trade_objectstore_factory(valid.name)
+  object <- trade_objectstore_factory(valid.key)
 
   expect_is(object, tested.class)
 
@@ -143,7 +154,7 @@ test_that("Can load warehouse from remote store() ", {
 
   expect_false(file.exists(valid.path))
 
-  object <- trade_objectstore_factory(valid.name)
+  object <- trade_objectstore_factory(valid.key)
 
   expect_is(object, tested.class)
 

@@ -6,19 +6,19 @@
 \alias{updateTradeStore,TradeObjectStore-method}
 \title{Store PPmodel in Store}
 \usage{
-updateTradeStore(object, ppmodel_object, key, force = FALSE)
+updateTradeStore(object, trade_object, key, force = FALSE)
 
-\S4method{updateTradeStore}{TradeObjectStore}(object, ppmodel_object, key,
+\S4method{updateTradeStore}{TradeObjectStore}(object, trade_object, key,
   force = FALSE)
 }
 \arguments{
 \item{object}{object of class "TradeObjectStore"}
 
-\item{ppmodel_object}{object of class "Trade"}
-
 \item{key}{"data.frame" with key related to query}
 
 \item{force}{"logical" force update of Trade if it is already present}
+
+\item{ppmodel_object}{object of class "Trade"}
 }
 \value{
 \code{object} object of class "TradeObjectStore"

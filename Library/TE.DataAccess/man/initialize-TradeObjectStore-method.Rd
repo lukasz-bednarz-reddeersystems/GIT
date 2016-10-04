@@ -5,7 +5,7 @@
 \alias{initialize,TradeObjectStore-method}
 \title{Initialize method for "TradeObjectStore" class}
 \usage{
-\S4method{initialize}{TradeObjectStore}(.Object, id)
+\S4method{initialize}{TradeObjectStore}(.Object, id, key)
 }
 \arguments{
 \item{.Object, }{object of class "TradeObjectStore"}
