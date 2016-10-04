@@ -9,7 +9,26 @@
   instrument, strategy, long, value_usd, consolidation, status)
 }
 \arguments{
-\item{.Object, }{object of class "VirtualTrade"}
+\item{.Object}{object of class "VirtualTrade"}
+
+\item{leg_start}{"Date" date of start of trade leg}
+
+\item{leg_end}{"NullableDate" date of end of trade leg}
+
+\item{trader}{"character" integer id if the trader as character}
+
+\item{instrument}{"integer" ID of the traded instrument}
+
+\item{strategy}{"character" name of the traded strategy}
+
+\item{long}{"logical" is Trade Long or Short}
+
+\item{value_usd}{"numeric" value of trade in USD}
+
+\item{consolidation}{"data.frame" with data related to trade leg.
+should contain columns : c('TradeDate','ValueUSD','Strategy', 'OrderID')}
+
+\item{status, }{object of class "VirtualTrade"}
 }
 \value{
 \code{.Object} object of class "VirtualTrade"

@@ -62,7 +62,7 @@ setClass(
     daily_data   = "DataSet",
     strategy     = "character",
     trader       = "character",
-    instrument   = "numeric",
+    instrument   = "integer",
     consolidation= "data.frame",
     dly_data_pad = "integer",
     datekey      = "character",
@@ -78,7 +78,17 @@ setClass(
 
 #' Initialize method for "VirtualTrade" class
 #'
-#' @param .Object, object of class "VirtualTrade"
+#' @param .Object object of class "VirtualTrade"
+#' @param leg_start "Date" date of start of trade leg
+#' @param leg_end "NullableDate" date of end of trade leg
+#' @param trader "character" integer id if the trader as character
+#' @param instrument "integer" ID of the traded instrument
+#' @param strategy "character" name of the traded strategy
+#' @param long "logical" is Trade Long or Short
+#' @param value_usd "numeric" value of trade in USD
+#' @param consolidation "data.frame" with data related to trade leg.
+#'        should contain columns : c('TradeDate','ValueUSD','Strategy', 'OrderID')
+#' @param status, object of class "VirtualTrade"
 #' @return \code{.Object} object of class "VirtualTrade"
 setMethod("initialize", "VirtualTrade",
           function(.Object,

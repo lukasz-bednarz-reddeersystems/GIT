@@ -262,7 +262,8 @@ setMethod(".generateKeyFromID",
 #' Initialize method for "TradeObjectStore" class
 #'
 #' @param .Object, object of class "TradeObjectStore"
-#' @param id id to set when initializing
+#' @param id "character "id to set when initializing
+#' @param key "data.frame" key defining objectstore to set when initializing
 #' @return \code{.Object} object of class "TradeObjectStore"
 
 setMethod("initialize", "TradeObjectStore",
@@ -333,7 +334,7 @@ setMethod("queryTradeStore","TradeObjectStore",
 #' Stores Trade and reated Query in Store
 #'
 #' @param object object of class "TradeObjectStore"
-#' @param ppmodel_object object of class "Trade"
+#' @param trade_object object of class "Trade"
 #' @param key "data.frame" with key related to query
 #' @param force "logical" force update of Trade if it is already present
 #' @return \code{object} object of class "TradeObjectStore"

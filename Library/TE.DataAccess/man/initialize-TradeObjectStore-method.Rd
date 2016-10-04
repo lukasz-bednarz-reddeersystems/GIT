@@ -10,7 +10,9 @@
 \arguments{
 \item{.Object, }{object of class "TradeObjectStore"}
 
-\item{id}{id to set when initializing}
+\item{id}{"character "id to set when initializing}
+
+\item{key}{"data.frame" key defining objectstore to set when initializing}
 }
 \value{
 \code{.Object} object of class "TradeObjectStore"

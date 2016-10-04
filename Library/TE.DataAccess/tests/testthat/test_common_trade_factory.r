@@ -1,10 +1,10 @@
 context("Test DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class")
 
-########################################################################################
+##############################################################################################
 #
 # Testing DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class
 #
-########################################################################################
+##############################################################################################
 
 tested.class     <- "DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID"
 
@@ -45,3 +45,10 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_gt(nrow(ret), 0)
 })
+
+
+##############################################################################################
+#
+# Testing DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID class
+#
+##############################################################################################

@@ -14,11 +14,11 @@ updateTradeStore(object, trade_object, key, force = FALSE)
 \arguments{
 \item{object}{object of class "TradeObjectStore"}
 
+\item{trade_object}{object of class "Trade"}
+
 \item{key}{"data.frame" with key related to query}
 
 \item{force}{"logical" force update of Trade if it is already present}
-
-\item{ppmodel_object}{object of class "Trade"}
 }
 \value{
 \code{object} object of class "TradeObjectStore"
