@@ -181,7 +181,7 @@ setClass(
 setClass(
   Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID",
   prototype = list(
-    key_cols   = c("TableName", "HashID", "CreatedDate", "CreatedBy", "FileName"),
+    key_cols   = c("TableName", "HashID", "CreatedDate", "CreatedByUserID", "FileName"),
     key_values = data.frame(TableName = character()),
     arguments  = c("@sJointTableName",
                    "@sHashID",
@@ -274,7 +274,8 @@ setClass(
 setClass(
   Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
   prototype = list(
-    key_cols   = c("TableName", "TraderID", "StartDate", "EndDate", "CreatedDate", "CreatedBy", "FileName"),
+    key_cols   = c("TableName", "TraderID", "StartDate", "EndDate",
+                   "CreatedDate", "CreatedByUserID", "FileName"),
     key_values = data.frame(TableName = character()),
     arguments  = c("@sJointTableName",
                    "@lTraderID",
@@ -349,7 +350,16 @@ setClass(
                              "sLegStatus",
                              "dtCreatedDate",
                              "sCreatedByUserID",
-                             "sFileName"
+                             "sFileName",
+                             'hash',
+                             'id',
+                             'instrument',
+                             'buysell',
+                             'strategy',
+                             'start',
+                             'end',
+                             'status'
+
                               ),
                            c("JointTableName",
                              "TraderID",
@@ -361,7 +371,15 @@ setClass(
                              "LegStatus",
                              "CreatedDate",
                              "CreatedByUserID",
-                             "FileName"
+                             "FileName",
+                             "HashID",
+                             "TraderID",
+                             "InstrumentID",
+                             "Direction",
+                             "Strategy",
+                             "LegStartDate",
+                             "LegEndDate",
+                             "LegStatus"
                           )),
     procedure    = "prMultiFactorRisk_JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate"
   ),
@@ -425,7 +443,15 @@ setClass(
                              "sLegStatus",
                              "dtCreatedDate",
                              "sCreatedByUserID",
-                             "sFileName"
+                             "sFileName",
+                             'hash',
+                             'id',
+                             'instrument',
+                             'buysell',
+                             'strategy',
+                             'start',
+                             'end',
+                             'status'
                             ),
                             c("JointTableName",
                               "HashID",
@@ -438,7 +464,15 @@ setClass(
                               "LegStatus",
                               "CreatedDate",
                               "CreatedByUserID",
-                              "FileName"
+                              "FileName",
+                              "HashID",
+                              "TraderID",
+                              "InstrumentID",
+                              "Direction",
+                              "Strategy",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStatus"
                             )),
     procedure    = "prMultiFactorRisk_JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate"
   ),
