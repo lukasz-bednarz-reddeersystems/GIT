@@ -324,6 +324,30 @@ setMethod("prepareSQLQuery",
           }
 )
 
+
+#' Prepare SQL query strings
+#'
+#' Parses key_values to vector of SQL query strings
+#'
+#' @param object object of class 'VirtualSQLQuery'.
+#' @param key_values "missing" with query keys
+#' @return \code{object} object of class 'VirtualSQLQuery'.
+#' @export
+setMethod("prepareSQLQuery",
+          signature(object = "VirtualSQLQuery", key_values = "missing"),
+          function(object, key_values){
+
+            parser <- .getSQLQueryKeyValuesParser(object)
+
+            sql_strings <- parser(key_values)
+
+            object <- .setSQLQueryStrings(object, sql_strings)
+
+            return(object)
+          }
+)
+
+
 #' Executes SQL query strings
 #'
 #' Executes previously prepared SQL queries and returns result
@@ -348,6 +372,13 @@ setMethod("executeSQLQuery",
           function(object){
 
             queries <- .getSQLQueryStrings(object)
+
+            if(length(queries) == 0) {
+              # case when there are no keys as we call procedure without parameters
+              object <- prepareSQLQuery(object)
+              queries <- .getSQLQueryStrings(object)
+            }
+
             db      <- .getSQLQueryDBName(object)
             schema  <- .getSQLQuerySchemaName(object)
 
@@ -355,9 +386,7 @@ setMethod("executeSQLQuery",
               schema = NULL
             }
 
-            if(length(queries) == 0) (
-              stop(sprintf("Tried to executeSQLQuery without valid queries set in class %s", class(object)))
-            )
+
 
             ret_df <- NULL
 
