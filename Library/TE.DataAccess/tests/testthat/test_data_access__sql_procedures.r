@@ -197,3 +197,105 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_gt(nrow(ret), 0)
 })
+
+
+context("Test DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate class")
+
+##############################################################################################
+#
+# Testing DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate class
+#
+##############################################################################################
+
+
+tested.class     <- "DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate"
+
+
+valid.key_cols   <- c("InstrumentID", "DateStart", "DateEnd")
+valid.key_values <- data.frame(InstrumentID  = 4454,
+                               DateStart = as.Date("2016-02-10"),
+                               DateEnd   = as.Date("2016-02-10") )
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+})
+
+
+test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object, valid.key_values)
+
+  expect_equal(getSQLQueryKeyValues(object), valid.key_values)
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object, valid.key_values)
+
+  expect_is(ret, "data.frame")
+
+  expect_gt(nrow(ret), 0)
+})
+
+
+context("Test DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy class")
+
+##############################################################################################
+#
+# Testing DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy class
+#
+##############################################################################################
+
+
+tested.class     <- "DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy"
+
+
+valid.key_cols   <- c("Strategy", "DateStart", "DateEnd")
+valid.key_values <- data.frame(Strategy  = 'DK_SPAT',
+                               DateStart = as.Date("2016-09-28"),
+                               DateEnd   = as.Date("2016-09-28") )
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+})
+
+
+test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object, valid.key_values)
+
+  expect_equal(getSQLQueryKeyValues(object), valid.key_values)
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object, valid.key_values)
+
+  expect_is(ret, "data.frame")
+
+  expect_gt(nrow(ret), 0)
+})

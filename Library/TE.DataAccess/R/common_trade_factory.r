@@ -121,23 +121,52 @@ long <- function(strat,mval){
   return(rval)
 }
 
-setGeneric("createPositionSummary", function(object){standardGeneric("createPositionSummary")})
+setGeneric("createPositionSummary", function(object, source = .__DEFAULT_EXT_POSITION_DATA_SOURCE__.){standardGeneric("createPositionSummary")})
 setMethod("createPositionSummary","TradeWarehouse",
-          function(object){
+          function(object, source){
 
             message("Building position summary...")
             object <- fillPositionData(object)
             keys <- object@positions@data@data[c('Name','Date')]
             colnames(keys) <- c('Strategy','Date')
-            ext_pos_data <- data_request('ext_pos_datastore',keys,c('InstrumentID','Date','Quantity','StrategyID','Strategy','Age'))
-            ext_pos_data <- tryCatch({
+
+            if (source == "DB") {
+
+              ext_pos_data <- dataset_factory(c('Date','StrategyID','InstrumentID'), data.frame(Date = as.Date(character()), StrategyID = integer(),InstrumentID = integer()))
+
+              strats <- unique(keys$Strategy)
+
+              for (strat in strats){
+
+                loc.keys <- unique(keys[keys$Strategy == strat, ])
+                sql_query <- new("DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy")
+
+
+
+                key <- data.frame(Strategy  = strat,
+                                  DateStart = min(loc.keys$Date),
+                                  DateEnd   = max(loc.keys$Date) )
+
+                ret_data <- executeSQLQuery(sql_query, key)
+                colnames(ret_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(ret_data))
+                ret_data <- ret_data[c('InstrumentID','Date','Quantity','StrategyID','Strategy','Age')]
+
+                ext_pos_data <- initialiseOrAppendData(ext_pos_data, ret_data)
+
+              }
+            }
+            else {
+              ext_pos_data <- data_request('ext_pos_datastore',keys,c('InstrumentID','Date','Quantity','StrategyID','Strategy','Age'))
+              ext_pos_data <- tryCatch({
                 dataset_factory(c('Date','StrategyID','InstrumentID'),ext_pos_data@data)
               },error = function(cond){
                 message(paste("DataSet creation failed when generating position summary:",cond))
                 stop()
               })
+            }
+
             object@positions@data <- innerJoin(object@positions@data,ext_pos_data,c('Date','StrategyID','InstrumentID'),joinmode='left')
-            l <- length(object@positions@data@data$TodayPL)
+            # l <- length(object@positions@data@data$TodayPL)
 
             loop_data <- object@positions@data@data
             loop_data <- unique(loop_data)
@@ -381,13 +410,30 @@ setMethod("fillTradeListPrices","TradeWarehouse",
           }
 )
 
-setGeneric("getLevelData",function(object,instrument,start_date,end_date,pad){standardGeneric("getLevelData")})
+setGeneric("getLevelData",function(object,instrument,start_date,end_date,pad, source = .__DEFAULT_TRADE_LEVELS_DATA_SOURCE__. ){standardGeneric("getLevelData")})
 setMethod("getLevelData","TradeWarehouse",
-          function(object,instrument,start_date,end_date,pad){
-            lvl_data <- data_request("trade_levels",data.frame(lInstrumentID=instrument,
+          function(object,instrument,start_date,end_date,pad, source = .__DEFAULT_TRADE_LEVELS_DATA_SOURCE__. ){
+
+
+            if (source == "DB") {
+              sql_query <- new("DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate")
+
+              key <- data.frame(InstrumentID  = instrument,
+                                DateStart = as.Date(start_date) - pad ,
+                                DateEnd   = as.Date(end_date) + pad )
+
+              lvl_data <- executeSQLQuery(sql_query, key)
+
+
+            } else {
+              lvl_data <- data_request("trade_levels",data.frame(lInstrumentID=instrument,
                                                                dtDateFrom=as.Date((start_date-pad):(end_date+pad),'1970-01-01')),
                                      c("dtDateTo","dblStopLoss","dblProfitTarget","lTraderID","lStrategyID","lPositionLevelTypeID"))
-            lvl_data <- lvl_data@data
+              lvl_data <- lvl_data@data
+            }
+
+
+
             lvl_data <- subset(lvl_data,lvl_data$lTraderID==object@trader_id)
             lvl_data <- subset(lvl_data,lvl_data$lPositionLevelTypeID==1)#Get price levels only
             strat_key <- unique(object@psn_summary@data[c('StrategyID','Strategy')])
@@ -913,14 +959,14 @@ setMethod("buildTrades","TradeWarehouse",
               object <- updateMap(object,tid,instrument,cnt)
 
               new_trade <- new("Trade",
-                               order_id      = order_id,
-                               leg_start     = leg_start,
-                               leg_end       = leg_end,
+                               order_id      = as.integer(order_id),
+                               leg_start     = as.Date(leg_start),
+                               leg_end       = as.Date(leg_end),
                                long          = test_long(buysell),
                                value_usd     = value_usd,
                                strategy      = strategy,
                                trader        = trader,
-                               instrument    = instrument,
+                               instrument    = as.integer(instrument),
                                consolidation = consolidation,
                                status        = leg_status)
 
@@ -970,6 +1016,8 @@ build_warehouse <- function(trader,start,end, source = .__DEFAULT_TRADE_HISTORY_
     trd_data <- runURLs(trd_data,c(trd_url_query@url))
     trd_df <- getURLData(trd_data,1)
     trd_dataset <- new("TradeHistoryDataSet",trader_id=trd_url_query@user_ids,start_date=trd_url_query@start,end_date=trd_url_query@end)
+
+    trd_df$OrderID <- as.integer(NA)
 
   }
 

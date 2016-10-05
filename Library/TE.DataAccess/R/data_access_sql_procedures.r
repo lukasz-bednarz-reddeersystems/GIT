@@ -118,3 +118,86 @@ setClass(
   contains  = c("VirtualSQLProcedureCall")
 )
 
+
+#' DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate" class
+#'
+#' Implements handling querries for trade position level data
+#'
+#' Inherits from "VirtualSQLProcedureCall"
+#' @rdname PositionLevel_SelectFromHistoryByDate-class
+#' @export
+setClass(
+  Class     = "DataAccess.SQLProcedureCall.PositionLevel_SelectFromHistoryByDate",
+  prototype = list(
+    db_name    = .__DEFAULT_ODBC_DB_NAME__.,
+    db_schema  = .__DEFAULT_DB_SCHEMA__.,
+    key_cols   = c("InstrumentID", "DateStart", "DateEnd"),
+    key_values = data.frame(InstrumentID = integer(),
+                            DateStart = as.Date(character()),
+                            DateStart = as.Date(character())),
+    arguments    = c("@lInstrumentID", "@dtFrom" , "@dtTo"),
+    column_name_map = hash("lInstrumentID"         = "InstrumentID",
+                           "lStrategyID"           = "StrategyID",
+                           "lTraderID"             = "TraderID",
+                           "dtDateFrom"            = "DateFrom",
+                           "dtDateTo"              = "DateTo",
+                           "dblStopLoss"           = "StopLoss",
+                           "dblProfitTarget"       = "ProfitTarget",
+                           "sPlan"                 = "Plan",
+                           "lPositionLevelTypeID"  = "PositionLevelTypeID",
+                           "sPositionLevelType"    = "PositionLevelType",
+                           "lPositionID"           = "PositionID"
+                           ),
+    procedure    = "prPositionLevel_SelectFromHistoryByDate",
+    results_parser = TE.SQLQuery:::convert_column_class
+  ),
+  contains  = c("VirtualSQLProcedureCall")
+)
+
+
+
+#' DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy" class
+#'
+#' Implements handling querries for position history for given strategy
+#' and date range
+#'
+#' Inherits from "VirtualSQLProcedureCall"
+#' @rdname PositionService_SelectHistoryBetweenForStrategy-class
+#' @export
+setClass(
+  Class     = "DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenForStrategy",
+  prototype = list(
+    db_name    = .__DEFAULT_ODBC_DB_NAME__.,
+    db_schema  = .__DEFAULT_DB_SCHEMA__.,
+    key_cols   = c("Strategy", "DateStart", "DateEnd"),
+    key_values = data.frame(sStrategy = integer(),
+                            DateStart = as.Date(character()),
+                            DateStart = as.Date(character())),
+    arguments    = c("@sStrategy", "@dtFrom" , "@dtTo"),
+    column_name_map = hash("sPositionKey"          = "PositionKey",
+                           "dtDate"                = "Date",
+                           "lInstrumentID"         = "InstrumentID",
+                           "lQuantity"             = "Quantity",
+                           "sExternalRef"          = "ExternalRef",
+                           "dblUnitCostPLCurrency" = "UnitCostPLCurrency",
+                           "lPLCurrencyID"         = "PLCurrencyID",
+                           "sStrategy"             = "Strategy",
+                           "lStrategyID"           = "StrategyID",
+                           "lAge"                  = "Age",
+                           "lAgeWorkingDays"       = "AgeWorkingDays",
+                           "dblBeauchampTodayPL"   = "BeauchampTodayPL",
+                           "dblBeauchampMTDPL"     = "BeauchampMTDPL",
+                           "dblMarketValue"        = "MarketValue",
+                           "dblSwing"              = "Swing",
+                           "dblBeauchampMid"       = "BeauchampMid",
+                           "lFunctionID"           = "FunctionID"
+                           ),
+
+
+    procedure    = "prPositionService_SelectHistoryBetweenForStrategy",
+    results_parser = TE.SQLQuery:::convert_column_class
+  ),
+  contains  = c("VirtualSQLProcedureCall")
+)
+
+
