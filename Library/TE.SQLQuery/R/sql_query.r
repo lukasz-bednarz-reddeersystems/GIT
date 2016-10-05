@@ -298,7 +298,7 @@ setMethod(".translateSQLQueryColumnNames",
 #' @param key_values "data.frame" with query keys
 #' @export
 
-setGeneric("prepareSQLQuery", function(object, key_values){standardGeneric("prepareSQLQuery")})
+setGeneric("prepareSQLQuery", function(object, key_values = NA){standardGeneric("prepareSQLQuery")})
 
 
 #' @describeIn prepareSQLQuery
@@ -330,16 +330,13 @@ setMethod("prepareSQLQuery",
 #' Parses key_values to vector of SQL query strings
 #'
 #' @param object object of class 'VirtualSQLQuery'.
-#' @param key_values "missing" with query keys
 #' @return \code{object} object of class 'VirtualSQLQuery'.
 #' @export
 setMethod("prepareSQLQuery",
           signature(object = "VirtualSQLQuery", key_values = "missing"),
-          function(object, key_values){
+          function(object){
 
-            parser <- .getSQLQueryKeyValuesParser(object)
-
-            sql_strings <- parser(key_values)
+            sql_strings <- .getSQLProcedureName(object)
 
             object <- .setSQLQueryStrings(object, sql_strings)
 

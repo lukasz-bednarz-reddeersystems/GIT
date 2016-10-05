@@ -5,12 +5,10 @@
 \alias{prepareSQLQuery,VirtualSQLQuery,missing-method}
 \title{Prepare SQL query strings}
 \usage{
-\S4method{prepareSQLQuery}{VirtualSQLQuery,missing}(object, key_values)
+\S4method{prepareSQLQuery}{VirtualSQLQuery,missing}(object)
 }
 \arguments{
 \item{object}{object of class 'VirtualSQLQuery'.}
-
-\item{key_values}{"missing" with query keys}
 }
 \value{
 \code{object} object of class 'VirtualSQLQuery'.

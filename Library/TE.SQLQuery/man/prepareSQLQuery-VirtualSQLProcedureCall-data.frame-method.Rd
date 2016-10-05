@@ -6,7 +6,7 @@
 \title{Prepare SQL query strings}
 \usage{
 \S4method{prepareSQLQuery}{VirtualSQLProcedureCall,data.frame}(object,
-  key_values)
+  key_values = NA)
 }
 \arguments{
 \item{object}{object of class 'VirtualSQLProcedureCall'.}
