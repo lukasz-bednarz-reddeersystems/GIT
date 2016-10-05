@@ -98,3 +98,102 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_gt(nrow(ret), 0)
 })
+
+
+context("Test DataAccess.SQLProcedureCall.PositionHistory_SelectByTraderDate class")
+
+##############################################################################################
+#
+# Testing DataAccess.SQLProcedureCall.PositionHistory_SelectByTraderDate class
+#
+##############################################################################################
+
+
+tested.class     <- "DataAccess.SQLProcedureCall.PositionHistory_SelectByTraderDate"
+
+
+valid.key_cols   <- c("TraderID", "DateStart", "DateEnd")
+valid.key_values <- data.frame(TraderID  = 101L,
+                               DateStart = as.Date("2016-09-28"),
+                               DateEnd   = as.Date("2016-09-28") )
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+})
+
+
+test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object, valid.key_values)
+
+  expect_equal(getSQLQueryKeyValues(object), valid.key_values)
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object, valid.key_values)
+
+  expect_is(ret, "data.frame")
+
+  expect_gt(nrow(ret), 0)
+})
+
+
+
+context("Test DataAccess.SQLProcedureCall.prStrategy_SelectAll class")
+
+##############################################################################################
+#
+# Testing DataAccess.SQLProcedureCall.prStrategy_SelectAll class
+#
+##############################################################################################
+
+tested.class     <- "DataAccess.SQLProcedureCall.Strategy_SelectAll"
+
+
+valid.key_cols   <- c()
+valid.key_values <- data.frame()
+
+test_that(sprintf("Can instantiate %s class witht parameters", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+})
+
+
+test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object)
+
+  expect_is(object, tested.class)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  ret <- executeSQLQuery(object)
+
+  expect_is(ret, "data.frame")
+
+  expect_gt(nrow(ret), 0)
+})

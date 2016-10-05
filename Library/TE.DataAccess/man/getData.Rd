@@ -15,8 +15,6 @@ getData(object)
 }
 \value{
 \code{data} data.frame with raw data.
-
-\code{data} data.frame with raw data.
 }
 \description{
 Return data stored in the DataSet

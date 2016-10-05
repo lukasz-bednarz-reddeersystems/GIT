@@ -12,7 +12,7 @@ valid.start <- as.Date("2016-09-28")
 valid.end   <- as.Date("2016-09-28")
 
 
-test_that(sprintf("Can create instance of %", tested.class),{
+test_that(sprintf("Can create instance of %s", tested.class),{
 
   object <- new(tested.class)
 

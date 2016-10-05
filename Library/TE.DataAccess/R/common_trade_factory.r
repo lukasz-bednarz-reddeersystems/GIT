@@ -236,6 +236,7 @@ setMethod("fillPositionDataAndSummarise","TradeWarehouse",
 setGeneric("tradeFactory", function(object,trade_dataset,fill_price=FALSE,fill_positions=FALSE,fill_levels=FALSE){standardGeneric("tradeFactory")})
 setMethod("tradeFactory","TradeWarehouse",
           function(object,trade_dataset,fill_price=FALSE,fill_positions=FALSE,fill_levels=FALSE){
+
             object@start_date <- trade_dataset@start_date
             object@end_date <- trade_dataset@end_date
             object@trader_id <- trade_dataset@trader_id
@@ -256,7 +257,7 @@ setMethod("tradeFactory","TradeWarehouse",
               cnt <- cnt + 1
               message(paste("*****>> Object memory profile <<*****",sep=""))
               slts <- slotNames(object)
-              rp <- sort(sapply(paste("object@",slts,sep=""),function(x){eval(parse(text=paste("object.size(",x,")")))}))
+              rp <- sapply(paste("object@",slts,sep=""),function(x){eval(parse(text=paste("object.size(",x,")")))})
               message(paste(rp,collapse=', '))
             }
             return (object)
@@ -303,23 +304,61 @@ setMethod("fillTradeListPosns","TradeWarehouse",
           }
 )
 
-setGeneric("getPriceData",function(object,instrument,start_date,end_date,pad){standardGeneric("getPriceData")})
+setGeneric("getPriceData",function(object,instrument,start_date,end_date,pad, ...){standardGeneric("getPriceData")})
 setMethod("getPriceData","TradeWarehouse",
-          function(object,instrument,start_date,end_date,pad){
+          function(object,instrument,start_date,end_date,pad, data_source = .__DEFAULT_PRICE_HISTORY_DATA_SOURCE__.){
             #Building objects to hold input data on the fly like this is not the best way, and is
             #historical. All data requests should be handled by central dataplex objects.
             #(see getLevelData)
-            query <- new("InstrumentHistoryURL",instrument_ids=instrument,start=start_date-pad,end=end_date+pad)
-            prc_data <- new("URLParser",parser_type="XMLToFrame")
-            prc_data <- runURLs(prc_data,c(query@url))
-            dataset  <- tryCatch({
-              extract_entities(getURLData(prc_data,1))
-            }, error=function(cond){
-              message(paste("Failed to fill price data on",instrument,":",cond))
-              d <- new("TradePriceDataSet")
-              d <- setData(d,cbind(data.frame(DateTime=as.Date(object@start_date-pad:object@end_date+pad,origin="1970-01-01")),ClosePrice=NA,OutstandingShares=NA,TodayPL=NA,StopLoss=NA,ProfitTarget=NA))
-              return(d)
-            })
+
+            if (data_source == "DB") {
+              sql_query <- new("DataAccess.SQLProcedureCall.InstrumentHistoryRequired_QueryPriceHistoryFromTQA")
+
+              key <- data.frame(InstrumentID  = instrument,
+                                DateStart = as.Date(start_date) - pad,
+                                DateEnd   = as.Date(end_date) + pad)
+
+              prc_data <- executeSQLQuery(sql_query, key)
+
+              colnames(prc_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(prc_data))
+              prc_data <- prc_data[c("DateTime","ClosePrice","OutstandingShares")]
+
+              dataset <- new("TradePriceDataSet")
+
+              if (!is.na(prc_data) && nrow(prc_data) > 0){
+                dataset <- setData(dataset,
+                                   cbind(prc_data, TodayPL=NA,StopLoss=NA,ProfitTarget=NA))
+              }
+              else {
+                dataset <- setData(dataset,
+                                   cbind(data.frame(DateTime=as.Date(object@start_date-pad:object@end_date+pad,origin="1970-01-01")),
+                                         ClosePrice=NA,
+                                         OutstandingShares=NA,
+                                         TodayPL=NA,
+                                         StopLoss=NA,
+                                         ProfitTarget=NA))
+              }
+
+            }
+            else {
+              query <- new("InstrumentHistoryURL",instrument_ids=instrument,start=start_date-pad,end=end_date+pad)
+              prc_data <- new("URLParser",parser_type="XMLToFrame")
+              prc_data <- runURLs(prc_data,c(query@url))
+              dataset  <- tryCatch({
+                extract_entities(getURLData(prc_data,1))
+              }, error=function(cond){
+                message(paste("Failed to fill price data on",instrument,":",cond))
+                d <- new("TradePriceDataSet")
+                d <- setData(d,cbind(data.frame(DateTime=as.Date(object@start_date-pad:object@end_date+pad,origin="1970-01-01")),
+                                     ClosePrice=NA,
+                                     OutstandingShares=NA,
+                                     TodayPL=NA,
+                                     StopLoss=NA,
+                                     ProfitTarget=NA))
+                return(d)
+              })
+
+            }
             return(dataset)
           }
 )
@@ -410,7 +449,7 @@ setMethod("blockFill","TradeWarehouse",
     for(instrument in instruments){
       keys <- data.frame(lInstrumentID=instrument,dtDateTime=object@start_date)
       keys <- rbind(keys,data.frame(lInstrumentID=instrument,dtDateTime=object@end_date))
-      dtr  <- data_request(object@fctr_datstr,keys,c('lInstrumentID'))
+      # dtr  <- data_request(object@fctr_datstr,keys,c('lInstrumentID'))
       message(paste(round(100*(cnt/length(instruments))),"% complete.",sep=""))
       cnt <- cnt + 1
     }
@@ -431,9 +470,9 @@ setMethod("attachFeatures","TradeWarehouse",
         for(feature in features){
           feature_present <- isFeaturePresent(trades[[trade_id]],feature)
           if(feature_present == FALSE || replace_features == TRUE){
-            dates <- get_trade_dates(trades[[trade_id]])
-            daily_data <- trades[[trade_id]]@daily_data
-            strategy <- trades[[trade_id]]@strategy
+            # dates <- get_trade_dates(trades[[trade_id]])
+            # daily_data <- trades[[trade_id]]@daily_data
+            # strategy <- trades[[trade_id]]@strategy
             f <- new(feature)
             tryCatch({
                   eval(parse(text=paste("f <- update",feature,"(f,dates,instrument,strategy,daily_data)",sep="")))
@@ -844,6 +883,7 @@ setMethod("buildTrades","TradeWarehouse",
             cnt <- 1
             while(i <= n_trades){
 
+              order_id       <-  trade_panel[i,'OrderID']
               leg_start      <-  trade_panel[i,'TradeDate']
               buysell        <-  trade_panel[i,'BuySell']
               value_usd      <-  trade_panel[i,'ValueUSD']
@@ -865,24 +905,30 @@ setMethod("buildTrades","TradeWarehouse",
               }
               else
               {
-                consolidation = data.frame()
+                consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
                 leg_end = leg_start
               }
 
               tid <- murmur3.32(paste(leg_start,instrument,trader,value_usd,strategy,sep=""))
               object <- updateMap(object,tid,instrument,cnt)
-              trade_id <- c(trade_id,tid)
-              trades[[cnt]] <- new("Trade",
-                               trade_id = tid,
-                               leg_start = leg_start,
-                               leg_end = leg_end,
-                               long = test_long(buysell),
-                               value_usd =value_usd,
-                               strategy = strategy,
-                               trader = trader,
-                               instrument = instrument,
+
+              new_trade <- new("Trade",
+                               order_id      = order_id,
+                               leg_start     = leg_start,
+                               leg_end       = leg_end,
+                               long          = test_long(buysell),
+                               value_usd     = value_usd,
+                               strategy      = strategy,
+                               trader        = trader,
+                               instrument    = instrument,
                                consolidation = consolidation,
                                status        = leg_status)
+
+              trades[[cnt]] <- new_trade
+
+              tid <- getTradeID(new_trade)
+
+              trade_id <- c(trade_id,tid)
 
               i <- i+ leg_end_index + 1
               cnt <- cnt + 1
@@ -910,8 +956,10 @@ build_warehouse <- function(trader,start,end, source = .__DEFAULT_TRADE_HISTORY_
 
     sql_query <- new("DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID")
     trd_df <- executeSQLQuery(sql_query, key)
+    colnames(trd_df) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(trd_df))
+
     trd_dataset <- new("TradeHistoryDataSet",
-                       trader_id=unique(trd_df$TraderName)[1],
+                       trader_id=trader,
                        start_date=start,
                        end_date=end)
 
@@ -925,7 +973,10 @@ build_warehouse <- function(trader,start,end, source = .__DEFAULT_TRADE_HISTORY_
 
   }
 
-  trd_dataset <- setData(trd_dataset,trd_df)
+  trd_cols <- c(getDataSetKeyColumnNames(trd_dataset),
+                getDataSetDataColumnNames(trd_dataset))
+
+  trd_dataset <- setData(trd_dataset,trd_df[trd_cols])
 
   warehouse <- new("TradeWarehouse")
   warehouse <- tradeFactory(warehouse,trd_dataset,fill_price=TRUE,fill_positions=TRUE,fill_levels=TRUE)

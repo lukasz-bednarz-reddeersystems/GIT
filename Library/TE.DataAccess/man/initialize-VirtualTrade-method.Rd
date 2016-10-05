@@ -5,8 +5,8 @@
 \alias{initialize,VirtualTrade-method}
 \title{Initialize method for "VirtualTrade" class}
 \usage{
-\S4method{initialize}{VirtualTrade}(.Object, leg_start, leg_end, trader,
-  instrument, strategy, long, value_usd, consolidation, status)
+\S4method{initialize}{VirtualTrade}(.Object, order_id, leg_start, leg_end,
+  trader, instrument, strategy, long, value_usd, consolidation, status)
 }
 \arguments{
 \item{.Object}{object of class "VirtualTrade"}

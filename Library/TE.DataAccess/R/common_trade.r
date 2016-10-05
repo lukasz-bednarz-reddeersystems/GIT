@@ -53,7 +53,8 @@ setClassUnion("NullableDate",c('NULL','Date'))
 setClass(
   Class          = "VirtualTrade",
   representation = representation(
-    trade_id     = "numeric",
+    trade_id     = "integer",
+    order_id     = "integer",
     leg_start    = "Date",
     leg_end      = "NullableDate",
     long         = "logical",
@@ -92,6 +93,7 @@ setClass(
 #' @return \code{.Object} object of class "VirtualTrade"
 setMethod("initialize", "VirtualTrade",
           function(.Object,
+                   order_id,
                    leg_start,
                    leg_end,
                    trader,
@@ -102,11 +104,29 @@ setMethod("initialize", "VirtualTrade",
                    consolidation,
                    status
                    ){
+            .Object@order_id      <- order_id
+            .Object@leg_start     <- leg_start
+            .Object@leg_end       <- leg_end
+            .Object@trader        <- trader
+            .Object@instrument    <- instrument
+            .Object@strategy      <- strategy
+            .Object@long          <- long
+            .Object@value_usd     <- value_usd
+            .Object@consolidation <- consolidation
+            .Object@status        <- status
 
             .Object@trade_id <- murmur3.32(paste(leg_start,instrument,trader,value_usd,strategy,sep=""))
 
             return(.Object)
 
+          }
+)
+
+
+setGeneric("getTradeID", function(object,feature,date){standardGeneric("getTradeID")})
+setMethod("getTradeID","VirtualTrade",
+          function(object){
+            return(object@trade_id)
           }
 )
 
