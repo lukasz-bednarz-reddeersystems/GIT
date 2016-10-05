@@ -25,7 +25,7 @@ setClass(
 position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITION_HISTORY_DATA_SOURCE__.){
 
   if(source == "DB"){
-    #This to be handled properly with database objects
+    #This to be handled properly with reference classes
 
     sql_query <- new("DataAccess.SQLProcedureCall.PositionHistory_SelectByTraderDate")
 
@@ -44,9 +44,9 @@ position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITI
 
     sql_query <- new("DataAccess.SQLProcedureCall.Strategy_SelectAll")
     str_data <- executeSQLQuery(sql_query)
+    colnames(str_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(str_data))
 
-    urls <- c(middleware_urls@strategies_url)
-
+    str_data <- str_data[c("StrategyID","Name","Active","Trader","FundGroup","UserID","Alias","Group","Type","Direction","Description","AliasID","GroupID","TypeID","InitiatorID")]
 
     } else {
 
