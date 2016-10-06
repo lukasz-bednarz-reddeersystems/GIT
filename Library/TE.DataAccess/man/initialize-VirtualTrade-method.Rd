@@ -6,10 +6,12 @@
 \title{Initialize method for "VirtualTrade" class}
 \usage{
 \S4method{initialize}{VirtualTrade}(.Object, order_id, leg_start, leg_end,
-  trader, instrument, strategy, long, value_usd, consolidation, status)
+  trader, instrument, strategy, long, buysell, value_usd, consolidation, status)
 }
 \arguments{
 \item{.Object}{object of class "VirtualTrade"}
+
+\item{order_id}{"integer" order ID of the trade}
 
 \item{leg_start}{"Date" date of start of trade leg}
 
@@ -22,6 +24,8 @@
 \item{strategy}{"character" name of the traded strategy}
 
 \item{long}{"logical" is Trade Long or Short}
+
+\item{buysell}{"character" buy or sell c("Buy", "Sell")}
 
 \item{value_usd}{"numeric" value of trade in USD}
 

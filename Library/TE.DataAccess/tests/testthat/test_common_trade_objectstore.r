@@ -11,8 +11,8 @@ valid.key  <- data.frame(id          = "1984",
                          instrument  = 4454L,
                          buysell     = "Buy",
                          strategy    = "LB_TEST",
-                         start       = as.Date("2016-03-29"),
-                         end         = as.Date("2016-04-01"),
+                         leg_start   = as.Date("2016-03-29"),
+                         leg_end     = as.Date("2016-04-01"),
                          status      = "Closed",
                          stringsAsFactors = FALSE)
 
@@ -25,6 +25,7 @@ test_that("Can create new Trade", {
                       leg_start = valid.key$start,
                       leg_end = valid.key$start,
                       long = TE.DataAccess:::test_long(valid.key$buysell),
+                      buysell = valid.key$buysell,
                       value_usd =1000,
                       strategy = valid.key$strategy,
                       trader = valid.key$id,

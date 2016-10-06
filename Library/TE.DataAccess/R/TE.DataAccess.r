@@ -40,7 +40,7 @@ NULL
 .__DEFAULT_DB_USER__.        <- Sys.info()["user"]
 .__DEFAULT_DB_SCHEMA__.      <- "Research"
 
-.__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. <- "Middleware" # possible values: c("DB", "Middleware")
+.__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. <- "DB" # possible values: c("DB", "Middleware")
 .__DEFAULT_POSITION_HISTORY_DATA_SOURCE__. <- .__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. # possible values: c("DB", "Middleware")
 .__DEFAULT_PRICE_HISTORY_DATA_SOURCE__. <- .__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. # possible values: c("DB", "Middleware")
 .__DEFAULT_TRADE_LEVELS_DATA_SOURCE__. <- .__DEFAULT_TRADE_HISTORY_DATA_SOURCE__. # possible values: c("DB", "Middleware")
