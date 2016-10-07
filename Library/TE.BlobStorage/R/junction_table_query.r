@@ -467,7 +467,7 @@ setClass(
                               "CreatedDate",
                               "CreatedByUserID",
                               "FileName",
-                              "HashIDs",
+                              "HashID",
                               "TraderID",
                               "InstrumentID",
                               "Direction",
