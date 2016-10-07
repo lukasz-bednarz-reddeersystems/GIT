@@ -60,6 +60,15 @@ setMethod("initialize", "TradeWarehouse",
           }
 )
 
+
+setGeneric("getTraderID", function(object){standardGeneric("getTraderID")})
+setMethod("getTraderID",
+          signature(object     = "TradeWarehouse"),
+          function(object){
+            return(object@trader_id)
+          }
+)
+
 setGeneric(".storeTrade", function(object, instrument, index, trade){standardGeneric(".storeTrade")})
 setMethod(".storeTrade",
           signature(object     = "TradeWarehouse",
@@ -262,7 +271,6 @@ setMethod("computeInstrumentReturn","TradeWarehouse",
               prc <- tryCatch({
                 getPriceData(object,ins,object@start_date,object@end_date,0)
               }, error = function(cond) {
-                browser()
                 message(sprintf("Problem when computing returns for instrument %s", ins))
                 stop(sprintf("Problem when computing returns for instrument %s", ins))
               })
@@ -270,7 +278,6 @@ setMethod("computeInstrumentReturn","TradeWarehouse",
               row <- tryCatch({
                 data.frame(InstrumentID=ins,StockReturn=prc@data[[nrow(prc@data),'ClosePrice']]/prc@data[[1,'ClosePrice']])
               }, error = function(cond) {
-                browser()
                 message(sprintf("Problem when computing returns for instrument %s", ins))
                 stop(sprintf("Problem when computing returns for instrument %s", ins))
               })
@@ -284,7 +291,6 @@ setMethod("computeInstrumentReturn","TradeWarehouse",
                 rtns <- tryCatch({
                   rbind(rtns,row)
                 }, error = function(cond) {
-                  browser()
                   message(sprintf("Problem when computing returns for instrument %s", ins))
                   stop(sprintf("Problem when computing returns for instrument %s", ins))
                 })
@@ -447,7 +453,7 @@ setMethod("fillTradeListPrices","TradeWarehouse",
           function(object,instrument){
             message(paste("Attempting to fill price data for instrument",instrument))
 
-            trd <- .getTrade(object, instrument, 1)
+            trd <- .getTrade(object, instrument, 1L)
 
             start_date <- getTradeLegStartDate(trd)
             end_date <- getTradeLegEndDate(trd)
@@ -503,7 +509,7 @@ setMethod("fillTradeLevels","TradeWarehouse",
           function(object,instrument){
             message(paste("Attempting to fill trade level data for instrument",instrument))
             lvl_data <- tryCatch({
-                            data_pad <- getTradeDailyDataPad(.getTrade(object, instrument, 1))
+                            data_pad <- getTradeDailyDataPad(.getTrade(object, instrument, 1L))
                             getLevelData(object,instrument,object@start_date,object@end_date,data_pad)
                         }, error=function(cond){
                             stop(paste("Error when getting trade level data on instrument",instrument,":",cond))
@@ -610,11 +616,8 @@ setMethod("resetAllTradeFeatures","TradeWarehouse",
 setGeneric("resetTradeFeatures",function(object,trade_id){standardGeneric("resetTradeFeatures")})
 setMethod("resetTradeFeatures","TradeWarehouse",
           function(object,trade_id){
-            tid <- as.character(trade_id)
-            instrument <- object@map[[tid]]['InstrumentID']
-            index <- object@map[[tid]]['Index']
 
-            trade <- .getTrade(object, instrument, index)
+            trade <- getTrade(trade_id)
             trade <- .setTradeFeaturesList(trade, list())
             object <- .storeTrade(object, trade)
 
@@ -897,6 +900,7 @@ setMethod("getTradeInformation","TradeWarehouse",
               info <- cbind(data.frame(Trader=trade@trader),trade@consolidation[!is.na(trade@consolidation$TradeDate), ])
               info <- cbind(data.frame(Instrument=trade@instrument),info)
               info <- cbind(data.frame(TradeID=trade@trade_id),info)
+              info <- cbind(data.frame(LegStatus=trade@status),info)
               info <- cbind(data.frame(Long=trade@long),info)
               info <- rbind(parent,info)
             }
@@ -985,6 +989,7 @@ setGeneric("buildTrades",function(object,trade_panel){standardGeneric("buildTrad
 setMethod("buildTrades","TradeWarehouse",
           function(object,trade_panel){
             n_trades <- nrow(trade_panel)
+            trader_id <- getTraderID(object)
             trades <- list()
             trade_id <- c()
             i <- 1
@@ -1016,6 +1021,7 @@ setMethod("buildTrades","TradeWarehouse",
               else
               {
                 consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
+                consolidation = data.frame();
                 leg_end = leg_start
               }
 
@@ -1029,6 +1035,7 @@ setMethod("buildTrades","TradeWarehouse",
                                value_usd     = value_usd,
                                strategy      = strategy,
                                trader        = trader,
+                               trader_id     = as.integer(trader_id),
                                instrument    = as.integer(instrument),
                                consolidation = consolidation,
                                status        = leg_status)

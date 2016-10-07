@@ -88,7 +88,7 @@ setMethod("isTradeStored",
               rval <- FALSE
             }
             else{
-              hash <- hash_data_frame(key[object@fields[2:7]], algo = "murmur32")
+              hash <- hash_data_frame(key[object@fields[2:6]], algo = "murmur32")
 
               rval <- hash%in%object@known_keys[['hash']]
 
@@ -122,7 +122,7 @@ setMethod(".generateRemoteQueryKey",
 
 
 setMethod(".generateRemoteInsertKey",
-          signature(object = "RemoteObjectQuery",
+          signature(object = "VirtualRemoteTradeQuery",
                     key = "data.frame"),
           function(object,key){
 
@@ -269,6 +269,7 @@ setMethod(".generateKeyFromID",
 
 setMethod("initialize", "TradeObjectStore",
           function(.Object,id, key){
+            .Object@stored <- new.env(parent = emptyenv())
             .Object@id <- id
             .Object@objectstore_key <- key
             .Object@data_path <- tempdir()

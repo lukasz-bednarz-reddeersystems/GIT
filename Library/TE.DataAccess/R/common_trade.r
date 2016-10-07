@@ -59,11 +59,13 @@ setClass(
     leg_start    = "Date",
     leg_end      = "NullableDate",
     long         = "logical",
+    buysell      = "character",
     value_usd    = "numeric",
     features     = "list",
     daily_data   = "DataSet",
     strategy     = "character",
     trader       = "character",
+    trader_id    = "integer",
     instrument   = "integer",
     consolidation= "data.frame",
     dly_data_pad = "integer",
@@ -100,6 +102,7 @@ setMethod("initialize", "VirtualTrade",
                    leg_start,
                    leg_end,
                    trader,
+                   trader_id,
                    instrument,
                    strategy,
                    long,
@@ -109,14 +112,15 @@ setMethod("initialize", "VirtualTrade",
                    status
                    ){
 
-            browser()
             .Object@order_id      <- order_id
             .Object@leg_start     <- leg_start
             .Object@leg_end       <- leg_end
             .Object@trader        <- trader
+            .Object@trader_id     <- trader_id
             .Object@instrument    <- instrument
             .Object@strategy      <- strategy
             .Object@long          <- long
+            .Object@buysell       <- buysell
             .Object@value_usd     <- value_usd
             .Object@consolidation <- consolidation
             .Object@status        <- status
@@ -126,32 +130,6 @@ setMethod("initialize", "VirtualTrade",
                                                 trader,
                                                 value_usd,
                                                 strategy)
-
-
-            if (TRUE) {
-              # generate key to query remote store
-              key <- data.frame(id         = trader,
-                                instrument = instrument,
-                                buysell    = buysell,
-                                strategy   = strategy,
-                                leg_start  = leg_start,
-                                leg_end    = leg_end,
-                                status     = status,
-                                stringsAsFactors = FALSE
-                                )
-
-              # query remote store
-              trdstr <- trade_objectstore_factory(key)
-              query <- getObjectStoreQuery(trdstr)
-              is_known <- isKeyKnown(query, key)
-
-              if (is_known){
-                stored_trd <- queryTradeStore(trdstr, key)
-
-                .Object <- mergeTradeConsolidation(.Object, stored_trd)
-              }
-
-            }
 
             return(.Object)
           }
@@ -268,7 +246,7 @@ setMethod("mergeTradeConsolidation",
             }
 
             merged_trade <- .setTradeConsolidation(stored_trade, merged_cons)
-            merged_trade <- .setTradeLegStatus(merged_leg_status)
+            merged_trade <- .setTradeLegStatus(merged_trade, merged_leg_status)
 
             return(merged_trade)
           }
@@ -401,7 +379,7 @@ setMethod(".setTradeLegStatus",
                     status = "character"),
           function(object, status){
             object@status <- status
-            return(object@status)
+            return(object)
           }
 )
 
@@ -453,6 +431,16 @@ setMethod("getTrader",
             return(object@trader)
           }
 )
+
+
+setGeneric("getTraderID", function(object){standardGeneric("getTraderID")})
+setMethod("getTraderID",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@trader_id)
+          }
+)
+
 
 setGeneric("getTradeDailyDataPad", function(object){standardGeneric("getTradeDailyDataPad")})
 setMethod("getTradeDailyDataPad",
@@ -722,6 +710,116 @@ setMethod("isPsnLong",
           }
 )
 
+
+setClass(
+  Class    = "VirtualRemoteStoredTrade",
+  contains = c("VirtualTrade")
+)
+
+setGeneric("getRemoteTradeStoreKey", function(object){standardGeneric("getRemoteTradeStoreKey")})
+setMethod("getRemoteTradeStoreKey",
+          signature(object = "VirtualRemoteStoredTrade"),
+          function(object){
+
+            key <- data.frame(id         = as.character(object@trader_id),
+                              instrument = object@instrument,
+                              buysell    = object@buysell,
+                              strategy   = object@strategy,
+                              leg_start  = object@leg_start,
+                              leg_end    = object@leg_end,
+                              status     = object@status,
+                              stringsAsFactors = FALSE
+                              )
+            return(key)
+          }
+)
+
+
+setGeneric("saveTradeInRemoteStore", function(object){standardGeneric("saveTradeInRemoteStore")})
+setMethod("saveTradeInRemoteStore",
+          signature(object = "VirtualRemoteStoredTrade"),
+          function(object){
+
+            key <- getRemoteTradeStoreKey(object)
+
+            trdstr <- trade_objectstore_factory(key)
+
+            trdstr <- updateTradeStore(trdstr, object, key, TRUE)
+
+            ret <- commitTradeStore(trdstr)
+
+            if (!ret){
+              message(sprintf("Trade: %s couldn't be commited.", getTradeID(object)))
+            }
+
+            return(ret)
+          }
+)
+
+#' Initialize method for "VirtualTrade" class
+#'
+#' @param .Object object of class "VirtualTrade"
+#' @param order_id "integer" order ID of the trade
+#' @param leg_start "Date" date of start of trade leg
+#' @param leg_end "NullableDate" date of end of trade leg
+#' @param trader "character" integer id if the trader as character
+#' @param instrument "integer" ID of the traded instrument
+#' @param strategy "character" name of the traded strategy
+#' @param long "logical" is Trade Long or Short
+#' @param buysell "character" buy or sell c("Buy", "Sell")
+#' @param value_usd "numeric" value of trade in USD
+#' @param consolidation "data.frame" with data related to trade leg.
+#'        should contain columns : c('TradeDate','ValueUSD','Strategy', 'OrderID')
+#' @param status, object of class "VirtualTrade"
+#' @return \code{.Object} object of class "VirtualTrade"
+setMethod("initialize", "VirtualRemoteStoredTrade",
+          function(.Object,
+                   order_id,
+                   leg_start,
+                   leg_end,
+                   trader,
+                   trader_id,
+                   instrument,
+                   strategy,
+                   long,
+                   buysell,
+                   value_usd,
+                   consolidation,
+                   status
+          ){
+
+            .Object <- callNextMethod()
+
+            if (TRUE) {
+              # generate key to query remote store
+              key <- data.frame(id         = as.character(trader_id),
+                                instrument = instrument,
+                                buysell    = buysell,
+                                strategy   = strategy,
+                                leg_start  = leg_start,
+                                leg_end    = leg_end,
+                                status     = status,
+                                stringsAsFactors = FALSE
+              )
+
+              # query remote store
+              trdstr <- trade_objectstore_factory(key)
+              query <- getObjectStoreQuery(trdstr)
+
+              is_known <- isTradeStored(query, key)
+
+              if (is_known){
+                stored_trd <- queryTradeStore(trdstr, key)
+
+                .Object <- mergeTradeConsolidation(.Object, stored_trd)
+              }
+
+            }
+
+            return(.Object)
+          }
+)
+
 #' Concrete S4 class for storing trade info.
 #'
 #' Stores information about trade leg together with
@@ -732,5 +830,5 @@ setMethod("isPsnLong",
 setClass(
   Class          = "Trade",
 
-  contains = c("VirtualTrade")
+  contains = c("VirtualRemoteStoredTrade")
 )
