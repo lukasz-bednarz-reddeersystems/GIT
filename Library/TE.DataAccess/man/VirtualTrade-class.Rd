@@ -11,27 +11,29 @@ all necessary "features" that can be attached
 \section{Slots}{
 
 \describe{
-\item{\code{trade_id}}{"numeric",}
+\item{\code{trade_id}}{"numeric"}
 
-\item{\code{leg_start}}{"Date",}
+\item{\code{order_id}}{"integer"}
 
-\item{\code{leg_end}}{"NullableDate",}
+\item{\code{leg_start}}{"Date"}
 
-\item{\code{long}}{"logical",}
+\item{\code{leg_end}}{"NullableDate"}
 
-\item{\code{value_usd}}{"numeric",}
+\item{\code{long}}{"logical"}
 
-\item{\code{features}}{"list",}
+\item{\code{value_usd}}{"numeric"}
 
-\item{\code{daily_data}}{"DataSet",}
+\item{\code{features}}{"list"}
 
-\item{\code{strategy}}{"character",}
+\item{\code{daily_data}}{"DataSet"}
 
-\item{\code{trader}}{"character",}
+\item{\code{strategy}}{"character"}
 
-\item{\code{instrument}}{"numeric",}
+\item{\code{trader}}{"character"}
 
-\item{\code{consolidation}}{"data.frame",}
+\item{\code{instrument}}{"numeric"}
+
+\item{\code{consolidation}}{"data.frame"}
 
 \item{\code{dly_data_pad}}{"integer",}
 

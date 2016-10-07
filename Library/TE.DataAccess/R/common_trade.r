@@ -33,17 +33,18 @@ setClassUnion("NullableDate",c('NULL','Date'))
 #' all necessary "features" that can be attached
 #'
 #'
-#' @slot trade_id      "numeric",
-#' @slot leg_start     "Date",
-#' @slot leg_end       "NullableDate",
-#' @slot long          "logical",
-#' @slot value_usd     "numeric",
-#' @slot features      "list",
-#' @slot daily_data    "DataSet",
-#' @slot strategy      "character",
-#' @slot trader        "character",
-#' @slot instrument    "numeric",
-#' @slot consolidation "data.frame",
+#' @slot trade_id      "numeric"
+#' @slot order_id      "integer"
+#' @slot leg_start     "Date"
+#' @slot leg_end       "NullableDate"
+#' @slot long          "logical"
+#' @slot value_usd     "numeric"
+#' @slot features      "list"
+#' @slot daily_data    "DataSet"
+#' @slot strategy      "character"
+#' @slot trader        "character"
+#' @slot instrument    "numeric"
+#' @slot consolidation "data.frame"
 #' @slot dly_data_pad  "integer",
 #' @slot datekey       "character"
 #' @slot status        "character"
@@ -80,6 +81,7 @@ setClass(
 #' Initialize method for "VirtualTrade" class
 #'
 #' @param .Object object of class "VirtualTrade"
+#' @param order_id "integer" order ID of the trade
 #' @param leg_start "Date" date of start of trade leg
 #' @param leg_end "NullableDate" date of end of trade leg
 #' @param trader "character" integer id if the trader as character

@@ -11,6 +11,8 @@
 \arguments{
 \item{.Object}{object of class "VirtualTrade"}
 
+\item{order_id}{"integer" order ID of the trade}
+
 \item{leg_start}{"Date" date of start of trade leg}
 
 \item{leg_end}{"NullableDate" date of end of trade leg}
