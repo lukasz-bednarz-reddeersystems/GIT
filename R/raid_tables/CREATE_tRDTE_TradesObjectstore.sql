@@ -34,6 +34,7 @@ CONSTRAINT [AK_FileTableDB_TradesObjectstore_HashIDPathLocator] UNIQUE NONCLUSTE
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
  CONSTRAINT [AK_FileTableDB_TradesObjectstore_HashIDCreatedUser] UNIQUE NONCLUSTERED 
 (
+	[bHashID] ASC,
 	[lTraderID] ASC,
 	[lInstrumentID] ASC,
 	[sDirection] ASC,
