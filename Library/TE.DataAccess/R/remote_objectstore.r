@@ -247,7 +247,6 @@ setMethod("updateKnownRemoteKeys","RemoteObjectQuery",
 
             tb_name <- .getObjectQueryTableName(object)
 
-
             ret <- tryCatch({
               executeSQLQuery(sql_insert, key)
             }, error = function(cond){
@@ -374,7 +373,6 @@ setMethod("saveObjectInRemoteStore",
           signature(object = "VirtualRemoteObjectStore"),
           function(object){
 
-
             filename <- paste0(getID(object),
                                "_objectstore_",
                                today(),
@@ -398,7 +396,7 @@ setMethod("saveObjectInRemoteStore",
             message(paste("Object store saving to path:",pth))
             rsp    <- store_file_in_referenced_filetable(pth, table, db, schema, overwrite = TRUE)
 
-            if (rsp != 0) {
+            if (rsp <= 0) {
               message(sprintf("Object hasn't been saved in remote path: %s, code : %s",
                               get_referenced_filetable_path(table, db, schema),
                               rsp))

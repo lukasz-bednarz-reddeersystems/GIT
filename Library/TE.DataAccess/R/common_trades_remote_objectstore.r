@@ -14,7 +14,7 @@ NULL
 
 get_trade_objectstore_name <- function(keys) {
 
-  key_cols <- c('id', 'instrument', 'buysell', 'strategy', 'start')
+  key_cols <- c('id', 'instrument', 'buysell', 'strategy', 'leg_start')
 
   rv <- apply(keys[key_cols], 1, function(x){paste0(c("trade_store", unlist(x)), collapse = "_")})
   return(rv)
@@ -42,7 +42,7 @@ key_from_trade_objectstore_name <- function(name) {
 setClass(
   Class          = "VirtualTradeQuery",
   prototype = prototype(
-    fields       = c('hash', 'id', 'instrument', 'buysell', 'strategy', 'start', 'end', 'status')
+    fields       = c('hash', 'id', 'instrument', 'buysell', 'strategy', 'leg_start', 'leg_end', 'status')
   ), contains = c("ObjectQuery", "VIRTUAL")
 )
 
@@ -88,7 +88,7 @@ setMethod("isTradeStored",
               rval <- FALSE
             }
             else{
-              hash <- hash_data_frame(key[object@fields[2:7]], algo = "murmur32")
+              hash <- hash_data_frame(key[object@fields[2:6]], algo = "murmur32")
 
               rval <- hash%in%object@known_keys[['hash']]
 
@@ -111,7 +111,7 @@ setMethod(".generateRemoteQueryKey",
 
             sql_query <- getSQLQueryObject(object)
 
-            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'start', 'end')]
+            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'leg_start', 'leg_end')]
 
 
             colnames(key) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(key))
@@ -122,13 +122,13 @@ setMethod(".generateRemoteQueryKey",
 
 
 setMethod(".generateRemoteInsertKey",
-          signature(object = "RemoteObjectQuery",
+          signature(object = "VirtualRemoteTradeQuery",
                     key = "data.frame"),
           function(object,key){
 
             sql <- getSQLInsertObject(object)
 
-            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'start', 'end', 'status')]
+            key <- key[c('id', 'instrument', 'buysell', 'strategy', 'leg_start', 'leg_end', 'status')]
 
             colnames(key) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql, colnames(key))
 
@@ -269,6 +269,7 @@ setMethod(".generateKeyFromID",
 
 setMethod("initialize", "TradeObjectStore",
           function(.Object,id, key){
+            .Object@stored <- new.env(parent = emptyenv())
             .Object@id <- id
             .Object@objectstore_key <- key
             .Object@data_path <- tempdir()
@@ -416,7 +417,7 @@ setMethod("getTradeStoreContents","TradeObjectStore",
 #' associated file if exists.
 #'
 #' @param key "data.frame", with keys for trade
-#' required keys are: c("id", "instrument", "buysell", "strategy", "legstart", "legend")
+#' required keys are: c("id", "instrument", "buysell", "strategy", "start", "end")
 #'
 #' @export
 

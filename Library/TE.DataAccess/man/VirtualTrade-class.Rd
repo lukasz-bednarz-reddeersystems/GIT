@@ -11,7 +11,7 @@ all necessary "features" that can be attached
 \section{Slots}{
 
 \describe{
-\item{\code{trade_id}}{"numeric"}
+\item{\code{trade_id}}{"integer"}
 
 \item{\code{order_id}}{"integer"}
 
@@ -31,11 +31,11 @@ all necessary "features" that can be attached
 
 \item{\code{trader}}{"character"}
 
-\item{\code{instrument}}{"numeric"}
+\item{\code{instrument}}{"integer"}
 
 \item{\code{consolidation}}{"data.frame"}
 
-\item{\code{dly_data_pad}}{"integer",}
+\item{\code{dly_data_pad}}{"integer"}
 
 \item{\code{datekey}}{"character"}
 

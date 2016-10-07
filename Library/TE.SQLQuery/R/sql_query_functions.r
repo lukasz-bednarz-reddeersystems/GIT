@@ -79,8 +79,8 @@ convert_column_class <- function(df, classes = NULL) {
 
   class_names <- unlist(class_names)
 
-  ret_data <- as.data.frame(lapply(seq(length(class_names)),
-                                   function(x) {as(df[,x], class_names[x])}), stringsAsFactors = FALSE)
+  ret_data <- suppressWarnings(as.data.frame(lapply(seq(length(class_names)),
+                                   function(x) {as(df[,x], class_names[x])}), stringsAsFactors = FALSE))
 
 
   colnames(ret_data) <- cols

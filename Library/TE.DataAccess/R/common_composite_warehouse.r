@@ -143,7 +143,7 @@ setMethod("generateMap","CompositeWarehouse",
 		  	object@map <- list()
 		  	instruments <- ls(object@trades)
 		  	for(instrument in instruments){
-		  		trade_list <- object@trades[[instrument]]
+		  		trade_list <- getInstrumentTrades(object, instrument)
 		  		dex <- 1
 		  		for(trade in trade_list){
 		  			object <- tryCatch({

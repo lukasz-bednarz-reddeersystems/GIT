@@ -26,3 +26,5 @@ test_that(sprintf("Can build_warehouse()", tested.class),{
 
   expect_is(object, tested.class)
 })
+
+

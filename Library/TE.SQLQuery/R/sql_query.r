@@ -409,7 +409,11 @@ setMethod("executeSQLQuery",
 
             parser <- .getSQLQueryResultsParser(object)
 
-            ret_df <- parser(ret_df)
+            ret_df <- tryCatch({
+              parser(ret_df)
+            }, error = function(cond){
+              message(sprintf("Error when parsing SQLQuery results for %s", class(object)))
+            })
 
             return(ret_df)
           }

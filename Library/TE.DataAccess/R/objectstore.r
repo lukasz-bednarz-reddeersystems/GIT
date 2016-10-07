@@ -333,6 +333,26 @@ setMethod("placeInObjectStore","VirtualObjectStore",
 	      }
 )
 
+setGeneric("removeFromObjectStore",function(object,name){standardGeneric("removeFromObjectStore")})
+setMethod("removeFromObjectStore",
+          signature(object = "VirtualObjectStore",
+                    name = "character"),
+          function(object, name){
+
+            if(name %in% ls(object@stored)){
+              remove(list = name, envir = object@stored)
+              message(sprintf("Removed object %s from objectstore %s",
+                              name, getID(object)))
+            } else {
+              message(sprintf("Requested to remove nonexistent object %s from objectstore %s",
+                              name, getID(object)))
+            }
+
+            return(object)
+
+          }
+)
+
 setGeneric("getFromObjectStore",function(object,name){standardGeneric("getFromObjectStore")})
 setMethod("getFromObjectStore","VirtualObjectStore",
 	      function(object,name){
