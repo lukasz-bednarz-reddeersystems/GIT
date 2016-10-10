@@ -18,7 +18,9 @@
 
 \item{leg_end}{"NullableDate" date of end of trade leg}
 
-\item{trader}{"character" integer id if the trader as character}
+\item{trader}{"character" trader initials}
+
+\item{trader_id}{"integer" trader id}
 
 \item{instrument}{"integer" ID of the traded instrument}
 

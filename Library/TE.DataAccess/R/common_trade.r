@@ -38,11 +38,13 @@ setClassUnion("NullableDate",c('NULL','Date'))
 #' @slot leg_start     "Date"
 #' @slot leg_end       "NullableDate"
 #' @slot long          "logical"
+#' @slot buysell       "character"
 #' @slot value_usd     "numeric"
 #' @slot features      "list"
 #' @slot daily_data    "DataSet"
 #' @slot strategy      "character"
 #' @slot trader        "character"
+#' @slot trader_id     "integer"
 #' @slot instrument    "integer"
 #' @slot consolidation "data.frame"
 #' @slot dly_data_pad  "integer"
@@ -87,6 +89,7 @@ setClass(
 #' @param leg_start "Date" date of start of trade leg
 #' @param leg_end "NullableDate" date of end of trade leg
 #' @param trader "character" integer id if the trader as character
+#' @param trader_id "integer" trader id
 #' @param instrument "integer" ID of the traded instrument
 #' @param strategy "character" name of the traded strategy
 #' @param long "logical" is Trade Long or Short
@@ -762,7 +765,8 @@ setMethod("saveTradeInRemoteStore",
 #' @param order_id "integer" order ID of the trade
 #' @param leg_start "Date" date of start of trade leg
 #' @param leg_end "NullableDate" date of end of trade leg
-#' @param trader "character" integer id if the trader as character
+#' @param trader "character" trader initials
+#' @param trader_id "integer" trader id
 #' @param instrument "integer" ID of the traded instrument
 #' @param strategy "character" name of the traded strategy
 #' @param long "logical" is Trade Long or Short

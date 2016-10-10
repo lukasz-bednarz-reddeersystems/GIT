@@ -8,7 +8,7 @@ trade_objectstore_factory(key)
 }
 \arguments{
 \item{key}{"data.frame", with keys for trade
-required keys are: c("id", "instrument", "buysell", "strategy", "start", "end")}
+required keys are: c("id", "instrument", "buysell", "strategy", "leg_start", "leg_end")}
 }
 \description{
 Creates Trade ObjectStore and loads data from

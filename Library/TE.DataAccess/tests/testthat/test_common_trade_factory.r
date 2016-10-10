@@ -7,7 +7,7 @@ context("Test Trade Warehouse")
 #
 ##############################################################################################
 tested.class <- "TradeWarehouse"
-valid.trader <- 101L
+valid.trader <- 11L
 valid.start <- as.Date("2016-09-28")
 valid.end   <- as.Date("2016-09-28")
 

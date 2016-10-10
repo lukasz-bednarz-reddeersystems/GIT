@@ -20,6 +20,8 @@
 
 \item{trader}{"character" integer id if the trader as character}
 
+\item{trader_id}{"integer" trader id}
+
 \item{instrument}{"integer" ID of the traded instrument}
 
 \item{strategy}{"character" name of the traded strategy}

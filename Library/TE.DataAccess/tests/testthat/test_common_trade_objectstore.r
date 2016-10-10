@@ -22,16 +22,18 @@ valid.name <- get_trade_objectstore_name(valid.key)
 test_that("Can create new Trade", {
   set.seed(1)
   valid.trade <<- new("Trade",
-                      leg_start = valid.key$start,
-                      leg_end = valid.key$start,
+                      order_id = 1L,
+                      trader_id = as.integer(valid.key$id),
+                      leg_start = valid.key$leg_start,
+                      leg_end = valid.key$leg_end,
                       long = TE.DataAccess:::test_long(valid.key$buysell),
                       buysell = valid.key$buysell,
                       value_usd =1000,
                       strategy = valid.key$strategy,
                       trader = valid.key$id,
                       instrument = valid.key$instrument,
-                      consolidation = data.frame(TradeDate = seq(valid.key$start,
-                                                                 valid.key$end,
+                      consolidation = data.frame(TradeDate = seq(valid.key$leg_start,
+                                                                 valid.key$leg_end,
                                                                  1),
                                                  ValueUSD  = sample(1000 + seq(100000)/100, 4),
                                                  Strategy  = valid.key$strategy,
@@ -139,7 +141,7 @@ test_that("Can load warehouse from remote store() ", {
 
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
-  object <- new(tested.class, valid.name)
+  object <- trade_objectstore_factory(valid.key)
   expect_is(object, tested.class)
 
   query <- getObjectStoreQuery(object)

@@ -21,6 +21,8 @@ all necessary "features" that can be attached
 
 \item{\code{long}}{"logical"}
 
+\item{\code{buysell}}{"character"}
+
 \item{\code{value_usd}}{"numeric"}
 
 \item{\code{features}}{"list"}
@@ -30,6 +32,8 @@ all necessary "features" that can be attached
 \item{\code{strategy}}{"character"}
 
 \item{\code{trader}}{"character"}
+
+\item{\code{trader_id}}{"integer"}
 
 \item{\code{instrument}}{"integer"}
 

@@ -23,7 +23,7 @@ get_trade_objectstore_name <- function(keys) {
 #' helper function to generate key from objectstore name
 #'
 #' @param name "character" name of the objectstore
-#' @return \code{key} "data.frame" with columns "id", "start", "end"
+#' @return \code{key} "data.frame" with columns "id", "leg_start", "leg_end"
 key_from_trade_objectstore_name <- function(name) {
 
   str_keys <- strsplit(name, "_")
@@ -32,8 +32,8 @@ key_from_trade_objectstore_name <- function(name) {
                     instrument  = as.integer(str_keys[[1]][4]),
                     buysell     = str_keys[[1]][5],
                     strategy    = str_keys[[1]][6],
-                    start       = as.Date(str_keys[[1]][7]),
-                    end         = as.Date(str_keys[[1]][8]))
+                    leg_start       = as.Date(str_keys[[1]][7]),
+                    leg_end         = as.Date(str_keys[[1]][8]))
 
   return(key)
 }
@@ -417,7 +417,7 @@ setMethod("getTradeStoreContents","TradeObjectStore",
 #' associated file if exists.
 #'
 #' @param key "data.frame", with keys for trade
-#' required keys are: c("id", "instrument", "buysell", "strategy", "start", "end")
+#' required keys are: c("id", "instrument", "buysell", "strategy", "leg_start", "leg_end")
 #'
 #' @export
 
