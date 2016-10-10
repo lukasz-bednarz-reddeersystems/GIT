@@ -16,7 +16,8 @@ NULL
 #' extended trades.
 #'
 #' Inherits from "VirtualAnalysisBlock",
-#'               "VirtualTradeDataHandler"
+#'               "VirtualTradeDataHandler",
+#'               "VirtualKeyExpander"
 #'
 #' @export
 
@@ -28,7 +29,8 @@ setClass(
                               start    = as.Date(character()),
                               end    = as.Date(character())),
     column_name_map = hash(c("TraderID", "start", "end"), c("id", "start", "end")),
-    output          = new("ExtendedTradeData")
+    output          = new("ExtendedTradeData"),
+    available_values= new("AvailableTraders")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualTradeDataHandler"
@@ -148,4 +150,30 @@ setMethod("Process",
 
             return(object)
           }
+)
+
+################################################################################
+#
+# AggregateExtendedTradesAnalysisBlock
+#
+# Aggregator for the extended trades analysis.
+# Enables blocks to be aggregated over multiple traders.
+###############################################################################
+
+#' Analysis Module for aggregation of Extended Trades
+#'
+#'
+#' Inherits from "AggregateAnalysisBlock"
+#'
+#' @export
+
+setClass(
+  Class             = "AggregateExtendedTradesAnalysisBlock",
+  prototype         = list(
+    ggplot_object_modifier = function(object){
+      object@ggplot_data[['TraderID']] <- as.character(object@ggplot_data[['TraderID']])
+      object@ggplot$data <- object@ggplot_data
+      return(object)}
+  ),
+  contains                 = c("AggregateAnalysisBlock")
 )

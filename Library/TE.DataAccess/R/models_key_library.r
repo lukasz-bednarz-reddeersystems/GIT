@@ -386,3 +386,20 @@ range_years_lookback <- function(trader, start, end){
 
   return(key_generator(trader,end,1,n,lookback_unit='months'))
 }
+
+#' Function to generate date only keys over 2 year lookback
+#' Generate keys for whole including years start and end years
+#'
+#' Generate keys for whole including years start and end years
+#'
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+two_year_monthly_lookback <- function(){
+  end <- Sys.Date()
+  day(end) <- 1
+  end <- end %m+% days(-1)
+  num <- 24
+  df <- key_generator(11,end,1,num,lookback_unit='months',cols=c('id','start','end'))
+  return(df[c('start','end')])
+}

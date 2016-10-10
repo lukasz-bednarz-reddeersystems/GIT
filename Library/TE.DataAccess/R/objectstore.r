@@ -247,7 +247,7 @@ setMethod(".generateKeyFromID",
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",
 		  function(object){
-		  	return(paste(object@data_path,"/",object@id,"_objectstore.rds",sep=""))
+		  	return(gsub(" ","",paste(object@data_path,"/",object@id,"_objectstore.rds",sep="")))
 		  }
 )
 

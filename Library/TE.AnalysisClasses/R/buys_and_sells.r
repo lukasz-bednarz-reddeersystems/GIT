@@ -68,7 +68,6 @@ setMethod("dataRequest",
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
-            #
             trade_data <- getTradeDataObject(object)
 
             if (getStoredNRows(trade_data) == 0) {
@@ -169,7 +168,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object,buy_sells)
             object <- .setOutputGGPlot(object, n_buys_sells)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Count")))
+            #object <- .setOutputFrontendData(object, data.frame(omit = c("Count")))
 
 
             return(object)

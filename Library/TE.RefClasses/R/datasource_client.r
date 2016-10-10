@@ -232,7 +232,6 @@ setMethod(".setDataSourceQueryKeyValues",
             }
             else {
 
-
               object@key_values <- key_values[key_cols]
               return(object)
             }

@@ -30,6 +30,7 @@ Collate:
     'TE.AnalysisClasses.r'
     'analysis_block_functions.r'
     'analysis_block.r'
+    'aggregate_analysis_block.r'
     'offside_positions.r'
     'average_down_trades.r'
     'average_down_trades_focus.r'

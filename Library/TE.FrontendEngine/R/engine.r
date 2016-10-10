@@ -141,8 +141,8 @@ setMethod("runAppCallback","EngineCommandInterpreter",
         										analysis_data <- engine@analysis_data
         										ui_options <- engine@ui_options
         										factory <- new("ShinyFactory")
-												    factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data, ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
-												    factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+												    factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data,ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
+												    factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data,ui_options)},error=function(cond)stop(paste("Server factory failed:",cond)))
         										shiny::runApp(list(ui = getUI(factory), server = getServer(factory)),host=engine@app_host,port=as.numeric(engine@app_port),launch.browser=FALSE)}
         										}
         object <- setEngineSlotCallback(object,'app',fn,TRUE,FALSE,TRUE)
@@ -431,10 +431,10 @@ setMethod("importAppData","Engine",
 			block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
 			object@analysis_data  <- getOutputGGPlotData(block)
 			object@analysis_ggplot<- getOutputGGPlot(block)
-			omit <- getOutputFrontendData(block)
+			ui <- getOutputFrontendData(block)
 
-			if (length(omit$omit) > 0) {
-			  object@ui_options[['omit']] <- unique(c(object@ui_options[['omit']], as.character(omit$omit)))
+			if (length(ui) > 0) {
+			  object@ui_options <- ui
 			}
 			if(scramble){
 			  object@analysis_data  <-scrambleData(object)

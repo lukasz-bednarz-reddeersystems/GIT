@@ -16,7 +16,7 @@ NULL
 #'
 #' @slot ggplot object of class "ggplot"
 #' @slot ggplot_data    "data.frame",
-#' @slot frontend_data  "data.frame",
+#' @slot frontend_data  "list",
 #' @slot output         "NullableReferenceData"
 
 setClass(
@@ -24,7 +24,7 @@ setClass(
   slots = c(
     ggplot       = "ANY",
     ggplot_data  = "data.frame",
-    frontend_data    = "data.frame",
+    frontend_data    = "list",
     output      = "NullableReferenceData"
   ),
   contains = c("VirtualDataSourceClient", "VIRTUAL")
@@ -249,14 +249,12 @@ setMethod("getOutputFrontendData",
 setGeneric(".setOutputFrontendData", function(object, frontend_data){standardGeneric(".setOutputFrontendData")})
 
 setMethod(".setOutputFrontendData",
-          signature(object = "VirtualAnalysisBlock", frontend_data = "data.frame"),
+          signature(object = "VirtualAnalysisBlock", frontend_data = "list"),
           function(object, frontend_data){
             object@frontend_data <- frontend_data
             return(object)
           }
 )
-
-
 
 #' Trigger computation of analysis data.
 #'

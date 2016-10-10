@@ -20,6 +20,7 @@ Imports:
     hash,
     quantmod,
     stats,
+    ggplot2
 Suggests:
     testthat,
     plyr,
@@ -27,12 +28,15 @@ Suggests:
     rmarkdown,
 Collate:
     'TE.RefClasses.r'
-    'data_validation_functions.r'
     'data_validator.r'
     'datasource_client_functions.r'
     'referenceobject.r'
     'referencedata.r'
     'datasource_client.r'
+    'available_values.r'
+    'available_values_data_handler.r'
+    'available_traders.r'
+    'data_validation_functions.r'
     'datastore_client_functions.r'
     'datastore_client.r'
     'datastore_client_test_class.r'
@@ -59,6 +63,7 @@ Collate:
     'index_portfolio.r'
     'instrument_betas_data.r'
     'instrument_betas_data_handler.r'
+    'key_expander.r'
     'market_data.r'
     'market_data_handler.r'
     'market_style_data.r'
@@ -81,5 +86,6 @@ Collate:
     'strategy_portfolio_transformations.r'
     'trade_data_handler.r'
     'trade_data_simple.r'
+    'traderid_key_expander.r'
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr

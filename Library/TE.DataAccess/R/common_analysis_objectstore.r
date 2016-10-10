@@ -322,6 +322,9 @@ get_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
   keys <- cbind(unique(keys[setdiff(colnames(keys), c("start", "end"))]),
                 data.frame(start = min(keys$start), end = max(keys$end)))
 
+  if(nrow(keys)>1){
+    stop("get_analysis_objectstore_name was unable to resolve a unique store name from the supplied keys.")
+  }
 
   rv <- apply(keys, 1, function(x){paste0(c("analysis", unlist(x)), collapse = "_")})
   return(rv)
@@ -351,6 +354,8 @@ get_old_analysis_objectstore_name <- function(keys,trader_col='TraderID') {
 #' @export
 analysis_objectstore_factory <- function(name){
   message("Initialising analysis store ...")
+  if(length(name)>1)stop("Attempt to initialise object store on multiple names.")
+
   anstr <- new("AnalysisObjectStore",id=name)
   pth <- getPath(anstr)
 

@@ -4,9 +4,6 @@ library(TE.RefClasses)
 library(TE.RiskModel)
 library(TE.FrontendEngine)
 library(shiny)
-library(R.utils)
-options(modifiedOnlySource=TRUE)
-#sourceTo("te_shiny_app_factories.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 module_name <- "MarketStyleFactorStatisticAnalysisBlock"
 lookback <- dated_twelve_monthly_lookback
@@ -21,10 +18,9 @@ block_client   <- tryCatch({dataRequest(block_client, key_values)},error=functio
 block          <- tryCatch({getAnalysisBlock(block_client)},error=function(cond)stop(paste("Failed to set analysis block:",cond)))
 analysis_ggplot<- getOutputGGPlot(block)
 analysis_data  <- getOutputGGPlotData(block)
-
-ui_options <- list(omit=c('Value','PL'))
+ui_options <- getOutputFrontendData(block)
 
 factory <- new("ShinyFactory")
 factory <- tryCatch({shinyUIFactory(factory,analysis_ggplot,analysis_data,ui_options=ui_options)},error=function(cond)stop(paste("UI factory failed:",cond)))
-factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data)},error=function(cond)stop(paste("Server factory failed:",cond)))
+factory <- tryCatch({shinyServerFactory(factory,analysis_ggplot,analysis_data,ui_options=ui_options)},error=function(cond)stop(paste("Server factory failed:",cond)))
 shinyApp(ui = getUI(factory), server = getServer(factory))

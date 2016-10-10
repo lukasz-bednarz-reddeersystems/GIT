@@ -36,7 +36,11 @@ setClass(
     column_name_map = hash(c("start", "end"),
                            c("start", "end")),
     market_style    = new("MarketStyleData"),
-    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
+    frontend_data   = list(omit=c('Value','PL'),
+                           row_layout=list(list('Date','RiskGroup'),list('RiskType')),
+                           Date=list(animate=TRUE),
+                           group_by=list(RiskType='RiskGroup'))
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualRiskModelHandler",
@@ -178,7 +182,6 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Value")))
 
             return(object)
           }
