@@ -60,8 +60,8 @@ setMethod("gatherData","VirtualAggregateFeature",
 	function(object,warehouse){
 	     if(length(object@trades)==0){
 				object@trades <- as.numeric(listTrades(warehouse))
-			}
-			message(paste("Gathering from",length(object@trades),"trades..."))
+	     }
+	    message(paste("Gathering from",length(object@trades),"trades..."))
 			trd_data <- tryCatch({
 			  object@gather_method(warehouse,object@trades[1])
 				}, error=function(cond){

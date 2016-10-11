@@ -395,7 +395,6 @@ setMethod("getPriceData","TradeWarehouse",
             #Building objects to hold input data on the fly like this is not the best way, and is
             #historical. All data requests should be handled by central dataplex objects.
             #(see getLevelData)
-
             if (data_source == "DB") {
               sql_query <- new("DataAccess.SQLProcedureCall.InstrumentHistoryRequired_QueryPriceHistoryFromTQA")
 
@@ -578,9 +577,9 @@ setMethod("attachFeatures","TradeWarehouse",
         for(feature in features){
           feature_present <- isFeaturePresent(trades[[trade_id]],feature)
           if(feature_present == FALSE || replace_features == TRUE){
-            # dates <- get_trade_dates(trades[[trade_id]])
-            # daily_data <- trades[[trade_id]]@daily_data
-            # strategy <- trades[[trade_id]]@strategy
+            dates <- get_trade_dates(trades[[trade_id]])
+            daily_data <- trades[[trade_id]]@daily_data
+            strategy <- trades[[trade_id]]@strategy
             f <- new(feature)
             tryCatch({
                   eval(parse(text=paste("f <- update",feature,"(f,dates,instrument,strategy,daily_data)",sep="")))
@@ -589,6 +588,7 @@ setMethod("attachFeatures","TradeWarehouse",
                 })
             f <- updateCompute(f)
             f <- tearDownTradeFeature(f)
+
             trades[[trade_id]] <- insertFeature(trades[[trade_id]],f)
           }
         }
@@ -832,13 +832,17 @@ setMethod("getTradeFeatures","TradeWarehouse",
               if(length(fd)>0){
                 rtn <- tryCatch(
                   {
-                    if(nrow(fd[!is.na(fd[,1]),]) > 0){
+
+                    overlap_dates <- as_date(intersect(unique(rtn_frm$DateTime), fd[!is.na(fd[,1]),1]))
+
+
+                    if(length(overlap_dates) > 0 && nrow(fd[overlap_dates,]) > 0){
                       if ("PassThruComputation" %in% colnames(fd)){
                         colnames(fd)[[match("PassThruComputation", colnames(fd))]] <- paste0(class(feature), "PassThruComputation")
                       }
-                      unique(merge(rtn_frm,fd,by.x="DateTime", by.y=colnames(fd)[[1]]))
+                      unique(merge(rtn_frm,fd,by.x="DateTime", by.y=colnames(fd)[[1]], all.x = TRUE))
                     } else {
-                      message(paste("Feature",class(feature)[[1]],"on trade",trade_id,"contains no data."))
+                      message(paste("Feature",class(feature)[[1]],"on trade",trade_id,"contains no data for dates."))
                       feature
                     }
                   }, error = function(cond)
@@ -885,13 +889,15 @@ setGeneric("getTradeInformation",function(object,trade_id){standardGeneric("getT
 setMethod("getTradeInformation","TradeWarehouse",
           function(object,trade_id){
             trade <- getTrade(object,trade_id)
-            parent <- data.frame(Long=trade@long,
-                                 TradeID=trade@trade_id,
-                                 Instrument=trade@instrument,
-                                 Trader=trade@trader,
-                                 TradeDate=trade@leg_start,
-                                 ValueUSD=trade@value_usd,
-                                 Strategy=trade@strategy)
+            parent <- data.frame(Long        = trade@long,
+                                 TradeID     = trade@trade_id,
+                                 OrderID     = trade@order_id,
+                                 Instrument  = trade@instrument,
+                                 Trader      = trade@trader,
+                                 TradeDate   = trade@leg_start,
+                                 ValueUSD    = trade@value_usd,
+                                 Strategy    = trade@strategy,
+                                 LegStatus   = trade@status)
             if(nrow(trade@consolidation)==0){
               info <- parent
             }
@@ -989,11 +995,14 @@ setGeneric("buildTrades",function(object,trade_panel){standardGeneric("buildTrad
 setMethod("buildTrades","TradeWarehouse",
           function(object,trade_panel){
             n_trades <- nrow(trade_panel)
+            trade_panel <- unique(trade_panel[order(trade_panel$TradeDate,
+                                                    trade_panel$OrderID),])
             trader_id <- getTraderID(object)
             trades <- list()
             trade_id <- c()
             i <- 1
             cnt <- 1
+
             while(i <= n_trades){
 
               order_id       <-  trade_panel[i,'OrderID']
@@ -1013,15 +1022,24 @@ setMethod("buildTrades","TradeWarehouse",
               leg_end_index  <- leg_info$leg_end_index
               leg_status     <- leg_info$leg_status
 
+              if(is.na(strategy) ){
+                strategy   <- leg_info$leg_strategy
+              }
+
               if(leg_end_index > 0)
               {
                 consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
+                consolidation$Strategy <- strategy
                 leg_end = trade_panel[(i+leg_end_index),'TradeDate']
               }
               else
               {
-                consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
-                consolidation = data.frame();
+                consolidation = data.frame(
+                                           TradeDate = as.Date(character()),
+                                           ValueUSD  = numeric(),
+                                           Strategy  = character(),
+                                           OrderID   = integer()
+                                           )
                 leg_end = leg_start
               }
 
@@ -1154,12 +1172,17 @@ find_trade_leg_end_index <- function(row,side,transactions){
   data_rows <- nrow(transactions)-row
   leg_end_index <- 0
   leg_status <- "Open"
-  if(data_rows > 1)
+  leg_strategy <- transactions$Strategy[row]
+  if(data_rows >= 1)
   {
-    same_side <- transactions[(row+1):data_rows,'BuySell'] == side
+    same_side <- transactions[(row+1):(row + data_rows),'BuySell'] == side
     for(i in 1:length(same_side)){
+
       if(same_side[i]==TRUE)
       {
+        if(!is.na(transactions$Strategy[row+i])){
+          leg_strategy <- transactions$Strategy[row+i]
+        }
         if (leg_end_index < nrow(transactions)) {
           leg_end_index <- leg_end_index+1
         }
@@ -1172,7 +1195,8 @@ find_trade_leg_end_index <- function(row,side,transactions){
     }
   }
   rv <- list(leg_end_index = leg_end_index,
-             leg_status    = leg_status)
+             leg_status    = leg_status,
+             leg_strategy  = leg_strategy)
   return(rv)
 }
 

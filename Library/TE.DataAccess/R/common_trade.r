@@ -77,7 +77,12 @@ setClass(
   prototype      = prototype(
     dly_data_pad = warehouse_defaults@default_dly_data_pad,
     datekey      = warehouse_defaults@default_date_key,
-    status       = "Open"
+    status       = "Open",
+    consolidation = data.frame(TradeDate = as.Date(character()),
+                               ValueUSD  = numeric(),
+                               Strategy  = character(),
+                               OrderID   = integer()
+                               )
   )
 )
 
@@ -178,25 +183,40 @@ setMethod("mergeTradeConsolidation",
           function(object, stored_trade){
 
 
-
+            browser()
             this_cons <- getTradeConsolidation(object)
             stored_cons <- getTradeConsolidation(stored_trade)
             this_leg_start <- getTradeLegStartDate(object)
             stored_leg_start <- getTradeLegStartDate(stored_trade)
+            this_order_id <- getTradeOrderID(object)
+            stored_order_id <- getTradeOrderID(stored_trade)
 
+            # create panel of all trades
             merged_cons <- unique(rbind(this_cons,
-                                     stored_cons))
+                                        stored_cons,
+                                        data.frame(TradeDate = stored_leg_start,
+                                                   ValueUSD  = getTradeValueUSD(object),
+                                                   Strategy  = getTradeStrategy(object),
+                                                   OrderID   = getTradeOrderID(object)),
+                                        data.frame(TradeDate = stored_leg_start,
+                                                   ValueUSD  = getTradeValueUSD(stored_trade),
+                                                   Strategy  = getTradeStrategy(stored_trade),
+                                                   OrderID   = getTradeOrderID(stored_trade))
+                                        )
+                                  )
 
-            if (nrow(merged_cons) == 0 && this_leg_start != stored_leg_start){
-              merged_cons <- rbind(data.frame(TradeDate = stored_leg_start,
-                                              ValueUsd  = getTradeValueUSD(object),
-                                              Strategy  = getTradeStrategy(object),
-                                              OrderID   = getTradeOrderID(object)),
-                                   data.frame(TradeDate = stored_leg_start,
-                                              ValueUsd  = getTradeValueUSD(stored_cons),
-                                              Strategy  = getTradeStrategy(stored_cons),
-                                              OrderID   = getTradeOrderID(stored_cons)))
+
+            # which trade to use as a base.
+            # if the order ids are different we do need to recompute the features
+            # so no need to copy anything
+            if (this_order_id < stored_order_id){
+              browser()
+              merged_trade <- object
             }
+            else {
+                merged_trade <- stored_trade
+            }
+
 
             stored_leg_end <- getTradeLegEndDate(stored_trade)
             new_leg_end    <- getTradeLegEndDate(object)
@@ -248,8 +268,15 @@ setMethod("mergeTradeConsolidation",
               merged_leg_status <- getTradeLegStatus(stored_trade)
             }
 
-            merged_trade <- .setTradeConsolidation(stored_trade, merged_cons)
+            merged_trade <- updateTradeConsolidation(merged_trade, merged_cons)
             merged_trade <- .setTradeLegStatus(merged_trade, merged_leg_status)
+
+            # resetting trade features if consolidation changes
+            if (!setequal(merged_cons$OrderID, c(stored_order_id, stored_cons$OrderID))){
+              browser()
+              merged_trade <- .setTradeFeaturesList(merged_trade, list())
+            }
+
 
             return(merged_trade)
           }
@@ -483,15 +510,7 @@ setMethod("getTradeFeaturesList",
           }
 )
 
-setGeneric(".setTradeFeaturesList", function(object, features){standardGeneric(".setTradeFeaturesList")})
-setMethod(".setTradeFeaturesList",
-          signature(object = "VirtualTrade",
-                    features = "list"),
-          function(object, features){
-            object@features <- features
-            return(object)
-          }
-)
+
 
 setGeneric("updateTradeConsolidation", function(object, consolidation){standardGeneric("updateTradeConsolidation")})
 setMethod("updateTradeConsolidation",
@@ -503,21 +522,30 @@ setMethod("updateTradeConsolidation",
               # sort consolidation
               consolidation <- consolidation[order(consolidation$TradeDate,
                                                    consolidation$OrderID),]
-
               object <- .setTradeLegStartDate(object, min(consolidation$TradeDate))
               object <- .setTradeLegEndDate(object, max(consolidation$TradeDate))
               object <- .setTradeOrderID(object, min(consolidation$OrderID))
               object <- .setTradeValueUSD(object, consolidation$ValueUSD[1])
-
-              object <- .setTradeID(generateTradeID(object,
+              object <- .setTradeID(object,
+                                    generateTradeID(object,
                                                     getTradeLegStartDate(object),
                                                     getTradeInstrument(object),
                                                     getTrader(object),
                                                     getTradeValueUSD(object),
                                                     getTradeStrategy(object)))
-
-              object <- .setTradeConsolidation(object, consolidation)
+              object <- .setTradeConsolidation(object, consolidation[-1,])
             }
+            return(object)
+           }
+
+)
+
+setGeneric(".setTradeFeaturesList", function(object, features){standardGeneric(".setTradeFeaturesList")})
+setMethod(".setTradeFeaturesList",
+          signature(object = "VirtualTrade",
+                    features = "list"),
+          function(object, features){
+            object@features <- features
             return(object)
           }
 )
@@ -809,6 +837,7 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
               # query remote store
               trdstr <- trade_objectstore_factory(key)
               query <- getObjectStoreQuery(trdstr)
+
 
               is_known <- isTradeStored(query, key)
 

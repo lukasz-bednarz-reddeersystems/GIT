@@ -438,7 +438,7 @@ setClass(
   Class      = "SectorRelativeRSI14",
   prototype  = prototype(
     data_store   = "factor_datastore",
-    data_columns = c("rRSISectorRelative14Day1DaysAgo"),
+    data_columns = c("rRSIRelativeSector14Day1DaysAgo"),
     computation  = new("PassThruComputation")
   ),
   contains = c("ContextFeature")
