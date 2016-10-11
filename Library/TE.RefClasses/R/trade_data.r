@@ -17,11 +17,11 @@ trade_history_features <- c('MarketValue','TodayPL')
 trade_delta_features <- c('DeltaSwing','DeltaSkew','DeltaPL')
 
 #' List of trade history basic features names
-trade_basic_features <- c("TradeDate", "TradeID", "Long", "Instrument", "Trader", "ValueUSD", "Strategy",
+trade_basic_features <- c("TradeDate", "TradeID", "OrderID", "Long", "Instrument", "Trader", "ValueUSD", "Strategy",
                          "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
 
 #' List of translated trade history basic features names
-trade_basic_features_transl <- c("Date", "TradeID", "Long", "InstrumentID", "TraderName", "ValueUSD", "Strategy",
+trade_basic_features_transl <- c("Date", "TradeID", "OrderID", "Long", "InstrumentID", "TraderName", "ValueUSD", "Strategy",
                           "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
 
 devtools::use_data(position_summary_features,

@@ -66,6 +66,7 @@ setMethod("dataRequest",
           signature(object = "VirtualPPModelClient", key_values = "data.frame"),
           function(object, key_values){
 
+            browser()
             object <- .setDataSourceQueryKeyValues(object,key_values)
 
             non_na_cols <- getNonNAColumnNames(object)
