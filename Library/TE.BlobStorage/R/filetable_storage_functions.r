@@ -2,11 +2,6 @@
 #' @include filetable_query.r
 NULL
 
-.__DEFAULT_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
-.__DEFAULT_DB_USER__.        <- Sys.info()["user"]
-.__DEFAULT_FILE_DB_SCHEMA__. <- "FileTableDB"
-
-
 
 #' Get name of file table associated with Junction Table
 #'

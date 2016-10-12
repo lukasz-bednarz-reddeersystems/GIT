@@ -198,9 +198,9 @@ valid.hash    <- TE.BlobStorage:::hash_data_frame(valid.keys)
 valid.keys    <- cbind(data.frame(HashID      = valid.hash),
                        valid.keys,
                        data.frame(LegStatus   = "Closed",
-                                  CreatedDate = as.Date("2016-10-04"),
+                                  CreatedDate = as.Date("2016-10-12"),
                                   CreatedByUserID = "lukasz.bednarz",
-                                  FileName    = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-04_lukasz.bednarz.rds"))
+                                  FileName    = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-12_lukasz.bednarz.rds"))
 
 valid.ret     <- data.frame(KeyAlreadyStored  = 1,
                             KeyInserted = 0,

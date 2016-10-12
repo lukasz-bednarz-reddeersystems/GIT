@@ -32,7 +32,7 @@ tested.class  <- "BlobStorage.SQLQuery.FileTableRootPath"
 valid.tb_name <- "ftMultiFactorRiskBlobTest"
 valid.db      <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
 valid.schema  <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
-valid.ret     <- data.frame(Path = "\\\\RAIDSTAGEDB\\MSSQLSERVER_STAGEDB\\FileTableDB\\BlobTest",
+valid.ret     <- data.frame(Path = "\\\\RAIDLIVEDB\\MSSQLSERVER\\FileTableDB\\BlobTest",
                             stringsAsFactors = FALSE)
 
 test_that(sprintf("Cannot instantiate %s class without parameters", tested.class),{

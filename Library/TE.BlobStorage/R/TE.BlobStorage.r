@@ -17,3 +17,9 @@
 #' @importFrom XML xmlTree saveXML
 #' @importClassesFrom hash hash
 NULL
+
+
+
+.__DEFAULT_ODBC_DB_NAME__.   <- "RAIDLIVEDB"
+.__DEFAULT_DB_USER__.        <- Sys.info()["user"]
+.__DEFAULT_FILE_DB_SCHEMA__. <- "FileTableDB"
