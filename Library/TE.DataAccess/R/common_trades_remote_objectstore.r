@@ -93,6 +93,16 @@ setMethod("isTradeStored",
               rval <- hash%in%object@known_keys[['hash']]
 
             }
+            if (!rval && is.na(key$strategy)){
+              message(sprintf("Trade not found for given key trying with out strategy column"))
+
+              res <- merge(object@known_keys, key[setdiff(colnames(key), "strategy")])
+
+              if (nrow(res) > 0 ) {
+                rval <- TRUE
+              }
+            }
+
             return(rval)
           }
 )
@@ -326,6 +336,37 @@ setMethod("queryTradeStore","TradeObjectStore",
               message(paste("Key",paste(unlist(Map(as.character,key)),collapse=", "),"not found in ppmodel store."))
               rval <- NULL
             }
+
+            return(rval)
+          }
+)
+
+#' Query store for Trade
+#'
+#' Querries Trade Objectstore for Trade stored under given key
+#' Returns Trade if present NULL otherwise
+#'
+#' @param object object of class "TradeObjectStore"
+#' @return \code{rval} object of class "Trade"
+
+
+setGeneric("getAllTradesdFromTradeStore",function(object){standardGeneric("getAllTradesdFromTradeStore")})
+
+#' @describeIn getAllTradesdFromTradeStore
+#' Query store for Trade
+#'
+#' Querries Trade Objectstore for Trade stored under given key
+#' Returns Trade if present NULL otherwise
+#'
+#' @inheritParams getAllTradesdFromTradeStore
+#' @return \code{rval} list of objects of class "Trade"
+setMethod("getAllTradesdFromTradeStore","TradeObjectStore",
+          function(object){
+            names <- ls(object@stored)
+
+            names <- setdiff(names, object@qry_store_nme)
+
+            rval <- mget(names, object@stored, ifnotfound = sapply(names, function(x)NULL))
 
             return(rval)
           }

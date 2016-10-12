@@ -120,24 +120,36 @@ setMethod("initialize", "VirtualTrade",
                    status
                    ){
 
-            .Object@order_id      <- order_id
-            .Object@leg_start     <- leg_start
-            .Object@leg_end       <- leg_end
-            .Object@trader        <- trader
-            .Object@trader_id     <- trader_id
-            .Object@instrument    <- instrument
-            .Object@strategy      <- strategy
-            .Object@long          <- long
-            .Object@buysell       <- buysell
-            .Object@value_usd     <- value_usd
-            .Object@consolidation <- consolidation
-            .Object@status        <- status
-            .Object@trade_id <- generateTradeID(.Object,
-                                                leg_start,
-                                                instrument,
-                                                trader,
-                                                value_usd,
-                                                strategy)
+            .Object <- .setTradeOrderID(.Object, as.integer(order_id))
+            .Object <- .setTradeLegStartDate(.Object, leg_start)
+            .Object <- .setTradeLegEndDate(.Object, leg_end)
+            .Object <- .setTradeTrader(.Object, trader)
+            .Object <- .setTradeTraderID(.Object, trader_id)
+            .Object <- .setTradeInstrument(.Object, instrument)
+
+            if(is.na(strategy)){
+              strats <- unique(consolidation$Strategy)
+
+              non_na <- (!is.na(strats))
+
+              if (any(non_na)){
+                strategy <- unique(strats[non_na])
+              }
+            }
+
+
+            .Object <- .setTradeStrategy(.Object, strategy)
+            .Object <- .setTradeLong(.Object, long)
+            .Object <- .setTradeBuySell(.Object, buysell)
+            .Object <- .setTradeValueUSD(.Object, value_usd)
+            .Object <- .setTradeConsolidation(.Object, consolidation)
+            .Object <- .setTradeLegStatus(.Object, status)
+            .Object <- .setTradeID(.Object, generateTradeID(.Object,
+                                                            leg_start,
+                                                            instrument,
+                                                            trader,
+                                                            value_usd,
+                                                            strategy))
 
             return(.Object)
           }
@@ -183,7 +195,6 @@ setMethod("mergeTradeConsolidation",
           function(object, stored_trade){
 
 
-            browser()
             this_cons <- getTradeConsolidation(object)
             stored_cons <- getTradeConsolidation(stored_trade)
             this_leg_start <- getTradeLegStartDate(object)
@@ -205,6 +216,13 @@ setMethod("mergeTradeConsolidation",
                                         )
                                   )
 
+            merged_cons <- unique(merged_cons)
+
+            if (any(is.na(merged_cons$Strategy))){
+
+              strats <- unique(merged_cons$Strategy)
+
+            }
 
             # which trade to use as a base.
             # if the order ids are different we do need to recompute the features
@@ -282,6 +300,62 @@ setMethod("mergeTradeConsolidation",
           }
 )
 
+
+
+setGeneric("getTradeInstrument", function(object){standardGeneric("getTradeInstrument")})
+setMethod("getTradeInstrument",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@instrument)
+          }
+)
+
+setGeneric(".setTradeInstrument", function(object, instrument){standardGeneric(".setTradeInstrument")})
+setMethod(".setTradeInstrument",
+          signature(object = "VirtualTrade",
+                    instrument = "integer"),
+          function(object, instrument){
+            object@instrument <- instrument
+            return(object)
+          }
+)
+
+setGeneric("getTradeTrader", function(object){standardGeneric("getTradeTrader")})
+setMethod("getTradeTrader",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@trader)
+          }
+)
+
+setGeneric(".setTradeTrader", function(object, trader){standardGeneric(".setTradeTrader")})
+setMethod(".setTradeTrader",
+          signature(object = "VirtualTrade",
+                    trader = "character"),
+          function(object, trader){
+            object@trader <- trader
+            return(object)
+          }
+)
+
+setGeneric("getTradeTraderID", function(object){standardGeneric("getTradeTraderID")})
+setMethod("getTradeTraderID",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@trader_id)
+          }
+)
+
+setGeneric(".setTradeTraderID", function(object, trader_id){standardGeneric(".setTradeTraderID")})
+setMethod(".setTradeTraderID",
+          signature(object = "VirtualTrade",
+                    trader_id = "integer"),
+          function(object, trader_id){
+            object@trader_id <- trader_id
+            return(object)
+          }
+)
+
 setGeneric("getTradeOrderID", function(object){standardGeneric("getTradeOrderID")})
 setMethod("getTradeOrderID",
           signature(object = "VirtualTrade"),
@@ -334,7 +408,16 @@ setMethod(".setTradeStrategy",
                     strategy = "character"),
           function(object, strategy){
             object@strategy <- strategy
-            return(object@strategy)
+
+            # also filling missing values in consolidation
+            cons <- getTradeConsolidation(object)
+
+            if (any(is.na(cons)) && !is.na(strategy)){
+              cons$Strategy <- strategy
+              object <- .setTradeConsolidation(object, cons)
+            }
+
+            return(object)
           }
 )
 
@@ -343,7 +426,7 @@ setMethod(".setTradeStrategy",
                     strategy = "missing"),
           function(object){
             object@strategy <- character(NA)
-            return(object@strategy)
+            return(object)
           }
 )
 
@@ -391,6 +474,42 @@ setMethod("isTradeLong",
           signature(object = "VirtualTrade"),
           function(object){
             return(object@long)
+          }
+)
+
+setGeneric("getTradeLong", function(object){standardGeneric("getTradeLong")})
+setMethod("getTradeLong",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@long)
+          }
+)
+
+setGeneric(".setTradeLong", function(object, long){standardGeneric(".setTradeLong")})
+setMethod(".setTradeLong",
+          signature(object = "VirtualTrade",
+                    long = "logical"),
+          function(object, long){
+            object@long <- long
+            return(object)
+          }
+)
+
+setGeneric("getTradeBuySell", function(object){standardGeneric("getTradeBuySell")})
+setMethod("getTradeBuySell",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@buysell)
+          }
+)
+
+setGeneric(".setTradeBuySell", function(object, buysell){standardGeneric(".setTradeBuySell")})
+setMethod(".setTradeBuySell",
+          signature(object = "VirtualTrade",
+                    buysell = "character"),
+          function(object, buysell){
+            object@buysell <- buysell
+            return(object)
           }
 )
 
@@ -495,6 +614,24 @@ setMethod(".setTradeConsolidation",
           function(object, consolidation){
 
             if (nrow(consolidation) > 0) {
+
+              consolidation <- unique(consolidation)
+
+              strat <- unique(consolidation$Strategy)
+              non_na <- !is.na(strat)
+
+              if (any(non_na)){
+                strat <- unique(strat[non_na])
+              } else {
+                top_strat <- getTradeStrategy(object)
+
+                if(!is.na(top_strat)){
+                  strat <- top_strat
+                }
+              }
+
+              consolidation[is.na(consolidation$Strategy)] <- strat
+
               object@consolidation <- consolidation
             }
             return(object)
@@ -524,7 +661,7 @@ setMethod("updateTradeConsolidation",
                                                    consolidation$OrderID),]
               object <- .setTradeLegStartDate(object, min(consolidation$TradeDate))
               object <- .setTradeLegEndDate(object, max(consolidation$TradeDate))
-              object <- .setTradeOrderID(object, min(consolidation$OrderID))
+              object <- .setTradeOrderID(object, as.integer(min(consolidation$OrderID)))
               object <- .setTradeValueUSD(object, consolidation$ValueUSD[1])
               object <- .setTradeID(object,
                                     generateTradeID(object,
@@ -822,6 +959,7 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
 
             .Object <- callNextMethod()
 
+            #browser()
             if (TRUE) {
               # generate key to query remote store
               key <- data.frame(id         = as.character(trader_id),
@@ -842,9 +980,19 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
               is_known <- isTradeStored(query, key)
 
               if (is_known){
+
                 stored_trd <- queryTradeStore(trdstr, key)
 
+                if (is.null(stored_trd)){
+                  # key was not matching probably due to missing strategy info
+                  # get first stored value
+
+                  stored_trd <- getAllTradesdFromTradeStore(trdstr)[[1]]
+                }
+
                 .Object <- mergeTradeConsolidation(.Object, stored_trd)
+              } else {
+                #browser()
               }
 
             }

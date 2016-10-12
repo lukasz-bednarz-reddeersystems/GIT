@@ -37,7 +37,7 @@ test_that("Can create new Trade", {
                                                                  1),
                                                  ValueUSD  = sample(1000 + seq(100000)/100, 4),
                                                  Strategy  = valid.key$strategy,
-                                                 OrderID   = sort(sample(50000 + seq(100), 4))
+                                                 OrderID   = sort(sample(50000L + seq(100), 4))
                                                  ),
 
                       status        = "Closed")

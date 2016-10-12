@@ -247,7 +247,7 @@ trade_comparison <- function(compute_object,column,fn,prev_trade=TRUE){
             rw <- tryCatch({
               data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex-1,column],compute_object@input[dex,column]))
             }, error = function(cond){
-              message(sprintf("error when computing trade_comparison for object of class %s", class(object)))
+              message(sprintf("error when computing trade_comparison for object of class %s", class(compute_object)))
             })
           } else if (!prev_trade && (dex + 1) <= nrow(compute_object@input) )
           {

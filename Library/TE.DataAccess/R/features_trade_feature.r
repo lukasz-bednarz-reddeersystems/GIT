@@ -36,6 +36,7 @@ setMethod("tearDownTradeFeature","TradeFeature",
           function(object){
             object <- tearDown(object)
             object@data_set <- NULL
+            object@computation@compute <- NULL
             return(object)
           }
 )

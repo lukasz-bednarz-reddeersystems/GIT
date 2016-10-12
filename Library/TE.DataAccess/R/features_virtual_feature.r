@@ -7,11 +7,14 @@ setClassUnion("FeatureOutput",c("data.frame","NULL"))
 #Features should return a frame of scalars for each trade indexed with trade date.
 # @exportClass FeatureInput
 setClassUnion("FeatureInput",c("data.frame","NULL"))
+
+setClassUnion("FeatureComputationFunction", c("function", "NULL"))
+
 setClass(
   Class      = "FeatureComputation",
   representation = representation(
     input    = "FeatureInput",
-    compute  = "function",
+    compute  = "FeatureComputationFunction",
     output   = "FeatureOutput",
     output_colnms= "character"
   )
@@ -49,6 +52,11 @@ setMethod("updateCompute","VirtualFeature",
             #Not implemented in the virtual function because it could adopt various forms
             message(paste("Triggering feature computation:",class(object)[[1]]))
             cmpt <- tryCatch({
+                # restoring computation function if it was removed
+                if (is.null(object@computation@compute)){
+                  tmp <- new(class(object))
+                  object@computation@compute <- tmp@computation@compute
+                }
                 object@computation@compute(object@computation)
               }, error = function(cond){
                 message(paste("Error when computing feature",class(object)[[1]],":",cond))

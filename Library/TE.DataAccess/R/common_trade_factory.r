@@ -368,7 +368,7 @@ setMethod("fillTradeListPosns","TradeWarehouse",
                 str <- unique(all_dtr[all_dtr$Date==trd@leg_start&all_dtr$InstrumentID==trd@instrument,]$Name)
                 if(length(str)==1){
                   message(paste("Found",str))
-                  trd@strategy <- str
+                  trd <- .setTradeStrategy(trd,str)
                 }
                 else{
                   message(paste("Instrument",trd@instrument,"resolves to multiple positions on",trd@leg_start,"could not assign to strategy."))
@@ -579,7 +579,7 @@ setMethod("attachFeatures","TradeWarehouse",
           if(feature_present == FALSE || replace_features == TRUE){
             dates <- get_trade_dates(trades[[trade_id]])
             daily_data <- trades[[trade_id]]@daily_data
-            strategy <- trades[[trade_id]]@strategy
+            strategy <- getTradeStrategy(trades[[trade_id]])
             f <- new(feature)
             tryCatch({
                   eval(parse(text=paste("f <- update",feature,"(f,dates,instrument,strategy,daily_data)",sep="")))
