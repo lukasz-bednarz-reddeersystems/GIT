@@ -229,17 +229,38 @@ store_file_in_filetable <- function(file,
   }
 
   path <- get_filetable_path(tb_name, db, schema)
-  file_copied <- suppressWarnings(copyFile(file,
-                                           path,
-                                           overwrite = overwrite,
-                                           validate = TRUE,
-                                           verbose = FALSE))
+
+  file_copied <- FALSE
+
+  for (try in seq(3)){
+
+    file_copied <- tryCatch({
+      suppressWarnings(copyFile(file,
+                                path,
+                                overwrite = overwrite,
+                                validate = TRUE,
+                                verbose = FALSE))
+    }, error = function(cond){
+
+      message(sprintf("Copying file : %s,\n to location :%s,\ was not successful.",
+                      file, path))
+
+      message(sprintf("Error : %s.",
+                      cond))
+
+      file_copied = FALSE
+
+    })
+
+    if(file_copied) break
+  }
+
 
   if (!file_copied) {
-    message(sprintf("Copying file : %s,\n to location :%s,\ was not successful.",
+    message(sprintf("Copying file : %s,\n to location :%s,\ was not successful after 3 attempts.",
                     file, path))
     stop(sprintf("Copying file : %s,\n to location :%s,\ was not successful.",
-                 file, path))
+                  file, path))
   }
 
   return(ret)
