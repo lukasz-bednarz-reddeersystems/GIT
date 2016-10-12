@@ -23,7 +23,6 @@ setClass(
   contains = c("VirtualReferenceData", "VIRTUAL")
 )
 
-
 #' Concrtete S4 class handling Implied Factor Returns data.
 #'
 #' Implements storage for Implied Factor Returns and access

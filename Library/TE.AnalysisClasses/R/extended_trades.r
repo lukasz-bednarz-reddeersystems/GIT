@@ -16,8 +16,7 @@ NULL
 #' extended trades.
 #'
 #' Inherits from "VirtualAnalysisBlock",
-#'               "VirtualTradeDataHandler",
-#'               "VirtualKeyExpander"
+#'               "VirtualTradeDataHandler"
 #'
 #' @export
 
@@ -36,7 +35,6 @@ setClass(
                         "VirtualTradeDataHandler"
                         )
 )
-
 
 #' Request data from data source
 #'

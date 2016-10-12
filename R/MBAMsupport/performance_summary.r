@@ -22,10 +22,10 @@ export_formattable <- function(f, file, width = "100%", height = NULL, backgroun
           delay = delay)
 }
 
-start <- '2016-04-01'
-end   <- '2016-06-30'
-start_last_q <- '2016-01-01'
-end_last_q <-   '2016-03-31'
+start <- '2016-07-01'
+end   <- '2016-09-30'
+start_last_q <- '2016-04-01'
+end_last_q <-   '2016-06-30'
 
 fund_perf <- rbind(get_trader_performance_simple(11,as.Date(start),as.Date(end),mbam=TRUE),
                    get_trader_performance_simple(70,as.Date(start),as.Date(end),mbam=TRUE),
@@ -110,7 +110,7 @@ cscaler <- function(x)log(100*as.numeric(x)+1)/log(100)
 liquidity_widget <- formattable(liquidity_smmry,list(Exposure = formatter("span", style = function(x) style(display = "block", 
                                                                                                             "border-radius" = "4px", 
                                                                                                             "padding-right" = "4px", "background" = paste("linear-gradient(to right, rgba(255, 255, 255, ",cscaler(x),"), rgba(255, 0, 0, ",cscaler(x),"))",sep="")))),
-                                                     row.names=c())
+                                                                                                            row.names=FALSE)
 
 
 
@@ -129,7 +129,7 @@ performance_widget <- formattable(df,list( Performance = formatter("span",style 
                                            Return = formatter("span",style = x ~ ifelse(x > 0, style(color = "green", font.weight = "bold"), style(color = "red", font.weight = "bold")),x ~ sprintf("%.2f%%", x*100)),
                                            PL     = formatter("span",style = x ~ ifelse(x > 0, style(color = "green", font.weight = "bold"), style(color = "red", font.weight = "bold")),x ~ ifelse(abs(x)<1000000,sprintf("$%.2fk",x/1000),sprintf("$%.2fm",x/1000000))),
                                            Change = formatter("span", style = x ~ style(color = ifelse(x, "green", "red")),x ~ icontext(ifelse(x, "arrow-up", "arrow-down")))),
-                                     row.names=c())
+                                     row.names=FALSE)
 
 
 #Fund-level volatility widget
@@ -141,7 +141,7 @@ colnames(df) <- c("Quarter","Ann.Volatilty")
 
 volatility_widget <- formattable(df,list( Quarter = formatter("span",style = x ~ style(display="block","border-radius" = "4px","background-color"=ifelse(x == "Q2","orange","white"))),
                                           Ann.Volatilty = formatter("span",x ~ sprintf("%.2f%%", x*100))),
-                                  row.names=c())
+                                  row.names=FALSE)
 
 
 
@@ -163,7 +163,7 @@ beta <- rtn_fit[[2]][[1]]*100
 regression_table <- data.frame(Parameter=c('Alpha','Beta','Correlation'),Vs.Market=c(alpha,beta,rtn_cor))
 regression_widget<- formattable(regression_table,list( Parameter = formatter("span",style = x ~ style(color = ifelse(x=="Alpha", "orange", ifelse(x=="Beta", "blue", ifelse(x=="Correlation","black",NA))))),
                                                        Vs.Market = formatter("span",x ~ ifelse(x==alpha,sprintf("%.2f bps", x),sprintf("%.2f%%", x)))),
-                                                       row.names=c())
+                                                       row.names=FALSE)
 
 png("performace.png")
 grid.newpage() 
@@ -228,5 +228,5 @@ position_widget<- formattable(position_table,list( Winners = formatter("span",st
                                                    Long = formatter("span",style = x ~ style(color=ifelse(get_ticker(x) %in% green_tickers,"black","green"),display="block","border-radius" = "4px","background-color"=ifelse(get_ticker(x) %in% red_tickers,"red",ifelse(get_ticker(x) %in% green_tickers,"green",NA)))),
                                                    Short = formatter("span",style = x ~ style(color=ifelse(get_ticker(x) %in% red_tickers,"black","red"),display="block","border-radius" = "4px","background-color"=ifelse(get_ticker(x) %in% red_tickers,"red",ifelse(get_ticker(x) %in% green_tickers,"green",NA)))),
                                                    ADV = formatter("span",style = x ~ style(color="black",display="block","border-radius" = "4px","background-color"=ifelse(get_ticker(x) %in% red_tickers,"red",ifelse(get_ticker(x) %in% green_tickers,"green",NA))))),
-                              row.names=c())
+                              row.names=FALSE)
 export_formattable(position_widget,'./position_widget.png',width="68%")

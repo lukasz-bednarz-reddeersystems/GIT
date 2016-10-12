@@ -116,3 +116,26 @@ days_since_last_flat <- function(history_data){
   return(history_data)
 
 }
+
+########################################################################
+#
+# compound a timeseries of excess return
+#
+########################################################################
+tseries_excess_compound <- function(input){
+  required_colnms <- c('Date')
+  if(!has_required_columns(input, required_colnms)) {
+    stop(paste("tseries_compound requires following columns :", required_colnms))
+  }
+  input <- input[order(input$Date),]
+  compound_on <- setdiff(colnames(input),'Date')
+  for(col in compound_on){
+    input[[col]] <- input[[col]] + 1
+    input[[col]][is.na(input[[col]])] <- 1
+    crtn <- exp(cumsum(log(input[[col]])))
+    input[[paste(col,'_cmpnd',sep="")]] <- crtn
+  }
+
+  return(input)
+
+}

@@ -66,4 +66,6 @@ Collate:
     'strategy_breakdown_total_pnl_and_pnl_delta.r'
     'trades_performance_on_results_day.r'
     'trades_pnl_outof_on_results_day.r'
+    'implied_factor_returns.r'
+    'implied_factor_returns_state.r'
 RoxygenNote: 5.0.1
