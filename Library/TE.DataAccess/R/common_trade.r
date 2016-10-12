@@ -228,7 +228,7 @@ setMethod("mergeTradeConsolidation",
             # if the order ids are different we do need to recompute the features
             # so no need to copy anything
             if (this_order_id < stored_order_id){
-              browser()
+              # browser()
               merged_trade <- object
             }
             else {
@@ -291,7 +291,7 @@ setMethod("mergeTradeConsolidation",
 
             # resetting trade features if consolidation changes
             if (!setequal(merged_cons$OrderID, c(stored_order_id, stored_cons$OrderID))){
-              browser()
+              # browser()
               merged_trade <- .setTradeFeaturesList(merged_trade, list())
             }
 
