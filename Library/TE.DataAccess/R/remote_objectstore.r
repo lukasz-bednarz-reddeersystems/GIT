@@ -426,7 +426,7 @@ setMethod("saveObjectInRemoteStore",
               key <- cbind(data.frame(TableName = table),
                            key,
                            data.frame(CreatedDate = today(),
-                                      CreatedByUserID = .__DEFAULT_OBJECTSTORE_DB_USER__. ,
+                                      CreatedByUserID = tolower(.__DEFAULT_OBJECTSTORE_DB_USER__.) ,
                                       FileName = filename))
 
               ret <- updateKnownRemoteKeys(query, key)

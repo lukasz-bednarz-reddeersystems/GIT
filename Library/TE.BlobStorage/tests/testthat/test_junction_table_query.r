@@ -87,7 +87,7 @@ valid.keys    <- data.frame(HashID = valid.hash)
 
 valid.ret     <- data.frame(sHashID       = valid.hash,
                             dtCreatedDate = as.Date("2016-09-25"),
-                            sCreatedByUserID = "Lukasz.Bednarz",
+                            sCreatedByUserID = "lukasz.bednarz",
                             sFileName  = "temp.txt",
                             stringsAsFactors = FALSE)
 
