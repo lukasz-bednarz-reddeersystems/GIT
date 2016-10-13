@@ -240,11 +240,21 @@ trade_comparison <- function(compute_object,column,fn,prev_trade=TRUE){
     if(nrow(compute_object@input)>1){
       for(d in 1:length(compute_object@dates)){
         dex <- which(compute_object@input$DateTime==compute_object@dates[d],TRUE)
-        if(prev_trade){
-          rw <- data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex-1,column],compute_object@input[dex,column]))
-        } else
-        {
-          rw <- data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex,column],compute_object@input[dex+1,column]))
+
+        rw <- data.frame(DateTime=compute_object@dates[d],Comparison = NA)
+        if (length(dex > 0)){
+          if(prev_trade && dex > 0){
+            rw <- tryCatch({
+              data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex-1,column],compute_object@input[dex,column]))
+            }, error = function(cond){
+              message(sprintf("error when computing trade_comparison for object of class %s", class(compute_object)))
+            })
+          } else if (!prev_trade && (dex + 1) <= nrow(compute_object@input) )
+          {
+            rw <- data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex,column],compute_object@input[dex+1,column]))
+          } else {
+            rw <- data.frame(DateTime=compute_object@dates[d],Comparison = NA)
+          }
         }
         if(d==1){
           rval <- rw

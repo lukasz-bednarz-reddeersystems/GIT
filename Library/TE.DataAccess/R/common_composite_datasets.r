@@ -18,42 +18,52 @@ setClass(
 #' @param user integer, trader ID.
 #' @param start Date start date
 #' @param end Date end date
-#' @param use_db logical, pool data from Database or via Middleware
+#' @param source "character", where the data should be pulled from
 #' @return \code{posn_comp_obj} object of class 'PositionComposite'.
 #' @export
 
-position_composite_factory <- function(user,start,end,use_db=TRUE){
+position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITION_HISTORY_DATA_SOURCE__.){
 
-  if(use_db){
-    #This to be handled properly with database objects
-    SQL <- paste("prPositionHistory_SelectByTraderDate @dtFrom = '",start,"', @dtTo = '",end,"', @lUserID = ",user,sep="")
-    cn <- odbcConnect(database_config@database,uid=database_config@dbuser)
-    pos_data <- sqlQuery(cn,SQL)
-    close(cn)
-    pos_data <- pos_data[c('lInstrumentID','lStrategyID','Date','dblTodayPL','dblMarketValue')]
-    pos_data$lInstrumentID <- as.numeric(pos_data$lInstrumentID)
-    pos_data$lStrategyID <- as.numeric(pos_data$lStrategyID)
+  if(source == "DB"){
+    #This to be handled properly with reference classes
+
+    sql_query <- new("DataAccess.SQLProcedureCall.PositionHistory_SelectByTraderDate")
+
+    key <- data.frame(TraderID  = user,
+                      DateStart = as.Date(start),
+                      DateEnd   = as.Date(end) )
+
+    pos_data <- executeSQLQuery(sql_query, key)
+
+    colnames(pos_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(pos_data))
+    pos_data <- pos_data[c("InstrumentID","StrategyID","Date","TodayPL","MarketValue")]
+
+    # converting Date class
     pos_data$Date <- as.Date(pos_data$Date)
-    pos_data$dblTodayPL <- as.numeric(pos_data$dblTodayPL)
-    pos_data$dblMarketValue <- as.numeric(pos_data$dblMarketValue)
-    colnames(pos_data) <- c("InstrumentID","StrategyID","Date","TodayPL","MarketValue")
-    urls <- c(middleware_urls@strategies_url)
-  } else{
-  psn_url_query = new("PositionHistoryURL",user_id=as.integer(user),start=as.Date(start),end=as.Date(end))
-    urls <- c(middleware_urls@strategies_url,psn_url_query@url)
-  }
 
-  parser <- new("URLParser",parser_type = "XMLToFrame")
-  parser <- runURLs(parser,urls)
-  if(!use_db){
+
+    sql_query <- new("DataAccess.SQLProcedureCall.Strategy_SelectAll")
+    str_data <- executeSQLQuery(sql_query)
+    colnames(str_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(str_data))
+
+    str_data <- str_data[c("StrategyID","Name","Active","Trader","FundGroup","UserID","Alias","Group","Type","Direction","Description","AliasID","GroupID","TypeID","InitiatorID")]
+
+    } else {
+
+    psn_url_query = new("PositionHistoryURL",user_id=as.integer(user),start=as.Date(start),end=as.Date(end))
+    urls <- c(middleware_urls@strategies_url,psn_url_query@url)
+
+    parser <- new("URLParser",parser_type = "XMLToFrame")
+    parser <- runURLs(parser,urls)
+
     pos_data <- getURLData(parser,2)
+    str_data <- getURLData(parser,1)
+    strat_cols <- colnames(str_data)
+    strat_cols[strat_cols=="ID"] <- "StrategyID"
+    colnames(str_data) <- strat_cols
   }
 
   strategies <- new("StrategiesDataSet")
-  str_data <- getURLData(parser,1)
-  strat_cols <- colnames(str_data)
-  strat_cols[strat_cols=="ID"] <- "StrategyID"
-  colnames(str_data) <- strat_cols
   strategies <- setData(strategies,str_data)
 
   if (nrow(pos_data) == 0){

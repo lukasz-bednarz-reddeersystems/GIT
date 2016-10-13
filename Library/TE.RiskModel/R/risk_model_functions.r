@@ -193,18 +193,6 @@ get_trader_allocation <- function(trader,start,end){
   return(allocation)
 }
 
-build_portfolio_history <- function(trader,start,end){
-  holdings_data <- position_composite_factory(as.integer(trader),as.Date(start),as.Date(end))
-  holdings_data <- holdings_data@data@data[c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue')]
-  colnames(holdings_data) <- c('Strategy','Trader','TraderID','Direction','InstrumentID','Date','MarketValue')
-  allocation    <- get_trader_allocation(trader,start,end)
-  allocation$Month <- format(allocation$Date,'%Y-%m')
-  holdings_data$Month <- format(holdings_data$Date,'%Y-%m')
-  holdings_data <- merge(holdings_data,allocation[c('TraderID','Allocation','Month')],by=c('Month','TraderID'))
-  holdings_data$Weight <- holdings_data$MarketValue/holdings_data$Allocation
-  return(holdings_data)
-}
-
 pivot_frame <- function(frame,pivot_on,value_col,date_col){
   pvals <- unique(frame[[pivot_on]])
   first <- TRUE

@@ -64,10 +64,53 @@ setMethod("checkUnique", "DataSet",
           }
 )
 
+
+#' Return column names of key columns
+#'
+#' @param object object of class 'DataSet'.
+#' @export
+
+setGeneric("getDataSetKeyColumnNames", function(object){standardGeneric("getDataSetKeyColumnNames")})
+
+#' @describeIn getDataSetKeyColumnNames Sets new data in the DataSet
+#'
+#' Return column names of key columns
+#'
+#' @inheritParams getDataSetKeyColumnNames
+#' @return \code{data_cols} "character" vector with key column names
+#' @export
+
+setMethod("getDataSetKeyColumnNames", "DataSet",
+          function(object){
+            return(object@data_cols)
+          }
+)
+
+#' Return column names of data columns
+#'
+#' @param object object of class 'DataSet'.
+#' @export
+
+setGeneric("getDataSetDataColumnNames", function(object){standardGeneric("getDataSetDataColumnNames")})
+
+#' @describeIn getDataSetDataColumnNames Sets new data in the DataSet
+#'
+#' Return column names of data columns
+#'
+#' @inheritParams getDataSetDataColumnNames
+#' @return \code{key_cols} "character" vector with key column names
+#' @export
+
+setMethod("getDataSetDataColumnNames", "DataSet",
+          function(object){
+            return(object@key_cols)
+          }
+)
+
+
 #' Return data stored in the DataSet
 #'
 #' @param object object of class 'DataSet'.
-#' @return \code{data} data.frame with raw data.
 #' @export
 
 setGeneric("getData", function(object){standardGeneric("getData")})

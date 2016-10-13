@@ -270,11 +270,19 @@ setMethod(".translateSQLQueryColumnNames",
 
             colnames_map <- getSQLQueryColumnNameMap(object)
 
-            names_to_translate <- intersect(colnames, names(colnames_map))
-            idx <- (colnames %in% names_to_translate)
+            if (length(colnames_map) > 0)
+            {
 
-            ret_colnames <- colnames
-            ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate]
+              names_to_translate <- intersect(colnames, names(colnames_map))
+              idx <- (colnames %in% names_to_translate)
+
+              ret_colnames <- colnames
+              ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate, drop = TRUE]
+
+            }
+            else {
+              ret_colnames <- colnames
+            }
 
             return(ret_colnames)
           }
@@ -290,7 +298,7 @@ setMethod(".translateSQLQueryColumnNames",
 #' @param key_values "data.frame" with query keys
 #' @export
 
-setGeneric("prepareSQLQuery", function(object, key_values){standardGeneric("prepareSQLQuery")})
+setGeneric("prepareSQLQuery", function(object, key_values = NA){standardGeneric("prepareSQLQuery")})
 
 
 #' @describeIn prepareSQLQuery
@@ -316,6 +324,27 @@ setMethod("prepareSQLQuery",
           }
 )
 
+
+#' Prepare SQL query strings
+#'
+#' Parses key_values to vector of SQL query strings
+#'
+#' @param object object of class 'VirtualSQLQuery'.
+#' @return \code{object} object of class 'VirtualSQLQuery'.
+#' @export
+setMethod("prepareSQLQuery",
+          signature(object = "VirtualSQLQuery", key_values = "missing"),
+          function(object){
+
+            sql_strings <- .getSQLProcedureName(object)
+
+            object <- .setSQLQueryStrings(object, sql_strings)
+
+            return(object)
+          }
+)
+
+
 #' Executes SQL query strings
 #'
 #' Executes previously prepared SQL queries and returns result
@@ -340,6 +369,13 @@ setMethod("executeSQLQuery",
           function(object){
 
             queries <- .getSQLQueryStrings(object)
+
+            if(length(queries) == 0) {
+              # case when there are no keys as we call procedure without parameters
+              object <- prepareSQLQuery(object)
+              queries <- .getSQLQueryStrings(object)
+            }
+
             db      <- .getSQLQueryDBName(object)
             schema  <- .getSQLQuerySchemaName(object)
 
@@ -347,9 +383,7 @@ setMethod("executeSQLQuery",
               schema = NULL
             }
 
-            if(length(queries) == 0) (
-              stop(sprintf("Tried to executeSQLQuery without valid queries set in class %s", class(object)))
-            )
+
 
             ret_df <- NULL
 
@@ -375,7 +409,11 @@ setMethod("executeSQLQuery",
 
             parser <- .getSQLQueryResultsParser(object)
 
-            ret_df <- parser(ret_df)
+            ret_df <- tryCatch({
+              parser(ret_df)
+            }, error = function(cond){
+              message(sprintf("Error when parsing SQLQuery results for %s", class(object)))
+            })
 
             return(ret_df)
           }

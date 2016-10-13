@@ -1,0 +1,28 @@
+USE [FileTableDB]
+GO
+
+/****** Object:  Table [dbo].[ftRDTE_TradesObjectstore]    Script Date: 21/09/2016 13:59:12 ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ARITHABORT ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[ftRDTE_TradesObjectstore] AS FILETABLE ON [PRIMARY] FILESTREAM_ON [FTFG]
+WITH
+(
+FILETABLE_DIRECTORY = N'TradesObjectstore', FILETABLE_COLLATE_FILENAME = Latin1_General_CI_AS
+)
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+

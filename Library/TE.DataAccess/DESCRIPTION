@@ -1,7 +1,7 @@
 Package: TE.DataAccess
 Type: Package
 Title: Basic package for RedDeer Trading Enhancement Engine
-Version: 0.1.1
+Version: 0.1.2
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions and classes for data access,
@@ -9,8 +9,8 @@ Description: Pakckage is implementing functions and classes for data access,
     Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.SQLQuery (>= 0.1.1),
-    TE.BlobStorage (>= 0.1.1),
+    TE.SQLQuery (>= 0.1.2),
+    TE.BlobStorage (>= 0.1.2),
     methods,
 License: file LICENSE
 LazyData: TRUE
@@ -25,6 +25,7 @@ Imports:
     graphics,
     R.utils,
     digest,
+    hash,
 Collate:
     'TE.DataAccess.r'
     'visualisation_functions.r'
@@ -54,10 +55,12 @@ Collate:
     'objectstore.r'
     'remote_objectstore.r'
     'common_analysis_objectstore.r'
+    'features_trade_feature.r'
     'common_RAIDdata.r'
     'common_composite_datasets.r'
     'common_dataset.r'
     'functions.r'
+    'common_trade.r'
     'common_trade_factory.r'
     'common_composite_warehouse.r'
     'common_warehouse_objectstore.r'
@@ -74,9 +77,10 @@ Collate:
     'analysis_module.r'
     'common_daily_riskmodel_objectstore.r'
     'common_ppmodel_objectstore.r'
+    'data_access_sql_procedures.r'
+    'common_trades_remote_objectstore.r'
     'common_trading_analysis_datastore.r'
     'features_feature_functions.r'
-    'features_trade_feature.r'
     'features_context_features.r'
     'features_control_features.r'
     'features_price_features.r'

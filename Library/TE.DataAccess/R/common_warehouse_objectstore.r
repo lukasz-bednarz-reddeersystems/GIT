@@ -352,23 +352,35 @@ setMethod("commitWarehouseStore","WarehouseObjectStore",
 		  	object <- placeInObjectStore(object,
 		  	                             getObjectStoreQuery(object),
 		  	                             getQueryID(object))
+
+		  	ret <- updateTradesObjectStores(object)
+
+		  	if (!ret) {
+		  	  message("Some trades were not saved when updating trades objectstore")
+		  	}
+
 		  	saveObject(object)
 		  }
 )
 
-# !!! Comented unused method with missing dependency tearDownFeatures !!!
-#
-# setGeneric("tearDownAllFeatures",function(object,trader_id,start,end){standardGeneric("tearDownAllFeatures")})
-# setMethod("tearDownAllFeatures","WarehouseObjectStore",
-# 			function(object,trader_id,start,end){
-# 			  wh <- getWarehouseFromStore(object,trader_id,start,end)
-# 			  if(length(wh)>0){
-# 			  	wh <- tearDownFeatures(wh,wh@features)
-# 			  	object <- placeInObjectStore(object,wh,object@id)
-# 			  }
-# 			  return(object)
-# 			}
-# )
+
+
+setGeneric("updateTradesObjectStores",function(object){standardGeneric("updateTradesObjectStores")})
+setMethod("updateTradesObjectStores","WarehouseObjectStore",
+          function(object){
+
+            wh <- getFromObjectStore(object,object@id)
+
+            trades <- listTrades(wh)
+            message(paste("Resetting features for",length(trades),"trades..."))
+            for(trd_id in trades){
+              trade <- getTrade(wh,trd_id)
+              ret <- saveTradeInRemoteStore(trade)
+            }
+            return(ret)
+          }
+)
+
 
 setGeneric("pushFeatures",function(object,warehouse,keep_old=TRUE){standardGeneric("pushFeatures")})
 setMethod("pushFeatures","WarehouseObjectStore",

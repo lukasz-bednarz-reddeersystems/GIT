@@ -4,7 +4,7 @@
 \name{trade_basic_features_transl}
 \alias{trade_basic_features_transl}
 \title{List of translated trade history basic features names}
-\format{An object of class \code{character} of length 11.}
+\format{An object of class \code{character} of length 12.}
 \usage{
 trade_basic_features_transl
 }

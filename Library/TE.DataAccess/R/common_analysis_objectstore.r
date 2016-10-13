@@ -386,7 +386,6 @@ analysis_objectstore_factory <- function(name){
 
 revert_hash <- function(hash, values, hash_function) {
 
-  browser()
   hashed_values <- sapply(values, hash_function)
 
   if (hash %in% hashed_values){
@@ -498,7 +497,7 @@ update_analysis_remote_storage <- function(){
       key_values <- tryCatch({
         analysis_block@key_values
       }, error = function(cond){
-        browser()
+        stop(cond)
       })
 
 
@@ -518,7 +517,7 @@ update_analysis_remote_storage <- function(){
       key_values <- tryCatch({
         analysis_block@key_values
       }, error = function(cond){
-        browser()
+        stop(cond)
       })
 
       if(!is.null(key_values) && nrow(key_values) > 0 && ncol(key_values) > 0){
@@ -547,7 +546,6 @@ update_analysis_remote_storage <- function(){
       new_anstr <- tryCatch({
         updateAnalysisStore(new_anstr, analysis_block, new_key, TRUE)
       }, error = function(cond){
-        browser()
         message(sprintf("Error when storing block %s, for keys %s",
                         analysis, store_key))
       })

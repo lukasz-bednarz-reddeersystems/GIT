@@ -356,7 +356,8 @@ setGeneric("runPreProcessorModel",function(object){standardGeneric("runPreProces
 setMethod("runPreProcessorModel","PPModel",
 		  function(object){
 		    if(length(object@queries)>0){
-		  		while(!hasBatchRun(object@queries)){
+
+		      while(!hasBatchRun(object@queries)){
 		  			key <- getCurrentKey(object@queries)
 		  			object <- queryPreProcessorModel(object,key)
 		  			object@queries <- advanceBatchKey(object@queries)

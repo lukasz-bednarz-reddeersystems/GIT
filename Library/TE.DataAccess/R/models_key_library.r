@@ -244,11 +244,7 @@ dated_three_year_lookback <- function(trader,date){
   month(end) <- 12
   day(end) <- 31
 
-  if (end == rdate) {
-    n <- 3
-  } else {
-    n <- 4
-  }
+  n <- 3 * 12
 
   return(key_generator(trader,end,1,n,lookback_unit='months'))
 }

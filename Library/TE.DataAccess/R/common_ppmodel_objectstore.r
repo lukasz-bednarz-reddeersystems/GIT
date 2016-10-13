@@ -445,7 +445,7 @@ update_ppmodel_remote_storage <- function(){
       getFromObjectStore(whstr, stored_name)
     }, error = function(cond) {
 
-     browser()
+     stop(cond)
     })
 
     new_whstr <- new("PPModelObjectStore", id = name)

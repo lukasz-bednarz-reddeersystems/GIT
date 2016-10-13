@@ -38,7 +38,7 @@ setClass(
   ),
   prototype      = prototype(
     key_cols     = c('InstrumentID','TradeDate','Trader','Strategy','BuySell'),
-    data_cols    = c('ValueUSD')
+    data_cols    = c('ValueUSD', 'OrderID' )
   ), contains = c("DataSet")
 )
 

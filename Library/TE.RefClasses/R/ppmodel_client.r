@@ -127,7 +127,14 @@ setMethod("dataRequest",
                   query_data[setdiff(colnames(ret_data), colnames(query_data))] <- NA
                 }
 
-                ret_data <- rbind(ret_data, query_data)
+                ret_data <- tryCatch({
+                  rbind.fill(ret_data, query_data)
+                }, error = function(cond){
+                  message(sprintf("Error when trying to bind new data in dataRequest() of class %s", class(object)))
+                  message(sprintf("Existing column names are : %s", colnames(ret_data)))
+                  message(sprintf("Incomming column names are : %s", colnames(ret_data)))
+                  stop(cond)
+                })
               }
 
             }
