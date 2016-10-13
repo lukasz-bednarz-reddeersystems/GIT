@@ -45,9 +45,18 @@ setClass(
 #' or halt execution of halt is TRUE
 #'
 #' @param object object of class 'VirtualDataValidator'.
-#' @return \code{data} data.frame of validated data
 #' @export
 setGeneric("validateData",function(object,data){standardGeneric("validateData")})
+
+#' @describeIn validateData
+#' Apply validation to dataframe
+#'
+#' Public method to return dataframe post validation
+#' or halt execution of halt is TRUE
+#'
+#' @inheritParams validateData
+#' @return \code{data} data.frame of validated data
+#' @export
 setMethod("validateData",
           signature(object = "VirtualDataValidator", data = "data.frame"),
           function(object,data){

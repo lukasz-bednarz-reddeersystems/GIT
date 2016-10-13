@@ -26,6 +26,7 @@
 #' @importFrom R.utils copyFile
 #' @importFrom digest digest
 #' @importFrom hash hash values names.hash keys
+#' @importFrom gtools permutations
 #' @importClassesFrom hash hash
 NULL
 ## NULL

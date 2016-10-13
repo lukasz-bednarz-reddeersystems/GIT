@@ -220,7 +220,7 @@ setMethod("mergeTradeConsolidation",
 
             if (any(is.na(merged_cons$Strategy))){
 
-              strats <- unique(merged_cons$Strategy)
+              strategy <- unique(merged_cons$Strategy)
 
             }
 
@@ -245,6 +245,7 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(object)
               }
               else {
+                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Open until %s but new trade is Closed earlier date %s.",
                                 stored_leg_end,
@@ -260,6 +261,7 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(stored_trade)
               }
               else {
+                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Closed on %s but new trade is still open on later date %s.",
                                 stored_leg_end,
@@ -274,6 +276,7 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(stored_trade)
               }
               else {
+                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Closed on %s but new trade is Closed on %s.",
                                 stored_leg_end,
@@ -976,7 +979,6 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
               trdstr <- trade_objectstore_factory(key)
               query <- getObjectStoreQuery(trdstr)
 
-
               is_known <- isTradeStored(query, key)
 
               if (is_known){
@@ -985,14 +987,21 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
 
                 if (is.null(stored_trd)){
                   # key was not matching probably due to missing strategy info
-                  # get first stored value
+                  # get closest match value
+                  browser()
 
-                  stored_trd <- getAllTradesdFromTradeStore(trdstr)[[1]]
+                  stored_trd <- queryClosestMatchFromTradeStore(trdstr, key)
                 }
 
-                .Object <- mergeTradeConsolidation(.Object, stored_trd)
+                if (!is.null(stored_trd)){
+                  .Object <- mergeTradeConsolidation(.Object, stored_trd)
+                }
+                else {
+                  browser()
+                }
+
               } else {
-                #browser()
+                browser()
               }
 
             }

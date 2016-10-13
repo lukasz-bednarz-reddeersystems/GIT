@@ -1,7 +1,7 @@
 Package: TE.DataAccess
 Type: Package
 Title: Basic package for RedDeer Trading Enhancement Engine
-Version: 0.1.2
+Version: 0.1.3
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions and classes for data access,
@@ -26,6 +26,7 @@ Imports:
     R.utils,
     digest,
     hash,
+    gtools,
 Collate:
     'TE.DataAccess.r'
     'visualisation_functions.r'

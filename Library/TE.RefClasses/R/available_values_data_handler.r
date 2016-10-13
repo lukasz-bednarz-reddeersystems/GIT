@@ -82,9 +82,16 @@ setMethod(".setAvailableValuesObject",
 #' Getter for the value column name
 #'
 #' @param object object of class 'VirtualAvailableValuesDataHandler'.
-#' @return \code{name} "character"
 #' @export
 setGeneric("getValueName", function(object){standardGeneric("getValueName")})
+
+#' @describeIn getValueName
+#'
+#' Getter for the value column name
+#'
+#' @inheritParams getValueName
+#' @return \code{name} "character"
+#' @export
 setMethod("getValueName","VirtualAvailableValuesDataHandler",
           function(object){
             return(object@available_values@column_name)

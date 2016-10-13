@@ -28,12 +28,13 @@ key_from_trade_objectstore_name <- function(name) {
 
   str_keys <- strsplit(name, "_")
 
-  key <- data.frame(id          = str_keys[[1]][3],
-                    instrument  = as.integer(str_keys[[1]][4]),
-                    buysell     = str_keys[[1]][5],
-                    strategy    = str_keys[[1]][6],
-                    leg_start       = as.Date(str_keys[[1]][7]),
-                    leg_end         = as.Date(str_keys[[1]][8]))
+  key <- data.frame(id          = str_keys[[1]][2],
+                    instrument  = as.integer(str_keys[[1]][3]),
+                    buysell     = str_keys[[1]][4],
+                    strategy    = paste(str_keys[[1]][5], str_keys[[1]][6], sep = "_"),
+                    leg_start   = as.Date(str_keys[[1]][7]),
+                    leg_end     = as.Date(str_keys[[1]][8]),
+                    status      = str_keys[[1]][9])
 
   return(key)
 }
@@ -306,7 +307,6 @@ setMethod("initialiseTradeStore","TradeObjectStore",
 #'
 #' @param object object of class "TradeObjectStore"
 #' @param key "data.frame" with key related to query
-#' @return \code{rval} object of class "Trade"
 #'
 #' @export
 
@@ -322,7 +322,9 @@ setGeneric("queryTradeStore",function(object,key){standardGeneric("queryTradeSto
 #' @return \code{rval} object of class "Trade"
 #' @export
 
-setMethod("queryTradeStore","TradeObjectStore",
+setMethod("queryTradeStore",
+          signature(object = "TradeObjectStore",
+                    key = "data.frame"),
           function(object,key){
             query <- getObjectStoreQuery(object)
             if(isTradeStored(query,key)){
@@ -344,29 +346,90 @@ setMethod("queryTradeStore","TradeObjectStore",
 #' Query store for Trade
 #'
 #' Querries Trade Objectstore for Trade stored under given key
-#' Returns Trade if present NULL otherwise
+#' Returns Trade if present NULL otherwise. Looks for closest match
+#' to query
 #'
 #' @param object object of class "TradeObjectStore"
-#' @return \code{rval} object of class "Trade"
+#' @param key "data.frame" with key related to query
 
+setGeneric("queryClosestMatchFromTradeStore",function(object, key){standardGeneric("queryClosestMatchFromTradeStore")})
 
-setGeneric("getAllTradesdFromTradeStore",function(object){standardGeneric("getAllTradesdFromTradeStore")})
-
-#' @describeIn getAllTradesdFromTradeStore
+#' @describeIn queryClosestMatchFromTradeStore
 #' Query store for Trade
 #'
-#' Querries Trade Objectstore for Trade stored under given key
-#' Returns Trade if present NULL otherwise
+#' Returns Trade if present NULL otherwise. Looks for closest match
+#' to query
 #'
-#' @inheritParams getAllTradesdFromTradeStore
+#' @inheritParams queryClosestMatchFromTradeStore
 #' @return \code{rval} list of objects of class "Trade"
-setMethod("getAllTradesdFromTradeStore","TradeObjectStore",
-          function(object){
+setMethod("queryClosestMatchFromTradeStore",
+          signature(object = "TradeObjectStore",
+                    key = "data.frame"),
+          function(object, key){
+
+            browser()
             names <- ls(object@stored)
 
             names <- setdiff(names, object@qry_store_nme)
 
-            rval <- mget(names, object@stored, ifnotfound = sapply(names, function(x)NULL))
+            query <- getObjectStoreQuery(object)
+
+            vals <- setdiff(query@fields, "hash")
+            key <- key[vals]
+
+            dist <- integer(length = length(names))
+            names(dist) <- names
+            dist <- dist + length(vals)
+
+            if (length(names) > 0){
+
+              for (name in names){
+                stored_key <- key_from_trade_objectstore_name(name)
+
+                stored_key <- stored_key[vals]
+                diffs <- sapply(vals, function(x){ stored_key[x] != key[x]})
+
+
+                # additional conditioning on leg dates
+                if (stored_key$status == "Closed" && key$status == "Closed"){
+                  if(stored_key$leg_end != key$leg_end){
+                    diffs[vals] <- TRUE
+                  }
+                }
+                else if (stored_key$status == "Closed" && key$status == "Open") {
+                  diffs["leg_end"] <- (key$leg_end < stored_key$leg_start) || (key$leg_end > stored_key$leg_end)
+                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+                }
+                else if (stored_key$status == "Open" && key$status == "Open") {
+                  diffs["leg_end"] <- key$leg_end < stored_key$leg_start
+                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+
+                }
+
+                else if (stored_key$status == "Open" && key$status == "Closed") {
+                  diffs["leg_end"] <- key$leg_end < stored_key$leg_end
+                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+
+                }
+
+                # counting distance
+                if (!(diffs["leg_start"] && diffs["leg_end"]) && !any(diffs[c("id", "instrument", "buysell")]) && (!diffs["strategy"] || is.na(key$strategy))){
+                  dist[name] <- sum(diffs)
+                }
+
+
+              }
+            }
+
+            dist <- sort(dist)
+
+            names <- names(dist[ dist < length(vals)])
+
+            if (length(names) ){
+              rval <- object@stored[[names[1]]]
+            } else {
+              rval <- NULL
+            }
 
             return(rval)
           }
@@ -410,6 +473,7 @@ setMethod("updateTradeStore","TradeObjectStore",
               query <- updateStoredTradeKeys(query,key)
 
               object <- .setObjectStoreQuery(object, query)
+              object <- .setObjectStoreKey(object, key)
 
               object <- placeInObjectStore(object,query,object@qry_store_nme)
               object <- placeInObjectStore(object,trade_object,getIdentifier(query))

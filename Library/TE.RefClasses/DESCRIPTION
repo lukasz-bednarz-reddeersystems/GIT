@@ -20,10 +20,10 @@ Imports:
     hash,
     quantmod,
     stats,
-    ggplot2
+    ggplot2,
+    plyr,
 Suggests:
     testthat,
-    plyr,
     knitr,
     rmarkdown,
 Collate:

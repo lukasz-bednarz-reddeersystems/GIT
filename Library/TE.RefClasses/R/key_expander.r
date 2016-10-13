@@ -27,8 +27,7 @@ setClass(
 #' if that column is not already present.
 #'
 #' @param object object of class "VirtualKeyExpander"
-#' @param object key_values of class "data.frame"
-#' @return \code{object} object of class "VirtualKeyExpander"
+#' @param key_values "data.frame" with values of keys to be expanded
 #' @export
 setGeneric("expandKeys", function(object,key_values){standardGeneric("expandKeys")})
 
@@ -41,7 +40,8 @@ setGeneric("expandKeys", function(object,key_values){standardGeneric("expandKeys
 #' @return \code{object} object of class "VirtualKeyExpander"
 #' @export
 setMethod("expandKeys",
-          signature(object = "VirtualKeyExpander",key_values = "data.frame"),
+          signature(object = "VirtualKeyExpander",
+                    key_values = "data.frame"),
           function(object,key_values){
             available_values <- getAvailableValuesObject(object)
             column_name <- getValueName(object)

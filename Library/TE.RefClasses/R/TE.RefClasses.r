@@ -18,5 +18,17 @@
 #' @importClassesFrom hash hash
 #' @importFrom RODBC odbcConnect sqlQuery
 #' @importFrom stats aggregate
+#' @importFrom plyr rbind.fill
 NULL
 ## NULL
+
+
+###############################
+#
+# create S4 classes
+#
+###############################
+
+setOldClass("gg")
+setOldClass("ggplot")
+

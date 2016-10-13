@@ -46,7 +46,7 @@ This is list of basic classes available via package:
 
 To instantiate new object of the class in R please execute:
 
-```{r, TE.RefClasses_use_example}
+```{r, TE.RefClasses_use_example, eval = FALSE}
 # create an instance of "TradeData" class
 trade_data <- new("TradeData")
 
@@ -80,7 +80,7 @@ To faciliate generation of the keys special key-generating functions are availab
 
 To generate set of keys please execute in R command line:
 
-```{r generate_query_key}
+```{r generate_query_key, eval = FALSE}
 # display help on function
 ? dated_three_monthly_lookback
 
@@ -97,7 +97,7 @@ keys
 
 To retrieve the data and populate internal object storage please use "dataRequest()" method (this might last up to few mins depending of data type and timespan):
 
-```{r, data_request, message = FALSE}
+```{r, data_request, message = FALSE, eval = FALSE}
 # request trade data from data source
 trade_data <- dataRequest(trade_data, keys)
 

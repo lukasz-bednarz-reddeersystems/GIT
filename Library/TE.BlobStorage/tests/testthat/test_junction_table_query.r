@@ -198,9 +198,9 @@ valid.hash    <- TE.BlobStorage:::hash_data_frame(valid.keys)
 valid.keys    <- cbind(data.frame(HashID      = valid.hash),
                        valid.keys,
                        data.frame(LegStatus   = "Closed",
-                                  CreatedDate = as.Date("2016-10-12"),
+                                  CreatedDate = as.Date("2016-10-13"),
                                   CreatedByUserID = "lukasz.bednarz",
-                                  FileName    = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-12_lukasz.bednarz.rds"))
+                                  FileName    = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-13_lukasz.bednarz.rds"))
 
 valid.ret     <- data.frame(KeyAlreadyStored  = 1,
                             KeyInserted = 0,
@@ -317,9 +317,9 @@ valid.ret     <- data.frame(sHashID    = valid.hash,
                             dtLegStartDate = as.Date("2016-03-29"),
                             dtLegEndDate   = as.Date("2016-04-01"),
                             sLegStatus     = "Closed",
-                            dtCreatedDate = as.Date("2016-10-04"),
+                            dtCreatedDate = as.Date("2016-10-13"),
                             sCreatedByUserID = "lukasz.bednarz",
-                            sFileName  = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-04_lukasz.bednarz.rds",
+                            sFileName  = "trade_store_1984_4454_Buy_LB_TEST_2016-03-29_objectstore_2016-10-13_lukasz.bednarz.rds",
                             stringsAsFactors = FALSE)
 
 test_that(sprintf("Cannot instantiate %s class without parameters", tested.class),{

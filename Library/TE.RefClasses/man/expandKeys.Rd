@@ -14,11 +14,9 @@ expandKeys(object, key_values)
 \arguments{
 \item{object}{object of class "VirtualKeyExpander"}
 
-\item{object}{key_values of class "data.frame"}
+\item{key_values}{"data.frame" with values of keys to be expanded}
 }
 \value{
-\code{object} object of class "VirtualKeyExpander"
-
 \code{object} object of class "VirtualKeyExpander"
 }
 \description{
