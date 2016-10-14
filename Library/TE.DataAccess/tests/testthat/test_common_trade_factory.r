@@ -22,6 +22,7 @@ test_that(sprintf("Can create instance of %s", tested.class),{
 
 test_that(sprintf("Can build_warehouse()", tested.class),{
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   object <- TE.DataAccess:::build_warehouse(valid.trader, valid.start, valid.end)
 
   expect_is(object, tested.class)

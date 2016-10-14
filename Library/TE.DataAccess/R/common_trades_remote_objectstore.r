@@ -367,7 +367,6 @@ setMethod("queryClosestMatchFromTradeStore",
                     key = "data.frame"),
           function(object, key){
 
-            browser()
             names <- ls(object@stored)
 
             names <- setdiff(names, object@qry_store_nme)
@@ -388,7 +387,6 @@ setMethod("queryClosestMatchFromTradeStore",
 
                 stored_key <- stored_key[vals]
                 diffs <- sapply(vals, function(x){ stored_key[x] != key[x]})
-
 
                 # additional conditioning on leg dates
                 if (stored_key$status == "Closed" && key$status == "Closed"){
@@ -412,6 +410,7 @@ setMethod("queryClosestMatchFromTradeStore",
 
                 }
 
+                diffs[is.na(diffs)] <- TRUE
                 # counting distance
                 if (!(diffs["leg_start"] && diffs["leg_end"]) && !any(diffs[c("id", "instrument", "buysell")]) && (!diffs["strategy"] || is.na(key$strategy))){
                   dist[name] <- sum(diffs)

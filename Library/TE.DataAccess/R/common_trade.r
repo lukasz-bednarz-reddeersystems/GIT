@@ -245,7 +245,6 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(object)
               }
               else {
-                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Open until %s but new trade is Closed earlier date %s.",
                                 stored_leg_end,
@@ -261,7 +260,6 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(stored_trade)
               }
               else {
-                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Closed on %s but new trade is still open on later date %s.",
                                 stored_leg_end,
@@ -276,7 +274,6 @@ setMethod("mergeTradeConsolidation",
                 merged_leg_status <- getTradeLegStatus(stored_trade)
               }
               else {
-                browser()
                 message(sprintf("Inconsistent trade consolidation for stored leg."))
                 message(sprintf("stored leg was Closed on %s but new trade is Closed on %s.",
                                 stored_leg_end,
@@ -988,8 +985,6 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
                 if (is.null(stored_trd)){
                   # key was not matching probably due to missing strategy info
                   # get closest match value
-                  browser()
-
                   stored_trd <- queryClosestMatchFromTradeStore(trdstr, key)
                 }
 
@@ -997,11 +992,11 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
                   .Object <- mergeTradeConsolidation(.Object, stored_trd)
                 }
                 else {
-                  browser()
+                  #browser()
                 }
 
               } else {
-                browser()
+                #browser()
               }
 
             }
