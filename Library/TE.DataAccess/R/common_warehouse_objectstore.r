@@ -277,7 +277,8 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  	      		message(paste("Error building trade warehouse during object store query:",cond))
 		  	      		stop("Could not create required TradeWarehouse object.")
 		  	      	})
-              object <- updateWarehouseStoreForKey(object,new_warehouse)
+
+		  	      object <- updateWarehouseStoreForKey(object,new_warehouse)
               key_map <- advanceCurrentKey(key_map)
               object <- .setObjectStoreKeyMap(object, key_map)
 		    }

@@ -121,8 +121,8 @@ setMethod("initialize", "VirtualTrade",
                    ){
 
             .Object <- .setTradeOrderID(.Object, as.integer(order_id))
-            .Object <- .setTradeLegStartDate(.Object, leg_start)
-            .Object <- .setTradeLegEndDate(.Object, leg_end)
+            .Object <- .setTradeLegStartDate(.Object, as_date(leg_start))
+            .Object <- .setTradeLegEndDate(.Object, as_date(leg_end))
             .Object <- .setTradeTrader(.Object, trader)
             .Object <- .setTradeTraderID(.Object, trader_id)
             .Object <- .setTradeInstrument(.Object, instrument)
@@ -220,7 +220,15 @@ setMethod("mergeTradeConsolidation",
 
             if (any(is.na(merged_cons$Strategy))){
 
-              strategy <- unique(merged_cons$Strategy)
+              strategy <- unique(merged_cons$Strategy[!is.na(merged_cons$Strategy)])
+
+              if(is.na(strategy)){
+                strategy <- getTradeStrategy(object)
+              }
+
+              if(!is.na(strategy)){
+                merged_cons$Strategy[is.na(merged_cons$Strategy)] <- strategy
+              }
 
             }
 
@@ -630,7 +638,7 @@ setMethod(".setTradeConsolidation",
                 }
               }
 
-              consolidation[is.na(consolidation$Strategy)] <- strat
+              consolidation$Strategy[is.na(consolidation$Strategy)] <- strat
 
               object@consolidation <- consolidation
             }
@@ -659,8 +667,27 @@ setMethod("updateTradeConsolidation",
               # sort consolidation
               consolidation <- consolidation[order(consolidation$TradeDate,
                                                    consolidation$OrderID),]
-              object <- .setTradeLegStartDate(object, min(consolidation$TradeDate))
-              object <- .setTradeLegEndDate(object, max(consolidation$TradeDate))
+              object <- tryCatch({
+                .setTradeLegStartDate(object, min(consolidation$TradeDate))
+              }, error  = function(cond){
+                message(sprintf("Error occured in updateTradeConsolidation() when calling %s with value %s",
+                                ".setTradeLegStartDate()",
+                                min(consolidation$TradeDate)))
+
+                stop(cond)
+              })
+
+
+              object <- tryCatch({
+                .setTradeLegEndDate(object, max(consolidation$TradeDate))
+              }, error  = function(cond){
+                message(sprintf("Error occured in updateTradeConsolidation() when calling %s with value %s",
+                                ".setTradeLegEndDate()",
+                                min(consolidation$TradeDate)))
+
+                stop(cond)
+              })
+
               object <- .setTradeOrderID(object, as.integer(min(consolidation$OrderID)))
               object <- .setTradeValueUSD(object, consolidation$ValueUSD[1])
               object <- .setTradeID(object,
@@ -913,6 +940,8 @@ setMethod("saveTradeInRemoteStore",
             trdstr <- trade_objectstore_factory(key)
 
             trdstr <- updateTradeStore(trdstr, object, key, TRUE)
+
+            res <- removeObjectFromRemoteStore(trdstr)
 
             ret <- commitTradeStore(trdstr)
 

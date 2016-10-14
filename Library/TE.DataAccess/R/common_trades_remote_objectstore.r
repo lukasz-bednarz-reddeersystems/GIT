@@ -40,6 +40,47 @@ key_from_trade_objectstore_name <- function(name) {
 }
 
 
+
+trade_objectstore_keys_distance <- function(stored_key, key){
+
+  vals <- colnames(stored_key)
+  diffs <- sapply(vals, function(x){ stored_key[x] != key[x]})
+
+  dist <- length(names(stored_key))
+
+  # additional conditioning on leg dates
+  if (stored_key$status == "Closed" && key$status == "Closed"){
+    if(stored_key$leg_end != key$leg_end){
+      diffs[vals] <- TRUE
+    }
+  }
+  else if (stored_key$status == "Closed" && key$status == "Open") {
+    diffs["leg_end"] <- (key$leg_end < stored_key$leg_start) || (key$leg_end > stored_key$leg_end)
+    diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+  }
+  else if (stored_key$status == "Open" && key$status == "Open") {
+    diffs["leg_end"] <- key$leg_end < stored_key$leg_start
+    diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+
+  }
+
+  else if (stored_key$status == "Open" && key$status == "Closed") {
+    diffs["leg_end"] <- key$leg_end < stored_key$leg_end
+    diffs["leg_start"] <- key$leg_start > stored_key$leg_end
+
+  }
+
+  diffs[is.na(diffs)] <- TRUE
+  # counting distance
+  if (!(diffs["leg_start"] && diffs["leg_end"]) && !any(diffs[c("id", "instrument", "buysell")]) && (!diffs["strategy"] || is.na(key$strategy))){
+    dist <- sum(diffs)
+  }
+
+  return(dist)
+
+}
+
+
 setClass(
   Class          = "VirtualTradeQuery",
   prototype = prototype(
@@ -85,22 +126,48 @@ setMethod("isTradeStored",
                     key    = "data.frame"),
           function(object,key){
 
-            if(length(object@known_keys)==0){
+            stored_keys <- getKnownKeys(object)
+
+            if(length(stored_keys)==0){
               rval <- FALSE
             }
             else{
               hash <- hash_data_frame(key[object@fields[2:6]], algo = "murmur32")
+              rval <- hash %in% stored_keys[['hash']]
 
-              rval <- hash%in%object@known_keys[['hash']]
+              if (!rval && is.na(key$strategy)){
+                message(sprintf("Trade not found for given key trying with out strategy column"))
 
-            }
-            if (!rval && is.na(key$strategy)){
-              message(sprintf("Trade not found for given key trying with out strategy column"))
+                res <- merge(stored_keys, key[setdiff(colnames(key), "strategy")])
 
-              res <- merge(object@known_keys, key[setdiff(colnames(key), "strategy")])
+                if (nrow(res) > 0 ) {
+                  rval <- TRUE
+                }
+              }
+              else if (!rval){
+                message(sprintf("Trade not found for given key with out strategy column"))
+                message(sprintf("Trying closest match method"))
 
-              if (nrow(res) > 0 ) {
-                rval <- TRUE
+                vals <- setdiff(colnames(stored_keys), "hash")
+
+                stored_keys <- stored_keys[vals]
+                key <- key[vals]
+
+                dist <- integer(length = nrow(stored_keys))
+                dist <- dist + length(vals)
+
+                for (r_idx in seq(nrow(stored_keys))){
+                  stored_key <- stored_keys[r_idx, , drop = FALSE]
+
+                  stored_key <- stored_key[vals]
+                  dist[r_idx] <- trade_objectstore_keys_distance(stored_key, key)
+
+                  dist <- sort(dist)
+
+                  rval <- any(dist < length(vals))
+
+                }
+
               }
             }
 
@@ -386,36 +453,7 @@ setMethod("queryClosestMatchFromTradeStore",
                 stored_key <- key_from_trade_objectstore_name(name)
 
                 stored_key <- stored_key[vals]
-                diffs <- sapply(vals, function(x){ stored_key[x] != key[x]})
-
-                # additional conditioning on leg dates
-                if (stored_key$status == "Closed" && key$status == "Closed"){
-                  if(stored_key$leg_end != key$leg_end){
-                    diffs[vals] <- TRUE
-                  }
-                }
-                else if (stored_key$status == "Closed" && key$status == "Open") {
-                  diffs["leg_end"] <- (key$leg_end < stored_key$leg_start) || (key$leg_end > stored_key$leg_end)
-                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
-                }
-                else if (stored_key$status == "Open" && key$status == "Open") {
-                  diffs["leg_end"] <- key$leg_end < stored_key$leg_start
-                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
-
-                }
-
-                else if (stored_key$status == "Open" && key$status == "Closed") {
-                  diffs["leg_end"] <- key$leg_end < stored_key$leg_end
-                  diffs["leg_start"] <- key$leg_start > stored_key$leg_end
-
-                }
-
-                diffs[is.na(diffs)] <- TRUE
-                # counting distance
-                if (!(diffs["leg_start"] && diffs["leg_end"]) && !any(diffs[c("id", "instrument", "buysell")]) && (!diffs["strategy"] || is.na(key$strategy))){
-                  dist[name] <- sum(diffs)
-                }
-
+                dist[name] <- trade_objectstore_keys_distance(stored_key, key)
 
               }
             }

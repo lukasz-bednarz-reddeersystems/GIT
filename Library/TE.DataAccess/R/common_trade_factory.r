@@ -21,19 +21,20 @@ NULL
 #' @export
 
 setClass(
-  Class          = "TradeWarehouse",
-  representation = representation(
-    trades       = "environment",
-    instruments  = "numeric",
-    features     = "character",
-    trader_id    = "integer",
-    positions    = "PositionComposite",
-    psn_summary  = "DataSet",
-    start_date   = "Date",
-    end_date     = "Date",
-    dly_data_pad = "numeric",
-    map          = "list",
-    fctr_datstr  = "character"
+  Class                = "TradeWarehouse",
+  representation       = representation(
+    trades             = "environment",
+    instruments        = "numeric",
+    features           = "character",
+    complete_features = "character",
+    trader_id          = "integer",
+    positions          = "PositionComposite",
+    psn_summary        = "DataSet",
+    start_date         = "Date",
+    end_date           = "Date",
+    dly_data_pad       = "numeric",
+    map                = "list",
+    fctr_datstr        = "character"
   ),
   prototype(
     dly_data_pad = warehouse_defaults@default_dly_data_pad,
@@ -595,6 +596,7 @@ setMethod("attachFeatures","TradeWarehouse",
       }
       object <- setInstrumentTrades(object,trades,instrument)
       object@features <- unique(c(object@features,features))
+      object@complete_features <- intersect(c(object@features,features))
       cnt <- cnt + 1
     }
   return(object)
@@ -634,11 +636,21 @@ setMethod("buildFeatureList","TradeWarehouse",
               trd <- getTrade(object,trade)
               f <- unique(c(f,names(trd@features)))
             }
+
+            fc <- f
+            for(trade in trades){
+              trd <- getTrade(object,trade)
+              fc <- intersect(fc,names(trd@features))
+            }
+
             object@features <- f
             names(object@features) <- f
+            object@complete_features <- fc
+            names(object@complete_features) <- fc
            return(object)
           }
 )
+
 
 setGeneric("getInstrumentTrades",function(object,instrument){standardGeneric("getInstrumentTrades")})
 setMethod("getInstrumentTrades","TradeWarehouse",
@@ -828,7 +840,13 @@ setMethod("getTradeFeatures","TradeWarehouse",
             rtn_frm <- data.frame(DateTime=get_trade_dates(trd))
             dropped <- c()
             for(feature in features){
+
+              if (is.null(feature)){
+                browser
+              }
+
               fd <- getOutPut(feature)
+
               if(length(fd)>0){
                 rtn <- tryCatch(
                   {
@@ -1044,19 +1062,39 @@ setMethod("buildTrades","TradeWarehouse",
               }
 
 
-              new_trade <- new("Trade",
-                               order_id      = as.integer(order_id),
-                               leg_start     = as.Date(leg_start),
-                               leg_end       = as.Date(leg_end),
-                               long          = test_long(buysell),
-                               buysell       = buysell,
-                               value_usd     = value_usd,
-                               strategy      = strategy,
-                               trader        = trader,
-                               trader_id     = as.integer(trader_id),
-                               instrument    = as.integer(instrument),
-                               consolidation = consolidation,
-                               status        = leg_status)
+              new_trade <- tryCatch({
+                new("Trade",
+                    order_id      = as.integer(order_id),
+                    leg_start     = as.Date(leg_start),
+                    leg_end       = as.Date(leg_end),
+                    long          = test_long(buysell),
+                    buysell       = buysell,
+                    value_usd     = value_usd,
+                    strategy      = strategy,
+                    trader        = trader,
+                    trader_id     = as.integer(trader_id),
+                    instrument    = as.integer(instrument),
+                    consolidation = consolidation,
+                    status        = leg_status)
+              }, error = function(cond){
+                message(sprintf("Error occured when creating new Trade object in buidTrades of object: %s",
+                                class(object)))
+                message("Parameters were :")
+                message(sprintf("order_id      : %s", as.integer(order_id)))
+                message(sprintf("leg_start     : %s", as.Date(leg_start)))
+                message(sprintf("leg_end       : %s", as.Date(leg_end)))
+                message(sprintf("long          : %s", test_long(buysell)))
+                message(sprintf("buysell       : %s", buysell))
+                message(sprintf("value_usd     : %s", value_usd))
+                message(sprintf("strategy      : %s", strategy))
+                message(sprintf("trader        : %s", trader))
+                message(sprintf("trader_id     : %s", as.integer(trader_id)))
+                message(sprintf("instrument    : %s", as.integer(instrument)))
+                message(sprintf("consolidation : %s", consolidation))
+                message(sprintf("status        : %s", leg_status))
+
+                stop(sprintf("Failed to create new trade : %s", cond))
+              })
 
               trades[[cnt]] <- new_trade
 

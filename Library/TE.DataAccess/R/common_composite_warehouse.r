@@ -182,7 +182,8 @@ setMethod("addWarehouse","CompositeWarehouse",
 setGeneric("getWarehouse", function(object,name){standardGeneric("getWarehouse")})
 setMethod("getWarehouse","CompositeWarehouse",
 	      function(object,name){
-	      	message(paste("Getting warehouse",name,"..."))
+
+	        message(paste("Getting warehouse",name,"..."))
 	      	tw <- new("TradeWarehouse")
 	      	get_trades <- object@orig_trade_ids[[name]]
 	      	instruments <- object@orig_instruments[[name]]

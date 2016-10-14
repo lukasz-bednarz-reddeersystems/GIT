@@ -270,6 +270,7 @@ setMethod("closeWarehouse","PPModel",
 setGeneric("queryPreProcessorModel",function(object,key){standardGeneric("queryPreProcessorModel")})
 setMethod("queryPreProcessorModel","PPModel",
 		  function(object,key){
+
 		    object@warehouse_store_name <- name_from_key(key)
 		  	object <- updateWarehouse(object,key)
 		  	object@setup_comp <- tryCatch({
@@ -475,7 +476,7 @@ setMethod("updateModel","PPModel",
 		  function(object){
 		  	message(paste("Updating model:",class(object)[[1]]))
 		    if(length(object@features)!=length(unique(object@features)))stop(paste("Duplicate features specified in",class(object)[[1]],"check the ppmodel definition."))
-		  	if(length(object@features)!=0 && object@features!="" && length(intersect(object@warehouse@features,object@features))!=length(object@features)){
+		  	if(length(object@features)!=0 && object@features!="" && length(intersect(object@warehouse@complete_features,object@features))!=length(object@features)){
 		  		message("Not all features found in warehouse.")
 		  		message("Adding features ...")
 		  		to_add <- setdiff(object@features,object@warehouse@features)
