@@ -71,7 +71,6 @@ setMethod("dataRequest",
             non_na_cols <- getNonNAColumnNames(object)
             model <- getPPModelClass(object)
             values <- getDataSourceReturnColumnNames(object)
-            colnames_map <- getDataSourceClientColumnNameMap(object)
 
             key_values <- cbind(data.frame(model_class = model), key_values)
 
@@ -83,7 +82,6 @@ setMethod("dataRequest",
               trader <- as.integer(key_values$id[i_row])
               start <- as.Date(key_values$start[i_row])
               end <- as.Date(key_values$end[i_row])
-              ppm_store_name <- store_ids[i_row]
 
               ppm_store <- ppmodel_objectstore_factory(store_ids[i_row])
 

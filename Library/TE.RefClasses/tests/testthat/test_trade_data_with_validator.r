@@ -166,8 +166,6 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 })
 
 
-
-
 test_that("Can dataRequest() with valid key_values", {
 
   # create new instance of class
