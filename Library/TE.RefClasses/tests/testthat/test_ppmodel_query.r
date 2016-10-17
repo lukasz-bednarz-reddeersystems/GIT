@@ -31,8 +31,8 @@ if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
   suppressMessages({
     tested.class  <-  "PPModelObjectStore"
     valid.trader_id <- 11
-    valid.end_date  <- "2016-06-01"
-    valid.key_func <- dated_three_day_lookback
+    valid.end_date  <- "2016-11-01"
+    valid.key_func <- dated_three_year_lookback
     valid.keys <- valid.key_func(valid.trader_id, valid.end_date)
     valid.ppmodel <- new('TradeHistorySimpleWithSummary', keys = valid.keys )
 
