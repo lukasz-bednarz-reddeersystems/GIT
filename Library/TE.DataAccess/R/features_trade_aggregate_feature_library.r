@@ -7,7 +7,16 @@ NULL
 # Get leg position impact from the trade object
 
 ftr_unit <- function(compute_object){
-	compute_object@output <- compute_object@input
+	output <- getFeatureComputationInput(compute_object)
+
+	compute_object <- tryCatch({
+	  .setFeatureComputationOutput(compute_object, output)
+	}, error = function(cond){
+	  message(sprintf("Error in ftr_unit() when computing %s : %s",
+	                  class(compute_object),
+	                  cond))
+	})
+
 	return(compute_object)
 }
 

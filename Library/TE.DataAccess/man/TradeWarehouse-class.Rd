@@ -16,6 +16,8 @@ Stores information about trades in given timespan for given trader.
 
 \item{\code{features}}{"character",}
 
+\item{\code{complete_features}}{"character",}
+
 \item{\code{trader_id}}{"integer",}
 
 \item{\code{positions}}{"PositionComposite",}

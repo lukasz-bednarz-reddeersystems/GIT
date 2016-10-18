@@ -488,7 +488,7 @@ setMethod("updateModel","PPModel",
 		  		tryCatch({
 		  				warehouse_push_features(object@warehouse_store_name,object@warehouse,replace_features=object@replace_features)
 		  			}, error = function(cond){
-		  				stop(paste("Error pushing feature changes to warehouse:",cond))
+		  			  stop(paste("Error pushing feature changes to warehouse:",cond))
 		  			})
 		  	}
 		  	message("Running preprocessor...")

@@ -313,7 +313,8 @@ setMethod("addDailyData","CompositeWarehouse",
 	      				original_data<-new_data
 	      			}
 	      		}
-	      		original_trade@daily_data <- original_data
+
+	      		original_trade <- .setTradeDailyData(original_trade, original_data)
 	      		object<-setTrade(object,original_trade)
 	      	}
 	      	message("Daily data update complete.")
