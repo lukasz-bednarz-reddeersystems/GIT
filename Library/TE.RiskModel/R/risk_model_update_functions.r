@@ -122,20 +122,20 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorVariance', day, lookback)
     data <- data[data$Date == day, ]
 
-    if (nrow(data) > 0) {
+    if (nrow(data) == 1) {
       bulk_load_factor_variances(data, model_id)
     }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorCorrelation', day, lookback)
     data <- data[data$Date == day, ]
 
-    if (nrow(data) > 0) {
+    if (nrow(data) == (ncol(data)-1)) {
       bulk_load_factor_correlations(data, model_id)
     }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'MarketStyle', day, lookback)
     data <- data[data$Date == day, ]
-    if (nrow(data) > 0) {
+    if (nrow(data) == 1) {
       bulk_load_market_style(data, model_id)
     }
 
