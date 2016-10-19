@@ -260,7 +260,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Open until %s but new trade is Closed earlier date %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
 
@@ -275,7 +275,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is still open on later date %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
             }
@@ -289,12 +289,12 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is Closed on %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
             }
             else{
-              merged_leg_status <- getTradeLegStatus(stored_trade)
+              merged_leg_status <- getTradeLegStatus(object)
             }
 
             merged_trade <- updateTradeConsolidation(merged_trade, merged_cons)

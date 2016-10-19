@@ -1126,6 +1126,7 @@ setMethod("buildTrades","TradeWarehouse",
                 consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
                 consolidation$Strategy <- strategy
                 leg_end = trade_panel[(i+leg_end_index),'TradeDate']
+
               }
               else
               {
@@ -1138,6 +1139,7 @@ setMethod("buildTrades","TradeWarehouse",
                 leg_end = leg_start
               }
 
+              new_trade <- NULL
 
               new_trade <- tryCatch({
                 new("Trade",
@@ -1170,20 +1172,25 @@ setMethod("buildTrades","TradeWarehouse",
                 message(sprintf("consolidation : %s", consolidation))
                 message(sprintf("status        : %s", leg_status))
 
-                stop(sprintf("Failed to create new trade : %s", cond))
+                #stop(sprintf("Failed to create new trade : %s", cond))
+
+                NULL
               })
 
-              trades[[cnt]] <- new_trade
+              if (!is.null(new_trade)){
 
-              tid <- getTradeID(new_trade)
+                trades[[cnt]] <- new_trade
 
-              object <- updateMap(object,tid,instrument,cnt)
+                tid <- getTradeID(new_trade)
+
+                object <- updateMap(object,tid,instrument,cnt)
 
 
-              trade_id <- c(trade_id,tid)
+                trade_id <- c(trade_id,tid)
 
-              i <- i+ leg_end_index + 1
-              cnt <- cnt + 1
+                i <- i+ leg_end_index + 1
+                cnt <- cnt + 1
+              }
             }
             names(trades) <- trade_id
             #object@trades[[as.character(instrument)]] <- trades
