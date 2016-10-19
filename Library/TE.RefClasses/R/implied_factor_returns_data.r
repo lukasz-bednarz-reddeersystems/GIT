@@ -29,7 +29,7 @@ setClass(
 #' Implements storage for Implied Factor Returns and access
 #' to Implied Factor Returns data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelObjectstoreClient"
 #' @export
 
 setClass(
