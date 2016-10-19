@@ -22,19 +22,40 @@ get_trade_objectstore_name <- function(keys) {
 
 #' helper function to generate key from objectstore name
 #'
-#' @param name "character" name of the objectstore
-#' @return \code{key} "data.frame" with columns "id", "leg_start", "leg_end"
+#' @param name "character" name of the entry in objectstore
+#' @return \code{key} "data.frame" with columns 'id', 'instrument', 'buysell', 'strategy', 'leg_start', 'leg_end', 'status'
 key_from_trade_objectstore_name <- function(name) {
 
   str_keys <- strsplit(name, "_")
 
-  key <- data.frame(id          = str_keys[[1]][2],
-                    instrument  = as.integer(str_keys[[1]][3]),
-                    buysell     = str_keys[[1]][4],
-                    strategy    = paste(str_keys[[1]][5], str_keys[[1]][6], sep = "_"),
-                    leg_start   = as.Date(str_keys[[1]][7]),
-                    leg_end     = as.Date(str_keys[[1]][8]),
-                    status      = str_keys[[1]][9])
+  if (length(store_keys) == 8 || str_keys[[1]][5] == "NA"){
+    key <- tryCatch({
+      data.frame(id          = str_keys[[1]][2],
+                 instrument  = as.integer(str_keys[[1]][3]),
+                 buysell     = str_keys[[1]][4],
+                 strategy    = paste(str_keys[[1]][5]),
+                 leg_start   = as.Date(str_keys[[1]][6]),
+                 leg_end     = as.Date(str_keys[[1]][7]),
+                 status      = str_keys[[1]][8])
+      }, error = function(cond){
+      message(sprintf("Failed to parse Trade objectstore name %s to key.",
+                      name))
+    })
+  } else {
+
+    key <- tryCatch({
+      data.frame(id          = str_keys[[1]][2],
+                 instrument  = as.integer(str_keys[[1]][3]),
+                 buysell     = str_keys[[1]][4],
+                 strategy    = paste(str_keys[[1]][5], str_keys[[1]][6], sep = "_"),
+                 leg_start   = as.Date(str_keys[[1]][7]),
+                 leg_end     = as.Date(str_keys[[1]][8]),
+                 status      = str_keys[[1]][9])
+    }, error = function(cond){
+      message(sprintf("Failed to parse Trade objectstore name %s to key.",
+                      name))
+    })
+  }
 
   return(key)
 }
@@ -450,7 +471,13 @@ setMethod("queryClosestMatchFromTradeStore",
             if (length(names) > 0){
 
               for (name in names){
-                stored_key <- key_from_trade_objectstore_name(name)
+                stored_key <- tryCatch({
+                  key_from_trade_objectstore_name(name)
+                }, error = function(cond){
+                  message(sprintf("Error when calling key_from_trade_objectstore_name(%s)",
+                                  name))
+                  next
+                })
 
                 stored_key <- stored_key[vals]
                 dist[name] <- trade_objectstore_keys_distance(stored_key, key)

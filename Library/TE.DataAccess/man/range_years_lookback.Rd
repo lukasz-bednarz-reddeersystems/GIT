@@ -5,8 +5,16 @@
 \title{Generate keys for whole including years start and end years}
 \usage{
 range_years_lookback(trader, start, end)
+
+range_years_lookback(trader, start, end)
 }
 \arguments{
+\item{trader}{integer, the user id}
+
+\item{start}{Date, the most distant time (included, i.e. not upto this date, but inclusive)}
+
+\item{end}{Date, the most recent time (included, i.e. not upto this date, but inclusive)}
+
 \item{trader}{integer, the user id}
 
 \item{start}{Date, the most distant time (included, i.e. not upto this date, but inclusive)}
@@ -15,8 +23,12 @@ range_years_lookback(trader, start, end)
 }
 \value{
 \code{keys} data.frame with generated keys.
+
+\code{keys} data.frame with generated keys.
 }
 \description{
 Generate keys for whole including years start and end years
+
+Generate keys for whole including months start and end months
 }
 

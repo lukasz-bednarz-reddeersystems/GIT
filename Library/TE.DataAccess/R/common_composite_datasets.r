@@ -67,7 +67,7 @@ position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITI
   strategies <- setData(strategies,str_data)
 
   if (nrow(pos_data) == 0){
-    stop(paste("Data query for positions in period", start, "to", stop, "returned empty dataset in position_composite_factory()."))
+    message(paste("Data query for positions in period", start, "to", end, "returned empty dataset in position_composite_factory()."))
   }
 
   positions  <- new("PositionDataSet")

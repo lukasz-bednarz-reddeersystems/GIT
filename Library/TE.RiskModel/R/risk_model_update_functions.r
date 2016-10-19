@@ -120,16 +120,30 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
     model_id <- query_model_id(rm_type, as_date(day), today() )
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorVariance', day, lookback)
-    bulk_load_factor_variances(data, model_id)
+    data <- data[data$Date == day, ]
+
+    if (nrow(data) == 1) {
+      bulk_load_factor_variances(data, model_id)
+    }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorCorrelation', day, lookback)
-    bulk_load_factor_correlations(data, model_id)
+    data <- data[data$Date == day, ]
+
+    if (nrow(data) == (ncol(data)-1)) {
+      bulk_load_factor_correlations(data, model_id)
+    }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'MarketStyle', day, lookback)
-    bulk_load_market_style(data, model_id)
+    data <- data[data$Date == day, ]
+    if (nrow(data) == 1) {
+      bulk_load_market_style(data, model_id)
+    }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
-    bulk_load_residual_returns(data, model_id)
+    data <- data[data$Date == day, ]
+    if (nrow(data) > 0) {
+      bulk_load_residual_returns(data, model_id)
+    }
 
   }
 }

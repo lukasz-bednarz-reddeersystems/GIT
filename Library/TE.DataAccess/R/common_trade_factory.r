@@ -6,17 +6,18 @@ NULL
 #'
 #' Stores information about trades in given timespan for given trader.
 #'
-#' @slot trades        "environment",
-#' @slot instruments   "numeric",
-#' @slot features      "character",
-#' @slot trader_id     "integer",
-#' @slot positions     "PositionComposite",
-#' @slot psn_summary   "DataSet",
-#' @slot start_date    "Date",
-#' @slot end_date      "Date",
-#' @slot dly_data_pad  "numeric",
-#' @slot map           "list",
-#' @slot fctr_datstr   "character"
+#' @slot trades            "environment",
+#' @slot instruments       "numeric",
+#' @slot features          "character",
+#' @slot complete_features "character",
+#' @slot trader_id         "integer",
+#' @slot positions         "PositionComposite",
+#' @slot psn_summary       "DataSet",
+#' @slot start_date        "Date",
+#' @slot end_date          "Date",
+#' @slot dly_data_pad      "numeric",
+#' @slot map               "list",
+#' @slot fctr_datstr       "character"
 #'
 #' @export
 
@@ -333,9 +334,36 @@ setMethod("tradeFactory","TradeWarehouse",
               pc <- round(100*cnt/length(object@instruments))
               message(paste("*****>> Building ",instrument," ",pc,"% complete. <<*****",sep=""))
               object <- buildTrades(object,trade_dataset@data[trade_dataset@data$InstrumentID==instrument,])
-              if(fill_price==TRUE){object<-fillTradeListPrices(object,instrument)}
-              if(fill_positions==TRUE){object<-fillTradeListPosns(object,instrument)}
-              if(fill_levels==TRUE){object<-fillTradeLevels(object,instrument)}
+
+              if(fill_price==TRUE){
+                object <- tryCatch({
+                  fillTradeListPrices(object,instrument)
+                }, error = function(cond){
+                  message(sprintf("Error in fillTradeListPrices() for instrument %s, error : %s",
+                                  instrument,
+                                  cond))
+                })
+              }
+
+              if(fill_positions==TRUE){
+                object <- tryCatch({
+                  fillTradeListPosns(object,instrument)
+                }, error = function(cond){
+                  message(sprintf("Error in fillTradeListPosns() for instrument %s, error : %s",
+                                  instrument,
+                                  cond))
+                })
+              }
+
+              if(fill_levels==TRUE){
+                object <- tryCatch({
+                  fillTradeLevels(object,instrument)
+                }, error = function(cond){
+                  message(sprintf("Error in fillTradeLevels() for instrument %s, error : %s",
+                                  instrument,
+                                  cond))
+                })
+              }
               cnt <- cnt + 1
               message(paste("*****>> Object memory profile <<*****",sep=""))
               slts <- slotNames(object)
@@ -358,9 +386,11 @@ setMethod("fillTradeListPosns","TradeWarehouse",
 
               #trd <- object@trades[[as.character(instrument)]][[i]]
               trd <- .getTrade(object, instrument, i)
-              start <- trd@leg_start-trd@dly_data_pad
-              end <- trd@leg_end+trd@dly_data_pad
-              if(!is.na(trd@strategy)&length(trd@strategy)>0){
+              dly_data_pad <- getTradeDailyDataPad(trd)
+              start <- as_date(getTradeLegStartDate(trd) - dly_data_pad)
+              end   <- as_date(getTradeLegEndDate(trd) + dly_data_pad)
+
+              if(!is.na(trd@strategy) && length(trd@strategy)>0){
                 dtr <- all_dtr[all_dtr$Name==trd@strategy,]
               }
               else{
@@ -396,6 +426,8 @@ setMethod("getPriceData","TradeWarehouse",
             #Building objects to hold input data on the fly like this is not the best way, and is
             #historical. All data requests should be handled by central dataplex objects.
             #(see getLevelData)
+
+
             if (data_source == "DB") {
               sql_query <- new("DataAccess.SQLProcedureCall.InstrumentHistoryRequired_QueryPriceHistoryFromTQA")
 
@@ -415,8 +447,9 @@ setMethod("getPriceData","TradeWarehouse",
                                    cbind(prc_data, TodayPL=NA,StopLoss=NA,ProfitTarget=NA))
               }
               else {
+
                 dataset <- setData(dataset,
-                                   cbind(data.frame(DateTime=as.Date(object@start_date-pad:object@end_date+pad,origin="1970-01-01")),
+                                   cbind(data.frame(DateTime = seq(key$DateStart, key$DateEnd, 1)),
                                          ClosePrice=NA,
                                          OutstandingShares=NA,
                                          TodayPL=NA,
@@ -434,7 +467,7 @@ setMethod("getPriceData","TradeWarehouse",
               }, error=function(cond){
                 message(paste("Failed to fill price data on",instrument,":",cond))
                 d <- new("TradePriceDataSet")
-                d <- setData(d,cbind(data.frame(DateTime=as.Date(object@start_date-pad:object@end_date+pad,origin="1970-01-01")),
+                d <- setData(d,cbind(data.frame(DateTime = seq(start_date-pad, end_date+pad, 1)),
                                      ClosePrice=NA,
                                      OutstandingShares=NA,
                                      TodayPL=NA,
@@ -453,18 +486,19 @@ setMethod("fillTradeListPrices","TradeWarehouse",
           function(object,instrument){
             message(paste("Attempting to fill price data for instrument",instrument))
 
-            trd <- .getTrade(object, instrument, 1L)
 
-            start_date <- getTradeLegStartDate(trd)
-            end_date <- getTradeLegEndDate(trd)
-            pad <- getTradeDailyDataPad(trd)
+            for(i in 1:getNumberLegs(object, instrument)){
+              trd <- .getTrade(object, instrument, i)
 
-            dataset <- getPriceData(object,instrument,start_date,end_date,pad)
-            if(length(dataset)>0){
-              for(i in 1:getNumberLegs(object, instrument)){
-                trd <- .getTrade(object, instrument, i)
+              start_date <- getTradeLegStartDate(trd)
+              end_date <- getTradeLegEndDate(trd)
+              pad <- getTradeDailyDataPad(trd)
+
+              dataset <- getPriceData(object,instrument,start_date,end_date,pad)
+
+              if(length(dataset)>0){
                 object <- .storeTrade(object, instrument, i,
-                                      bindData(trd,dataset,overlap_data=TRUE))
+                                      bindData(trd, dataset,overlap_data=TRUE))
               }
             }
             return(object)
@@ -510,7 +544,11 @@ setMethod("fillTradeLevels","TradeWarehouse",
             message(paste("Attempting to fill trade level data for instrument",instrument))
             lvl_data <- tryCatch({
                             data_pad <- getTradeDailyDataPad(.getTrade(object, instrument, 1L))
-                            getLevelData(object,instrument,object@start_date,object@end_date,data_pad)
+                            getLevelData(object,
+                                         instrument,
+                                         object@start_date,
+                                         object@end_date,
+                                         data_pad)
                         }, error=function(cond){
                             stop(paste("Error when getting trade level data on instrument",instrument,":",cond))
                         })
@@ -579,8 +617,12 @@ setMethod("attachFeatures","TradeWarehouse",
           feature_present <- isFeaturePresent(trades[[trade_id]],feature)
           if(feature_present == FALSE || replace_features == TRUE){
             dates <- get_trade_dates(trades[[trade_id]])
-            daily_data <- trades[[trade_id]]@daily_data
-            strategy <- getTradeStrategy(trades[[trade_id]])
+
+            trade <- trades[[trade_id]]
+            trade <- .setTradeDailyData(trade,getTradeDailyData(trade))
+
+            daily_data <- getTradeDailyData(trade)
+            strategy <- getTradeStrategy(trade)
             f <- new(feature)
             tryCatch({
                   eval(parse(text=paste("f <- update",feature,"(f,dates,instrument,strategy,daily_data)",sep="")))
@@ -590,16 +632,26 @@ setMethod("attachFeatures","TradeWarehouse",
             f <- updateCompute(f)
             f <- tearDownTradeFeature(f)
 
-            trades[[trade_id]] <- insertFeature(trades[[trade_id]],f)
+            trades[[trade_id]] <- tryCatch({
+              insertFeature(trades[[trade_id]],f)
+            }, error = function(cond){
+              message(sprintf("Error occured when inserting feature list in attachFeatures() for instrument %s and trade_id %s and feature %s",
+                              instrument, trade_id, feature))
+            })
           }
         }
       }
       object <- setInstrumentTrades(object,trades,instrument)
-      object@features <- unique(c(object@features,features))
-      object@complete_features <- intersect(c(object@features,features))
       cnt <- cnt + 1
     }
-  return(object)
+
+    object <- tryCatch({
+      buildFeatureList(object)
+    }, error = function(x){
+      message(sprintf("Error occured in attachFeatures(), buildFeatureList()"))
+    })
+
+    return(object)
   }
 )
 
@@ -631,7 +683,13 @@ setGeneric("buildFeatureList",function(object){standardGeneric("buildFeatureList
 setMethod("buildFeatureList","TradeWarehouse",
           function(object){
             trades <- listTrades(object)
+
             f <- object@features
+
+            if (length(f) > 0){
+              f <- f[!is.na(f)]
+            }
+
             for(trade in trades){
               trd <- getTrade(object,trade)
               f <- unique(c(f,names(trd@features)))
@@ -643,10 +701,29 @@ setMethod("buildFeatureList","TradeWarehouse",
               fc <- intersect(fc,names(trd@features))
             }
 
-            object@features <- f
-            names(object@features) <- f
-            object@complete_features <- fc
-            names(object@complete_features) <- fc
+            if(!is.null(f) && is(f, "character")) {
+
+              if (length(f) > 0){
+                f <- f[!is.na(f)]
+              }
+
+              object@features <- f
+              if (length(f) > 0) {
+                names(object@features) <- f
+              }
+            }
+
+            if (!is.null(fc) && is(fc, "character")) {
+              object@complete_features <- fc
+
+              if (length(fc) > 0){
+                fc <- fc[!is.na(fc)]
+              }
+
+              if (length(fc) > 0) {
+                names(object@complete_features) <- fc
+              }
+            }
            return(object)
           }
 )
@@ -1049,6 +1126,7 @@ setMethod("buildTrades","TradeWarehouse",
                 consolidation = trade_panel[(i+1):(i+leg_end_index),c('TradeDate','ValueUSD','Strategy', 'OrderID')]
                 consolidation$Strategy <- strategy
                 leg_end = trade_panel[(i+leg_end_index),'TradeDate']
+
               }
               else
               {
@@ -1061,6 +1139,7 @@ setMethod("buildTrades","TradeWarehouse",
                 leg_end = leg_start
               }
 
+              new_trade <- NULL
 
               new_trade <- tryCatch({
                 new("Trade",
@@ -1093,20 +1172,25 @@ setMethod("buildTrades","TradeWarehouse",
                 message(sprintf("consolidation : %s", consolidation))
                 message(sprintf("status        : %s", leg_status))
 
-                stop(sprintf("Failed to create new trade : %s", cond))
+                #stop(sprintf("Failed to create new trade : %s", cond))
+
+                NULL
               })
 
-              trades[[cnt]] <- new_trade
+              if (!is.null(new_trade)){
 
-              tid <- getTradeID(new_trade)
+                trades[[cnt]] <- new_trade
 
-              object <- updateMap(object,tid,instrument,cnt)
+                tid <- getTradeID(new_trade)
+
+                object <- updateMap(object,tid,instrument,cnt)
 
 
-              trade_id <- c(trade_id,tid)
+                trade_id <- c(trade_id,tid)
 
-              i <- i+ leg_end_index + 1
-              cnt <- cnt + 1
+                i <- i+ leg_end_index + 1
+                cnt <- cnt + 1
+              }
             }
             names(trades) <- trade_id
             #object@trades[[as.character(instrument)]] <- trades

@@ -42,7 +42,12 @@ setMethod("tearDownTradeFeature","TradeFeature",
 )
 
 pass_thru <- function(compute_object){
-  compute_object@output <- compute_object@input
+  output <- getFeatureComputationInput(compute_object)
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, input)
+  }, error = function(cond) {
+
+  })
   return(compute_object)
 }
 

@@ -378,6 +378,38 @@ range_years_lookback <- function(trader, start, end){
   month(end) <- 12
   day(end) <- 31
 
+  n <- (year(end) - year(sdate)) + 1
+
+  return(key_generator(trader,end,1,n,lookback_unit='years'))
+}
+
+
+#' Generate keys for whole including months start and end months
+#'
+#' Generate keys for whole including months start and end months
+#'
+#' @param trader integer, the user id
+#' @param start  Date, the most distant time (included, i.e. not upto this date, but inclusive)
+#' @param end  Date, the most recent time (included, i.e. not upto this date, but inclusive)
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+range_years_lookback <- function(trader, start, end){
+  tryCatch({
+    sdate <- as.Date(start)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_three_day_lookback module key function for date value",start,":",cond))
+  })
+  tryCatch({
+    edate <- as.Date(end)
+  }, error = function(cond){
+    stop(paste("Error when setting dated_three_day_lookback module key function for date value",start,":",end))
+  })
+
+  end <- edate
+  month(end) <- 12
+  day(end) <- 31
+
   n <- 12*(year(end) - year(sdate)) + 1
 
   return(key_generator(trader,end,1,n,lookback_unit='months'))

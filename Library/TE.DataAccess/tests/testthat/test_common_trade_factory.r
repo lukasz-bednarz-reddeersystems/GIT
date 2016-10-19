@@ -8,8 +8,8 @@ context("Test Trade Warehouse")
 ##############################################################################################
 tested.class <- "TradeWarehouse"
 valid.trader <- 11L
-valid.start <- as.Date("2016-03-29")
-valid.end   <- as.Date("2016-04-01")
+valid.start <- as.Date("2014-11-30")
+valid.end   <- today()
 
 
 test_that(sprintf("Can create instance of %s", tested.class),{

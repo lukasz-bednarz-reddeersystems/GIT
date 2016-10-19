@@ -19,14 +19,60 @@ setClass(
     output_colnms= "character"
   )
 )
+
+setGeneric("getFeatureComputationInput",function(object){standardGeneric("getFeatureComputationInput")})
+setMethod("getFeatureComputationInput",
+          signature(object  = "FeatureComputation"),
+          function(object){
+            return(object@input)
+          }
+)
+
+setGeneric(".setFeatureComputationInput",function(object,data){standardGeneric(".setFeatureComputationInput")})
+setMethod(".setFeatureComputationInput",
+          signature(object  = "FeatureComputation",
+                    data    = "FeatureInput"),
+          function(object,data){
+            object@input <- data
+            return(object)
+          }
+)
+
+
+setGeneric("getFeatureComputationOutput",function(object){standardGeneric("getFeatureComputationOutput")})
+setMethod("getFeatureComputationOutput",
+          signature(object  = "FeatureComputation"),
+          function(object){
+            return(object@output)
+          }
+)
+
+setGeneric(".setFeatureComputationOutput",function(object,data){standardGeneric(".setFeatureComputationOutput")})
+setMethod(".setFeatureComputationOutput",
+          signature(object  = "FeatureComputation",
+                    data    = "FeatureOutput"),
+          function(object,data){
+            object@output <- data
+            return(object)
+          }
+)
+
+
 setGeneric("setComputationData",function(object,data){standardGeneric("setComputationData")})
-setMethod("setComputationData", "FeatureComputation",
+setMethod("setComputationData",
+          signature(object  = "FeatureComputation",
+                    data    = "data.frame"),
           function(object,data){
             object@output_colnms <- c('DateTime',class(object)[[1]])
             object@input <- data
             return(object)
           }
 )
+
+
+
+
+
 
 # @exportClass FeatureComputations
 setClassUnion("FeatureComputations",c("FeatureComputation"))
@@ -60,6 +106,7 @@ setMethod("updateCompute","VirtualFeature",
                 object@computation@compute(object@computation)
               }, error = function(cond){
                 message(paste("Error when computing feature",class(object)[[1]],":",cond))
+
                 if(inherits(object,"Preprocessor"))
                 {
                   stop("Object is a preprocessor, halting.")
@@ -84,4 +131,5 @@ setMethod("getOutPut","VirtualFeature",
             return(object@computation@output)
           }
 )
+
 

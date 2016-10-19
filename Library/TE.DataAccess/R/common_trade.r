@@ -26,6 +26,7 @@ setClass(
 
 # @exportClass NullableDate
 setClassUnion("NullableDate",c('NULL','Date'))
+setClassUnion("NullableCharacter", c("NULL", "character"))
 
 #' An S4 class for storing trade info.
 #'
@@ -127,13 +128,15 @@ setMethod("initialize", "VirtualTrade",
             .Object <- .setTradeTraderID(.Object, trader_id)
             .Object <- .setTradeInstrument(.Object, instrument)
 
-            if(is.na(strategy)){
+            if(is.null(strategy) || length(strategy) == 0 || is.na(strategy)){
               strats <- unique(consolidation$Strategy)
 
               non_na <- (!is.na(strats))
 
               if (any(non_na)){
                 strategy <- unique(strats[non_na])
+              } else {
+                strategy = as.character(NA)
               }
             }
 
@@ -150,6 +153,7 @@ setMethod("initialize", "VirtualTrade",
                                                             trader,
                                                             value_usd,
                                                             strategy))
+
 
             return(.Object)
           }
@@ -222,11 +226,11 @@ setMethod("mergeTradeConsolidation",
 
               strategy <- unique(merged_cons$Strategy[!is.na(merged_cons$Strategy)])
 
-              if(is.na(strategy)){
+              if(is.null(strategy) || length(strategy) == 0 || is.na(strategy)){
                 strategy <- getTradeStrategy(object)
               }
 
-              if(!is.na(strategy)){
+              if(!is.null(strategy) && length(strategy) == 1 || !is.na(strategy)){
                 merged_cons$Strategy[is.na(merged_cons$Strategy)] <- strategy
               }
 
@@ -236,7 +240,6 @@ setMethod("mergeTradeConsolidation",
             # if the order ids are different we do need to recompute the features
             # so no need to copy anything
             if (this_order_id < stored_order_id){
-              # browser()
               merged_trade <- object
             }
             else {
@@ -257,7 +260,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Open until %s but new trade is Closed earlier date %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
 
@@ -272,7 +275,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is still open on later date %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
             }
@@ -286,12 +289,12 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is Closed on %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                stop(sprintf("Inconsistent trade consolidation for stored trade"))
+                #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
             }
             else{
-              merged_leg_status <- getTradeLegStatus(stored_trade)
+              merged_leg_status <- getTradeLegStatus(object)
             }
 
             merged_trade <- updateTradeConsolidation(merged_trade, merged_cons)
@@ -299,8 +302,9 @@ setMethod("mergeTradeConsolidation",
 
             # resetting trade features if consolidation changes
             if (!setequal(merged_cons$OrderID, c(stored_order_id, stored_cons$OrderID))){
-              # browser()
               merged_trade <- .setTradeFeaturesList(merged_trade, list())
+              # reinitialize daily data
+              merged_trade <- .setTradeDailyData(merged_trade, new("DataSet"))
             }
 
 
@@ -308,7 +312,13 @@ setMethod("mergeTradeConsolidation",
           }
 )
 
-
+setGeneric("getTradeDateKey", function(object){standardGeneric("getTradeDateKey")})
+setMethod("getTradeDateKey",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@datekey)
+          }
+)
 
 setGeneric("getTradeInstrument", function(object){standardGeneric("getTradeInstrument")})
 setMethod("getTradeInstrument",
@@ -345,6 +355,40 @@ setMethod(".setTradeTrader",
             return(object)
           }
 )
+
+
+setGeneric("getTradeDailyData", function(object){standardGeneric("getTradeDailyData")})
+setMethod("getTradeDailyData",
+          signature(object = "VirtualTrade"),
+          function(object){
+            return(object@daily_data)
+          }
+)
+
+setGeneric(".setTradeDailyData", function(object, daily_data){standardGeneric(".setTradeDailyData")})
+setMethod(".setTradeDailyData",
+          signature(object = "VirtualTrade",
+                    daily_data = "DataSet"),
+          function(object, daily_data){
+
+            datekey <- getTradeDateKey(object)
+
+            if (nrow(daily_data@data) > 0 && datekey %in% colnames(daily_data@data)){
+              dd_dates <- daily_data@data[[datekey]]
+
+              trd_dates <- get_trade_dates(object)
+
+              if (max(trd_dates) > max(dd_dates) || min(trd_dates) < min(dd_dates)){
+                message(sprintf("Daily data is not overlappling with Trade Dates in .setTradeDailyData()"))
+
+              }
+            }
+
+            object@daily_data <- daily_data
+            return(object)
+          }
+)
+
 
 setGeneric("getTradeTraderID", function(object){standardGeneric("getTradeTraderID")})
 setMethod("getTradeTraderID",
@@ -737,9 +781,11 @@ setMethod("bindData",
           signature(object = "VirtualTrade",
                     dataset = "DataSet"),
           function(object,dataset,aliases=NULL,keep_incoming=NULL,joinmode='inner',overlap_data=FALSE){
+
             if(length(dataset@data)>0){
               start <- object@leg_start - object@dly_data_pad
-              if(is.null(object@leg_end)==FALSE)
+
+              if(!is.null(object@leg_end))
               {
                 end <- object@leg_end + object@dly_data_pad
               }
@@ -767,8 +813,11 @@ setMethod("bindData",
               }
 
               dataset <- setData(dataset,datasubset)
+              daily_data <- getTradeDailyData(object)
+
               if(length(object@daily_data@data)==0){
-                object@daily_data <- dataset
+                object <- .setTradeDailyData(object,
+                                             dataset)
               }
               else
               {
@@ -790,7 +839,9 @@ setMethod("bindData",
                         }
                       }
                     }
-                    object@daily_data <- setData(object@daily_data,old_data)
+                    daily_data <- getTradeDailyData(object)
+                    object <- .setTradeDailyData(object,
+                                                 setData(daily_data,old_data))
                   }
                   else{
                     message("Bind data blocked attempt to add existing data column to trade, use overlap_data flag to overwrite.")
@@ -798,15 +849,24 @@ setMethod("bindData",
                   rm_icols <- dataset@data[c(dataset@key_cols,setdiff(dataset@data_cols,icols))]
                   if(ncol(rm_icols)>0){
                     dataset <- resetData(dataset,rm_icols)
-                    object@daily_data <- innerJoin(object@daily_data,dataset,dataset@key_cols,aliases=aliases,joinmode=joinmode)
+
+                    daily_data <- getTradeDailyData(object)
+                    object <- .setTradeDailyData(object,
+                                                 innerJoin(daily_data,dataset,dataset@key_cols,aliases=aliases,joinmode=joinmode))
                   }
                 }
                 else{
-                  object@daily_data <- innerJoin(object@daily_data,dataset,dataset@key_cols,aliases=aliases,joinmode=joinmode)
+                  daily_data <- getTradeDailyData(object)
+                  object <- .setTradeDailyData(object,
+                                               innerJoin(daily_data,dataset,dataset@key_cols,aliases=aliases,joinmode=joinmode))
                 }
               }
             }
-            object@daily_data <- setData(object@daily_data,object@daily_data@data[!is.na(object@daily_data@data[object@datekey]),])
+
+            daily_data <- getTradeDailyData(object)
+            object <- .setTradeDailyData(object,
+                                         setData(daily_data,daily_data@data[!is.na(daily_data@data[object@datekey]),]))
+
             return(object)
           }
 )
@@ -870,9 +930,11 @@ setGeneric("isPsnLong", function(object,date){standardGeneric("isPsnLong")})
 setMethod("isPsnLong",
           signature(object = "VirtualTrade"),
           function(object){
-            mv <- sum(c(object@daily_data@data$MarketValue[object@daily_data@data[[object@datekey]]==(object@leg_start-1)],
-                        object@daily_data@data$MarketValue[object@daily_data@data[[object@datekey]]==object@leg_start],
-                        object@daily_data@data$MarketValue[object@daily_data@data[[object@datekey]]==(object@leg_start+1)]),na.rm=TRUE)
+            daily_data <- getTradeDailyData(object)
+
+            mv <- sum(c(daily_data@data$MarketValue[daily_data@data[[object@datekey]]==(object@leg_start-1)],
+                        daily_data@data$MarketValue[daily_data@data[[object@datekey]]==object@leg_start],
+                        daily_data@data$MarketValue[daily_data@data[[object@datekey]]==(object@leg_start+1)]),na.rm=TRUE)
             if(length(mv)>0 && !is.na(mv)){
               if(mv<0){
                 is_long <- FALSE
@@ -988,7 +1050,6 @@ setMethod("initialize", "VirtualRemoteStoredTrade",
 
             .Object <- callNextMethod()
 
-            #browser()
             if (TRUE) {
               # generate key to query remote store
               key <- data.frame(id         = as.character(trader_id),
