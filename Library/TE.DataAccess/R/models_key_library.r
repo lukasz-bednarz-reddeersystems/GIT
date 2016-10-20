@@ -394,7 +394,7 @@ range_years_lookback <- function(trader, start, end){
 #' @return \code{keys} data.frame with generated keys.
 #' @export
 
-range_years_lookback <- function(trader, start, end){
+range_months_lookback <- function(trader, start, end){
   tryCatch({
     sdate <- as.Date(start)
   }, error = function(cond){

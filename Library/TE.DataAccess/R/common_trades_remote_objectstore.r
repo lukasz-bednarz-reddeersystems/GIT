@@ -28,7 +28,7 @@ key_from_trade_objectstore_name <- function(name) {
 
   str_keys <- strsplit(name, "_")
 
-  if (length(store_keys) == 8 || str_keys[[1]][5] == "NA"){
+  if (length(str_keys) == 8 || str_keys[[1]][5] == "NA"){
     key <- tryCatch({
       data.frame(id          = str_keys[[1]][2],
                  instrument  = as.integer(str_keys[[1]][3]),

@@ -56,6 +56,7 @@ test_that("Can updateWarehouseStore() and commitWarehouseStore()", {
 
 test_that("Can check for keys in remote store() ", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   object <- warehouse_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
