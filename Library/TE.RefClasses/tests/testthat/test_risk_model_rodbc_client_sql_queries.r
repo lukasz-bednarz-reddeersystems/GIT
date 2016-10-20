@@ -379,3 +379,64 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
   expect_equal(nrow(ret), 9)
   expect_equal(ncol(ret), 45)
 })
+
+
+########################################################################################
+#
+# Testing RiskModel.SQLProcedureCall.MultiFactorRisk_ResidualReturnsByInstrumentIDModelNameDate class
+#
+########################################################################################
+
+tested.class     <- "RiskModel.SQLProcedureCall.MultiFactorRisk_ResidualReturnsByInstrumentIDModelNameDate"
+valid.risk_model <- new("RiskModel.DevelopedEuropePrototype150.1.1")
+valid.model_name <- getRiskModelName(valid.risk_model)
+valid.key_vals   <- data.frame(RiskModelName = valid.model_name,
+                               InstrumentID = c(5004, 5793, 6496, 7703, 8038, 5826, 5687, 6002, 6203),
+                               Date = seq(as.Date("2016-01-04"),
+                                          as.Date("2016-01-04"),
+                                          1))
+
+
+test_that(sprintf("Can instantiate %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+})
+
+
+test_that(sprintf("Can prepareSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object, valid.key_vals)
+
+  expect_is(object, tested.class)
+
+  expect_equal(getSQLQueryKeyValues(object), valid.key_vals)
+})
+
+test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- new(tested.class)
+
+  expect_is(object, tested.class)
+
+  object <- prepareSQLQuery(object, valid.key_vals)
+
+  expect_is(object, tested.class)
+
+  expect_equal(getSQLQueryKeyValues(object), valid.key_vals)
+
+  ret <- executeSQLQuery(object)
+
+  expect_is(ret, "data.frame")
+  expect_equal(nrow(ret), 9)
+  expect_equal(ncol(ret), 45)
+})
