@@ -40,6 +40,7 @@ test_that("Can call ppmodel_objectstore_factory() with locally existing file", {
 
 test_that("Can check for keys in remote store() ", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   object <- ppmodel_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)
