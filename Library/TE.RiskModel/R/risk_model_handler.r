@@ -25,7 +25,7 @@ setClass(
     risk_model = "VirtualRiskModel"
   ),
   prototype = list(
-    risk_model = new("RiskModel.DevelopedEuropePrototype150")
+    risk_model = new("RiskModel.DevelopedEuropePrototype150.1.1")
   ),
   contains  = c("VIRTUAL")
 )
