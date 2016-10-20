@@ -7,10 +7,10 @@
 key_from_trade_objectstore_name(name)
 }
 \arguments{
-\item{name}{"character" name of the objectstore}
+\item{name}{"character" name of the entry in objectstore}
 }
 \value{
-\code{key} "data.frame" with columns "id", "leg_start", "leg_end"
+\code{key} "data.frame" with columns 'id', 'instrument', 'buysell', 'strategy', 'leg_start', 'leg_end', 'status'
 }
 \description{
 helper function to generate key from objectstore name
