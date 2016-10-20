@@ -920,6 +920,9 @@ setMethod("getTradeFeatures","TradeWarehouse",
 
               if (is.null(feature)){
                 browser()
+                stop(sprintf("Missing feature in trade_id %s",
+                                trade_id))
+
               }
 
               fd <- getOutPut(feature)
