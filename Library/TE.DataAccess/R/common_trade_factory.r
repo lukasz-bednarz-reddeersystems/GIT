@@ -919,7 +919,7 @@ setMethod("getTradeFeatures","TradeWarehouse",
             for(feature in features){
 
               if (is.null(feature)){
-                browser
+                browser()
               }
 
               fd <- getOutPut(feature)
