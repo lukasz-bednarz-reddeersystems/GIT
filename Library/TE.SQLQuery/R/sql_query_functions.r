@@ -1,6 +1,6 @@
 #' @include TE.SQLQuery.r
 
-.__DEFAULT_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
+.__DEFAULT_ODBC_DB_NAME__.   <- "RAIDLIVEDB"
 .__DEFAULT_DB_USER__.        <- Sys.info()["user"]
 .__DEFAULT_FILE_DB_SCHEMA__. <- "Research"
 
