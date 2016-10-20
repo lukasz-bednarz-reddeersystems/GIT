@@ -165,8 +165,8 @@ test_that("Can dataRequest() with valid key_values", {
   values <- getDataSourceReturnColumnNames(object)
 
   # create valid return data.frame
-  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
-  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(getSQLQueryObject(object))
+  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(getSQLQueryObject(object))
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
   query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
   valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string)

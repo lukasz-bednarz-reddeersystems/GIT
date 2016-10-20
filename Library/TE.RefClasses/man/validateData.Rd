@@ -12,6 +12,8 @@ validateData(object, data)
 }
 \arguments{
 \item{object}{object of class 'VirtualDataValidator'.}
+
+\item{data}{"data.frame" with data to validate}
 }
 \value{
 \code{data} data.frame of validated data

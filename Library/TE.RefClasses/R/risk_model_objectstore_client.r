@@ -4,7 +4,7 @@ NULL
 
 #########################################
 #
-# VirtualRiskModelObjectstoreClient Class
+# VirtualRiskModelClient Class
 #
 #########################################
 
@@ -14,38 +14,40 @@ risk_model_objectstore_keys <-  c("Date")
 devtools::use_data(risk_model_objectstore_keys,
                    overwrite = TRUE)
 
-#' Virtual S4 class for access to Risk Model Objectstore.
+
+#' Virtual S4 class for access to Risk Model Components.
 #'
 #' This is handler class that is to be inherited
 #' by other classes handling Risk Model Objects
 #'
-#' Inherits from "VirtualDataSourceClient" and "VirtualRiskModelHandler"
+#' Inherits from "VirtualDataSourceClient"
 #'
 #' @slot component    "character", name of the component of risk model
 
 setClass(
-  Class                = "VirtualRiskModelObjectstoreClient",
+  Class                = "VirtualRiskModelDataSourceClient",
   slots = c(
     component          = "character" # name of component in Risk Model
-    ),
+  ),
   prototype = list(
     key_cols        = risk_model_objectstore_keys,
     key_values      = data.frame(Date = as.Date(character()))
   ),
-  contains = c("VirtualDataSourceClient","VirtualRiskModelFactorDependentComponent", "VIRTUAL")
+  contains = c("VirtualDataSourceClient",
+               "VirtualRiskModelFactorDependentComponent",
+               "VIRTUAL")
 )
 
 
-
-#' initialize method for "VirtualRiskModelObjectstoreClient" derived classes
+#' initialize method for "VirtualRiskModelDataSourceClient" derived classes
 #'
 #' initializes required column names from the values obtained from contained risk model
 #'
-#' @param .Object object of class derived from "VirtualRiskModelObjectstoreClient"
+#' @param .Object object of class derived from "VirtualRiskModelDataSourceClient"
 #' @export
 
 setMethod("initialize",
-          "VirtualRiskModelObjectstoreClient",
+          "VirtualRiskModelDataSourceClient",
           function(.Object){
 
             .Object <- callNextMethod()
@@ -58,25 +60,50 @@ setMethod("initialize",
 #'
 #' Returns name of the component that given class is accessing
 #'
-#' @param object object of class 'VirtualRiskModelObjectstoreClient'.
+#' @param object object of class 'VirtualRiskModelDataSourceClient'.
 #' @return \code{component} 'character', name of the component beeing accessed.
 #' @export
 
-setGeneric("getRiskModelObjectstoreComponentName", function(object){standardGeneric("getRiskModelObjectstoreComponentName")})
+setGeneric("getRiskModelComponentName", function(object){standardGeneric("getRiskModelComponentName")})
 
-#' @describeIn getRiskModelObjectstoreComponentName
+#' @describeIn getRiskModelComponentName
 #' Get Risk Model Component Name
 #'
 #' Returns name of the component that given class is accessing
 #'
-#' @inheritParams getRiskModelObjectstoreComponentName
+#' @inheritParams getRiskModelComponentName
 #' @return \code{component} 'character', name of the component beeing accessed.
 #' @export
-setMethod("getRiskModelObjectstoreComponentName",
-          signature(object = "VirtualRiskModelObjectstoreClient"),
+setMethod("getRiskModelComponentName",
+          signature(object = "VirtualRiskModelDataSourceClient"),
           function(object){
             return(object@component)
           }
+)
+
+
+#########################################
+#
+# VirtualRiskModelObjectstoreClient Class
+#
+#########################################
+
+#' Virtual S4 class for access to Risk Model Objectstore.
+#'
+#' This is handler class that is to be inherited
+#' by other classes handling Risk Model Objects
+#'
+#' Inherits from "VirtualRiskModelDataSourceClient" and "VirtualRiskModelFactorDependentComponent"
+#'
+#' @slot component    "character", name of the component of risk model
+
+setClass(
+  Class                = "VirtualRiskModelObjectstoreClient",
+  slots = c(
+    component          = "character" # name of component in Risk Model
+    ),
+  contains = c("VirtualRiskModelDataSourceClient",
+               "VIRTUAL")
 )
 
 
@@ -144,10 +171,9 @@ setMethod("dataRequest",
 
             model_prefix <- getRiskModelName(object)
             lookback     <- getRiskModelLookback(object)
-            component    <- getRiskModelObjectstoreComponentName(object)
+            component    <- getRiskModelComponentName(object)
 
             query_key_vals <- .generateQueryKeyValues(object, key_values)
-            merge_cols   <- colnames(key_values)
 
             first <- TRUE
 

@@ -36,7 +36,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
   expect_equal(getRequiredVariablesNames(object), valid.required_colnms)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_is(getRiskModelObject(object), valid.risk_model)
 

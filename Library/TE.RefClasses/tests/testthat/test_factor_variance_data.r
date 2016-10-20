@@ -35,7 +35,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_is(getRiskModelObject(object), valid.risk_model)
 

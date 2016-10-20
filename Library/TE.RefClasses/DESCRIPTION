@@ -81,6 +81,7 @@ Collate:
     'price_data.r'
     'price_data_handler.r'
     'risk_model_objectstore_client_functions.r'
+    'risk_model_rodbc_client.r'
     'strategy_data.r'
     'strategy_data_handler.r'
     'strategy_portfolio_transformations.r'
