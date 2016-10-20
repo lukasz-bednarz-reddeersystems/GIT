@@ -8,7 +8,7 @@ context("Testing Instrument Betas Data")
 
 tested.class          <-  "InstrumentBetasData"
 valid.component       <- "Betas"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
@@ -122,8 +122,8 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
   object <- new(tested.class)
 
   nexist.key_vals <- data.frame(InstrumentID = 1984,
-                                Date = seq(from = as.Date('2016-06-01'),
-                                                  to = as.Date('2016-06-03'),
+                                Date = seq(from = today(),
+                                                  today() + 5,
                                                   by = "1 day"))
   diff <- setdiff(valid.required_colnms,valid.key_cols)
 
@@ -216,7 +216,7 @@ test_that("Can dataRequest() with valid key_values", {
 #
 #########################################################
 
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 
 context(sprintf("Testing Instrument Betas Data with %s risk model", valid.risk_model))
 
@@ -304,8 +304,8 @@ test_that("Can .setDataSourceQueryKeyValues with valid data", {
   object <- new(tested.class)
   object <- setRiskModelObject(object, valid.risk_model_obj)
 
-  valid.key_vals <- data.frame(Date = seq(from = as.Date('2016-06-01'),
-                                          to = as.Date('2016-06-03'),
+  valid.key_vals <- data.frame(Date = seq(from = as.Date('2016-10-01'),
+                                          to = as.Date('2016-10-03'),
                                           by = "1 day"),
                                InstrumentID = 4454
   )

@@ -438,5 +438,5 @@ test_that(sprintf("Can executeSQLQuery on  %s class", tested.class),{
 
   expect_is(ret, "data.frame")
   expect_equal(nrow(ret), 9)
-  expect_equal(ncol(ret), 45)
+  expect_equal(ncol(ret), 4)
 })

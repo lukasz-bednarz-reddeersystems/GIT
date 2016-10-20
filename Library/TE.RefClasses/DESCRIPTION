@@ -8,7 +8,7 @@ Description: Pakckage is implementing Reference Classes for handling,
     of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RiskModel (>= 0.1.2),
+    TE.RiskModel (>= 0.1.3),
     TE.DataAccess (>= 0.1.3),
     TE.SQLQuery (>= 0.1.2),
 License: file LICENSE

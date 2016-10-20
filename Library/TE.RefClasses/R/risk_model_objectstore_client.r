@@ -143,7 +143,8 @@ setMethod(".generateDataFilledWithNA",
 
             ret_data <- cbind(key_vals, data.frame(t(rep(NA,length(diff)))))
 
-            colnames(ret_data) <- c(ret_vars)
+            colnames(ret_data) <- .translateDataSourceColumnNames(object,
+                                                                  ret_vars)
 
             return(ret_data)
           }
@@ -185,6 +186,7 @@ setMethod("dataRequest",
               rm_str       <- get_most_recent_model_objectstore(model_prefix, end, lookback)
 
               if (is.null(rm_str)) {
+                ret_data <- data.frame()
                 next
                 }
 

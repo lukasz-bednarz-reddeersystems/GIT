@@ -182,7 +182,7 @@ setMethod("initialize",
               stop(cond)
             })
 
-            if (is.null(sql_query) || !is(sql_query, RefClasses.RiskModel.VirtualSQLProcedureCall)){
+            if (is.null(sql_query) || !is(sql_query, "RefClasses.RiskModel.VirtualSQLProcedureCall")){
               stop(sprintf("Invalid class %s of sql_query returned for component name %s in initialize(%s)",
                            class(sql_query),
                            component,

@@ -8,7 +8,7 @@ context("Testing Factor Correlation Data")
 
 tested.class          <-  "FactorCorrelationData"
 valid.component       <- "FactorCorrelation"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
