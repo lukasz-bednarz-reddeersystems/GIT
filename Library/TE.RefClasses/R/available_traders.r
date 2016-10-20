@@ -24,7 +24,7 @@ setClass(
   contains = c("VirtualAvailableValues")
 )
 
-#' Dummy method returns hard coded trader IDs
+
 setMethod(".obtainValues",
           signature(object="AvailableTraders"),
           function(object,key_values){

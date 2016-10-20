@@ -45,6 +45,7 @@ setClass(
 #' or halt execution of halt is TRUE
 #'
 #' @param object object of class 'VirtualDataValidator'.
+#' @param data "data.frame" with data to validate
 #' @export
 setGeneric("validateData",function(object,data){standardGeneric("validateData")})
 
@@ -58,7 +59,8 @@ setGeneric("validateData",function(object,data){standardGeneric("validateData")}
 #' @return \code{data} data.frame of validated data
 #' @export
 setMethod("validateData",
-          signature(object = "VirtualDataValidator", data = "data.frame"),
+          signature(object = "VirtualDataValidator",
+                    data = "data.frame"),
           function(object,data){
 
             if(length(object@argument_list)>0){

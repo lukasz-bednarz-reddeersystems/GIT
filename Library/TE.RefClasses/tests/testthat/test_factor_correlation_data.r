@@ -8,7 +8,7 @@ context("Testing Factor Correlation Data")
 
 tested.class          <-  "FactorCorrelationData"
 valid.component       <- "FactorCorrelation"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
@@ -36,7 +36,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
   expect_equal(getRequiredVariablesNames(object), valid.required_colnms)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_is(getRiskModelObject(object), valid.risk_model)
 

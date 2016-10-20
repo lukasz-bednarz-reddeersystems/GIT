@@ -304,7 +304,7 @@ setMethod("mergeTradeConsolidation",
             merged_trade <- .setTradeLegStatus(merged_trade, merged_leg_status)
 
             # resetting trade features if consolidation changes
-            if (!setequal(merged_cons$OrderID, c(stored_order_id, stored_cons$OrderID))){
+            if (!length(setdiff(merged_cons$OrderID, c(stored_order_id, stored_cons$OrderID))) > 0){
               merged_trade <- .setTradeFeaturesList(merged_trade, list())
               # reinitialize daily data
               merged_trade <- .setTradeDailyData(merged_trade, new("DataSet"))

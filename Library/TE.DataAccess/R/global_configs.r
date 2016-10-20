@@ -241,7 +241,7 @@ setClass(
     store_database = 'character'
   ),
   prototype = prototype(
-    store_database =  'RAIDSTAGEDB'
+    store_database =  'RAIDLIVEDB'
   )
 )
 

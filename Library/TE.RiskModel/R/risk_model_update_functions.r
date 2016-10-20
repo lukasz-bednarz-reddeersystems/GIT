@@ -140,7 +140,7 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
     }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
-    data <- data[data$Date == day, ]
+    data <- data[data$Date]
     if (nrow(data) > 0) {
       bulk_load_residual_returns(data, model_id)
     }

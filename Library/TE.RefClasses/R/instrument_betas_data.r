@@ -28,7 +28,7 @@ setClass(
 #' Implements storage for Instrument Betas and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelObjectstoreClient"
 #' @export
 
 setClass(

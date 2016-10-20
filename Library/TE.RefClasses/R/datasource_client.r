@@ -414,10 +414,9 @@ setGeneric("dataRequest", function(object, key_values, ...){standardGeneric("dat
 #' Private method to apply the objects validation object against data.
 #' Typically would call this as part of the dataRequest implementation
 #'
+#' @rdname private_validateData
 #' @param object object of class 'VirtualDataSourceClient'.
-#' @param dataset DataSet holding data retrieved by client.
 #' @return \code{object} client with validated reference data.
-
 setGeneric(".validateData", function(object){standardGeneric(".validateData")})
 setMethod(".validateData",
           signature(object="VirtualDataSourceClient"),

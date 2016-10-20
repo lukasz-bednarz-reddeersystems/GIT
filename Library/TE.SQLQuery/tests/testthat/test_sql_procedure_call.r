@@ -30,7 +30,7 @@ test_that(sprintf("Can inherit from %s class", tested.class),{
   setClass(
     Class     = test.class,
     prototype = list(
-      db_name        = "RAIDSTAGEDB",
+      db_name        = "RAIDLIVEDB",
       db_schema      = "Razor",
       key_cols       = valid.key_cols,
       key_values     = data.frame(lInstrumentID = integer(),

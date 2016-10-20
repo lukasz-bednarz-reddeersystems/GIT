@@ -393,6 +393,7 @@ setMethod("updateWarehouse","PPModel",
 		  	message(paste("Fetching data ... "))
 		    object@warehouse_store_name <- name_from_key(key)
 		  	object@warehouse <- warehouse_request(object@warehouse_store_name,key[['id']],key[['start']],key[['end']])
+		  	object@warehouse <- buildFeatureList(object@warehouse)
             return(object)
 		  }
 )
@@ -475,6 +476,8 @@ setGeneric("updateModel",function(object){standardGeneric("updateModel")})
 setMethod("updateModel","PPModel",
 		  function(object){
 		  	message(paste("Updating model:",class(object)[[1]]))
+		    object@warehouse <- buildFeatureList(object@warehouse)
+
 		    if(length(object@features)!=length(unique(object@features)))stop(paste("Duplicate features specified in",class(object)[[1]],"check the ppmodel definition."))
 		  	if(length(object@features)!=0 && object@features!="" && length(intersect(object@warehouse@complete_features,object@features))!=length(object@features)){
 		  		message("Not all features found in warehouse.")
