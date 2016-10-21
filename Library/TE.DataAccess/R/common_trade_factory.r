@@ -692,13 +692,15 @@ setMethod("buildFeatureList","TradeWarehouse",
 
             for(trade in trades){
               trd <- getTrade(object,trade)
-              f <- unique(c(f,names(trd@features)))
+              tf <- getTradeFeaturesList(trd)
+              f <- unique(c(f,tf))
             }
 
             fc <- f
             for(trade in trades){
               trd <- getTrade(object,trade)
-              fc <- intersect(fc,names(trd@features))
+              tf <- getTradeFeaturesList(trd)
+              fc <- intersect(fc,tf)
             }
 
             if(!is.null(f) && is(f, "character")) {

@@ -11,7 +11,7 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="prInstrumentMatrixStaticHistory_GetFields"),
     urlquery     = new("URLQuery",root_url=middleware_urls@static_factors1,fields=c('id','start','end')),
     key_map      = new("KeyMap",key_generator=date_instrument_kgen_fn,key_columns=c('lInstrumentID','dtDateTime'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )
 
 setClass(
@@ -21,5 +21,5 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="prInstrumentMatrixHistory_GetFields"),
     urlquery     = new("URLQuery",root_url=middleware_urls@dynamic_factors,fields=c('id','start','end')),
     key_map      = new("KeyMap",key_generator=date_instrument_kgen_fn,key_columns=c('lInstrumentID','dtDateTime'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )

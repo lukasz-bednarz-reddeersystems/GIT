@@ -52,7 +52,7 @@ setMethod(".setFeatureComputationOutput",
           signature(object  = "FeatureComputation",
                     data    = "FeatureOutput"),
           function(object,data){
-            object@output <- data
+            object@output <- unique(data)
             return(object)
           }
 )
@@ -128,7 +128,7 @@ setMethod("updateCompute","VirtualFeature",
 setGeneric("getOutPut",function(object){standardGeneric("getOutPut")})
 setMethod("getOutPut","VirtualFeature",
           function(object){
-            return(object@computation@output)
+            return(unique(object@computation@output))
           }
 )
 

@@ -1,4 +1,5 @@
 #' @include urldatareader_functions.r
+#' @include query.r
 NULL
 
 #' An S4 class to represent generic URL query.
@@ -11,21 +12,21 @@ NULL
 setClass(
   Class            = "URLQuery",
   representation   = representation(
-    fields         = "character",
-    values         = "character",
     root_url       = "character",
     url            = "character"
-  )
+  ),
+  contains         = c("VirtualQuery")
 )
 
 setGeneric("buildURL",function(object){standardGeneric("buildURL")})
 setMethod("buildURL","URLQuery",
           function(object){
-            if(length(object@fields)!=length(object@values))stop("Unequal number of URL query fields and values.")
+            values <- getQueryKeyValues(object)
+            if(length(object@fields)!=length(values))stop("Unequal number of URL query fields and values.")
             object@url <- paste(object@root_url,"?",sep="")
             amp=""
             for(i in 1:length(object@fields)){
-              object@url <- paste(object@url,amp,object@fields[i],"=",object@values[i],sep="")
+              object@url <- paste(object@url,amp,object@fields[i],"=",values[i],sep="")
               amp="&"
             }
             return(object)

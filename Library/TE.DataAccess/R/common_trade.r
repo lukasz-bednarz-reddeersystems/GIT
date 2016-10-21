@@ -898,7 +898,25 @@ setMethod("isFeaturePresent",
           signature(object = "VirtualTrade",
                     feature = "character"),
           function(object,feature){
-            return(feature %in% names(object@features))
+
+            features <- getTradeFeaturesList(object)
+
+            is_present <- feature %in% names(features)
+
+            if (is_present) {
+              value <- tryCatch({
+                getOutPut(features[[feature]])
+              }, error = function(cond){
+                browser()
+                message(sprintf("Error when trying to get output from for feature %s in isFeaturePresent()."))
+
+              })
+            if (all(is.na(value[,2]))){
+              is_present <- FALSE
+              }
+            }
+
+            return(is_present)
           }
 )
 
@@ -908,6 +926,17 @@ setMethod("getFeatureValue",
                     feature = "character",
                     date    = "Date"),
           function(object,feature,date){
+
+
+            f <- object@features[[feature]]
+
+            if (is.null(feature)){
+              browser()
+              stop(sprintf("Missing feature in trade_id %s",
+                           getTradeID(object)))
+
+            }
+
             value <- getOutPut(object@features[[feature]])
             value <- value[object@datekey==date,2]
             return(value)
