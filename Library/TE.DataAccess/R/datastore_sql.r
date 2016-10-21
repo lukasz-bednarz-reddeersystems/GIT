@@ -20,19 +20,63 @@ setClass(
   prototype = list(
     db_name        = .__DEFAULT_ODBC_DB_NAME__.,
     db_schema      = "Razor",
-    key_cols       = c("InstrumentID", "Date"),
-    key_values     = data.frame(RiskModelName = character(),
-                                Date = as.Date(character())),
+    key_cols       = c("id", "start", "end"),
+    key_values     = data.frame(lInstrumentID = integer(),
+                                StartDate = as.Date(character()),
+                                EndDate = as.Date(character())),
     results_parser = TE.SQLQuery:::convert_column_class,
     arguments    = c("@lInstrumentID", "@dtStartDate", "@dtEndDate")
   ),
-  contains  = c("VirtualSQLProcedureCall", "VIRTUAL")
+  contains  = c("VirtualSQLProcedureCall", "VirtualBaseQuery", "VIRTUAL")
 )
+
+
+
+#' concrete S4 class handling sql procedures calls to DataStore DB.
+#'
+#' Implements handling of access to data via sql stored procedures calls.
+#' Inherits from "VirtualSQLProcedureCall"
+#'
+#' @export
+setClass(
+  Class     = "DataStore.InstrumentMatrixStaticHistory_GetTEFeaturesFields",
+  prototype = list(
+    procedure = "prInstrumentMatrixStaticHistory_GetTEFeaturesFields"
+  ),
+  contains  = c("DataStore.VirtualSQLProcedureCall")
+)
+
+
+
 
 setMethod("getQueryKeyValues",
           signature(object = "DataStore.VirtualSQLProcedureCall"),
           function(object){
-            return(object@key_values)
+
+            key_values <- unlist(object@key_values[getQueryKeyColumnNames])
+
+            return(key_values)
+          }
+)
+
+setMethod(".setQueryKeyValues",
+          signature(object = "DataStore.VirtualSQLProcedureCall",
+                    values = "character"),
+          function(object, values){
+
+            fields <- getQueryKeyColumnNames(object)
+
+            if (length(values) != length(fields)){
+              stop(sprintf("Wrong number of values passed to Query object of class %s",
+                           class(object)))
+            }
+
+            names(values) <- fields
+
+            key_values <- as.data.frame(t(values))
+
+            object <- TE.SQLQuery:::.setSQLQueryKeyValues(object, key_values)
+            return(object)
           }
 )
 
@@ -40,6 +84,7 @@ setMethod("getQueryKeyValues",
 setMethod("getQueryKeyColumnNames",
           signature(object = "DataStore.VirtualSQLProcedureCall"),
           function(object){
+
             return(object@key_cols)
           }
 )
@@ -67,7 +112,7 @@ setClass(
 
 
 setMethod("updateStore",
-          signature(object  = "DataStore.URL",
+          signature(object  = "DataStore.SQL",
                     values  = "data.frame",
                     get_variables = "character"),
           function(object,values,get_variables){
@@ -78,18 +123,20 @@ setMethod("updateStore",
             object@key_map <- mapFields(object@key_map,values)
             num_key_values <- numberKeyValues(object@key_map)
 
+            sql_query <- getSQLQueryObject(object)
+
             for(values_row in 1:num_key_values){
-              object@urlquery <- getCurrentKeyQuery(object@key_map,object@urlquery)
-              object@key_map <- advanceCurrentKey(object@key_map)
-              object@urlquery <- buildURL(object@urlquery)
-              object@urlparser <- tryCatch({
-                runURLs(object@urlparser,c(object@urlquery@url))
-              }, error=function(cond){
-                message(paste("Error fetching URL data:",cond))
-                return(object@urlparser)
-              })
-              url_data <- getURLData(object@urlparser,1)
-              cn <- getColnames(object@urlparser)
+
+              sql_query <- getCurrentKeyQuery(object@key_map,sql_query)
+
+              sql_query <- prepareSQLQuery(sql_query, getSQLQueryKeyValues(sql_query))
+
+              url_data <- executeSQLQuery(sql_query)
+
+              url_data <- merge(url_data, values, all = TRUE)
+
+              cn <- colnames(url_data)
+
               if(length(cn)==0)cn <- colnames(data)
               if(length(url_data)==0 && length(cn)>0){
                 diff <- setdiff(cn,colnames(values))

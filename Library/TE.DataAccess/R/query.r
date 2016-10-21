@@ -1,3 +1,11 @@
+#' An S4 class implementing basic query class and functions.
+
+setClass(
+  Class = "VirtualBaseQuery",
+  contains = c("VIRTUAL")
+)
+
+
 #' An S4 class implementing basic query accessors and functions.
 #'
 #' @slot fields      "character",
@@ -9,7 +17,7 @@ setClass(
 		fields     = "character",
 		values     = "character"
 	),
-	contains = c("VIRTUAL")
+	contains = c("VirtualBaseQuery","VIRTUAL")
 )
 
 setGeneric("getQueryKeyColumnNames",function(object){standardGeneric("getQueryKeyColumnNames")})
@@ -26,6 +34,24 @@ setMethod("getQueryKeyValues",
           signature(object = "VirtualQuery"),
           function(object){
             return(object@values)
+          }
+)
+
+
+setGeneric(".setQueryKeyValues",function(object, values){standardGeneric(".setQueryKeyValues")})
+setMethod(".setQueryKeyValues",
+          signature(object = "VirtualQuery",
+                    values = "character"),
+          function(object, values){
+            if (length(values) != length(getQueryKeyColumnNames(object))){
+              stop(sprintf("Wrong number of values passed to Query object of class %s",
+                           class(object)))
+            }
+            else {
+              object@values <- values
+            }
+
+            return(object)
           }
 )
 

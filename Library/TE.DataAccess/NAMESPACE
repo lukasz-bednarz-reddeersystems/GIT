@@ -91,6 +91,7 @@ exportClasses(DataAccess.SQLProcedureCall.PositionService_SelectHistoryBetweenFo
 exportClasses(DataAccess.SQLProcedureCall.Query_HistoricalTrades_WithInstrumentIDAndOrderID)
 exportClasses(DataAccess.SQLProcedureCall.Strategy_SelectAll)
 exportClasses(DataSet)
+exportClasses(DataStore.InstrumentMatrixStaticHistory_GetTEFeaturesFields)
 exportClasses(DataStore.VirtualSQLProcedureCall)
 exportClasses(KeyMap)
 exportClasses(PPModelObjectStore)

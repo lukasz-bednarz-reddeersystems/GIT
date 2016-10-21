@@ -283,7 +283,7 @@ setClass(
   Class      = "AvgDailyValTraded5Day",
   prototype  = prototype(
     data_store   = "dynamic_factor_datastore",
-    data_columns = c("rAvgDailyValTraded5Day"),
+    data_columns = c("r20DayAverageValueTradedUSD"),
     computation  = new("PassThruComputation")
   ),
   contains = c("ContextFeature")

@@ -17,7 +17,8 @@ setClass(
   Class          = "VirtualDataStore",
   representation = representation(
     dataset      = "DataSet",
-    last_result  = "NullableResult"
+    last_result  = "NullableResult",
+    key_map      = "KeyMap"
   ),
   contains = c("VIRTUAL")
 )
@@ -45,9 +46,7 @@ setMethod("queryStore", "VirtualDataStore",
               else
               {
                 message("No dataset found, attempting to intialise using input data.")
-                object@dataset <- new("DataSet")
-                object@dataset@key_cols <- colnames(values)
-                object@indexed <- TRUE
+                object@dataset <- new("DataSet", colnames(values), indexed  = TRUE, unique_rows = TRUE)
                 missing_keys <- values
               }
               if(nrow(missing_keys)>0){
@@ -64,7 +63,13 @@ setMethod("queryStore", "VirtualDataStore",
                 })
               if(nrow(object@last_result@data)>0){
                 object@last_result <- tryCatch({
-                  resetData(object@last_result,object@last_result@data[c(key_cols,get_variables)])
+                  last_result_df <- object@last_result@data[c(key_cols,get_variables)]
+
+                  # removing rows that do not have any data
+                  have_data <- apply(last_result_df[get_variables], 1, function(x){any(!is.na(x))})
+                  last_result_df <- last_result_df[have_data,]
+
+                  resetData(object@last_result,last_result_df)
                 },error=function(cond){
                   message(paste("Error resetting last result field in datastore:",cond))
                   return(new("DataSet"))
@@ -99,7 +104,6 @@ setMethod("getLastResult", "DataClass",
 setClass(
   Class          = "DataStore.URL",
   representation = representation(
-    key_map      = "KeyMap",
     urlparser    = "URLParser",
     urlquery     = "URLQuery"
   ),
@@ -131,6 +135,10 @@ setMethod("updateStore",
                 return(object@urlparser)
               })
               url_data <- getURLData(object@urlparser,1)
+
+              # merging with original keys to avoid unnecessary querrries for weekends
+              url_data <- merge(url_data, values, all = TRUE)
+
               cn <- getColnames(object@urlparser)
               if(length(cn)==0)cn <- colnames(data)
               if(length(url_data)==0 && length(cn)>0){

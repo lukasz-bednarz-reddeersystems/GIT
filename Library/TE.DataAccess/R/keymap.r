@@ -177,10 +177,13 @@ setMethod("advanceCurrentKey","KeyMap",
           }
 
 )
+
+
+
 setGeneric("getCurrentKeyQuery", function(object,query_obj){standardGeneric("getCurrentKeyQuery")})
 setMethod("getCurrentKeyQuery",
           signature("KeyMap",
-                    "VirtualQuery"),
+                    "VirtualBaseQuery"),
           function(object,query_obj){
             values = c()
             query_fields <- getQueryKeyColumnNames(query_obj)
@@ -194,7 +197,7 @@ setMethod("getCurrentKeyQuery",
                                   stop(paste("Error when getting key for field",field,"in",class(object)[[1]],":",cond))
                                  })
             }
-            query_obj <- setQueryValuesFromKey(query_obj, values)
+            query_obj <- .setQueryKeyValues(query_obj, values)
             return(query_obj)
           }
 )
