@@ -157,6 +157,10 @@ initialise_data_store <- function(){
 data_request <- function(store,keys,variables){
   rval <- NULL
   dataplex <- new("DataPlex")
+
+  if (store == "factor_datastore") {
+    browser()
+  }
   str_obj <- getDataPlexStore(dataplex, store)
 
   str_obj <- queryStore(str_obj,keys,variables)

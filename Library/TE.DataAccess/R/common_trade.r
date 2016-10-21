@@ -244,6 +244,8 @@ setMethod("mergeTradeConsolidation",
             }
             else {
                 merged_trade <- stored_trade
+
+                merged_trade <- .updateFeaturesDataStore(merged_trade)
             }
 
 
@@ -703,6 +705,32 @@ setMethod("getTradeFeaturesList",
 )
 
 
+setGeneric(".updateFeaturesDataStore", function(object){standardGeneric(".updateFeaturesDataStore")})
+setMethod(".updateFeaturesDataStore",
+          signature(object = "VirtualTrade"),
+          function(object){
+
+            features <- getTradeFeaturesList(object)
+
+            for(feature in features){
+
+              if (is(feature, "TradeFeature")){
+                feature <- tryCatch({
+                  .updteFeatureDataStore(feature)
+                }, error = function(cond){
+                  stop(sprintf("Error in .updateFeaturesDataStore() when updating feature %s",
+                               class(feature)))
+                })
+
+                object <- suppressMessages( insertFeature(object, feature))
+              }
+
+            }
+
+            return(object)
+          }
+)
+
 
 setGeneric("updateTradeConsolidation", function(object, consolidation){standardGeneric("updateTradeConsolidation")})
 setMethod("updateTradeConsolidation",
@@ -911,8 +939,9 @@ setMethod("isFeaturePresent",
                 message(sprintf("Error when trying to get output from for feature %s in isFeaturePresent()."))
 
               })
-            if (all(is.na(value[,2]))){
-              is_present <- FALSE
+
+              if (!is(value, "data.frame") || length(value) < 2 || isall(is.na(value[,2]))){
+                is_present <- FALSE
               }
             }
 

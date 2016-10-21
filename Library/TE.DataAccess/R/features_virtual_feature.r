@@ -83,6 +83,7 @@ setClass(
   )
 )
 
+
 setGeneric("tearDown",function(object){standardGeneric("tearDown")})
 setMethod("tearDown","VirtualFeature",
           function(object){
@@ -128,7 +129,14 @@ setMethod("updateCompute","VirtualFeature",
 setGeneric("getOutPut",function(object){standardGeneric("getOutPut")})
 setMethod("getOutPut","VirtualFeature",
           function(object){
-            return(unique(object@computation@output))
+
+            output <- object@computation@output
+
+            if (is(output, "data.frame")){
+              output <- unique(output)
+            }
+
+            return(output)
           }
 )
 

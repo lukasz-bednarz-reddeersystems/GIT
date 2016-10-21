@@ -41,4 +41,3 @@ test_that(sprintf("Can retrieve data from %s", tested.data_store),{
 
 
 })
-
