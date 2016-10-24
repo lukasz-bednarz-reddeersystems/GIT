@@ -278,8 +278,17 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is still open on later date %s.",
                                 stored_leg_end,
                                 new_leg_end))
-                browser()
                 #stop(sprintf("Inconsistent trade consolidation for stored trade"))
+
+                merged_cons <- unique(rbind(this_cons,
+                                            data.frame(TradeDate = stored_leg_start,
+                                                       ValueUSD  = getTradeValueUSD(object),
+                                                       Strategy  = getTradeStrategy(object),
+                                                       OrderID   = getTradeOrderID(object)
+                                                       )
+                                            )
+                                      )
+
 
               }
             }
