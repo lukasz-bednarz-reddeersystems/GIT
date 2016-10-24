@@ -940,6 +940,10 @@ setMethod("isFeaturePresent",
 
             is_present <- feature %in% names(features)
 
+            if (class(feature) == "DailyN") {
+              browser()
+            }
+
             if (is_present) {
               value <- tryCatch({
                 getOutPut(features[[feature]])
@@ -949,7 +953,7 @@ setMethod("isFeaturePresent",
 
               })
 
-              if (!is(value, "data.frame") || length(value) < 2 || isall(is.na(value[,2]))){
+              if (!is(value, "data.frame") || length(value) < 2 || all(is.na(value[,2]))){
                 is_present <- FALSE
               }
             }

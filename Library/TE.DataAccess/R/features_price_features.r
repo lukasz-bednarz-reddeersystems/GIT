@@ -715,7 +715,7 @@ setMethod("updateMidOnEntry","MidOnEntry",
                 data <- subset(data,data$lInstrumentID==instrument)
                 data <- data[c("dtTradeDate","dblMidOnEntry")]
                 colnames(data) <- c("Date","MidOnEntry")
-                object@computation <- setComputationData(object@computation,data)
+                object@computation <- setComputationData(object@computation,average(data))
               }
               return(object)
            }

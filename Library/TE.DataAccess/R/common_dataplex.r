@@ -30,9 +30,7 @@ setClass(
 setGeneric("resetMemory",function(object){standardGeneric("resetMemory")})
 setMethod("resetMemory","DataPlex",
           function(object){
-            browser()
             rm(list = ls(object@warehouse))
-            object@warehouse <- new.env()
             return(object)
           }
 )
@@ -158,9 +156,6 @@ data_request <- function(store,keys,variables){
   rval <- NULL
   dataplex <- new("DataPlex")
 
-  if (store == "factor_datastore") {
-    browser()
-  }
   str_obj <- getDataPlexStore(dataplex, store)
 
   str_obj <- queryStore(str_obj,keys,variables)
