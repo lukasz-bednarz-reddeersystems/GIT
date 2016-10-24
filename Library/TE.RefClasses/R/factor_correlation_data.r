@@ -1,6 +1,5 @@
 #' @include referencedata.r
-#' @include risk_model_component.r
-#' @include risk_model_objectstore_client.r
+#' @include risk_model_rodbc_client.r
 NULL
 
 ####################################
@@ -28,7 +27,7 @@ setClass(
 #' Implements storage for Factor Correlation and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelClientPicker"
 #' @export
 
 setClass(
@@ -37,11 +36,9 @@ setClass(
     component          = "FactorCorrelation", # name of component
     key_cols        = c(risk_model_objectstore_keys),
     key_values      = data.frame(Date = as.Date(character())),
-    values             = c("Date"), # columns that neeed to be returned from datastore
-    column_name_map = hash()
-
+    values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c( "VirtualFactorCorrelationData", "VirtualRiskModelObjectstoreClient")
+  contains = c( "VirtualFactorCorrelationData", "VirtualRiskModelClientPicker")
 )
 

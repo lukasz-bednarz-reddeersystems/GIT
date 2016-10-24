@@ -8,7 +8,7 @@ context("Testing Factor Variance Data")
 
 tested.class          <-  "FactorVarianceData"
 valid.component       <- "FactorVariance"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)

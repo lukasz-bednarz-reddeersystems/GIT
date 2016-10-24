@@ -99,9 +99,10 @@ setMethod("getRiskModelComponentName",
 
 setClass(
   Class                = "VirtualRiskModelObjectstoreClient",
-  slots = c(
-    component          = "character" # name of component in Risk Model
-    ),
+  prototype = list(
+    column_name_map = hash(c("Instrument", "InstrumentID"),
+                           c("InstrumentID","Instrument")) # name of component in Risk Model
+  ),
   contains = c("VirtualRiskModelDataSourceClient",
                "VIRTUAL")
 )

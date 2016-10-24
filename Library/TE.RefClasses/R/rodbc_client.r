@@ -58,6 +58,9 @@ setMethod("dataRequest",
             object <- .setDataSourceQueryKeyValues(object,key_values)
             values <- getDataSourceReturnColumnNames(object)
             sql_query <- getSQLQueryObject(object)
+
+            browser()
+
             sql_query <- prepareSQLQuery(sql_query, key_values)
 
             # data request sent to dataplex
@@ -69,9 +72,7 @@ setMethod("dataRequest",
                            class(sql_query), class(object), cond))
             })
 
-            query_data <- query_data[values]
-
-            if (0 == nrow(query_data)) {
+            if (is.null(query_data) || 0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
               message(paste("Query sent via", class(sql_query), "returned zero row data.frame"))
               query_data <- .generateDataFilledWithNA(object)
@@ -79,7 +80,12 @@ setMethod("dataRequest",
             }
 
             # translating column names
-            colnames(query_data) <- .translateDataSourceColumnNames(object, values)
+            colnames(query_data) <- .translateDataSourceColumnNames(object, colnames(query_data))
+
+
+            if (!is.null(query_data)){
+              query_data <- query_data[values]
+            }
 
             # storing Reference data internaly
             object <- setReferenceData(object, query_data)

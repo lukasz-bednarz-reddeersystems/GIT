@@ -2,6 +2,7 @@
 #' @include risk_model_objectstore_client.r
 NULL
 
+
 ####################################################
 #
 # RefClasses.RiskModel.VirtualSQLProcedureCall Class
@@ -110,6 +111,11 @@ setClass(
 #
 #########################################
 
+risk_model_rodbc_keys <-  c("dtDate")
+
+devtools::use_data(risk_model_rodbc_keys,
+                   overwrite = TRUE)
+
 
 #' Virtual S4 class for access to Risk Model Objectstore.
 #'
@@ -130,6 +136,7 @@ setClass(
     key_cols        = risk_model_objectstore_keys,
     key_values      = data.frame(Date = as.Date(character())),
     column_name_map = hash("dtDateTime"    = "Date",
+                           "dtDate"        = "Date",
                            "lInstrumentID" = "InstrumentID",
                            "sFactorName"   = "FactorName")
   ),
@@ -142,12 +149,11 @@ setClass(
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{sql_query} object of class "RiskModel.VirtualSQLProcedureCall"
 setGeneric(".getSQLQueryObjectForRiskComponent",
-           function(object, component){standardGeneric(".getSQLQueryObjectForRiskComponent")})
+           function(object){standardGeneric(".getSQLQueryObjectForRiskComponent")})
 
 setMethod(".getSQLQueryObjectForRiskComponent",
-          signature(object = "VirtualRiskModelRODBCClient",
-                    component = "character"),
-          function(object, component){
+          signature(object = "VirtualRiskModelRODBCClient"),
+          function(object){
 
 
             component <- getRiskModelComponentName(object)
@@ -162,9 +168,13 @@ setMethod(".getSQLQueryObjectForRiskComponent",
                                   )
             if (component %in% names(component_map)){
               sql_query <- new(component_map[[component]])
+            } else {
+              stop(sprintf("Unknown risk model component name %s",
+                           component))
             }
 
 
+            return(sql_query)
           }
 )
 
@@ -194,7 +204,7 @@ setMethod("initialize",
               stop(cond)
             })
 
-            if (is.null(sql_query) || !is(sql_query, "RefClasses.RiskModel.VirtualSQLProcedureCall")){
+            if (is.null(sql_query) || !is(sql_query, "RiskModel.VirtualSQLProcedureCall")){
               stop(sprintf("Invalid class %s of sql_query returned for component name %s in initialize(%s)",
                            class(sql_query),
                            component,
@@ -222,7 +232,18 @@ setMethod("dataRequest",
           signature(object = "VirtualRiskModelRODBCClient", key_values = "data.frame"),
           function(object, key_values){
 
-            object <- callNextMethod()
+
+            rm_name <- getRiskModelName(object)
+
+            if (0 == nrow(key_values)){
+              key_values <- cbind(data.frame(RiskModelName = character()),
+                                  key_values)
+            } else {
+              key_values <- cbind(data.frame(RiskModelName = rm_name),
+                                  key_values)
+            }
+
+            object <- callNextMethod(object, key_values)
 
             return(object)
           }
@@ -230,3 +251,22 @@ setMethod("dataRequest",
 
 
 
+#########################################
+#
+# VirtualRiskModelClientPicker Class
+#
+#########################################
+
+
+#' Virtual S4 class for access to Risk Model Objectstore.
+#'
+#' This is a class serving as a switcher between RODBC and Objectstore
+#' Source of data for risk model
+#'
+#' Inherits from "VirtualDataSourceClient" and "VirtualRiskModelHandler"
+#'
+#' @slot component    "character", name of the component of risk model
+setClass(
+  Class                = "VirtualRiskModelClientPicker",
+  contains = c("VirtualRiskModelRODBCClient", "VIRTUAL")
+)
