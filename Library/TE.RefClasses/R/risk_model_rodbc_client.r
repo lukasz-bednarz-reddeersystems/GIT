@@ -142,16 +142,28 @@ setClass(
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{sql_query} object of class "RiskModel.VirtualSQLProcedureCall"
 setGeneric(".getSQLQueryObjectForRiskComponent",
-           function(object){standardGeneric(".getSQLQueryObjectForRiskComponent")})
+           function(object, component){standardGeneric(".getSQLQueryObjectForRiskComponent")})
 
 setMethod(".getSQLQueryObjectForRiskComponent",
-          signature(object = "VirtualRiskModelRODBCClient"),
-          function(object){
-            return(object@factorized_cols)
+          signature(object = "VirtualRiskModelRODBCClient",
+                    component = "character"),
+          function(object, component){
+
 
             component <- getRiskModelComponentName(object)
 
-            component_map <- hash("FactorCorrelation" =  "")
+            component_map <- hash("FactorCorrelation"    = "RiskModel.SQLProcedureCall.MultiFactorRisk_FactorCorrelationByModelNameDate",
+                                  "FactorCovariance"     = "RiskModel.SQLProcedureCall.MultiFactorRisk_FactorCovarianceByModelNameDate",
+                                  "FactorVariance"       = "RiskModel.SQLProcedureCall.MultiFactorRisk_FactorVarianceByModelNameDate",
+                                  "MarketStyle"          = "RiskModel.SQLProcedureCall.MultiFactorRisk_MarketStyleByModelNameDate",
+                                  "ImpliedFactorReturns" = "RiskModel.SQLProcedureCall.MultiFactorRisk_ImpliedFactorReturnsByModelNameDate",
+                                  "Betas"                = "RiskModel.SQLProcedureCall.MultiFactorRisk_InstrumentBetasByInstrumentIDModelNameDate",
+                                  "ResidualReturns"      = "RiskModel.SQLProcedureCall.MultiFactorRisk_ResidualReturnsByInstrumentIDModelNameDate"
+                                  )
+            if (component %in% names(component_map)){
+              sql_query <- new(component_map[[component]])
+            }
+
 
           }
 )
@@ -215,4 +227,6 @@ setMethod("dataRequest",
             return(object)
           }
 )
+
+
 

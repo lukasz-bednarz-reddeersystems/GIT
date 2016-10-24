@@ -140,12 +140,17 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end) {
     }
 
     data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
-    data <- data[data$Date]
+    data <- data[data$Date, ]
     if (nrow(data) > 0) {
       bulk_load_residual_returns(data, model_id)
     }
 
   }
+}
+
+push_risk_model_component_to_db <- function(risk_model, component){
+
+
 }
 
 get_betas_composite <- function(universe_betas){
