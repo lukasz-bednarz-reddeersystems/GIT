@@ -244,6 +244,8 @@ setMethod("mergeTradeConsolidation",
             }
             else {
                 merged_trade <- stored_trade
+
+                merged_trade <- .updateFeaturesDataStore(merged_trade)
             }
 
 
@@ -260,6 +262,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Open until %s but new trade is Closed earlier date %s.",
                                 stored_leg_end,
                                 new_leg_end))
+                browser()
                 #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
@@ -277,6 +280,16 @@ setMethod("mergeTradeConsolidation",
                                 new_leg_end))
                 #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
+                merged_cons <- unique(rbind(this_cons,
+                                            data.frame(TradeDate = stored_leg_start,
+                                                       ValueUSD  = getTradeValueUSD(object),
+                                                       Strategy  = getTradeStrategy(object),
+                                                       OrderID   = getTradeOrderID(object)
+                                                       )
+                                            )
+                                      )
+
+
               }
             }
             else if (isTradeLegClosed(stored_trade) && isTradeLegClosed(object)) {
@@ -289,6 +302,7 @@ setMethod("mergeTradeConsolidation",
                 message(sprintf("stored leg was Closed on %s but new trade is Closed on %s.",
                                 stored_leg_end,
                                 new_leg_end))
+                browser()
                 #stop(sprintf("Inconsistent trade consolidation for stored trade"))
 
               }
@@ -700,6 +714,32 @@ setMethod("getTradeFeaturesList",
 )
 
 
+setGeneric(".updateFeaturesDataStore", function(object){standardGeneric(".updateFeaturesDataStore")})
+setMethod(".updateFeaturesDataStore",
+          signature(object = "VirtualTrade"),
+          function(object){
+
+            features <- getTradeFeaturesList(object)
+
+            for(feature in features){
+
+              if (is(feature, "TradeFeature")){
+                feature <- tryCatch({
+                  .updteFeatureDataStore(feature)
+                }, error = function(cond){
+                  stop(sprintf("Error in .updateFeaturesDataStore() when updating feature %s",
+                               class(feature)))
+                })
+
+                object <- suppressMessages( insertFeature(object, feature))
+              }
+
+            }
+
+            return(object)
+          }
+)
+
 
 setGeneric("updateTradeConsolidation", function(object, consolidation){standardGeneric("updateTradeConsolidation")})
 setMethod("updateTradeConsolidation",
@@ -895,7 +935,26 @@ setMethod("isFeaturePresent",
           signature(object = "VirtualTrade",
                     feature = "character"),
           function(object,feature){
-            return(feature %in% names(object@features))
+
+            features <- getTradeFeaturesList(object)
+
+            is_present <- feature %in% names(features)
+
+            if (is_present) {
+              value <- tryCatch({
+                getOutPut(features[[feature]])
+              }, error = function(cond){
+                browser()
+                message(sprintf("Error when trying to get output from for feature %s in isFeaturePresent()."))
+
+              })
+
+              if (!is(value, "data.frame") || length(value) < 2 || isall(is.na(value[,2]))){
+                is_present <- FALSE
+              }
+            }
+
+            return(is_present)
           }
 )
 
@@ -905,6 +964,17 @@ setMethod("getFeatureValue",
                     feature = "character",
                     date    = "Date"),
           function(object,feature,date){
+
+
+            f <- object@features[[feature]]
+
+            if (is.null(feature)){
+              browser()
+              stop(sprintf("Missing feature in trade_id %s",
+                           getTradeID(object)))
+
+            }
+
             value <- getOutPut(object@features[[feature]])
             value <- value[object@datekey==date,2]
             return(value)

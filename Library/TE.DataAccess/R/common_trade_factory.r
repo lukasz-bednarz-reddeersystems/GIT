@@ -408,10 +408,10 @@ setMethod("fillTradeListPosns","TradeWarehouse",
               dtr <- dtr[dtr$Date>=start,]
               dtr <- dtr[dtr$Date<=end,]
               dtr <- dtr[dtr$InstrumentID==instrument,]
-              psns <- new("DataSet")
+              psns <- new("DataSet", unique_rows = TRUE)
               psns@key_cols <- object@positions@data@key_cols
               psns@data_cols <- object@positions@data@data_cols
-              psns <- setData(psns,dtr)
+              psns <- setData(psns,unique(dtr))
               object <- .storeTrade(object,instrument,i,
                                    bindData(trd,psns,aliases=alias,keep_incoming=c('Date','TodayPL','MarketValue'),joinmode='left',overlap_data=TRUE))
               #object@trades[[as.character(instrument)]][[i]] <- bindData(trd,psns,aliases=alias,keep_incoming=c('Date','TodayPL','MarketValue'),joinmode='left',overlap_data=TRUE)
@@ -692,13 +692,15 @@ setMethod("buildFeatureList","TradeWarehouse",
 
             for(trade in trades){
               trd <- getTrade(object,trade)
-              f <- unique(c(f,names(trd@features)))
+              tf <- getTradeFeaturesList(trd)
+              f <- unique(c(f,tf))
             }
 
             fc <- f
             for(trade in trades){
               trd <- getTrade(object,trade)
-              fc <- intersect(fc,names(trd@features))
+              tf <- getTradeFeaturesList(trd)
+              fc <- intersect(fc,tf)
             }
 
             if(!is.null(f) && is(f, "character")) {
@@ -1008,7 +1010,9 @@ setMethod("getTradeInformation","TradeWarehouse",
               info <- cbind(data.frame(Long=trade@long),info)
               info <- rbind(parent,info)
             }
-            return (info)
+
+
+            return (unique(info))
           }
 )
 
@@ -1030,7 +1034,9 @@ setMethod("getFullTradeInformation","TradeWarehouse",
             base <- getTradeInformation(object,trade_id)
             colnames(base)[colnames(base)=='TradeDate'] <- "DateTime"
             trade <- getTrade(object,trade_id)
-            info <- merge(x=trade@daily_data@data,y=base,by="DateTime",all.x=TRUE)
+            daily_data <- unique(trade@daily_data@data)
+
+            info <- merge(x=daily_data,y=base,by="DateTime",all.x=TRUE)
             return(info)
           }
 )
@@ -1159,6 +1165,9 @@ setMethod("buildTrades","TradeWarehouse",
                     consolidation = consolidation,
                     status        = leg_status)
               }, error = function(cond){
+
+                browser()
+
                 message(sprintf("Error occured when creating new Trade object in buidTrades of object: %s",
                                 class(object)))
                 message("Parameters were :")
@@ -1175,6 +1184,7 @@ setMethod("buildTrades","TradeWarehouse",
                 message(sprintf("consolidation : %s", consolidation))
                 message(sprintf("status        : %s", leg_status))
 
+                message(sprintf("Failed to create new trade : %s", cond))
                 #stop(sprintf("Failed to create new trade : %s", cond))
 
                 NULL

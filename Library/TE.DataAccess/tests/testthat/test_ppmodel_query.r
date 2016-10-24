@@ -36,9 +36,9 @@ if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
     valid.key_func <- dated_three_day_lookback
     valid.keys <- valid.key_func(valid.trader_id, valid.end_date)
 
-    valid.keys <- data.frame(id = valid.trader_id,
-                             start = as.Date("2014-11-30"),
-                             end = as.Date("2016-09-30"))
+    # valid.keys <- data.frame(id = valid.trader_id,
+    #                          start = as.Date("2014-11-30"),
+    #                          end = as.Date("2016-09-30"))
     valid.ppmodel <- new('TradeHistorySimpleWithSummary', keys = valid.keys )
 
     valid.store_keys <- data.frame(model_class = "TradeHistorySimpleWithSummary",

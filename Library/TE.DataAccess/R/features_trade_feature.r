@@ -41,6 +41,23 @@ setMethod("tearDownTradeFeature","TradeFeature",
           }
 )
 
+
+
+
+setGeneric(".updteFeatureDataStore",function(object,data){standardGeneric(".updteFeatureDataStore")})
+setMethod(".updteFeatureDataStore",
+          signature(object  = "TradeFeature"),
+          function(object){
+
+            nf <- new(class(object))
+            data_store <- nf@data_store
+
+            object@data_store <- data_store
+
+            return(object)
+          }
+)
+
 pass_thru <- function(compute_object){
   output <- getFeatureComputationInput(compute_object)
   compute_object <- tryCatch({

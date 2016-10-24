@@ -64,16 +64,16 @@ position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITI
   }
 
   strategies <- new("StrategiesDataSet")
-  strategies <- setData(strategies,str_data)
+  strategies <- setData(strategies,unique(str_data))
 
   if (nrow(pos_data) == 0){
     message(paste("Data query for positions in period", start, "to", end, "returned empty dataset in position_composite_factory()."))
   }
 
   positions  <- new("PositionDataSet")
-  positions  <- setData(positions,pos_data)
+  positions  <- setData(positions,unique(pos_data))
 
-  position_composite <- new("DataSet")
+  position_composite <- new("DataSet", unique_rows = TRUE)
   position_composite <- innerJoin(position_composite,strategies,NULL)
   position_composite <- innerJoin(position_composite,positions,c("StrategyID"))
   posn_comp_obj <- new("PositionComposite")

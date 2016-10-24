@@ -1,3 +1,8 @@
+#' @include query.r
+NULL
+
+
+
 #' helper function to generate key from objectstore name
 #'
 #' @param name "character" name of the objectstore
@@ -22,11 +27,9 @@ key_from_name <- function(name) {
 setClass(
 	Class = "ObjectQuery",
 	representation = representation(
-		fields     = "character",
-		values     = "character",
 		known_keys = "data.frame"
 	),
-	contains = c("VIRTUAL")
+	contains = c("VirtualQuery", "VIRTUAL")
 )
 
 
@@ -39,53 +42,6 @@ setMethod("getKnownKeys","ObjectQuery",
             return(object@known_keys)
           }
 )
-
-
-setGeneric("getQueryKeyColumnNames",function(object,key){standardGeneric("getQueryKeyColumnNames")})
-setMethod("getQueryKeyColumnNames","ObjectQuery",
-          function(object,key){
-            return(object@fields)
-          }
-)
-
-
-setGeneric("getQueryKeyValues",function(object,key){standardGeneric("getQueryKeyValues")})
-setMethod("getQueryKeyValues","ObjectQuery",
-          function(object,key){
-            return(object@values)
-          }
-)
-
-
-setGeneric("setQueryValuesFromKey",function(object,key){standardGeneric("setQueryValuesFromKey")})
-setMethod("setQueryValuesFromKey","ObjectQuery",
-          function(object,key){
-            if(class(key)[[1]]!='data.frame')stop("Key must be data.frame with colnames matching fields.")
-            if(nrow(key)!=1)stop("key must be exactly one row")
-            fill_fields <- colnames(key)
-            for(field in fill_fields){
-              object <- setQueryValueByField(object,field,key[[field]])
-            }
-            return(object)
-          }
-)
-
-setGeneric("getQueryValueByField",function(object,field){standardGeneric("getQueryValueByField")})
-setMethod("getQueryValueByField","ObjectQuery",
-          function(object,field){
-          	return(object@values[object@fields==field])
-          }
-)
-
-
-setGeneric("setQueryValueByField",function(object,field,value){standardGeneric("setQueryValueByField")})
-setMethod("setQueryValueByField","ObjectQuery",
-          function(object,field,value){
-            object@values[object@fields==field] <- as.character(value)
-            return(object)
-          }
-)
-
 
 
 setGeneric("getIdentifier",function(object){standardGeneric("getIdentifier")})

@@ -8,7 +8,7 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="DocumentElement"),
     urlquery     = new("URLQuery",root_url=middleware_urls@trader_perf_url,fields=c('id','start','end','mbam')),
     key_map      = new("KeyMap",key_generator=date_trader_mbam_kgen_fn,key_columns=c('TraderID','DateTime','MBAMLevel'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )
 
 setClass(
@@ -18,7 +18,7 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="DocumentElement"),
     urlquery     = new("URLQuery",root_url=middleware_urls@ratios_url,fields=c('id','start','end')),
     key_map      = new("KeyMap",key_generator=date_trader_kgen_fn,key_columns=c('TraderID','DateTime'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )
 
 setClass(
@@ -28,7 +28,7 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="DocumentElement"),
     urlquery     = new("URLQuery",root_url=middleware_urls@top_psn_url,fields=c('id','start','end')),
     key_map      = new("KeyMap",key_generator=date_trader_kgen_fn,key_columns=c('TraderID','DateTime'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )
 
 setClass(
@@ -38,5 +38,5 @@ setClass(
     urlparser    = new("URLParser",parser_type = "XMLToFrame",cstm_body_tag="DocumentElement"),
     urlquery     = new("URLQuery",root_url=middleware_urls@bottom_psn_url,fields=c('id','start','end')),
     key_map      = new("KeyMap",key_generator=date_trader_kgen_fn,key_columns=c('TraderID','DateTime'))
-  ), contains = c("DataStore")
+  ), contains = c("DataStore.URL")
 )

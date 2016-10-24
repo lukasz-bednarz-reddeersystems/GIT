@@ -482,6 +482,7 @@ setMethod("updateIndex","DataSet",
               tryCatch({
                           rownames(object@data) <- row_hash_values
                        }, error=function(cond){
+                         browser()
                           stop(paste("Error during dataset indexing, could not set hash values:",cond))
 
                        })

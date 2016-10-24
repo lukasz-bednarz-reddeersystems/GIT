@@ -52,7 +52,7 @@ setMethod(".setFeatureComputationOutput",
           signature(object  = "FeatureComputation",
                     data    = "FeatureOutput"),
           function(object,data){
-            object@output <- data
+            object@output <- unique(data)
             return(object)
           }
 )
@@ -82,6 +82,7 @@ setClass(
     computation  = "FeatureComputations"
   )
 )
+
 
 setGeneric("tearDown",function(object){standardGeneric("tearDown")})
 setMethod("tearDown","VirtualFeature",
@@ -128,7 +129,14 @@ setMethod("updateCompute","VirtualFeature",
 setGeneric("getOutPut",function(object){standardGeneric("getOutPut")})
 setMethod("getOutPut","VirtualFeature",
           function(object){
-            return(object@computation@output)
+
+            output <- object@computation@output
+
+            if (is(output, "data.frame")){
+              output <- unique(output)
+            }
+
+            return(output)
           }
 )
 
