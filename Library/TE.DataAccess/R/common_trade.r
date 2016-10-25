@@ -940,10 +940,6 @@ setMethod("isFeaturePresent",
 
             is_present <- feature %in% names(features)
 
-            if (class(feature) == "DailyN") {
-              browser()
-            }
-
             if (is_present) {
               value <- tryCatch({
                 getOutPut(features[[feature]])
