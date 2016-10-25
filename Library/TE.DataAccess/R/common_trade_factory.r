@@ -576,11 +576,32 @@ setMethod("fillTradeLevels","TradeWarehouse",
 )
 
 get_trade_dates <- function(trade){
+
+  consolidation <- getTradeConsolidation(trade)
+  leg_start_date <- getTradeLegStartDate(trade)
+
   if(length(trade@consolidation$TradeDate)>0){
-    dates <- c(trade@leg_start,trade@consolidation$TradeDate)
+    dates <- c(leg_start_date,
+               consolidation$TradeDate)
   }
   else{
-    dates <- c(trade@leg_start)
+    dates <- c(leg_start_date)
+  }
+  return(dates)
+}
+
+
+get_trade_order_ids <- function(trade){
+
+  consolidation <- getTradeConsolidation(trade)
+  start_order_id <- getTradeOrderID(trade)
+
+  if(length(consolidation$TradeDate)>0){
+    orders <- c(start_order_id,
+                consolidation$OrderID)
+  }
+  else{
+    dates <- c(start_order_id)
   }
   return(dates)
 }
@@ -616,7 +637,11 @@ setMethod("attachFeatures","TradeWarehouse",
         for(feature in features){
           feature_present <- isFeaturePresent(trades[[trade_id]],feature)
           if(feature_present == FALSE || replace_features == TRUE){
-            dates <- get_trade_dates(trades[[trade_id]])
+
+            # __LB__ unique here is a hack to avoid duplication of
+            # entries for trades happening on the same day. Proper fix
+            # should be to rewrite all "updateFeatureClass" methods to accept panel of dates and OrderIDs
+            dates <- unique(get_trade_dates(trades[[trade_id]]))
 
             trade <- trades[[trade_id]]
             trade <- .setTradeDailyData(trade,getTradeDailyData(trade))
@@ -752,7 +777,7 @@ setGeneric("getPriceSnapshot",function(object,trade_id,window=10,scale_rebase=TR
 setMethod("getPriceSnapshot","TradeWarehouse",
           function(object,trade_id,window=10,scale_rebase=TRUE,exposure=FALSE){
             trd   <- getTrade(object,trade_id)
-            dates <- get_trade_dates(trd)
+            dates <- unique(get_trade_dates(trd))
             nrows <- nrow(trd@daily_data@data)
             for(date in dates){
               rw    <- which(trd@daily_data@data$DateTime==date)
@@ -916,7 +941,7 @@ setMethod("getTradeFeatures","TradeWarehouse",
             message(paste("Collecting features for trade",trade_id))
             trd <- getTrade(object,trade_id)
             features <- trd@features[features]
-            rtn_frm <- data.frame(DateTime=get_trade_dates(trd))
+            rtn_frm <- data.frame(DateTime= unique(get_trade_dates(trd)))
             dropped <- c()
             for(feature in features){
 
@@ -947,6 +972,7 @@ setMethod("getTradeFeatures","TradeWarehouse",
                     }
                   }, error = function(cond)
                   {
+                    browser()
                     stop(paste("Could not bind data for",class(feature)[[1]],"on trade",trade_id))
                   })
                 if(class(rtn)[[1]]==class(feature)[[1]])dropped <- c(dropped,class(rtn)[[1]])
@@ -958,10 +984,12 @@ setMethod("getTradeFeatures","TradeWarehouse",
               }
             }
 
+
             rtn_frm <- rtn_frm[!(duplicated(lapply(rtn_frm, c))&&unlist(lapply(rtn_frm, function(x)class(x)[[1]]=="Date")))]
             err <- tryCatch(
               {
-                rtn_frm <- cbind(data.frame(TradeID=trd@trade_id),rtn_frm)
+                rtn_frm <- cbind(data.frame(TradeID=trd@trade_id),
+                                            rtn_frm)
                 FALSE
               },error = function(cond)
               {

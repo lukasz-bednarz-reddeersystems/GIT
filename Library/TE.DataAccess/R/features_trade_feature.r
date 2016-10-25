@@ -25,6 +25,7 @@ setMethod("updateData","TradeFeature",
           function(object,trade_dates,instrument){
             get_keys <- data.frame(a=c(instrument),b=trade_dates)
             colnames(get_keys) <- object@key_columns
+
             message(paste("Requesting feature data from store",object@data_store))
             object@data_set <- data_request(object@data_store,get_keys,object@data_columns)
             return(object)
@@ -61,7 +62,7 @@ setMethod(".updteFeatureDataStore",
 pass_thru <- function(compute_object){
   output <- getFeatureComputationInput(compute_object)
   compute_object <- tryCatch({
-    .setFeatureComputationOutput(compute_object, input)
+    .setFeatureComputationOutput(compute_object, output)
   }, error = function(cond) {
 
   })

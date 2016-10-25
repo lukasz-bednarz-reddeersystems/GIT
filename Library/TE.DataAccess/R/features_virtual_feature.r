@@ -98,6 +98,7 @@ setMethod("updateCompute","VirtualFeature",
             #Need to have updated the FeatureComputation data first if this is relevant
             #Not implemented in the virtual function because it could adopt various forms
             message(paste("Triggering feature computation:",class(object)[[1]]))
+
             cmpt <- tryCatch({
                 # restoring computation function if it was removed
                 if (is.null(object@computation@compute)){
@@ -116,6 +117,7 @@ setMethod("updateCompute","VirtualFeature",
             if(length(cmpt)>0){
               object@computation <- cmpt
               if(length(object@computation@output_colnms)>0 && class(cmpt@output)[[1]]=="data.frame"){
+                # __LB__ here handling should be addedd to rename pass-thru computation name
                 colnames(object@computation@output)<-object@computation@output_colnms
               }
             }
