@@ -25,7 +25,10 @@ test_that("Can insert_model_type_factors to DB",{
 
   valid.ret.factors <- merge(valid.ret.factors,
                              valid.factor_info,
-                             sort = FALSE)[c("lModelTypeID", "lFactorID")]
+                             sort = TRUE)[c("lModelTypeID", "lFactorID")]
+
+  valid.ret.factors <- valid.ret.factors[order(valid.ret.factors$lFactorID),]
+  rownames(valid.ret.factors) <- seq(nrow(valid.ret.factors))
 
 
   ret.factors <- TE.RiskModel:::insert_model_type_factors(valid.model_name,

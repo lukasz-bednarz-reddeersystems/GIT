@@ -251,7 +251,8 @@ setGeneric("getRiskModelFactorNames", function(object){standardGeneric("getRiskM
 setMethod("getRiskModelFactorNames",
           signature(object = "VirtualRiskModel"),
           function(object){
-            return(object@model_factors)
+            model_factors <- sort(object@model_factors)
+            return(model_factors)
           }
 )
 
