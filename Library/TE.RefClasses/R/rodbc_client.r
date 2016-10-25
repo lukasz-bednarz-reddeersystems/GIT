@@ -59,8 +59,6 @@ setMethod("dataRequest",
             values <- getDataSourceReturnColumnNames(object)
             sql_query <- getSQLQueryObject(object)
 
-            browser()
-
             sql_query <- prepareSQLQuery(sql_query, key_values)
 
             # data request sent to dataplex

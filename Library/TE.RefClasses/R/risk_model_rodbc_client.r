@@ -111,6 +111,7 @@ setClass(
 #
 #########################################
 
+#' list of key column names for RODBC riskmodel client
 risk_model_rodbc_keys <-  c("dtDate")
 
 devtools::use_data(risk_model_rodbc_keys,
@@ -138,7 +139,8 @@ setClass(
     column_name_map = hash("dtDateTime"    = "Date",
                            "dtDate"        = "Date",
                            "lInstrumentID" = "InstrumentID",
-                           "sFactorName"   = "FactorName")
+                           "sFactorName"   = "FactorName",
+                           "Instrument"    = "InstrumentID")
   ),
   contains = c("VirtualRiskModelDataSourceClient","VirtualRODBCClient", "VIRTUAL")
 )

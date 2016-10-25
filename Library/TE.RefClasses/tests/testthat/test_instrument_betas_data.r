@@ -20,8 +20,14 @@ valid.values          <- c("Date", "InstrumentID",
 valid.required_colnms <- c('Date', "InstrumentID",
                            valid.model_factors)
 
-valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
-                              c("InstrumentID","Instrument"))
+# valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
+#                               c("InstrumentID","Instrument"))
+
+valid.column_name_map <- hash("dtDateTime"    = "Date",
+                              "dtDate"        = "Date",
+                              "lInstrumentID" = "InstrumentID",
+                              "sFactorName"   = "FactorName",
+                              "Instrument"    = "InstrumentID")
 init.key_values       <-  data.frame(Date = as.Date(character()),
                                      InstrumentID = integer())
 
@@ -186,7 +192,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   merge_keys   <- valid.key_vals
 
-  colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  #colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  colnames(merge_keys) <- c("Instrument", "Date")
 
   valid.ret_data <- merge(query_data,
                         merge_keys[merge_keys$Date >= start & merge_keys$Date <= end, ], all.y = TRUE)
@@ -194,6 +201,8 @@ test_that("Can dataRequest() with valid key_values", {
   colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
+
+  valid.ret_data <- arrange(valid.ret_data, InstrumentID, Date)
 
   object <- dataRequest(object, valid.key_vals)
 
@@ -227,8 +236,8 @@ valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
 valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
-valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
-                              c("InstrumentID","Instrument"))
+# valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
+#                               c("InstrumentID","Instrument"))
 
 valid.key_cols        <- c(risk_model_objectstore_keys, "InstrumentID")
 valid.values          <- c("Date", "InstrumentID",
@@ -410,7 +419,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   merge_keys   <- valid.key_vals
 
-  colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  # colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  colnames(merge_keys) <- c("Instrument", "Date")
 
   valid.ret_data <- merge(query_data,
                           merge_keys[merge_keys$Date >= start & merge_keys$Date <= end, ], all.y = TRUE)
@@ -418,6 +428,8 @@ test_that("Can dataRequest() with valid key_values", {
   colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
+
+  valid.ret_data <- arrange(valid.ret_data, InstrumentID, Date)
 
   object <- dataRequest(object, valid.key_vals)
 

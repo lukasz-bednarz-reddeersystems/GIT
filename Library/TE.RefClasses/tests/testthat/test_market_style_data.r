@@ -21,7 +21,11 @@ valid.values          <- c("Date",
                            valid.model_factors)
 valid.required_colnms <- c('Date',
                            valid.model_factors)
-valid.column_name_map <- hash()
+valid.column_name_map <-  hash("dtDateTime"    = "Date",
+                               "dtDate"        = "Date",
+                               "lInstrumentID" = "InstrumentID",
+                               "sFactorName"   = "FactorName",
+                               "Instrument"    = "InstrumentID")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 

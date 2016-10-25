@@ -19,7 +19,11 @@ valid.values          <- c("Date",
                            valid.model_factors)
 valid.required_colnms <- c('Date',
                            valid.model_factors)
-valid.column_name_map <- hash()
+valid.column_name_map <-  hash("dtDateTime"    = "Date",
+                               "dtDate"        = "Date",
+                               "lInstrumentID" = "InstrumentID",
+                               "sFactorName"   = "FactorName",
+                               "Instrument"    = "InstrumentID")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 
@@ -179,7 +183,11 @@ test_that("Can dataRequest() with valid key_values", {
 
   colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
 
+  factors <- colnames(query_data)[-1]
+
   query_data$Index <- seq(nrow(query_data))
+
+
 
   valid.ret_data <- merge(query_data,
                         merge_keys[merge_keys$Date >= start & merge_keys$Date <= end,, drop = FALSE],
@@ -189,6 +197,9 @@ test_that("Can dataRequest() with valid key_values", {
 
   colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
 
+
+  valid.ret_data$FactorName <- factors[((valid.ret_data$Index - 1) %% length(factors)) +1]
+
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
 
   object <- dataRequest(object, valid.key_vals)
@@ -197,6 +208,8 @@ test_that("Can dataRequest() with valid key_values", {
   expect_true(setequal(getDataSourceQueryKeyValues(object), valid.key_vals))
 
   ret_data <- getReferenceData(object)
+
+  valid.ret_data <- arrange(valid.ret_data, Date, FactorName)
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
 
