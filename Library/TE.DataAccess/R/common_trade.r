@@ -12,7 +12,9 @@ setClass(
   Class          = "TradePriceDataSet",
   prototype      = prototype(
     key_cols     = c("DateTime"),
-    data_cols    = c("ClosePrice","OutstandingShares","TodayPL","StopLoss","ProfitTarget")
+    data_cols    = c("ClosePrice","OutstandingShares","TodayPL","StopLoss","ProfitTarget"),
+    unique_rows  = TRUE,
+    indexed      = TRUE
   ), contains = c("DataSet")
 )
 

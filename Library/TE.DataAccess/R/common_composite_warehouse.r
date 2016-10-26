@@ -205,7 +205,8 @@ setMethod("getWarehouse","CompositeWarehouse",
 	      	}
 	      	message(paste("Got",length(get_trades),"trades."))
 	      	tw@trades <- trd
-	      	message(paste("Restoring warehouse variables ..."))
+	      	message(sprintf("Restoring warehouse variables started %s",
+	      				     now()))
 	      	tw@trader_id <- as.integer(object@orig_trader_ids[[name]])
 	      	tw@instruments <- object@orig_instruments[[name]]
 	      	tw@positions <- object@orig_positions[[name]]
@@ -216,6 +217,8 @@ setMethod("getWarehouse","CompositeWarehouse",
 	      	tw@map <- object@orig_maps[[name]]
 	      	tw@fctr_datstr <- object@orig_dtr_stores[[name]]
 	      	tw <- buildFeatureList(tw)
+	      	message(sprintf("Restoring warehouse variables finished %s",
+	      				     now()))
 	      	return(tw)
 	      }
 )

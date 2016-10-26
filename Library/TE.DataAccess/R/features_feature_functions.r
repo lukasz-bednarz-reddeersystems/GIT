@@ -55,6 +55,7 @@ eps_rev <-  function(compute_object){
 trade_accumulator <-  function(compute_object,dir_in,acc_fn,column,na.rm=TRUE){
   #Accumlator function to compute short term accumulations around a trade
   #the callback acc_fn actually computes the value in each case.
+
   if(length(compute_object@window)==0)stop("Attempt to accumulate feature with no window property.")
   input <- compute_object@input
   if(dir_in==TRUE){

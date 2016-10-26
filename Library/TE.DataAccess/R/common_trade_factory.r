@@ -443,6 +443,15 @@ setMethod("getPriceData","TradeWarehouse",
               dataset <- new("TradePriceDataSet")
 
               if (!is.na(prc_data) && nrow(prc_data) > 0){
+                prc_data <- tryCatch({
+                  aggregate(. ~ DateTime, data = prc_data, function(x){x[1]}, na.action = NULL)
+                }, error = function(cond){
+                  browser()
+
+                  stop(sprintf("Error when aggregating data in getPriceData() for instrument %s",
+                               instrument))
+                })
+
                 dataset <- setData(dataset,
                                    cbind(prc_data, TodayPL=NA,StopLoss=NA,ProfitTarget=NA))
               }
@@ -707,7 +716,10 @@ setMethod("resetTradeFeatures","TradeWarehouse",
 setGeneric("buildFeatureList",function(object){standardGeneric("buildFeatureList")})
 setMethod("buildFeatureList","TradeWarehouse",
           function(object){
-            trades <- listTrades(object)
+
+            message(sprintf("buildFeatureList() started %s",
+                     now()))
+
 
             f <- object@features
 
@@ -715,18 +727,24 @@ setMethod("buildFeatureList","TradeWarehouse",
               f <- f[!is.na(f)]
             }
 
-            for(trade in trades){
-              trd <- getTrade(object,trade)
-              tf <- getTradeFeaturesList(trd)
-              f <- unique(c(f,tf))
+            instruments <- listInstruments(object)
+            for (instrument in listInstruments(object)){
+              for(trd in object@trades[[as.character(instrument)]]){
+
+                tf <- ls(trd@features)
+                f <- unique(c(f,tf))
+              }
             }
 
             fc <- f
-            for(trade in trades){
-              trd <- getTrade(object,trade)
-              tf <- getTradeFeaturesList(trd)
-              fc <- intersect(fc,tf)
+            for (instrument in listInstruments(object)){
+              for(trd in object@trades[[as.character(instrument)]]){
+
+                tf <- ls(trd@features)
+                fc <- intersect(fc,tf)
+              }
             }
+
 
             if(!is.null(f) && is(f, "character")) {
 
@@ -751,6 +769,9 @@ setMethod("buildFeatureList","TradeWarehouse",
                 names(object@complete_features) <- fc
               }
             }
+
+            message(sprintf("buildFeatureList() finished %s",
+                     now()))
            return(object)
           }
 )
