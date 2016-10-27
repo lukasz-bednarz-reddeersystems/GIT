@@ -522,8 +522,11 @@ trade_history <- function(ppmodel_computation_object){
   output <- output[setdiff(colnames(output),c('ClosePrice','MarketValue'))]
   trades <- unique(output$TradeID)
   raw_psn_data <- getRawPositionData(ppmodel_computation_object@wh)
-  raw_psn_data <- raw_psn_data@data[c('Date','InstrumentID','Strategy','MarketValue','TodayPL')]
+  raw_psn_data <- unique(raw_psn_data@data[c('Date','InstrumentID','Strategy','MarketValue','TodayPL')])
   colnames(raw_psn_data) <- c('TradeDate','Instrument','Strategy','MarketValue','TodayPL')
+
+  raw_psn_data <-aggretate(cbind(MarketValue, TodayPL) ~ ., data = raw_psn_data, function(x){sum(unique(x))})
+  
   first_trade <- TRUE
   for(trade in trades){
     trd <- getTrade(ppmodel_computation_object@wh,trade)
