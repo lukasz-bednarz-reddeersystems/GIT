@@ -314,6 +314,8 @@ setMethod("prepareSQLQuery",
           function(object, key_values){
 
             object <- .setSQLQueryKeyValues(object, key_values)
+            key_values <- getSQLQueryKeyValues(object)
+
             parser <- .getSQLQueryKeyValuesParser(object)
 
             sql_strings <- parser(key_values)
