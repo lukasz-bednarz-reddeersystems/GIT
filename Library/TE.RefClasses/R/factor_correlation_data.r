@@ -27,7 +27,7 @@ setClass(
 #' Implements storage for Factor Correlation and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -39,6 +39,6 @@ setClass(
     values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c( "VirtualFactorCorrelationData", "VirtualRiskModelClientPicker")
+  contains = c( "VirtualFactorCorrelationData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

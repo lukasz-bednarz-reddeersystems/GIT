@@ -140,7 +140,8 @@ setClass(
                            "dtDate"        = "Date",
                            "lInstrumentID" = "InstrumentID",
                            "sFactorName"   = "FactorName",
-                           "Instrument"    = "InstrumentID")
+                           "Instrument"    = "InstrumentID",
+                           "dblLogReturn"  = "Return")
   ),
   contains = c("VirtualRiskModelDataSourceClient","VirtualRODBCClient", "VIRTUAL")
 )
@@ -253,11 +254,11 @@ setMethod("dataRequest",
 
 
 
-#########################################
+#####################################################
 #
-# VirtualRiskModelClientPicker Class
+# VirtualRiskModelFactorDependentClientSelector Class
 #
-#########################################
+#####################################################
 
 
 #' Virtual S4 class for access to Risk Model Objectstore.
@@ -265,10 +266,40 @@ setMethod("dataRequest",
 #' This is a class serving as a switcher between RODBC and Objectstore
 #' Source of data for risk model
 #'
-#' Inherits from "VirtualDataSourceClient" and "VirtualRiskModelHandler"
+#' Inherits from "VirtualRiskModelRODBCClient"
 #'
 #' @slot component    "character", name of the component of risk model
 setClass(
-  Class                = "VirtualRiskModelClientPicker",
+  Class                = "VirtualRiskModelFactorDependentClientSelector",
   contains = c("VirtualRiskModelRODBCClient", "VIRTUAL")
+)
+
+
+########################################################
+#
+# VirtualRiskModelNonFactorDependentClientSelector Class
+#
+########################################################
+
+
+#' Virtual S4 class for access to Risk Model Objectstore.
+#'
+#' This is a class serving as a switcher between RODBC and Objectstore
+#' Source of data for risk model
+#'
+#' Inherits from "VirtualRiskModelRODBCClient"
+#'
+#' @slot component    "character", name of the component of risk model
+setClass(
+  Class                = "VirtualRiskModelNonFactorDependentClientSelector",
+  contains = c("VirtualRiskModelRODBCClient", "VIRTUAL")
+)
+
+
+
+setMethod(".initializeRiskModelDependentValues",
+          "VirtualRiskModelNonFactorDependentClientSelector",
+          function(object){
+             return(object)
+          }
 )

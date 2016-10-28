@@ -9,6 +9,6 @@ Implements storage for Implied Factor Returns and access
 to Implied Factor Returns data via Risk Model Objectstore
 }
 \details{
-Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelClientPicker"
+Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelFactorDependentClientSelector"
 }
 

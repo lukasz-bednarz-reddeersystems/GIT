@@ -76,7 +76,8 @@ setGeneric("setInstrumentResidualReturnsDataObject", function(object,instrument_
 setGeneric(".setInstrumentResidualReturnsDataObject", function(object,instrument_residual_returns){standardGeneric(".setInstrumentResidualReturnsDataObject")})
 
 setMethod(".setInstrumentResidualReturnsDataObject",
-          signature(object = "VirtualInstrumentResidualReturnsDataHandler", instrument_residual_returns = "VirtualInstrumentResidualReturnsData"),
+          signature(object = "VirtualInstrumentResidualReturnsDataHandler",
+                    instrument_residual_returns = "VirtualInstrumentResidualReturnsData"),
           function(object, instrument_residual_returns){
               object@instrument_residual_returns <- instrument_residual_returns
             return(object)

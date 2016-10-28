@@ -55,7 +55,7 @@ setMethod("dataRequest",
           signature(object = "VirtualRODBCClient", key_values = "data.frame"),
           function(object, key_values){
 
-            browser()
+
             object <- .setDataSourceQueryKeyValues(object,key_values)
             values <- getDataSourceReturnColumnNames(object)
             sql_query <- getSQLQueryObject(object)

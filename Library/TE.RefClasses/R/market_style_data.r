@@ -28,7 +28,7 @@ setClass(
 #' Implements storage for Market Style and access
 #' to Market Style data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -40,6 +40,6 @@ setClass(
     values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualMarketStyleData", "VirtualRiskModelClientPicker")
+  contains = c("VirtualMarketStyleData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

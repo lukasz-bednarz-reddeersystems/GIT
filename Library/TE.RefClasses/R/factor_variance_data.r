@@ -27,7 +27,7 @@ setClass(
 #' Implements storage for Factor Variance and access
 #' to Factor Variance data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -39,6 +39,6 @@ setClass(
     values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualFactorVarianceData", "VirtualRiskModelClientPicker")
+  contains = c("VirtualFactorVarianceData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

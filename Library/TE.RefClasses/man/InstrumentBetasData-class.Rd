@@ -9,6 +9,6 @@ Implements storage for Instrument Betas and access
 to Factor Correlation data via Risk Model Objectstore
 }
 \details{
-Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelClientPicker"
+Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelFactorDependentClientSelector"
 }
 

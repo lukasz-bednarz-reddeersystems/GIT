@@ -9,6 +9,6 @@ Implements storage for Market Style and access
 to Market Style data via Risk Model Objectstore
 }
 \details{
-Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelClientPicker"
+Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelFactorDependentClientSelector"
 }
 

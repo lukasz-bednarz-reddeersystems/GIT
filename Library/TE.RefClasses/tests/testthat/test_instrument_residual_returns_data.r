@@ -429,7 +429,7 @@ test_that("Can dataRequest() with valid key_values", {
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
 
-  valid.ret_data <- arrange(valid.ret_data, InstrumentID, Date)
+  valid.ret_data <- arrange(valid.ret_data, Date, InstrumentID)
 
   object <- dataRequest(object, valid.key_vals)
 

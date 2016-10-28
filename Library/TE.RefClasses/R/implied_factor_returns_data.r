@@ -28,7 +28,7 @@ setClass(
 #' Implements storage for Implied Factor Returns and access
 #' to Implied Factor Returns data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -40,6 +40,6 @@ setClass(
     values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualImpliedFactorReturnsData", "VirtualRiskModelClientPicker")
+  contains = c("VirtualImpliedFactorReturnsData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

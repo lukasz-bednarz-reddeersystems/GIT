@@ -17,7 +17,7 @@ NULL
 setClass(
   Class                = "VirtualInstrumentResidualReturnsData",
   prototype = list(
-    required_colnms = c('Date','InstrumentID')
+    required_colnms = c('Date','InstrumentID', 'Return')
   ),
   contains = c("VirtualReferenceData", "VIRTUAL")
 )
@@ -28,19 +28,21 @@ setClass(
 #' Implements storage for Instrument Betas and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualInstrumentResidualReturnsData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualInstrumentResidualReturnsData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
   Class             = "InstrumentResidualReturnsData",
   prototype      = list(
     component          = "ResidualReturns", # name of component
+    required_colnms = c('Date','InstrumentID', 'Return'),
     key_cols        = c(risk_model_objectstore_keys, "InstrumentID"),
     key_values      = data.frame(Date = as.Date(character()),
                                  InstrumentID = integer()),
-    values             = c("Date", "InstrumentID") # columns that neeed to be returned from datastore
+    values             = c("Date", "InstrumentID", "Return") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualInstrumentResidualReturnsData", "VirtualRiskModelClientPicker")
+  contains = c("VirtualInstrumentResidualReturnsData",
+               "VirtualRiskModelNonFactorDependentClientSelector")
 )
 

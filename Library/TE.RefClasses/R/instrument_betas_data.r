@@ -28,7 +28,7 @@ setClass(
 #' Implements storage for Instrument Betas and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelClientPicker"
+#' Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -41,6 +41,7 @@ setClass(
     values             = c("Date", "InstrumentID") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualInstrumentBetasData", "VirtualRiskModelClientPicker")
+  contains = c("VirtualInstrumentBetasData",
+               "VirtualRiskModelFactorDependentClientSelector")
 )
 
