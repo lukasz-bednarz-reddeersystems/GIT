@@ -304,7 +304,7 @@ setMethod("queryPreProcessorModel","PPModel",
 		  					now()))
 
 			object@post_comp <- tryCatch({
-		  								setModelComputationData(object@post_comp,object@ppdata,object@warehouse)
+			                setModelComputationData(object@post_comp,object@ppdata,object@warehouse)
 		  							},error=function(cond){
 		  								stop(paste("Error setting model post computation data in",class(object)[[1]],":",cond))
 		  							})
@@ -395,9 +395,9 @@ setMethod("runPreProcessorModel","PPModel",
 		      while(!hasBatchRun(object@queries)){
 		  			key <- getCurrentKey(object@queries)
 
-					message(sprintf("queryPreProcessorModel() started %s in runPreProcessorModel() PPModel method.", now()))
+					  message(sprintf("queryPreProcessorModel() started %s in runPreProcessorModel() PPModel method.", now()))
 		  			object <- queryPreProcessorModel(object,key)
-					message(sprintf("queryPreProcessorModel() finished %s in runPreProcessorModel() PPModel method.", now()))
+					  message(sprintf("queryPreProcessorModel() finished %s in runPreProcessorModel() PPModel method.", now()))
 
 		  			object@queries <- advanceBatchKey(object@queries)
 		  		}

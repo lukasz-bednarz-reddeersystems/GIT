@@ -726,6 +726,7 @@ setMethod("updateMidOnEntry","MidOnEntry",
                 colnames(data) <- c("Date","MidOnEntry")
 
                 if (!is.null(data) && is(data , "data.frame") && nrow(data) > 1){
+
                   data <- aggregate(MidOnEntry ~ Date,
                                     data = data,
                                     function(x){mean(x, na.rm = TRUE)},

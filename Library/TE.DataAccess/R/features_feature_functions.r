@@ -393,9 +393,11 @@ trade_comparison <- function(compute_object,column,fn,prev_trade=TRUE){
 
   rval <- NULL
 
+  dates <- unique(compute_object@dates)
+
   if(nrow(compute_object@input)>1){
-    for(d in 1:length(compute_object@dates)){
-      dex <- which(compute_object@input$DateTime==compute_object@dates[d],TRUE)
+    for(d in 1:length(dates)){
+      dex <- which(compute_object@input$DateTime == dates[d],TRUE)
 
       rw <- data.frame(DateTime=compute_object@dates[d],Comparison = NA)
       if (length(dex > 0)){

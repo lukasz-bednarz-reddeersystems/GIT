@@ -33,6 +33,11 @@ setMethod(".setFeatureComputationInput",
           signature(object  = "FeatureComputation",
                     data    = "FeatureInput"),
           function(object,data){
+
+            if (class(data, "data.frame") && length(data) > 1 && nrow(data) > 1) {
+              data <- aggregate( . ~ DateTime, data = data, function(x){unique(x)[1]}, na.action = NULL)
+            }
+
             object@input <- data
             return(object)
           }
@@ -53,6 +58,10 @@ setMethod(".setFeatureComputationOutput",
                     data    = "FeatureOutput"),
           function(object,data){
             object@output <- unique(data)
+
+            if (class(data, "data.frame") && length(data) > 1 && nrow(data) > 1) {
+              data <- aggregate( . ~ DateTime, data = data, function(x){unique(x)[1]}, na.action = NULL)
+            }
             return(object)
           }
 )
@@ -64,12 +73,10 @@ setMethod("setComputationData",
                     data    = "data.frame"),
           function(object,data){
             object@output_colnms <- c('DateTime',class(object)[[1]])
-            object@input <- data
+            objec <- .setFeatureComputationInput(object, data)
             return(object)
           }
 )
-
-
 
 
 
