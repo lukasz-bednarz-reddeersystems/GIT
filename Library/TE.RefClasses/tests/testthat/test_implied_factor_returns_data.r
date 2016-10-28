@@ -8,7 +8,7 @@ context("Testing ImpliedFactorReturnsData")
 
 tested.class          <-  "ImpliedFactorReturnsData"
 valid.component       <- "ImpliedFactorReturns"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
@@ -20,7 +20,11 @@ valid.values          <- c("Date",
                            valid.model_factors)
 valid.required_colnms <- c('Date',
                            valid.model_factors)
-valid.column_name_map <- hash()
+valid.column_name_map <- hash("dtDateTime"    = "Date",
+                              "dtDate"        = "Date",
+                              "lInstrumentID" = "InstrumentID",
+                              "sFactorName"   = "FactorName",
+                              "Instrument"    = "InstrumentID")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 
@@ -159,8 +163,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-20'),
-                                               to = as.Date('2016-06-23'),
+  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-01'),
+                                               to = as.Date('2016-06-30'),
                                                by = "1 day"))
 
   values <- getDataSourceReturnColumnNames(object)

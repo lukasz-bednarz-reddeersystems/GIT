@@ -8,8 +8,8 @@ Description: Package is implementing Analysis and Report Classes for creating
     reports with data and graphs for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RefClasses (>= 0.1.1),
-    TE.RiskModel (>= 0.1.1),
+    TE.RefClasses (>= 0.1.3),
+    TE.RiskModel (>= 0.1.3),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -51,6 +51,7 @@ Collate:
     'portfolio_factor_exposures.r'
     'portfolio_variance_decomposition_functions.r'
     'portfolio_factor_returns.r'
+    'portfolio_instrument_marginal_contribution_to_risk.r'
     'position_revisits.r'
     'position_revisits_delta_prev_quarter.r'
     'positions_holding_capital_distribution.r'

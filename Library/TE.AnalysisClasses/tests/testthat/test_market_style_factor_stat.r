@@ -28,7 +28,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getMarketStyleDataObject(object), "MarketStyleData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
   expect_equal(getDataSourceClientColumnNameMap(object), valid.column_name_map)
 
 })
@@ -145,7 +146,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getMarketStyleDataObject(object), "MarketStyleData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
   expect_equal(getDataSourceClientColumnNameMap(object), valid.column_name_map)
 
 })

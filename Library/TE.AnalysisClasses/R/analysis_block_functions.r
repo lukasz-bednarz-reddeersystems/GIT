@@ -853,6 +853,28 @@ market_day_age <- function(data){
   return(out_data[setdiff(colnames(out_data),'Nmd')])
 }
 
+portfolio_instrument_mctv <- function(weight,betas,factor_covariance,columns=NULL){
+
+  wtbt <- merge(betas,weight,by='InstrumentID')
+  weight_matrix <- as.matrix(wtbt['Weight'])
+  beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
+  fct <- factor_covariance
+
+  fct_columns <- colnames(fct)
+  beta_matrix <- beta_matrix[,fct_columns]
+
+  if(length(columns)>0){
+    beta_matrix.l <- beta_matrix
+    beta_matrix.l[,setdiff(colnames(beta_matrix.l), columns)] <- 0
+    instr_risk <- weight_matrix*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
+  }
+  else{
+    instr_risk <- 2*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
+  }
+
+  return(instr_risk)
+}
+
 portfolio_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
 
   wtbt <- merge(betas,weight,by='InstrumentID')
@@ -875,6 +897,7 @@ portfolio_variance_decomposition <- function(weight,betas,factor_covariance,colu
   return(market_risk)
 }
 
+
 portfolio_returns_decomposition <- function(weight,betas,factor_returns){
 
   wtbt <- merge(betas,weight,by='InstrumentID')
@@ -888,6 +911,19 @@ portfolio_returns_decomposition <- function(weight,betas,factor_returns){
 
   return(market_ret)
 }
+
+
+portfolio_factor_exposure <- function(weight,betas){
+
+  wtbt <- merge(betas,weight,by='InstrumentID')
+  weight_matrix <- as.matrix(wtbt['Weight'])
+  beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
+
+  market_ret <- t(beta_matrix)%*%weight_matrix
+
+  return(market_ret)
+}
+
 
 
 portfolio_factor_exposure <- function(weight,betas){

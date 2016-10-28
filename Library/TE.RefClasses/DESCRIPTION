@@ -64,6 +64,8 @@ Collate:
     'index_portfolio.r'
     'instrument_betas_data.r'
     'instrument_betas_data_handler.r'
+    'instrument_residual_returns_data.r'
+    'instrument_residual_returns_data_handler.r'
     'key_expander.r'
     'market_data.r'
     'market_data_handler.r'

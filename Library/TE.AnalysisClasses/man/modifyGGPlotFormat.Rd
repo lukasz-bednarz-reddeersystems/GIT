@@ -4,12 +4,10 @@
 \alias{modifyGGPlotFormat}
 \title{Modify the plot format: i.e. add gg functions the plot stream}
 \usage{
-modifyGGPlotFormat(object, ggplot)
+modifyGGPlotFormat(object)
 }
 \arguments{
 \item{object}{object of class "VirtualAggregateAnalysisBlock"}
-
-\item{object}{ggplot of class "gg"}
 }
 \value{
 \code{object} object of class "VirtualAggregateAnalysisBlock"

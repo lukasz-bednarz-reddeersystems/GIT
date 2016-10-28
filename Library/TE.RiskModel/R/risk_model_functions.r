@@ -399,6 +399,7 @@ factor_covariance <- function(correlation,factor_stdev){
   return(vrnce*as.matrix(correlation))
 }
 
+
 #' Compute portfolio variance decomposition
 #'
 #' This computes the variance of the log returns. This is not identical to the variance of the
