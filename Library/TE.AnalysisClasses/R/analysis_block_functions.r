@@ -853,7 +853,28 @@ market_day_age <- function(data){
   return(out_data[setdiff(colnames(out_data),'Nmd')])
 }
 
-portfolio_instrument_mctv <- function(weight,betas,factor_covariance,columns=NULL){
+portfolio_instrument_mctv <- function(weight,
+                                      betas,
+                                      factor_covariance,
+                                      res_ret,
+                                      corr_residuals = FALSE){
+
+
+  if (!corr_residuals){
+    ins_var <- res_ret[res_ret$Date > (rm_date - lookback) & res_ret$Date <= rm_date, ]
+    ins_var <- aggregate(Return ~ InstrumentID, data = ins_var, function(x){sd(x, na.rm = TRUE)})
+    ins_var <- merge(weight["InstrumentID"], ins_var)
+
+    ins_sp_cov <- matrix(0, nrow = lenght(ins_var), ncol = lenght(ins_var))
+    diag(ins_sp_cov) <- ins_var
+
+  } else {
+
+    res_ret.u <- cbind(res_ret["Date"], unstack(res_ret, Return ~ InstrumentId))
+
+    ins_sp_cov <- cov(as.matrix(as.numeric(res_ret.u)))
+
+  }
 
   wtbt <- merge(betas,weight,by='InstrumentID')
   weight_matrix <- as.matrix(wtbt['Weight'])
@@ -863,17 +884,27 @@ portfolio_instrument_mctv <- function(weight,betas,factor_covariance,columns=NUL
   fct_columns <- colnames(fct)
   beta_matrix <- beta_matrix[,fct_columns]
 
-  if(length(columns)>0){
-    beta_matrix.l <- beta_matrix
-    beta_matrix.l[,setdiff(colnames(beta_matrix.l), columns)] <- 0
-    instr_risk <- weight_matrix*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
-  }
-  else{
-    instr_risk <- 2*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
-  }
+  # Sigma_hat = B' Omega_hat B + Phi_hat
 
-  return(instr_risk)
+  ins_sys_cov <- beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)
+
+  ins_tot_cov <- ins_sys_cov + ins_sp_cov
+
+  # instr_risk <- 2*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
+
+  instr_risk <- 2*(ins_tot_cov%*%weight_matrix)
+
+  total_variance <- t(weight_matrix)%*%ins_tot_cov%*%weight_matrix
+
+  ret <- list(instr_risk = instr_risk,
+              total_variance = total_variance)
+
+  return(ret)
 }
+
+
+
+
 
 portfolio_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
 

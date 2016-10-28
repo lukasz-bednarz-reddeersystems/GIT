@@ -49,6 +49,7 @@ setClass(
     instrument_betas   = "InstrumentBetasData",
     factor_correlation = "FactorCorrelationData",
     factor_variance    = "FactorVarianceData",
+    instrument_residual_returns = "InstrumentResidualReturnsData",
     output             = "PortfolioInstrumentMCTRData"
   ),
   prototype         = list(
@@ -63,6 +64,7 @@ setClass(
     instrument_betas = new("InstrumentBetasData"),
     factor_correlation = new("FactorCorrelationData"),
     factor_variance = new("FactorVarianceData"),
+    instrument_residual_returns = new("InstrumentResidualReturnsData"),
     output          = new("PortfolioInstrumentMCTRData")
   ),
   contains          = c("VirtualAnalysisBlock",
@@ -70,10 +72,10 @@ setClass(
                         "VirtualRiskModelHandler",
                         "VirtualInstrumentBetasDataHandler",
                         "VirtualFactorCorrelationDataHandler",
-                        "VirtualFactorVarianceDataHandler"
+                        "VirtualFactorVarianceDataHandler",
+                        "VirtualInstrumentResidualReturnsDataHandler"
   )
 )
-
 
 
 #' Set risk_model object in object slot
@@ -91,15 +93,7 @@ setMethod("setRiskModelObject",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
-            req_factors <- getRiskModelFactorNames(risk_model)
-            output_obj <- getOutputObject(object)
 
-            output_obj <- TE.RefClasses:::.setRequiredVariablesNames(output_obj,
-                                                                     c("Date",
-                                                                       req_factors))
-            object <- .setOutputObject(object, output_obj)
-#
-#
 #             object <- .copyRiskModelToChildren(object)
 
             return(object)
@@ -119,7 +113,10 @@ setMethod("dataRequest",
           function(object, key_values){
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
+            risk_model <- getRiskModelObject(object)
+            lookback <- getRiskModelLookback(object)
 
+            start <- max(key_values$start)
             end <- max(key_values$end)
 
             portf_data <- getPortfolioDataObject(object)
@@ -140,13 +137,35 @@ setMethod("dataRequest",
             # retrieve risk model instrument betas
             query_keys <- getReferenceData(portf_data)[c( "InstrumentID","Date")]
 
+
+            # getting instrument residual returns
+            res_returns <- getInstrumentResidualReturnsDataObject(object)
+            # important step to copy risk_model info
+            res_returns <- setRiskModelObject(res_returns, risk_model)
+
+            res_returns <- tryCatch({
+              dataRequest(res_returns, expand.grid(InstrumentID = unique(query_keys$InstrumentID),
+                                                   Date = c(as.Date(min(query_keys$Date)) - lookback,
+                                                            as.Date(max(query_keys$Date))
+                                                            )
+                                                   )
+                          )
+
+            },error = function(cond){
+              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(res_returns)))
+              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(res_returns), cond))
+            })
+
+            object <- TE.RefClasses:::.setInstrumentResidualReturnsDataObject(object, res_returns)
+
+
+
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
             # important step to copy risk_model info
-            risk_model <- getRiskModelObject(object)
             betas_data <- setRiskModelObject(betas_data, risk_model)
 
-            browser()
             betas_data <- tryCatch({
               dataRequest(betas_data, query_keys)
 
@@ -208,16 +227,9 @@ setMethod("Process",
           function(object){
 
             # risk model
-            risk_model <- getRiskModelObject(object)
+            lookback <- getRiskModelLookback(object)
 
             # Lists for factor names
-            market_factors    <- getRiskModelMarketFactorNames(risk_model)
-            currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
-            commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
-            sector_factors    <- getRiskModelSectorFactorNames(risk_model)
-
-            # List of all portfolio decomposition factor groups
-            factor_groups <- get_portfolio_decomposition_factor_groups(risk_model)
 
             # retrieve data
             portf_data <- getPortfolioDataObject(object)
@@ -231,6 +243,11 @@ setMethod("Process",
 
             factor_var <- getFactorVarianceDataObject(object)
             all_fct_sd <- getReferenceData(factor_var)
+
+            res_ret_data <- getInstrumentResidualReturnsDataObject(object)
+            res_ret <- getReferenceData(res_ret_data)
+            res_ret <- merge(res_ret, expand.grid(Date = unique(res_ret$Date), InstrumentID = unique(res_ret$InstrumentID)), all.y = TRUE)
+            res_ret[is.na(res_ret)] <- 0
 
             # compute output
 
@@ -247,6 +264,7 @@ setMethod("Process",
                 colnames(wt) <- c('InstrumentID','Weight')
                 fct_cor <- all_fct_cor[all_fct_cor$Date==rm_date,setdiff(colnames(all_fct_cor),'Date')]
                 fct_sd  <- all_fct_sd[all_fct_sd$Date==rm_date,setdiff(colnames(all_fct_cor),'Date')]
+
                 if(nrow(fct_cor)>0 && nrow(fct_sd)>0){
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
@@ -259,10 +277,21 @@ setMethod("Process",
                   })
                   if (is.null(fct_cov)) next()
                   #fct_cov <- 365*3/5*factor_covariance(fct_cor, sqrt(fct_sd))/150
-                  market_risk <- portfolio_variance_decomposition(wt,bt,fct_cov)
-                  total_sys_var <- sum(market_risk)
-                  instr_mctv <- portfolio_instrument_mctv(wt,bt,fct_cov)
-                  instr_mctr <- instr_mctv/2/sqrt(total_sys_var)
+
+                  mctr_info <- portfolio_instrument_mctv(wt,bt,fct_cov, ins_var, corr_residuals = FALSE)
+
+                  instr_mctv <- mctr_info$instr_risk
+                  instr_mctr <- instr_mctv/2/sqrt(mctr_info$total_variance)
+
+                  total_sys_var <- mctr_info$total_variance
+
+                  mctr_info <- portfolio_instrument_mctv(wt,bt,fct_cov, ins_var, corr_residuals = TRUE)
+
+                  instr_mctv_c <- mctr_info$instr_risk
+                  instr_mctr_c <- instr_mctv/2/sqrt(mctr_info$total_variance)
+
+                  total_sys_var_c <- portfolio_total_variance(wt,bt,fct_cov, ins_var, corr_residuals = TRUE )
+
 
 
                   vd.tot <- data.frame(Date=rm_date,TotalSystematicVar=total_sys_var[1])

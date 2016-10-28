@@ -29,6 +29,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getInstrumentBetasDataObject(object), "InstrumentBetasData")
   expect_is(getFactorCorrelationDataObject(object), "FactorCorrelationData")
   expect_is(getFactorVarianceDataObject(object), "FactorVarianceData")
+  expect_is(getInstrumentResidualReturnsDataObject(object), "InstrumentResidualReturnsData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
   expect_is(getOutputFrontendData(object), "list")
@@ -98,6 +99,11 @@ test_that("Can dataRequest() with valid key_values", {
   expect_is(fct_var_data, "FactorVarianceData")
   expect_gt(getStoredNRows(fct_var_data), 0)
 
+  # residual returns data verification
+  res_ret_data <- getInstrumentResidualReturnsDataObject(object)
+  expect_is(res_ret_data, "InstrumentResidualReturnsData")
+  expect_gt(getStoredNRows(res_ret_data), 0)
+
 
 })
 
@@ -136,6 +142,11 @@ test_that(paste("Can Process() on", tested.class), {
   fct_var_data <- getFactorVarianceDataObject(object)
   expect_is(fct_var_data, "FactorVarianceData")
   expect_gt(getStoredNRows(fct_var_data), 0)
+
+  # residual returns data verification
+  res_ret_data <- getInstrumentResidualReturnsDataObject(object)
+  expect_is(res_ret_data, "InstrumentResidualReturnsData")
+  expect_gt(getStoredNRows(res_ret_data), 0)
 
 
   object <- Process(object)
