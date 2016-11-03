@@ -589,7 +589,7 @@ bulk_load_implied_factor_returns <- function(returns, rm_type){
     }
 
     index_key_names <- c("lModelTypeID", "dtDate", "lFactorID" )
-    bulk_load_data(table_name, data, data.frame(dtDate = as_date(date)), index_key_names )
+    bulk_load_data(table_name, data, data.frame(lModelTypeID = rm_type, dtDate = as_date(date)), index_key_names )
   }
 }
 

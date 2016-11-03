@@ -87,7 +87,17 @@ update_risk_model_on_date <- function(risk_model,date, force = FALSE, copy_histo
 }
 
 
-update_risk_model_db <- function(risk_model, rmstr, date_start, date_end, force_new_model_id  = TRUE) {
+update_risk_model_db <- function(risk_model,
+                                 rmstr,
+                                 date_start,
+                                 date_end,
+                                 force_new_model_id  = TRUE,
+                                 components = c('Betas',
+                                                'ImpliedFactorReturns',
+                                                'FactorVariance',
+                                                'FactorCorrelation',
+                                                'MarketStyle',
+                                                'ResidualReturns')) {
 
   model_prefix <- getRiskModelPrefix(risk_model)
   lookback <- getRiskModelLookback(risk_model)
@@ -97,35 +107,45 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end, force_
 
   store_name <- getID(rmstr)
 
-  # betas <- getData(queryDailyRiskModelObjectStore(rmstr,getID(rmstr), lookback,'Betas'))
-  # betas <- betas[betas$Date >= date_start & betas$Date <= date_end,]
-  # tryCatch({
-  #   bulk_load_factor_betas(betas, rm_type)
-  # }, error = function(cond){
-  #   browser()
-  #   message(sprintf("errror in call to bulk_load_factor_betas()"))
-  #   stop(cond)
-  # })
+  if ("Betas" %in% components){
+    betas <- getData(queryDailyRiskModelObjectStore(rmstr,getID(rmstr), lookback,'Betas'))
+    betas <- betas[betas$Date >= date_start & betas$Date <= date_end,]
+    tryCatch({
+      bulk_load_factor_betas(betas, rm_type)
+    }, error = function(cond){
+      browser()
+      message(sprintf("errror in call to bulk_load_factor_betas()"))
+      stop(cond)
+    })
+  }
 
 
-  returns <- getData(queryDailyRiskModelObjectStore(rmstr,getID(rmstr), lookback,'ImpliedFactorReturns'))
-  returns <- returns[returns$Date >= date_start - lookback & returns$Date <= date_end,]
+  if ("ImpliedFactorReturns" %in% components){
+    returns <- getData(queryDailyRiskModelObjectStore(rmstr,getID(rmstr), lookback,'ImpliedFactorReturns'))
+    returns <- returns[returns$Date >= date_start - lookback & returns$Date <= date_end,]
 
-  tryCatch({
-    bulk_load_implied_factor_returns(returns, rm_type)
-  }, error = function(cond){
-    browser()
-    message(sprintf("errror in call to bulk_load_implied_factor_returns()"))
-    stop(cond)
-  })
+    tryCatch({
+      bulk_load_implied_factor_returns(returns, rm_type)
+    }, error = function(cond){
+      browser()
+      message(sprintf("errror in call to bulk_load_implied_factor_returns()"))
+      stop(cond)
+    })
+
+  }
+
+  daily_comp <- c('FactorVariance',
+                  'FactorCorrelation',
+                  'MarketStyle',
+                  'ResidualReturns')
+
+  if (any(daily_comp %in% components)) {
+    # update daily computations
+    days <-  seq(from= date_start, to = date_end, by = '1 day')
+    days <- days[wday(days)!=7&wday(days)!=1]
 
 
-  # update daily computations
-  days <-  seq(from= date_start, to = date_end, by = '1 day')
-  days <- days[wday(days)!=7&wday(days)!=1]
-
-
-  for (day in days) {
+    for (day in days) {
 
     day <- as_date(day)
 
@@ -141,47 +161,59 @@ update_risk_model_db <- function(risk_model, rmstr, date_start, date_end, force_
       }
     }
 
-    data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorVariance', day, lookback)
+    if ("FactorVariance" %in% components){
 
-    if (nrow(data) > 0) {
-      bulk_load_factor_variances(data[1,], model_id)
+      data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorVariance', day, lookback)
+
+      if (nrow(data) > 0) {
+        bulk_load_factor_variances(data[1,], model_id)
+      }
     }
 
-    data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorCorrelation', day, lookback)
-    data <- data[data$Date == day, ]
+    if ("FactorCorrelation" %in% components){
+      data <- getRiskModelComponentOnDate(rmstr,store_name, 'FactorCorrelation', day, lookback)
+      data <- data[data$Date == day, ]
 
-    if (nrow(data) == (ncol(data)-1)) {
-      tryCatch({
-        bulk_load_factor_correlations(data, model_id)
-      }, error = function(cond){
-        browser()
-        message(sprintf("errror in call to bulk_load_factor_correlations()"))
-        stop(cond)
-      })
+      if (nrow(data) == (ncol(data)-1)) {
+        tryCatch({
+          bulk_load_factor_correlations(data, model_id)
+        }, error = function(cond){
+          browser()
+          message(sprintf("errror in call to bulk_load_factor_correlations()"))
+          stop(cond)
+        })
+      }
     }
 
-    data <- getRiskModelComponentOnDate(rmstr,store_name, 'MarketStyle', day, lookback)
 
-    if (nrow(data) > 0 ) {
-      tryCatch({
-        bulk_load_market_style(data[1,], model_id)
-      }, error = function(cond){
-        browser()
-        message(sprintf("errror in call to bulk_load_market_style()"))
-        stop(cond)
-      })
+    if ("MarketStyle" %in% components){
+      data <- getRiskModelComponentOnDate(rmstr,store_name, 'MarketStyle', day, lookback)
+
+      if (nrow(data) > 0 ) {
+        tryCatch({
+          bulk_load_market_style(data[1,], model_id)
+        }, error = function(cond){
+          browser()
+          message(sprintf("errror in call to bulk_load_market_style()"))
+          stop(cond)
+        })
+      }
     }
 
-    data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
-    if (nrow(data) > 0) {
-      tryCatch({
-        bulk_load_residual_returns(data, model_id)
-      }, error = function(cond){
-        browser()
-        message(sprintf("errror in call to bulk_load_residual_returns()"))
-        stop(cond)
-      })
+    if ("ResidualReturns" %in% components){
+      data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
+      if (nrow(data) > 0) {
+        tryCatch({
+          bulk_load_residual_returns(data, model_id)
+        }, error = function(cond){
+          browser()
+          message(sprintf("errror in call to bulk_load_residual_returns()"))
+          stop(cond)
+        })
+      }
+
     }
+  }
   }
 }
 
@@ -212,7 +244,13 @@ get_risk_model_store_names <- function(risk_model){
   return(wh_str.names)
 }
 
-push_risk_model_component_to_db <- function(risk_model){
+push_risk_model_component_to_db <- function(risk_model,
+                                            components = c('Betas',
+                                                           'ImpliedFactorReturns',
+                                                           'FactorVariance',
+                                                           'FactorCorrelation',
+                                                           'MarketStyle',
+                                                           'ResidualReturns')){
 
   risk_model_store_names <- get_risk_model_store_names(risk_model)
 
@@ -225,7 +263,7 @@ push_risk_model_component_to_db <- function(risk_model){
     date_start <- getEarliestRiskModelDate(rmstr, rm_name, lookback)
     date_end <- getMostRecentRiskModelDate(rmstr, rm_name, lookback)
 
-    update_risk_model_db(risk_model, rmstr, date_start, date_end , FALSE)
+    update_risk_model_db(risk_model, rmstr, date_start, date_end , FALSE, components)
   }
 
 
@@ -261,7 +299,6 @@ compute_risk_model_on_dates <- function(risk_model,
                                         date =  today() -1,
                                         force = TRUE) {
 
-  model_prefix <- getRiskModelPrefix(risk_model)
   lookback <- getRiskModelLookback(risk_model)
 
   rm_name       <- getID(rm_store)
