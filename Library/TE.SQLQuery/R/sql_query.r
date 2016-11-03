@@ -277,7 +277,11 @@ setMethod(".translateSQLQueryColumnNames",
               idx <- (colnames %in% names_to_translate)
 
               ret_colnames <- colnames
-              ret_colnames[idx] <- values(colnames_map[names_to_translate])[names_to_translate, drop = TRUE]
+              
+              if(length(names_to_translate) > 0) {
+                new_colnames <- values(colnames_map[names_to_translate])[names_to_translate, drop = TRUE]
+                ret_colnames[idx] <- new_colnames
+              }
 
             }
             else {
