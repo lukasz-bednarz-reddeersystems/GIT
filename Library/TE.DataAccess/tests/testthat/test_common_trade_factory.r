@@ -8,7 +8,8 @@ context("Test Trade Warehouse")
 ##############################################################################################
 tested.class <- "TradeWarehouse"
 valid.trader <- 11L
-valid.start <- as.Date("2014-11-30")
+#valid.start <- as.Date("2014-11-30")
+valid.start <- today() - 7
 valid.end   <- today()
 
 
