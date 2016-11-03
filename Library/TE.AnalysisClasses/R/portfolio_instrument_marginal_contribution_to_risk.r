@@ -143,13 +143,14 @@ setMethod("dataRequest",
             # important step to copy risk_model info
             res_returns <- setRiskModelObject(res_returns, risk_model)
 
-            res_returns <- tryCatch({
-              dataRequest(res_returns, expand.grid(InstrumentID = unique(query_keys$InstrumentID),
-                                                   Date = c(as.Date(min(query_keys$Date)) - lookback,
-                                                            as.Date(max(query_keys$Date))
-                                                            )
+            ins_query_keys <- expand.grid(InstrumentID = unique(query_keys$InstrumentID),
+                                          Date = c(as.Date(min(query_keys$Date)) - lookback,
+                                                   as.Date(max(query_keys$Date))
                                                    )
-                          )
+                                          )
+
+            res_returns <- tryCatch({
+              dataRequest(res_returns,ins_query_keys)
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(res_returns)))
@@ -167,7 +168,7 @@ setMethod("dataRequest",
             betas_data <- setRiskModelObject(betas_data, risk_model)
 
             betas_data <- tryCatch({
-              dataRequest(betas_data, query_keys)
+              dataRequest(betas_data, ins_query_keys)
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
@@ -228,6 +229,12 @@ setMethod("Process",
 
             # risk model
             lookback <- getRiskModelLookback(object)
+            risk_model <- getRiskModelObject(object)
+
+            factor_groups <- list(Currency = getRiskModelCurrencyFactorNames(risk_model),
+                                  Commodity = getRiskModelCommodityFactorNames(risk_model),
+                                  Sector    = getRiskModelSectorFactorNames(risk_model),
+                                  Market    = getRiskModelMarketFactorNames(risk_model))
 
             # Lists for factor names
 
@@ -238,6 +245,8 @@ setMethod("Process",
             betas_data <- getInstrumentBetasDataObject(object)
             betas <- getReferenceData(betas_data)
 
+            betas <- adjust_ipo_betas(betas)
+
             factor_corr <- getFactorCorrelationDataObject(object)
             all_fct_cor <- getReferenceData(factor_corr)
 
@@ -245,13 +254,13 @@ setMethod("Process",
             all_fct_sd <- getReferenceData(factor_var)
 
             res_ret_data <- getInstrumentResidualReturnsDataObject(object)
-            res_ret <- getReferenceData(res_ret_data)
-            res_ret <- merge(res_ret, expand.grid(Date = unique(res_ret$Date), InstrumentID = unique(res_ret$InstrumentID)), all.y = TRUE)
-            res_ret[is.na(res_ret)] <- 0
+            all_res_ret <- getReferenceData(res_ret_data)
+            all_res_ret <- merge(all_res_ret, expand.grid(Date = unique(all_res_ret$Date), InstrumentID = unique(all_res_ret$InstrumentID)), all.y = TRUE)
+            #all_res_ret[is.na(all_res_ret)] <- 0
 
             # compute output
 
-            browser()
+
             first <- TRUE
             for(rm_date in sort(unique(port$Date))){
 
@@ -259,11 +268,19 @@ setMethod("Process",
 
               if(wday(rm_date)!=7&wday(rm_date)!=1){
                 bt <- betas[betas$Date==rm_date,setdiff(colnames(betas),'Date')]
+
                 bt[is.na(bt)] <- 0
-                wt <- port[port$Date==rm_date,c('InstrumentID','Weight')]
+                wt <- unique(port[port$Date==rm_date,c('InstrumentID','Weight')])
+                wt <- wt[wt$Weight != 0.0, ]
                 colnames(wt) <- c('InstrumentID','Weight')
                 fct_cor <- all_fct_cor[all_fct_cor$Date==rm_date,setdiff(colnames(all_fct_cor),'Date')]
                 fct_sd  <- all_fct_sd[all_fct_sd$Date==rm_date,setdiff(colnames(all_fct_cor),'Date')]
+
+                res_ret <- all_res_ret[all_res_ret$Date > rm_date - lookback & all_res_ret$Date <= rm_date, ]
+
+                res_ret <- unique(res_ret)
+
+                res_ret <- merge(expand.grid(InstrumentID = wt[,"InstrumentID"], Date = unique(res_ret$Date)), res_ret, all.x = TRUE)
 
                 if(nrow(fct_cor)>0 && nrow(fct_sd)>0){
                   # The variance of log returns is equal to the variance of returns upto second order.
@@ -278,52 +295,96 @@ setMethod("Process",
                   if (is.null(fct_cov)) next()
                   #fct_cov <- 365*3/5*factor_covariance(fct_cor, sqrt(fct_sd))/150
 
-                  mctr_info <- portfolio_instrument_mctv(wt,bt,fct_cov, ins_var, corr_residuals = FALSE)
+                  mctr_info <- portfolio_instrument_mctv(wt,bt,fct_cov, res_ret, factor_groups, corr_residuals = TRUE)
 
-                  instr_mctv <- mctr_info$instr_risk
-                  instr_mctr <- instr_mctv/2/sqrt(mctr_info$total_variance)
+                  vd.tot <- cbind(data.frame(Date = rm_date), mctr_info$summary_risk)
+                  mctr <- cbind(data.frame(Date = rm_date), mctr_info$instr_risk)
+                  mctr_pg <- cbind(data.frame(Date = rm_date), mctr_info$instr_group_risk)
 
-                  total_sys_var <- mctr_info$total_variance
-
-                  mctr_info <- portfolio_instrument_mctv(wt,bt,fct_cov, ins_var, corr_residuals = TRUE)
-
-                  instr_mctv_c <- mctr_info$instr_risk
-                  instr_mctr_c <- instr_mctv/2/sqrt(mctr_info$total_variance)
-
-                  total_sys_var_c <- portfolio_total_variance(wt,bt,fct_cov, ins_var, corr_residuals = TRUE )
-
-
-
-                  vd.tot <- data.frame(Date=rm_date,TotalSystematicVar=total_sys_var[1])
-                  vd <- cbind(data.frame(Date = rm_date), as.data.frame(InstrumentID = wd$InstrumentID, MCTR = instr_mctr/sum(market_risk)*100))
                   if(first){
-                    variance_decomposition <- vd
-                    variance_decomposition.tot <- vd.tot
+                    mctr_df <- mctr
+                    vd_df <- vd.tot
+                    mctv_fg_df <- mctr_pg
                     first <- FALSE
                   }
                   else{
-                    variance_decomposition.tot <- rbind(variance_decomposition.tot, vd.tot)
-                    variance_decomposition <- rbind(variance_decomposition,vd)
+                    vd_df <- rbind(vd_df, vd.tot)
+                    mctr_df <- rbind(mctr_df,mctr)
+                    mctv_fg_df <- rbind(mctv_fg_df,mctr_pg)
+
                   }
                 }
               }
             }
 
-            browser()
-            risk_plot_data <- rbind(data.frame(Date     = variance_decomposition$Date,
-                                               RiskType = 'TotalSystematic',
-                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1e2),
-                                    data.frame(Date     = variance_decomposition$Date,
-                                               RiskType = 'Sector',
-                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1e2))
-            plt_risk <- ggplot(data=risk_plot_data,aes_string(x="Date",y="Value",colour="RiskType")) +
-              geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type")
+            ## Possibly for future use
+            # ggobj <-  filter(vd.tot, RiskAggregate == "Factor Group") %>%
+            #   ggvis(y = ~ Variance,
+            #         x = ~ Date,
+            #         stroke = ~ factor(RiskType),
+            #         key  := ~ id)%>%
+            #   layer_lines() %>%
+            #   layer_points() %>%
+            #   add_tooltip(tip, on = "hover")
+                      # %>%
+            # scale_numeric("x", domain = input_slider(min(vd.tot$Date), max(vd.tot$Date),
+            #               c(min(vd.tot$Date), max(vd.tot$Date))))
+
+
+
+
+            mctv_fg_df <- merge(mctv_fg_df, unique(port[c("Date", "InstrumentID", "Weight")]))
+
+            mctv_fg_df <- mctv_fg_df[mctv_fg_df$ACV != 0.0 & mctv_fg_df$MCV != 0,]
+
+            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(ACV))
+
+
+            mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
+
+            mctr_df.top10 <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
+
+            plt_data <- rbind(data.frame(Date        = vd_df$Date,
+                                         RiskMeasure = "Risk (%/Year)",
+                                         RiskType    = vd_df$RiskType,
+                                         Value       = 1600 * abs_sqrt(vd_df$Variance) ),
+                              data.frame(Date        = mctr_df.top10$Date,
+                                         RiskMeasure = "T10 ACR by ACV (%/Year)",
+                                         RiskType    = mctr_df.top10$RiskType,
+                                         Value       = 1600 * abs_sqrt(mctr_df.top10$ACV)),
+                              data.frame(Date        = mctr_df.top10$Date,
+                                         RiskMeasure = "T10 PMCR by ACV (%)",
+                                         RiskType    = mctr_df.top10$RiskType,
+                                         Value       = abs_sqrt(mctr_df.top10$PMCR))
+                              )
+
+
+            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(MCV))
+            mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
+
+            mctr_df.top10 <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
+
+
+
+            plt_data <- rbind(plt_data,
+                              data.frame(Date        = mctr_df.top10$Date,
+                                         RiskMeasure = "T10 PMCR by MCV (%)",
+                                         RiskType    = mctr_df.top10$RiskType,
+                                         Value       = abs_sqrt(mctr_df.top10$PMCR))
+            )
+
+            plt_risk <- ggplot(data=plt_data,aes_string(x="Date",y="Value",colour="RiskType")) +
+              geom_line() +
+              facet_grid( RiskMeasure ~ ., scales = "free_y") +
+              xlab("Date") +
+              labs(fill="Risk type")
+
 
             outp_object <- getOutputObject(object)
-            outp_object <- setReferenceData(outp_object, variance_decomposition.tot)
+            outp_object <- setReferenceData(outp_object, mctv_fg_df)
             object <- .setOutputObject(object, outp_object)
 
-            object <- .setOutputGGPlotData(object, risk_plot_data)
+            object <- .setOutputGGPlotData(object, plt_data)
             object <- .setOutputGGPlot(object, plt_risk)
             object <- .setOutputFrontendData(object, data.frame(omit = c("Value")))
 

@@ -666,6 +666,39 @@ position_activity <- function(position_history,tau){
   return(new_history)
 }
 
+adjust_ipo_betas <- function(betas){
+
+
+  min_dates <- aggregate(Date ~ InstrumentID, data = betas, function(x){Find(Negate(is.na), x)})
+
+  rownames(min_dates) <- min_dates$InstrumentID
+
+
+  lambda <- 1/21
+
+  w <- seq(120 ,1)
+  w <- exp(-1*lambda * w)
+
+
+  instruments <- unique(min_dates$InstrumentID[min_dates$Date > min(min_dates$Date)])
+
+  for(instr in instruments){
+    idxs <- (betas$InstrumentID == instr) & (betas$Date >= min_dates[as.character(instr), "Date"])
+
+    idxs <- seq(nrow(betas))[idxs]
+    idxs <- head(idxs, 120)
+
+    betas[idxs[is.na(betas[idxs, "EUR"])], -1] <- 0
+
+
+    betas[idxs,-1] <- head(w, length(idxs))*betas[idxs,-1]
+  }
+
+  return(betas)
+
+}
+
+
 pl_timescales <- function(history_data,data=FALSE){
   psn_hstry <- categorise_psn_ages(history_data)
   position_history <- psn_hstry[[1]]
@@ -857,28 +890,45 @@ portfolio_instrument_mctv <- function(weight,
                                       betas,
                                       factor_covariance,
                                       res_ret,
+                                      factor_groups,
                                       corr_residuals = FALSE){
 
 
-  if (!corr_residuals){
-    ins_var <- res_ret[res_ret$Date > (rm_date - lookback) & res_ret$Date <= rm_date, ]
-    ins_var <- aggregate(Return ~ InstrumentID, data = ins_var, function(x){sd(x, na.rm = TRUE)})
-    ins_var <- merge(weight["InstrumentID"], ins_var)
+  wtbt <- merge(weight,betas,by='InstrumentID', all.x = TRUE)
 
-    ins_sp_cov <- matrix(0, nrow = lenght(ins_var), ncol = lenght(ins_var))
-    diag(ins_sp_cov) <- ins_var
+
+  if (!corr_residuals){
+    ins_var <- res_ret
+    ins_var <- aggregate(Return ~ InstrumentID,
+                         data = ins_var,
+                         function(x){var(x, na.rm = TRUE)})
+
+    ins_var <- merge(weight["InstrumentID"], ins_var, all.x = TRUE)
+
+    ins_var$Return[is.na(ins_var$Return)] <- 0.0
+
+    ins_sp_cov <- matrix(0.0, nrow = nrow(ins_var), ncol = nrow(ins_var))
+
+    diag(ins_sp_cov) <- ins_var[,"Return"]
+
 
   } else {
 
-    res_ret.u <- cbind(res_ret["Date"], unstack(res_ret, Return ~ InstrumentId))
+    dates <- unique(res_ret["Date"])
+    dates <- dates[!is.na(dates),, drop = FALSE]
 
-    ins_sp_cov <- cov(as.matrix(as.numeric(res_ret.u)))
+    res_ret.u <- cbind(dates, unstack(res_ret, Return ~ InstrumentID))
 
+    res_ret.u[is.na(res_ret.u)] <- NA_real_
+
+    ins_sp_cov <- cov(as.matrix(res_ret.u[,-1]), use = "pairwise.complete.obs")
+
+    ins_sp_cov[is.na(ins_sp_cov)] <- 0.0
   }
 
-  wtbt <- merge(betas,weight,by='InstrumentID')
   weight_matrix <- as.matrix(wtbt['Weight'])
   beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
+  beta_matrix[is.na(beta_matrix)] <- 0.0
   fct <- factor_covariance
 
   fct_columns <- colnames(fct)
@@ -888,16 +938,93 @@ portfolio_instrument_mctv <- function(weight,
 
   ins_sys_cov <- beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)
 
+
+
+  sys_variance <- as.numeric(t(weight_matrix)%*%ins_sys_cov%*%weight_matrix)
+
   ins_tot_cov <- ins_sys_cov + ins_sp_cov
 
-  # instr_risk <- 2*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
+  instr_acv <- weight_matrix*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
 
-  instr_risk <- 2*(ins_tot_cov%*%weight_matrix)
+  instr_mtcv <- 2*(ins_tot_cov%*%weight_matrix)
 
-  total_variance <- t(weight_matrix)%*%ins_tot_cov%*%weight_matrix
+  total_variance <- as.numeric(t(weight_matrix)%*%ins_tot_cov%*%weight_matrix)
 
-  ret <- list(instr_risk = instr_risk,
-              total_variance = total_variance)
+  instr_risk = data.frame(InstrumentID = wtbt$InstrumentID,
+                          RiskType = "Total",
+                          MCV  = instr_mtcv[,],
+                          RMCV = 1,
+                          MCR  = instr_mtcv[,]/2/sqrt(total_variance),
+                          PMCR = instr_mtcv[,]/2/total_variance,
+                          ACV   = instr_acv[,],
+                          PCV  = instr_acv[,]/total_variance*100)
+
+  # factor loading matrix
+  bw_matrix <- t(beta_matrix)%*%weight_matrix
+  rownames(bw_matrix) <- colnames(beta_matrix)
+
+
+  # beta matrix times factor covariance
+  bf_matrix <- beta_matrix%*%as.matrix(fct)
+
+  summary_risk <- data.frame(RiskAggregate = c("Total"),
+                             RiskType     = c("Total", "Systematic", "Residual"),
+                             Variance      = c(total_variance,
+                                               sys_variance,
+                                               total_variance - sys_variance))
+
+  first <- TRUE
+  for (group in ls(factor_groups)){
+
+    unused_factors <- setdiff(rownames(bw_matrix), factor_groups[[group]])
+
+    bwf_matrix <- bw_matrix
+    bwf_matrix[unused_factors, ] <- 0.0
+    #
+
+    # instrument marginal contribution to variance via factor group
+    instr_mtcv_pfg <- 2*(bf_matrix%*%bwf_matrix)
+    instr_acv_pfg <- weight_matrix * bf_matrix%*%bwf_matrix
+
+    total_gr_variance <- as.numeric(t(weight_matrix)%*%bf_matrix%*%bwf_matrix)
+
+    summary_risk <- rbind(summary_risk,
+                          data.frame(RiskAggregate = "Factor Group",
+                                     RiskType      = group,
+                                     Variance      = total_gr_variance))
+
+    # relative instrument marginal contribution to variance via factor group
+    # metric to asses potential of instrument to adjust exposure to factor
+    # group without much affecting the portfolio total variance
+    instr_mctv_pfgr <- instr_mtcv_pfg/instr_mtcv
+
+    instr_mctv_pfgr[is.na(instr_mctv_pfgr) | is.nan(instr_mctv_pfgr)] <- 0
+
+    group_risk <- data.frame(InstrumentID = wtbt$InstrumentID,
+                             RiskType    = group,
+                             MCV = instr_mtcv_pfg[,],
+                             RMCV = instr_mctv_pfgr[,],
+                             MCR = instr_mtcv_pfg[,]/2/sqrt(total_variance),
+                             PMCR = instr_mtcv_pfg[,]/2/total_variance,
+                             ACV   = instr_acv_pfg[,],
+                             PCV  = instr_acv_pfg[,]/total_variance*100)
+
+    if (first) {
+      instr_group_risk <- group_risk
+      first <- FALSE
+    }
+    else {
+      instr_group_risk <- rbind(instr_group_risk,
+                                group_risk)
+    }
+  }
+
+
+  ret <- list(instr_risk       = instr_risk,
+              instr_group_risk = instr_group_risk,
+              summary_risk     = summary_risk)
+
+
 
   return(ret)
 }

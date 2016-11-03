@@ -115,6 +115,7 @@ test_that(paste("Can Process() on", tested.class), {
 
   #valid.key_values <- dated_three_monthly_lookback(11, "2016-08-30")
   #valid.key_values <- dated_full_month(11, "2016-05-30")
+  #valid.key_values <- dated_one_monthly_lookback(11, '2016-07-01')
   valid.key_values <- dated_eighteen_monthly_lookback(11, '2016-07-01')
 
   colnames(valid.key_values) <- c("TraderID", "start", "end")

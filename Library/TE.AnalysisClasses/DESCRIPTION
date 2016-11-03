@@ -22,6 +22,8 @@ Imports:
     stats,
     utils,
     plotly,
+    dplyr,
+    ggvis,
     RColorBrewer,
 Suggests:
     testthat,

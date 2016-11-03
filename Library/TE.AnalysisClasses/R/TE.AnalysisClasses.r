@@ -12,6 +12,8 @@
 #' @import quantmod
 #' @import lubridate
 #' @import ggplot2
+#' @import ggvis
+#' @importFrom dplyr arrange
 #' @importFrom hash hash values names.hash keys
 #' @importFrom DMwR lofactor
 #' @importFrom graphics barplot frame text
