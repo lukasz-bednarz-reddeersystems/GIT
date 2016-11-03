@@ -458,6 +458,29 @@ warehouse_objectstore_factory <- function(name){
 	query <- getObjectStoreQuery(whstr)
 	pth <- getPath(whstr)
 
+	if(file.exists(pth)){
+	  message(paste("Found warehouse store at",pth))
+	  whstr <- loadObject(whstr)
+
+
+	  whstr <- tryCatch({
+  	  whstr <- .setObjectStoreKeyMap(whstr,
+  	                                 getFromObjectStore(whstr,getKeyMapID(whstr))
+  	                                 )
+  	  whstr <- .setObjectStoreQuery(whstr,
+  	                                getFromObjectStore(whstr,getQueryID(whstr)))
+  	  whstr
+	  }, error =  function(cond){
+	    message(sprintf("Error: %s occured in warehouse_objectstore_factory()",
+	                    cond))
+	    message(sprintf("When extracting object from warehouse %s",
+	                    name))
+
+	    file.remove(pth)
+	  })
+
+	}
+
 	if (!file.exists(pth)) {
 	  message(sprintf("File initially not found in local path %s. Checking remote store",pth))
 	  key <- key_from_name(basename(pth))
@@ -466,22 +489,26 @@ warehouse_objectstore_factory <- function(name){
 	  if (is_known) {
 	    whstr <- updateLocalStoreFile(whstr,key)
 	  }
+
+	  if(file.exists(pth)){
+	    message(paste("Found warehouse store at",pth))
+	    whstr <- loadObject(whstr)
+	    whstr <- .setObjectStoreKeyMap(whstr,
+	                                   getFromObjectStore(whstr,getKeyMapID(whstr))
+	    )
+	    whstr <- .setObjectStoreQuery(whstr,
+	                                  getFromObjectStore(whstr,getQueryID(whstr)))
+
+	  }
+
+	  else{
+	    message(paste("No previous store data found at",pth,"new store created."))
+	  }
+
+
 	}
 
-	if(file.exists(pth)){
-		message(paste("Found warehouse store at",pth))
-		whstr <- loadObject(whstr)
-		whstr <- .setObjectStoreKeyMap(whstr,
-		                               getFromObjectStore(whstr,getKeyMapID(whstr))
-		                               )
-		whstr <- .setObjectStoreQuery(whstr,
-		                              getFromObjectStore(whstr,getQueryID(whstr)))
 
-	}
-
-	else{
-		message(paste("No previous store data found at",pth,"new store created."))
-	}
 	return(whstr)
 }
 

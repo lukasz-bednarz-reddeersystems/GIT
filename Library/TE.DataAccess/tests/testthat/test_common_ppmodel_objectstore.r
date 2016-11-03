@@ -9,8 +9,8 @@ tested.class <- "PPModelObjectStore"
 
 valid.key  <- data.frame(model_class = "TradeHistorySimpleWithSummary",
                          id          = 11L,
-                         start       = as.Date("2016-03-29"),
-                         end         = as.Date("2016-04-01"))
+                         start       = as.Date("2015-03-29"),
+                         end         = as.Date("2015-04-01"))
 
 valid.name <- get_ppmodel_objectstore_name(valid.key)
 valid.key2  <- TE.DataAccess:::key_from_ppmodel_objectstore_name(valid.name)

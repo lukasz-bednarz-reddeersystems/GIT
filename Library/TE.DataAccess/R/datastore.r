@@ -50,7 +50,6 @@ setMethod("queryStore", "VirtualDataStore",
                 missing_keys <- values
               }
               if(nrow(missing_keys)>0){
-
                 object <- updateStore(object,missing_keys,get_variables)
               }
 
@@ -137,7 +136,10 @@ setMethod("updateStore",
               url_data <- getURLData(object@urlparser,1)
 
               # merging with original keys to avoid unnecessary querrries for weekends
-              url_data <- merge(url_data, values, all = TRUE)
+              if (nrow(url_data) > 0) {
+                url_data <- merge(url_data, values, all = TRUE)
+              }
+
 
               cn <- getColnames(object@urlparser)
               if(length(cn)==0)cn <- colnames(data)
@@ -159,7 +161,6 @@ setMethod("updateStore",
                   #but will not work if the url returns data computed over the range. Need to handle differnt range types.
                   adding <- setdiff(colnames(values),colnames(url_data))
                   message(paste("Not all key columns are contained in the datastore",class(object)[[1]],", adding",paste(adding,collapse=",")))
-                  nmes <- colnames(url_data)
                   url_data <- merge(values[values_row,],url_data,by=intersect(colnames(values),colnames(url_data)))
                   #colnames(url_data) <- c(adding,nmes)
                 }

@@ -6,7 +6,7 @@ context("Test Trade Warehouse Objectstore")
 #
 #############################
 tested.class <- "WarehouseObjectStore"
-valid.name <- "11_2016-03-29_2016-04-01"
+valid.name <- "11_2015-03-29_2015-04-01"
 valid.key  <- TE.DataAccess:::key_from_name(valid.name)
 
 test_that("Can move local objectstore files to Blob Objectstore", {
