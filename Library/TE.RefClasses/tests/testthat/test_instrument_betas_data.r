@@ -27,7 +27,8 @@ valid.column_name_map <- hash("dtDateTime"    = "Date",
                               "dtDate"        = "Date",
                               "lInstrumentID" = "InstrumentID",
                               "sFactorName"   = "FactorName",
-                              "Instrument"    = "InstrumentID")
+                              "Instrument"    = "InstrumentID",
+                              "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()),
                                      InstrumentID = integer())
 

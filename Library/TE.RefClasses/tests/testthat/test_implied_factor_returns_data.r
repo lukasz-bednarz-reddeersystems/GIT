@@ -24,7 +24,8 @@ valid.column_name_map <- hash("dtDateTime"    = "Date",
                               "dtDate"        = "Date",
                               "lInstrumentID" = "InstrumentID",
                               "sFactorName"   = "FactorName",
-                              "Instrument"    = "InstrumentID")
+                              "Instrument"    = "InstrumentID",
+                              "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 
@@ -164,12 +165,12 @@ test_that("Can dataRequest() with valid key_values", {
   object <- new(tested.class)
 
   valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-01'),
-                                               to = as.Date('2016-06-30'),
+                                               to = as.Date('2016-09-30'),
                                                by = "1 day"))
 
   values <- getDataSourceReturnColumnNames(object)
 
-  # create valid return data.frame
+  # create valid return data.frameret_data
   start        <- min(valid.key_vals$Date)
   end          <- max(valid.key_vals$Date)
   rm_str       <- get_most_recent_model_objectstore(valid.model_prefix, end, valid.lookback)
@@ -205,7 +206,7 @@ test_that("Can dataRequest() with valid key_values", {
 
   expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
 
-  expect_equal(ret_data, valid.ret_data)
+  expect_equal(, valid.ret_data)
 
 })
 

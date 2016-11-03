@@ -9,16 +9,21 @@ library(plyr)
 #########################
 tested.class          <-  "DealerData"
 valid.datastore_name  <- "dealing_datastore"
-valid.key_cols        <- c("lTraderID", "dtTradeDate")
+valid.key_cols        <- c("TraderID", "Date")
 valid.factor_cols     <- c("InputDirection")
 valid.factor_keys     <- c("Date", "InstrumentID")
 valid.non_na_cols     <- character()
 valid.values          <- c("lTraderID","dtTradeDate","lInstrumentID","sTradeRationale","sInputDirection")
 valid.required_colnms <- c("Date","InstrumentID","Rationale","InputDirection")
-valid.column_name_map <- hash(c("lTraderID","dtTradeDate","lInstrumentID","sTradeRationale","sInputDirection"),
-                              c("TraderID","Date","InstrumentID","Rationale","InputDirection"))
-init.key_values       <-  data.frame(lTraderID = integer(),
-                                     dtTradeDate = as.Date(character()))
+valid.column_name_map <- hash("lTraderID"       = "TraderID",
+                              "dtTradeDate"     = "Date",
+                              "TraderID"        = "lTraderID",
+                              "Date"            = "dtTradeDate",
+                              "lInstrumentID"   = "InstrumentID",
+                              "sTradeRationale" = "Rationale",
+                              "sInputDirection" = "InputDirection")
+init.key_values       <-  data.frame(TraderID = integer(),
+                                     Date = as.Date(character()))
 
 
 
@@ -54,8 +59,8 @@ test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
 
   object <- new(tested.class)
 
-  invalid.key_values <- data.frame(lTraderID = integer(),
-                                   dtTradeDate = as.Date(character()))
+  invalid.key_values <- data.frame(TraderID = integer(),
+                                   Date = as.Date(character()))
 
   expect_error(TE.RefClasses:::.setDataSourceQueryKeyValues(object, invalid.key_values),
                regexp = "Zero row query keys data.frame passed")
@@ -76,10 +81,10 @@ test_that("Can .setDataSourceQueryKeyValues with valid data", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- data.frame(lTraderID = 11,
-                               dtTradeDate = seq(from = as.Date('2016-06-01'),
-                                                 to = as.Date('2016-06-03'),
-                                                 by = "1 day"))
+  valid.key_vals <- data.frame(TraderID = 11,
+                               Date = seq(from = as.Date('2016-06-01'),
+                                          to = as.Date('2016-06-03'),
+                                          by = "1 day"))
 
   object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object, valid.key_vals)
 
@@ -93,8 +98,8 @@ test_that("Cannot dataRequest() with invalid key_values", {
   object <- new(tested.class)
 
 
-  invalid.key_values <- data.frame(lTraderID = integer(),
-                                   dtTradeDate = as.Date(character()))
+  invalid.key_values <- data.frame(TraderID = integer(),
+                                   Date = as.Date(character()))
 
   expect_error(dataRequest(object, invalid.key_values),
                regexp = "Zero row query keys data.frame passed")
@@ -118,15 +123,15 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
   object <- new(tested.class)
 
-  nexist.key_vals <- data.frame(lTraderID = 1984,
-                                dtTradeDate = seq(from = as.Date('2016-06-01'),
-                                                  to = as.Date('2016-06-03'),
-                                                  by = "1 day"))
+  nexist.key_vals <- data.frame(TraderID = 1984,
+                                Date = seq(from = as.Date('2016-06-01'),
+                                           to = as.Date('2016-06-03'),
+                                           by = "1 day"))
   diff <- setdiff(valid.values,valid.key_cols)
 
   valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
 
-  cols <- values(valid.column_name_map[valid.values])[valid.values]
+  cols <- TE.RefClasses:::.translateDataSourceColumnNames(object, valid.values)
 
   colnames(valid.ret_data) <- cols
 
@@ -163,17 +168,19 @@ test_that("Can dataRequest() with valid key_values", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- data.frame(lTraderID = 11,
-                               dtTradeDate = seq(from = as.Date('2016-06-01'),
-                                                 to = as.Date('2016-06-03'),
-                                                 by = "1 day"))
+  valid.key_vals <- data.frame(TraderID = 11,
+                               Date = seq(from = as.Date('2016-06-01'),
+                                          to = as.Date('2016-06-03'),
+                                          by = "1 day"))
 
+  valid.store_keys <- valid.key_vals
+  colnames(valid.store_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.store_keys))
   values <- getDataSourceReturnColumnNames(object)
   datastore <- getDataStoreName(object)
 
   # create valid return data.frame
-  valid.ret_data <- data_request(datastore ,valid.key_vals,values)
-  valid.ret_data <- data_request(datastore ,valid.key_vals,values)
+
+  valid.ret_data <- data_request(datastore ,valid.store_keys,values)
   valid.ret_data <- getData(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
   valid.ret_data <- valid.ret_data[values]

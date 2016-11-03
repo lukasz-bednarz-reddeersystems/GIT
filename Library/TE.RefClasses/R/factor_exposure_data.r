@@ -43,8 +43,8 @@ setClass(
   Class             = "FactorExposureData",
   prototype      = list(
     key_cols        = c("InstrumentID", "Date"),
-    values          = c("lInstrumentID","dtDateTime","lFactorRiskInstrumentID", "sFactorName",
-                        "dblZScore", "dblValue"),
+    values          = c("InstrumentID","Date","FactorRiskInstrumentID", "FactorName",
+                        "ZScore", "Value"),
     column_name_map = hash(c("lFactorRiskInstrumentID", "sFactorName", "dtDateTime", "lInstrumentID",
                              "dblZScore", "dblValue"),
                            c("FactorRiskInstrumentID", "FactorName", "Date", "InstrumentID",

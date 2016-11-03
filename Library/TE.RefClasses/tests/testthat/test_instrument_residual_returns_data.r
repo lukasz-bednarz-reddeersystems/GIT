@@ -15,10 +15,8 @@ valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
 valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
 
 valid.key_cols        <- c(risk_model_objectstore_keys, "InstrumentID")
-valid.values          <- c("Date", "InstrumentID",
-                           valid.model_factors)
-valid.required_colnms <- c('Date', "InstrumentID",
-                           valid.model_factors)
+valid.values          <- c("Date", "InstrumentID", "Return")
+valid.required_colnms <- c("Date", "InstrumentID", "Return")
 
 # valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
 #                               c("InstrumentID","Instrument"))
@@ -27,7 +25,8 @@ valid.column_name_map <- hash("dtDateTime"    = "Date",
                               "dtDate"        = "Date",
                               "lInstrumentID" = "InstrumentID",
                               "sFactorName"   = "FactorName",
-                              "Instrument"    = "InstrumentID")
+                              "Instrument"    = "InstrumentID",
+                              "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()),
                                      InstrumentID = integer())
 
@@ -210,6 +209,7 @@ test_that("Can dataRequest() with valid key_values", {
   expect_true(setequal(getDataSourceQueryKeyValues(object), valid.key_vals))
 
   ret_data <- getReferenceData(object)
+  ret_data <- arrange(ret_data, InstrumentID, Date)
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
 
@@ -227,10 +227,10 @@ test_that("Can dataRequest() with valid key_values", {
 
 valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 
-context(sprintf("Testing Instrument Betas Data with %s risk model", valid.risk_model))
+context(sprintf("Testing Instrument Residual Returns Data with %s risk model", valid.risk_model))
 
 tested.class          <-  "InstrumentResidualReturnsData"
-valid.component       <- "Betas"
+valid.component       <- "ResidualReturns"
 
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
@@ -238,12 +238,6 @@ valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
 valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
 # valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
 #                               c("InstrumentID","Instrument"))
-
-valid.key_cols        <- c(risk_model_objectstore_keys, "InstrumentID")
-valid.values          <- c("Date", "InstrumentID",
-                           valid.model_factors)
-valid.required_colnms <- c('Date', "InstrumentID",
-                           valid.model_factors)
 
 init.key_values       <-  data.frame(Date = as.Date(character()),
                                      InstrumentID = integer())
@@ -439,6 +433,8 @@ test_that("Can dataRequest() with valid key_values", {
   ret_data <- getReferenceData(object)
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
+
+  ret_data <- merge(ret_data, valid.ret_data)
 
   expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
 

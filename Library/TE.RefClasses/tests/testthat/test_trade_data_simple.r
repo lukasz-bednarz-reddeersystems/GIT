@@ -74,8 +74,8 @@ test_that("Can .setDataSourceQueryKeyValues with valid data", {
   object <- new(tested.class)
 
   valid.key_vals <- data.frame(id = 11,
-                                  start = "2016-03-29",
-                                  end = "2016-04-01")
+                                  start = "2015-03-29",
+                                  end = "2015-04-01")
 
   object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object, valid.key_vals)
 
@@ -114,8 +114,8 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
   # create test vectors
   nexist.key_vals <- data.frame(id = 1984,
-                                start = as.Date("2016-03-29"),
-                                end = as.Date("2016-04-01"))
+                                start = as.Date("2015-03-29"),
+                                end = as.Date("2015-04-01"))
 
 
 

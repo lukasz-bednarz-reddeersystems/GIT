@@ -8,8 +8,8 @@ context("Testing FactorExposureData")
 tested.class          <- "FactorExposureData"
 valid.db_name         <- TE.RefClasses:::RISK_MODEL_DB()
 valid.key_cols        <- c("InstrumentID", "Date")
-valid.values          <- c("lInstrumentID","dtDateTime","lFactorRiskInstrumentID", "sFactorName",
-                             "dblZScore", "dblValue")
+valid.values          <- c("InstrumentID","Date","FactorRiskInstrumentID", "FactorName",
+                             "ZScore", "Value")
 valid.required_colnms <- c("FactorName", "Date", "InstrumentID",
                            "ZScore", "Value")
 valid.column_name_map <- hash(c("lFactorRiskInstrumentID", "sFactorName", "dtDateTime", "lInstrumentID",
@@ -169,8 +169,9 @@ test_that("Can dataRequest() with valid key_values", {
   valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string, valid.db_name, "Razor")
   valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
+  colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
+
   valid.ret_data <- valid.ret_data[values]
-  colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]
   valid.ret_data <- valid.ret_data[with(valid.ret_data, order(Date, InstrumentID, FactorRiskInstrumentID)),]
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))

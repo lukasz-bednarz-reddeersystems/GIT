@@ -130,8 +130,8 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
   # create test vectors
   nexist.key_vals <- data.frame(id = 1984,
-                                start = as.Date("2016-03-29"),
-                                end = as.Date("2016-04-01"))
+                                start = as.Date("2015-03-29"),
+                                end = as.Date("2015-04-01"))
 
 
 
@@ -175,8 +175,8 @@ test_that("Can dataRequest() with valid key_values", {
   # create new instance of class
   object <- new(tested.class)
   valid.key_vals <- data.frame(id = 11L,
-                               start = as.Date("2016-03-29"),
-                               end = as.Date("2016-04-01"))
+                               start = as.Date("2015-03-29"),
+                               end = as.Date("2015-04-01"))
   valid.store_keys <- data.frame(model_class = valid.model_class,
                                  id = valid.key_vals$id,
                                  start = min(valid.key_vals$start),
@@ -185,7 +185,7 @@ test_that("Can dataRequest() with valid key_values", {
   # valid.key_vals <- data.frame(id = 11,
   #                              start = as.Date("2015-07-31"),
   #                              end = as.Date("2015-08-31"))
-  valid.key_vals <- dated_eighteen_monthly_lookback(101L, '2016-10-01')
+  #valid.key_vals <- dated_eighteen_monthly_lookback(101L, '2016-10-01')
 
   valid.key_vals <- valid.key_vals[order(valid.key_vals$start),]
 

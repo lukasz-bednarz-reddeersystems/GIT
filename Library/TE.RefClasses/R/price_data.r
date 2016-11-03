@@ -42,15 +42,20 @@ setClass(
   Class             = "PriceData",
   prototype      = list(
     key_cols        = c("InstrumentID", "Date"),
-    values          = c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
-                        ,"dblHigh","dblLow","dblPreviousClosePrice",
-                        "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-    column_name_map = hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
-                             ,"dblHigh","dblLow","dblPreviousClosePrice",
-                             "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-                           c('InstrumentID','Date','ClosePrice',"OpenPrice"
-                             ,"High","Low","PreviousClosePrice",
-                             "Volume", "OutstandingShares","AvgVol30Day")),
+    values          = c("InstrumentID", "Date","ClosePrice","OpenPrice"
+                        ,"High","Low","PreviousClosePrice",
+                        "Volume", "OutstandingShares","AvgVol30Day" ),
+    column_name_map = hash("lInstrumentID"         = 'InstrumentID',
+                           "dtDateTime"            = 'Date',
+                           "dblClosePrice"         = 'ClosePrice',
+                           "dblOpenPrice"          = "OpenPrice",
+                           "dblHigh"               = "High",
+                           "dblLow"                = "Low",
+                           "dblPreviousClosePrice" = "PreviousClosePrice",
+                           "dblVolume"             = "Volume",
+                           "lOutstandingShares"    = "OutstandingShares",
+                           "dbl30DayAvgVol"        = "AvgVol30Day"
+                           ),
     key_values      = data.frame(InstrumentID = integer(),
                                  Date = as.Date(character())),
     sql_query       = new("PriceDataSQLQuery")
