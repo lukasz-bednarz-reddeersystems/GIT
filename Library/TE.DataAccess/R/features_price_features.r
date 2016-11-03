@@ -492,6 +492,9 @@ setGeneric("updateClosePrice",function(object,trade_dates,instrument,strategy,da
 setMethod("updateClosePrice","ClosePrice",
            function(object,trade_dates,instrument,strategy,daily_data){
               data <- daily_data@data[c('DateTime','ClosePrice')]
+
+              #for some stock there are multiple entries generated for the same day
+
               object@computation <- setComputationData(object@computation,data)
               return(object)
            }
@@ -517,8 +520,14 @@ setClass(
 setGeneric("updatePriorClosePrice",function(object,trade_dates,instrument,strategy,daily_data){standardGeneric("updatePriorClosePrice")})
 setMethod("updatePriorClosePrice","PriorClosePrice",
            function(object,trade_dates,instrument,strategy,daily_data){
-              data <- daily_data@data[c('DateTime','ClosePrice')]
-              data$DateTime <- data$DateTime+1
+              data <- unique(daily_data@data[c('DateTime','ClosePrice')])
+
+              if (nrow(data) > 1){
+                data$ClosePrice <- c(NA, data$ClosePrice[1:(nrow(data) -1)])
+              } else {
+                data$ClosePrice <- NA
+              }
+
               object@computation <- setComputationData(object@computation,data)
               return(object)
            }
@@ -715,7 +724,15 @@ setMethod("updateMidOnEntry","MidOnEntry",
                 data <- subset(data,data$lInstrumentID==instrument)
                 data <- data[c("dtTradeDate","dblMidOnEntry")]
                 colnames(data) <- c("Date","MidOnEntry")
-                object@computation <- setComputationData(object@computation,average(data))
+
+                if (!is.null(data) && is(data , "data.frame") && nrow(data) > 1){
+
+                  data <- aggregate(MidOnEntry ~ Date,
+                                    data = data,
+                                    function(x){mean(x, na.rm = TRUE)},
+                                    na.action = NULL)
+                }
+                object@computation <- setComputationData(object@computation,data)
               }
               return(object)
            }

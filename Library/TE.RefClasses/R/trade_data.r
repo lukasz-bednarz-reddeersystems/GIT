@@ -40,7 +40,8 @@ setClass(
                           context_price_features,
                           position_summary_features,
                           trade_history_features ,
-                          trade_delta_features)
+                          trade_delta_features),
+    unique_rows       =  TRUE
   ),
 
   contains = c("VirtualReferenceData")
@@ -79,7 +80,7 @@ setClass(
                                    start = as.Date(character()),
                                    end = as.Date(character())),
     model_class       = "TradeHistorySimpleWithSummary",
-    unique_rows       = FALSE,
+    unique_rows       = TRUE,
     validation_function = basic_unique_data_validator,
     argument_list = list(unique_on=c('Date','Strategy','ValueUSD','InstrumentID'))
     ),

@@ -272,31 +272,65 @@ setMethod("queryPreProcessorModel","PPModel",
 		  function(object,key){
 
 		    object@warehouse_store_name <- name_from_key(key)
+
+		    message(sprintf("updateWarehouse started %s in queryPreProcessorModel() PPModel method.", now()))
 		  	object <- updateWarehouse(object,key)
+		  	message(sprintf("updateWarehouse finished %s in queryPreProcessorModel() PPModel method.", now()))
+
 		  	object@setup_comp <- tryCatch({
 		  								setModelComputationData(object@setup_comp,object@ppdata,object@warehouse)
 		  							},error=function(cond){
 		  								stop(paste("Error setting model setup computation data in",class(object)[[1]],":",cond))
 		  							})
+
+		  	message(sprintf("triggerModelComputation(%s) started %s in queryPreProcessorModel() PPModel method.",
+		  					"object@setup_comp",
+		  					now()))
 		  	object@setup_comp <- tryCatch({
 		  								triggerModelComputation(object@setup_comp)
 		  							},error=function(cond){
 		  								stop(paste("Error in model setup computation for",class(object)[[1]],":",cond))
 		  							})
+		  	message(sprintf("triggerModelComputation(%s) finished %s in queryPreProcessorModel() PPModel method.",
+		  					"object@setup_comp",
+		  					now()))
+
 		  	if(length(object@setup_comp@output)>0)object@warehouse <- object@setup_comp@output
-			  object <- updateModel(object)
-		  	object@post_comp <- tryCatch({
-		  								setModelComputationData(object@post_comp,object@ppdata,object@warehouse)
+
+		  	message(sprintf("updateModel started %s in queryPreProcessorModel() PPModel method.",
+		  					now()))
+			object <- updateModel(object)
+			message(sprintf("updateModel finished %s in queryPreProcessorModel() PPModel method.",
+		  					now()))
+
+			object@post_comp <- tryCatch({
+			                setModelComputationData(object@post_comp,object@ppdata,object@warehouse)
 		  							},error=function(cond){
 		  								stop(paste("Error setting model post computation data in",class(object)[[1]],":",cond))
 		  							})
+
+			message(sprintf("triggerModelComputation(%s) started %s in queryPreProcessorModel() PPModel method.",
+		  					"object@post_comp",
+		  					now()))
+
 		  	object@post_comp <- tryCatch({
 		  								triggerModelComputation(object@post_comp)
 		  							},error=function(cond){
 		  								stop(paste("Error in model post computation for",class(object)[[1]],":",cond))
 		  							})
+
+		  	message(sprintf("triggerModelComputation(%s) finished %s in queryPreProcessorModel() PPModel method.",
+		  					"object@post_comp",
+		  					now()))
+
 		   if(length(object@post_comp@output)>0)object@ppdata <- object@post_comp@output
+
+		   message(sprintf("attachDataToModel() started %s in queryPreProcessorModel() PPModel method.",
+		  					now()))
 		   object <- attachDataToModel(object)
+			message(sprintf("attachDataToModel() finished %s in queryPreProcessorModel() PPModel method.",
+		  					now()))
+
 		   object <- closeWarehouse(object)
 		   return(object)
 		  }
@@ -360,21 +394,38 @@ setMethod("runPreProcessorModel","PPModel",
 
 		      while(!hasBatchRun(object@queries)){
 		  			key <- getCurrentKey(object@queries)
+
+					  message(sprintf("queryPreProcessorModel() started %s in runPreProcessorModel() PPModel method.", now()))
 		  			object <- queryPreProcessorModel(object,key)
+					  message(sprintf("queryPreProcessorModel() finished %s in runPreProcessorModel() PPModel method.", now()))
+
 		  			object@queries <- advanceBatchKey(object@queries)
 		  		}
 		  		object <- updateWarehouse(object,key)
+
+
 		  		object@summary_comp <- tryCatch({
 		  											setModelComputationData(object@summary_comp,object@modeldata,object@warehouse)
 		  										},error=function(cond){
 		  											stop(paste("Error setting model summary computation data in",class(object)[[1]],":",cond))
 		  										})
+
+
 		  		object <- closeWarehouse(object)
+
+		  		message(sprintf("triggerModelComputation(%s) started %s in queryPreProcessorModel() PPModel method.",
+		  					"object@summary_comp",
+		  					now()))
 		  		object@summary_comp <- tryCatch({
 		  											triggerModelComputation(object@summary_comp)
 		  										},error=function(cond){
 		  											stop(paste("Error in model summary computation for",class(object)[[1]],":",cond))
 		  										})
+
+		  		message(sprintf("triggerModelComputation(%s) started %s in queryPreProcessorModel() PPModel method.",
+		  					"object@summary_comp",
+		  					now()))
+
 		  		if(length(object@summary_comp@output)>0)
 		  		{
 		  			object@modeldata <- object@summary_comp@output
@@ -390,10 +441,19 @@ setMethod("runPreProcessorModel","PPModel",
 setGeneric("updateWarehouse",function(object,key){standardGeneric("updateWarehouse")})
 setMethod("updateWarehouse","PPModel",
 		  function(object,key){
+		  	message(sprintf("updateWarehouse started %s", now()))
 		  	message(paste("Fetching data ... "))
 		    object@warehouse_store_name <- name_from_key(key)
-		  	object@warehouse <- warehouse_request(object@warehouse_store_name,key[['id']],key[['start']],key[['end']])
+
+		  	message(sprintf("warehouse_request started %s in updateWarehouse() PPModel method.", now()))
+		  		object@warehouse <- warehouse_request(object@warehouse_store_name,key[['id']],key[['start']],key[['end']])
+		  	message(sprintf("warehouse_request finished %s in updateWarehouse() PPModel method.", now()))
+
+		  	message(sprintf("buildFeatureList() started %s in updateWarehouse() PPModel method.", now()))
 		  	object@warehouse <- buildFeatureList(object@warehouse)
+		  	message(sprintf("buildFeatureList() finished %s in updateWarehouse() PPModel method.", now()))
+
+		  	message(sprintf("updateWarehouse finished %s", now()))
             return(object)
 		  }
 )
@@ -482,7 +542,7 @@ setMethod("updateModel","PPModel",
 		  	if(length(object@features)!=0 && object@features!="" && length(intersect(object@warehouse@complete_features,object@features))!=length(object@features)){
 		  		message("Not all features found in warehouse.")
 		  		message("Adding features ...")
-		  		to_add <- setdiff(object@features,object@warehouse@features)
+		  		to_add <- setdiff(object@features,object@warehouse@complete_features)
 		  		tryCatch({
 		  				object@warehouse <- attachFeatures(object@warehouse,to_add,replace_features=object@replace_features)
 		  			}, error = function(cond){

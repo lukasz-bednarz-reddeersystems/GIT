@@ -519,11 +519,20 @@ compute_delta_stats <- function(ppmodel_computation_object){
 trade_history <- function(ppmodel_computation_object){
   ppmodel_computation_object <- compute_delta_stats(ppmodel_computation_object)
   output <- ppmodel_computation_object@output@data
-  output <- output[setdiff(colnames(output),c('ClosePrice','MarketValue'))]
+  output <- unique(output[setdiff(colnames(output),c('ClosePrice','MarketValue'))])
+
+
+  output <- output[!duplicated(output[c("TradeDate", "TradeID", "OrderID")]),]
+
   trades <- unique(output$TradeID)
   raw_psn_data <- getRawPositionData(ppmodel_computation_object@wh)
-  raw_psn_data <- raw_psn_data@data[c('Date','InstrumentID','Strategy','MarketValue','TodayPL')]
+  raw_psn_data <- unique(raw_psn_data@data[c('Date','InstrumentID','Strategy','MarketValue','TodayPL')])
   colnames(raw_psn_data) <- c('TradeDate','Instrument','Strategy','MarketValue','TodayPL')
+
+  raw_psn_data <-aggregate(cbind(MarketValue, TodayPL) ~ ., data = raw_psn_data, function(x){sum(unique(x), na.rm = TRUE)})
+
+
+
   first_trade <- TRUE
   for(trade in trades){
     trd <- getTrade(ppmodel_computation_object@wh,trade)

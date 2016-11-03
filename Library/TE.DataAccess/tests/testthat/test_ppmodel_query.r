@@ -33,7 +33,8 @@ if (Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")) {
     valid.trader_id <- 11L
     #valid.end_date  <- "2016-10-01"
     valid.end_date  <- "2015-04-01"
-    valid.key_func <- dated_three_day_lookback
+    #valid.key_func <- dated_three_day_lookback
+    valid.key_func <- dated_three_monthly_lookback
     valid.keys <- valid.key_func(valid.trader_id, valid.end_date)
 
     # valid.keys <- data.frame(id = valid.trader_id,
