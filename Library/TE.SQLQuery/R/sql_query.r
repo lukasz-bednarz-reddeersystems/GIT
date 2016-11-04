@@ -156,7 +156,7 @@ setMethod(".setSQLQueryKeyValues",
               stop("Zero row query keys data.frame passed to .setSQLQueryKeyValues().")
             }
             else {
-              object@key_values <- key_values
+              object@key_values <- key_values[getSQLQueryKeyColumnNames(object)]
               return(object)
             }
           }
@@ -186,7 +186,9 @@ setGeneric("getSQLQueryKeyValues", function(object){standardGeneric("getSQLQuery
 setMethod("getSQLQueryKeyValues",
           signature(object = "VirtualSQLQuery"),
           function(object){
-            return(object@key_values)
+            key_values <- object@key_values[getSQLQueryKeyColumnNames(object)]
+
+            return(key_values)
           }
 )
 
@@ -277,7 +279,7 @@ setMethod(".translateSQLQueryColumnNames",
               idx <- (colnames %in% names_to_translate)
 
               ret_colnames <- colnames
-              
+
               if(length(names_to_translate) > 0) {
                 new_colnames <- values(colnames_map[names_to_translate])[names_to_translate, drop = TRUE]
                 ret_colnames[idx] <- new_colnames
