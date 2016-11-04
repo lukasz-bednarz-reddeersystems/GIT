@@ -2,9 +2,10 @@
 title: "Risk Review Report"
 author: "Lukasz Bednarz"
 date: "21 July 2016"
-output: 
-  word_document: 
+output:
+  word_document:
     keep_md: yes
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -23,17 +24,20 @@ fig_type <- 'png'
 
 ```{r data_range, results='hide', warning=FALSE, message=FALSE}
 
+key_fun <- dated_eighteen_monthly_lookback
+#key_fun <- dated_three_monthly_lookback
+
 trader   <- 11
-query.js <- dated_eighteen_monthly_lookback(trader, '2016-07-01')
+query.js <- key_fun(trader, '2016-11-01')
 colnames(query.js) <- c("TraderID", "start", "end")
 
 trader   <- 70
-query.ba <- dated_eighteen_monthly_lookback(trader, '2016-07-01')
+query.ba <- key_fun(trader, '2016-11-01')
 colnames(query.ba) <- c("TraderID", "start", "end")
 
 
 trader   <- 101
-query.dk <- dated_eighteen_monthly_lookback(trader, '2016-07-01')
+query.dk <- key_fun(trader, '2016-11-01')
 colnames(query.dk) <- c("TraderID", "start", "end")
 
 ```
