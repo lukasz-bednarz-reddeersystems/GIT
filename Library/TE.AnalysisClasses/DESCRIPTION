@@ -23,7 +23,6 @@ Imports:
     utils,
     plotly,
     dplyr,
-    ggvis,
     RColorBrewer,
 Suggests:
     testthat,

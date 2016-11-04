@@ -101,13 +101,87 @@ setMethod("setRiskModelObject",
 )
 
 
+#' Set portfolio object in object slot
+#'
+#' Public method to set portfolio slot with "StrategyPortfolio"
+#' class object
+#'
+#' @rdname setPortfolioDataObject-PortfolioFactorExposuresAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param portfolio object of class "StrategyPortfolio"
+#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @export
+setMethod("setPortfolioDataObject",
+          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", portfolio = "StrategyPortfolio"),
+          function(object, portfolio){
+            object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
+            return(object)
+          }
+)
+
+
+#' Set instrument_betas object in object slot
+#'
+#' Public method to set instrument_betas slot with "InstrumentBetasData"
+#' class object
+#'
+#' @rdname setInstrumentBetasDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param instrument_betas object of class "InstrumentBetasData"
+#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @export
+setMethod("setInstrumentBetasDataObject",
+          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", instrument_betas = "InstrumentBetasData"),
+          function(object, instrument_betas){
+            object <- TE.RefClasses:::.setInstrumentBetasDataObject(object, instrument_betas)
+            return(object)
+          }
+)
+
+
+#' Set factor_correlation object in object slot
+#'
+#' Public method to set factor_correlation slot with "InstrumentBetasData"
+#' class object
+#'
+#' @rdname setFactorCorrelationDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param factor_correlation object of class "FactorCorrelationData"
+#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @export
+setMethod("setFactorCorrelationDataObject",
+          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", factor_correlation = "FactorCorrelationData"),
+          function(object, factor_correlation){
+            object <- TE.RefClasses:::.setFactorCorrelationDataObject(object, factor_correlation)
+            return(object)
+          }
+)
+
+
+#' Set factor_variance object in object slot
+#'
+#' Public method to set factor_variance slot with "InstrumentBetasData"
+#' class object
+#'
+#' @rdname setFactorVarianceDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param factor_variance object of class "FactorVarianceData"
+#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @export
+setMethod("setFactorVarianceDataObject",
+          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", factor_variance = "FactorVarianceData"),
+          function(object, factor_variance){
+            object <- TE.RefClasses:::.setFactorVarianceDataObject(object, factor_variance)
+            return(object)
+          }
+)
+
 #' Request data from data source
 #'
 #' @param object object of class 'PortfolioInstrumentMCTRAnalysisBlock'.
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'PortfolioInstrumentMCTRAnalysisBlock'.
 #' @export
-
 setMethod("dataRequest",
           signature(object = "PortfolioInstrumentMCTRAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
@@ -122,96 +196,114 @@ setMethod("dataRequest",
             portf_data <- getPortfolioDataObject(object)
 
 
-            # retrieve trade reference data for query key_values
-            portf_data <- tryCatch({
-              dataRequest(portf_data, key_values)
 
-            },error = function(cond){
-              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(portf_data)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
-              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(portf_data), cond))
-            })
+            if(getStoredNRows(portf_data) == 0){
+              # retrieve trade reference data for query key_values
+              portf_data <- tryCatch({
+                dataRequest(portf_data, key_values)
 
-            object <- TE.RefClasses:::.setPortfolioDataObject(object, portf_data)
+              },error = function(cond){
+                message(sprintf("Error when calling %s on %s class", "dataRequest()", class(portf_data)))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+                end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(portf_data), cond))
+              })
+
+              object <- TE.RefClasses:::.setPortfolioDataObject(object, portf_data)
+            }
 
             # retrieve risk model instrument betas
             query_keys <- getReferenceData(portf_data)[c( "InstrumentID","Date")]
 
-
-            # getting instrument residual returns
-            res_returns <- getInstrumentResidualReturnsDataObject(object)
-            # important step to copy risk_model info
-            res_returns <- setRiskModelObject(res_returns, risk_model)
-
             ins_query_keys <- expand.grid(InstrumentID = unique(query_keys$InstrumentID),
                                           Date = c(as.Date(min(query_keys$Date)) - lookback,
                                                    as.Date(max(query_keys$Date))
-                                                   )
+                                          )
                                           )
 
-            res_returns <- tryCatch({
-              dataRequest(res_returns,ins_query_keys)
 
-            },error = function(cond){
-              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(res_returns)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
-              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(res_returns), cond))
-            })
+            # getting instrument residual returns
+            res_returns <- getInstrumentResidualReturnsDataObject(object)
 
-            object <- TE.RefClasses:::.setInstrumentResidualReturnsDataObject(object, res_returns)
+            if(getStoredNRows(res_returns) == 0){
+              # important step to copy risk_model info
+              res_returns <- setRiskModelObject(res_returns, risk_model)
 
+
+              res_returns <- tryCatch({
+                dataRequest(res_returns,ins_query_keys)
+
+              },error = function(cond){
+                message(sprintf("Error when calling %s on %s class", "dataRequest()", class(res_returns)))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+                end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(res_returns), cond))
+              })
+
+              object <- TE.RefClasses:::.setInstrumentResidualReturnsDataObject(object, res_returns)
+            }
 
 
             # getting Instrument Betas data
             betas_data <- getInstrumentBetasDataObject(object)
-            # important step to copy risk_model info
-            betas_data <- setRiskModelObject(betas_data, risk_model)
 
-            betas_data <- tryCatch({
-              dataRequest(betas_data, ins_query_keys)
+            if(getStoredNRows(betas_data) == 0){
+              # important step to copy risk_model info
+              betas_data <- setRiskModelObject(betas_data, risk_model)
 
-            },error = function(cond){
-              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
-              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(betas_data), cond))
-            })
+              betas_data <- tryCatch({
+                bt <- dataRequest(betas_data, ins_query_keys)
+                betas <- getReferenceData(bt)
+                betas <- adjust_ipo_betas(betas)
+                bt <- setReferenceData(bt, betas)
+                bt
 
-            object <- TE.RefClasses:::.setInstrumentBetasDataObject(object, betas_data)
+              },error = function(cond){
+                message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+                end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(betas_data), cond))
+              })
 
+              object <- TE.RefClasses:::.setInstrumentBetasDataObject(object, betas_data)
+            }
 
             # getting Factor Correlation data
             factor_corr <- getFactorCorrelationDataObject(object)
-            # important step to copy risk_model info
-            factor_corr <- setRiskModelObject(factor_corr, risk_model)
 
-            query_keys <- unique(query_keys["Date"])
-            factor_corr <- tryCatch({
-              dataRequest(factor_corr, query_keys)
+            if(getStoredNRows(factor_corr) == 0){
+              # important step to copy risk_model info
+              factor_corr <- setRiskModelObject(factor_corr, risk_model)
 
-            },error = function(cond){
-              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(factor_corr)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
-              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(factor_corr), cond))
-            })
+              query_keys <- unique(query_keys["Date"])
+              factor_corr <- tryCatch({
+                dataRequest(factor_corr, query_keys)
 
-            object <- TE.RefClasses:::.setFactorCorrelationDataObject(object, factor_corr)
+              },error = function(cond){
+                message(sprintf("Error when calling %s on %s class", "dataRequest()", class(factor_corr)))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+                end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(factor_corr), cond))
+              })
+
+              object <- TE.RefClasses:::.setFactorCorrelationDataObject(object, factor_corr)
+            }
 
 
             # getting Factor Variance data
             factor_var <- getFactorVarianceDataObject(object)
-            # important step to copy risk_model info
-            factor_var <- setRiskModelObject(factor_var, risk_model)
 
-            factor_var <- tryCatch({
-              dataRequest(factor_var, query_keys)
+            if(getStoredNRows(factor_var) == 0){
+              # important step to copy risk_model info
+              factor_var <- setRiskModelObject(factor_var, risk_model)
 
-            },error = function(cond){
-              message(sprintf("Error when calling %s on %s class", "dataRequest()", class(factor_var)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
-              end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(factor_var), cond))
-            })
+              factor_var <- tryCatch({
+                dataRequest(factor_var, query_keys)
 
-            object <- TE.RefClasses:::.setFactorVarianceDataObject(object, factor_var)
+              },error = function(cond){
+                message(sprintf("Error when calling %s on %s class", "dataRequest()", class(factor_var)))
+                message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
+                end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(factor_var), cond))
+              })
+
+              object <- TE.RefClasses:::.setFactorVarianceDataObject(object, factor_var)
+            }
 
             return(object)
           }
@@ -245,7 +337,6 @@ setMethod("Process",
             betas_data <- getInstrumentBetasDataObject(object)
             betas <- getReferenceData(betas_data)
 
-            betas <- adjust_ipo_betas(betas)
 
             factor_corr <- getFactorCorrelationDataObject(object)
             all_fct_cor <- getReferenceData(factor_corr)

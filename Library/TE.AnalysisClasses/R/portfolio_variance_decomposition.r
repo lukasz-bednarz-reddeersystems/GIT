@@ -149,7 +149,13 @@ setMethod("dataRequest",
             betas_data <- setRiskModelObject(betas_data, risk_model)
 
             betas_data <- tryCatch({
-              dataRequest(betas_data, query_keys)
+
+              bt <- dataRequest(betas_data, query_keys)
+
+              betas <- getReferenceData(bt)
+              betas <- adjust_ipo_betas(betas)
+              bt <- setReferenceData(bt, betas)
+              bt
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
