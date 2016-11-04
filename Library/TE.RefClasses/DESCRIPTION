@@ -20,7 +20,8 @@ Imports:
     hash,
     quantmod,
     stats,
-    ggplot2
+    ggplot2,
+    zoo,
 Suggests:
     testthat,
     plyr,

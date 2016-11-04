@@ -25,7 +25,6 @@ setClass(
     column_name_map = hash(c("TraderID", "start", "end"),
                            c("id", "start", "end")),
     risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
-    implied_factor_returns = new("ImpliedFactorReturnsState"),
     implied_factor_returns = new("ImpliedFactorReturnsState")
   ),
   contains          = c("VirtualAnalysisBlock",
@@ -86,7 +85,7 @@ setMethod("dataRequest",
             risk_model <- getRiskModelObject(object)
             # important step to copy risk_model info
             factor_ret <- setRiskModelObject(factor_ret, risk_model)
-            browser()
+
             factor_ret <- tryCatch({
               dataRequest(factor_ret, query_keys)
 
@@ -126,8 +125,10 @@ setMethod("Process",
             sector_factors    <- getRiskModelSectorFactorNames(risk_model)
 
             cn <- colnames(factor_data)
-            mv_factors <- cn[grep('cmpnd',cn)]
-            factors <- setdiff(cn,c(mv_factors,"Date"))
+            cd_factors <- cn[grep('cmpnd',cn)]
+            mv_factors <- cn[grep('mavg',cn)]
+            qt_factors <- cn[grep('ftile',cn)]
+            factors <- setdiff(cn,c(cd_factors,mv_factors,qt_factors,"Date"))
             first <- TRUE
             for(fct in factors){
               if(fct%in%market_factors){
@@ -141,20 +142,28 @@ setMethod("Process",
               } else {
                 rt <- NA
               }
-
+              #browser()
+              levels <- c(as.character(sort(unique(factor_data[[paste(fct,"_ftile",sep="")]]))),NA)
+              factor_data[[paste(fct,"_ftile",sep="")]] <- unlist(Map(function(x)if(is.na(x)){NA}else{which(x==levels)},as.character(factor_data[[paste(fct,"_ftile",sep="")]])))
               if(first){
-                plt_data <- data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd",sep="")]],RiskType=rt,Factor=fct)
+                plt_data <- rbind(data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd",sep="")]],RiskType=rt,Factor=fct,Quantity='Cmpd. Return'),
+                                  data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_20_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
+                                  #data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_50_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
+                                  data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_ftile",sep="")]],RiskType=rt,Factor=fct,Quantity='Quartile'))
                 first <- FALSE
               } else {
-                plt_data <- rbind(plt_data,data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd",sep="")]],RiskType=rt,Factor=fct))
+                plt_data <- rbind(plt_data,rbind(data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd",sep="")]],RiskType=rt,Factor=fct,Quantity='Cmpd. Return'),
+                                                 data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_20_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
+                                                 #data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_50_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
+                                                 data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_ftile",sep="")]],RiskType=rt,Factor=fct,Quantity='Quartile')))
               }
             }
-            browser()
+
             object <- .setOutputGGPlotData(object, plt_data)
 
             plt_risk <- ggplot(data=plt_data,aes(x=Date,y=Value,color=Factor)) +
                                geom_line(size=1) +
-                               facet_grid(RiskType~.,scales="free_y")
+                               facet_grid(RiskType~Quantity,scales="free_y")
 
             object <- .setOutputGGPlot(object, plt_risk)
 

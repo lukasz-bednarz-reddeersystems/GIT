@@ -139,3 +139,65 @@ tseries_excess_compound <- function(input){
   return(input)
 
 }
+
+########################################################################
+#
+# compute moving averages of a timeseries
+#
+########################################################################
+tseries_mavgs <- function(input,mavgs=c(20,50)){
+  required_colnms <- c('Date')
+  if(!has_required_columns(input, required_colnms)) {
+    stop(paste("tseries_mavgs requires following columns :", required_colnms))
+  }
+  input <- input[order(input$Date),]
+  mavg_on <- setdiff(colnames(input),'Date')
+  for(col in mavg_on){
+    for(m in mavgs){
+      mavg <- zoo::rollapply(input[[col]],width=m,FUN=function(x)mean(x,na.rm=TRUE))
+      input[[paste(col,'_',m,'_mavg',sep="")]] <- c(rep(NA,m-1),mavg)
+    }
+  }
+  return(input)
+}
+
+########################################################################
+#
+# compute spread between two moving averages
+#
+########################################################################
+tseries_mavgs_spread <- function(input,mavgs=c(20,50)){
+  required_colnms <- c('Date')
+  if(!has_required_columns(input, required_colnms)) {
+    stop(paste("tseries_mavgs requires following columns :", required_colnms))
+  }
+  if(length(mavgs)!=2)stop("Can only compute mavg spread between two moving averages.")
+  mavgs <- sort(mavgs)
+
+  input <- input[order(input$Date),]
+  cn <- colnames(input)
+  mavg_cols <- cn[grep('mavg',cn)]
+  base_cols <- setdiff(cn,c(mavg_cols,'Date'))
+  for(col in base_cols){
+    input[[paste(col,'_mavg_sprd',sep="")]] <- input[[paste(col,'_',mavgs[1],'_mavg',sep='')]]-input[[paste(col,'_',mavgs[2],'_mavg',sep='')]]
+    input[[paste(col,'_mavg_sprd_df',sep="")]] <- c(NA,diff(input[[paste(col,'_mavg_sprd',sep="")]]))
+  }
+  return(input)
+}
+
+########################################################################
+#
+# compute quantiles of timeseries
+#
+########################################################################
+ftiler <- function(data,ntiles=4){
+  required_colnms <- c('Date')
+  if(!has_required_columns(data, required_colnms)) {
+    stop(paste("tseries_mavgs requires following columns :", required_colnms))
+  }
+  ntile_on <- setdiff(colnames(data),"Date")
+  for(on in ntile_on){
+    data[[paste(on,'_ftile',sep='')]] <- with(data[on], cut(as.numeric(unlist(data[on])), breaks=unique(quantile(data[on], probs=seq(0,1, by=1/ntiles), na.rm=TRUE)), include.lowest=TRUE))
+  }
+  return(data)
+}

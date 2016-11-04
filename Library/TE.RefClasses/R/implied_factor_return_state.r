@@ -27,7 +27,10 @@ NULL
 setClass(
   Class          = "ImpliedFactorReturnsState",
   prototype      = list(
-    transformations = list(new("CompoundImpliedFactorReturnsTransformation"))
+    transformations = list(new("CompoundImpliedFactorReturnsTransformation"),
+                           new("ImpliedFactorReturnsMAVGTransformation"),
+                           new("ImpliedFactorReturnsMAVGSpreadTransformation"),
+                           new("ImpliedFactorReturnsQuartileTransformation"))
   ),
   contains = c("ImpliedFactorReturnsData",
                "VirtualTransformationsHandler")
@@ -57,14 +60,24 @@ setMethod("computeImpliedFactorReturnsState",
             transformations <- getTransformations(object)
             data <- getReferenceData(object)
             all_data <- data
+            orig_cols <- colnames(data)
             compd_cols <- c()
-            for(transformation in transformations){
+            for(transformation in transformations[1:3]){
               transformation <- setComputationInput(transformation,data[setdiff(colnames(data),compd_cols)])
               transformation <- triggerComputation(transformation)
               compd_cols <- setdiff(colnames(data),"Date")
               data <- getComputationOutput(transformation)
               all_data <- merge(all_data,data[setdiff(colnames(data),compd_cols)],by=c("Date"))
             }
+            #browser()
+            transformation <- transformations[[4]]
+            df <- all_data[c('Date',paste(setdiff(orig_cols,'Date'),'_cmpnd',sep=""))]
+            names(df) <- orig_cols
+            transformation <- setComputationInput(transformation,df)
+            transformation <- triggerComputation(transformation)
+            data <- getComputationOutput(transformation)
+            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),orig_cols))],by=c("Date"))
+
             object <- setReferenceData(object,all_data)
 
             return(object)

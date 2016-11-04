@@ -150,7 +150,7 @@ setMethod("dataRequest",
             merge_cols   <- colnames(key_values)
 
             first <- TRUE
-            browser()
+  
             for(key_idx in seq(nrow(query_key_vals))) {
 
               start        <- as.Date(query_key_vals$start[key_idx])
