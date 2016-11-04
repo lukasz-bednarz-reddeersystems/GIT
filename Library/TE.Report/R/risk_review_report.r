@@ -13,6 +13,7 @@ NULL
 #' List of Analysis modules used by RiskReviewReport Class
 risk_review_analysis_blocks <- c(
                                              "PortfolioVarianceDecomposition",
+                                             "PortfolioInstrumentMCTR",
                                              "PortfolioFactorReturns",
                                              "PortfolioFactorExposures"
 )
@@ -91,11 +92,38 @@ setMethod("Process",
             #process
             portf.var.an <- Process(portf.var.an)
 
-            portf_data <- getPortfolioDataObject(portf.var.an)
-            betas_data <- getInstrumentBetasDataObject(portf.var.an)
+            portf_data         <- getPortfolioDataObject(portf.var.an)
+            betas_data         <- getInstrumentBetasDataObject(portf.var.an)
+            factor_correlation <- getFactorCorrelationDataObject(portf.var.an)
+            factor_variance    <- getFactorVarianceDataObject(portf.var.an)
 
             # set processed result
             object <- .copyAnalyzerOutputData(object, portf.var.an)
+
+
+            ######################################################
+            #
+            # PortfolioInstrumentMCTRAnalysisBlock xx
+            #
+            ######################################################
+
+            # create/get data/process offside positions analyzer
+            portf.mcr.an <- new("PortfolioInstrumentMCTRAnalysisBlock")
+
+            # set data
+            portf.mcr.an <- setPortfolioDataObject(portf.mcr.an, portf_data)
+            portf.mcr.an <- setInstrumentBetasDataObject(portf.mcr.an, betas_data)
+            portf.mcr.an <- setFactorCorrelationDataObject(portf.mcr.an, factor_correlation)
+            portf.mcr.an <- setFactorVarianceDataObject(portf.mcr.an, factor_variance)
+
+            # gets required data
+            portf.mcr.an <- dataRequest(portf.mcr.an, key_values)
+
+            #process
+            portf.mcr.an <- Process(portf.mcr.an)
+
+            # set processed result
+            object <- .copyAnalyzerOutputData(object, portf.mcr.an)
 
             ######################################################
             #
