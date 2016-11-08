@@ -40,7 +40,7 @@ setClass(
 #' Public method to set trade_data slot with "AverageDownTradesData"
 #' class object
 #'
-#' @rdname setTradeDataObject-AverageDownTradesFocusAnalysisBlock-method
+#' @rdname setTradeDataObject-AverageDownTradesFocus-method
 #' @param object object of class "AverageDownTradesFocusAnalysisBlock"
 #' @param trade_data object of class "AverageDownTradesData"
 #' @return \code{object} object of class "AverageDownTradesFocusAnalysisBlock"

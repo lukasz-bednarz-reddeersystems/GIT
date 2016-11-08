@@ -72,7 +72,7 @@ setClass(
 #' Public method to set position_data slot with "OffsidePositionData"
 #' class object
 #'
-#' @rdname setPositionDataObject-AverageDownTradesAnalysisBlock-method
+#' @rdname setPositionDataObject-AverageDownTrades-method
 #' @param object object of class "AverageDownTradesAnalysisBlock"
 #' @param position_data object of class "OffsidePositionData"
 #' @return \code{object} object of class "AverageDownTradesAnalysisBlock"

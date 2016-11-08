@@ -34,7 +34,7 @@ setClass(
 #' Public method to set trade_data slot with "TradeData"
 #' class object
 #'
-#' @rdname setTradeDataObject-ExtendedTradesSummaryAnalysisBlock-method
+#' @rdname setTradeDataObject-ExtendedTradesSummary-method
 #' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
 #' @param trade_data object of class "TradeData"
 #' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"
@@ -53,7 +53,7 @@ setMethod("setTradeDataObject",
 #' Public method to set ex_trade_data slot with "ExtendedTradeData"
 #' class object
 #'
-#' @rdname setExtendedTradeDataObject-ExtendedTradesSummaryAnalysisBlock-method
+#' @rdname setExtendedTradeDataObject-ExtendedTradesSummary-method
 #' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
 #' @param ex_trade_data object of class "ExtendedTradeData"
 #' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"

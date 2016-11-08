@@ -4,24 +4,24 @@ NULL
 
 ################################################################################
 #
-# PortfolioCoreFactorReturnsAnalysisBlock Class
+# PortfolioCoreFactorHedgeReturnsAnalysisBlock Class
 #
 # Computation block class to pull data required for portfolio returns decomposition
 # Pulls data required for computation and adds required columns.
 ###############################################################################
 
 
-#' PortfolioCoreFactorReturnsData Reference Data class.
+#' PortfolioCoreFactorHedgeReturnsData Reference Data class.
 #'
 #' Concrete S4 class storing data Portfolio Returns Decomposition
-#' Data. Generated only within PortfolioCoreFactorReturnsAnalysisBlock
+#' Data. Generated only within PortfolioCoreFactorHedgeReturnsAnalysisBlock
 #'
 #' Inherits from "VirtualImpliedFactorReturnsData"
 #'
 #' @export
 
 setClass(
-  Class             = "PortfolioCoreFactorReturnsData",
+  Class             = "PortfolioCoreFactorHedgeReturnsData",
   prototype         = list(
     required_colnms = c("Date")
   ),
@@ -45,12 +45,12 @@ setClass(
 #' @export
 
 setClass(
-  Class             = "PortfolioCoreFactorReturnsAnalysisBlock",
+  Class             = "PortfolioCoreFactorHedgeReturnsAnalysisBlock",
   slots             = c(
     portfolio              = "Portfolio",
     instrument_betas       = "InstrumentBetasData",
     implied_factor_returns = "ImpliedFactorReturnsData",
-    output                 = "PortfolioCoreFactorReturnsData"
+    output                 = "PortfolioCoreFactorHedgeReturnsData"
   ),
   prototype         = list(
     key_cols        = c("TraderID", "start", "end"),
@@ -63,7 +63,7 @@ setClass(
     risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
     instrument_betas = new("InstrumentBetasData"),
     implied_factor_returns = new("ImpliedFactorReturnsData"),
-    output          = new("PortfolioCoreFactorReturnsData")
+    output          = new("PortfolioCoreFactorHedgeReturnsData")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualPortfolioDataHandler",
@@ -79,14 +79,14 @@ setClass(
 #' Public method to set trade_data slot with "VirtualRiskModel"
 #' class object
 #'
-#' @rdname setRiskModelObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @rdname setRiskModelObject-PortfolioCoreFactorHedgeReturns-method
+#' @param object object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @return \code{object} object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
-          signature(object = "PortfolioCoreFactorReturnsAnalysisBlock",
+          signature(object = "PortfolioCoreFactorHedgeReturnsAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
@@ -106,14 +106,14 @@ setMethod("setRiskModelObject",
 #' Public method to set portfolio slot with "StrategyPortfolio"
 #' class object
 #'
-#' @rdname setPortfolioDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @rdname setPortfolioDataObject-PortfolioCoreFactorHedgeReturns-method
+#' @param object object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @param portfolio object of class "StrategyPortfolio"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @return \code{object} object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @export
 
 setMethod("setPortfolioDataObject",
-          signature(object = "PortfolioCoreFactorReturnsAnalysisBlock", portfolio = "StrategyPortfolio"),
+          signature(object = "PortfolioCoreFactorHedgeReturnsAnalysisBlock", portfolio = "StrategyPortfolio"),
           function(object, portfolio){
             object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
@@ -127,14 +127,14 @@ setMethod("setPortfolioDataObject",
 #' Public method to set instrument_betas slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setInstrumentBetasDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @rdname setInstrumentBetasDataObject-PortfolioCoreFactorHedgeReturns-method
+#' @param object object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @param instrument_betas object of class "InstrumentBetasData"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @return \code{object} object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @export
 
 setMethod("setInstrumentBetasDataObject",
-          signature(object = "PortfolioCoreFactorReturnsAnalysisBlock", instrument_betas = "InstrumentBetasData"),
+          signature(object = "PortfolioCoreFactorHedgeReturnsAnalysisBlock", instrument_betas = "InstrumentBetasData"),
           function(object, instrument_betas){
             object <- TE.RefClasses:::.setInstrumentBetasDataObject(object, instrument_betas)
             return(object)
@@ -145,14 +145,14 @@ setMethod("setInstrumentBetasDataObject",
 
 #' Request data from data source
 #'
-#' @rdname dataRequest-PortfolioCoreFactorReturns-method
-#' @param object object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
+#' @rdname dataRequest-PortfolioCoreFactorHedgeReturns-method
+#' @param object object of class 'PortfolioCoreFactorHedgeReturnsAnalysisBlock'.
 #' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
+#' @return \code{object} object of class 'PortfolioCoreFactorHedgeReturnsAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
-          signature(object = "PortfolioCoreFactorReturnsAnalysisBlock", key_values = "data.frame"),
+          signature(object = "PortfolioCoreFactorHedgeReturnsAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
@@ -228,13 +228,13 @@ setMethod("dataRequest",
 
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PortfolioCoreFactorReturns-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @rdname Process-PortfolioCoreFactorHedgeReturns-method
+#' @param object object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
+#' @return \code{object} object object of class "PortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @export
 
 setMethod("Process",
-          signature(object = "PortfolioCoreFactorReturnsAnalysisBlock"),
+          signature(object = "PortfolioCoreFactorHedgeReturnsAnalysisBlock"),
           function(object){
 
 
@@ -258,6 +258,9 @@ setMethod("Process",
 
             portf_data <- getPortfolioDataObject(object)
             port <- getReferenceData(portf_data)
+            strats <- unique(port$Strategy)
+            strats <- strats[grepl("HEDGE|HDG", strats)]
+            port <- port[port$Strategy %in% strats, ]
 
             betas_data <- getInstrumentBetasDataObject(object)
             betas <- getReferenceData(betas_data)
@@ -330,7 +333,7 @@ setMethod("Process",
                                                              y="Value",
                                                              color="RiskType",
                                                              linetype = "RiskType")) +
-              geom_line(size=1) + ylab("Cumulative Daily returns attribution (%)") +
+              geom_line(size=1) + ylab("Hedges Cumulative Daily returns attribution (%)") +
               # scale_colour_manual(breaks  = ret_plot_data$RiskType,
               #                     values  = ret_plot_data$)
               #colScale + lineScale +
@@ -354,7 +357,7 @@ setMethod("Process",
 
 ################################################################################
 #
-# IndexPortfolioCoreFactorReturnsAnalysisBlock Class
+# IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock Class
 #
 # Computation block class to pull data required for portfolio returns decomposition
 # Pulls data required for computation and adds required columns.
@@ -367,12 +370,12 @@ setMethod("Process",
 #' and adds required columns. Generates ggplot with returns
 #' decomposition to factors.
 #'
-#' Inherits from "PortfolioCoreFactorReturnsAnalysisBlock"
+#' Inherits from "IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #'
 #' @export
 
 setClass(
-  Class             = "IndexPortfolioCoreFactorReturnsAnalysisBlock",
+  Class             = "IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock",
   prototype         = list(
     key_cols        = c("IndexTicker", "start", "end"),
     key_values      = data.frame(IndexTicker = character(),
@@ -384,7 +387,7 @@ setClass(
     risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
 
   ),
-  contains          = c("PortfolioCoreFactorReturnsAnalysisBlock"
+  contains          = c("PortfolioCoreFactorHedgeReturnsAnalysisBlock"
   )
 )
 
@@ -394,13 +397,13 @@ setClass(
 #' Public method to set portfolio slot with "VirtualIndexPortfolio"
 #' class object
 #'
-#' @rdname setPortfolioDataObject-IndexPortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
+#' @rdname setPortfolioDataObject-IndexPortfolioCoreFactorHedgeReturns-method
+#' @param object object of class "IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
+#' @return \code{object} object of class "IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock"
 #' @export
 setMethod("setPortfolioDataObject",
-          signature(object = "IndexPortfolioCoreFactorReturnsAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
+          signature(object = "IndexPortfolioCoreFactorHedgeReturnsAnalysisBlock", portfolio = "VirtualIndexPortfolio"),
           function(object, portfolio){
             object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)

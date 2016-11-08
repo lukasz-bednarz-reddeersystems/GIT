@@ -83,7 +83,7 @@ setClass(
 #' Public method to set trade_data slot with "VirtualRiskModel"
 #' class object
 #'
-#' @rdname setRiskModelObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @rdname setRiskModelObject-PortfolioInstrumentCoreFactorsMCTRA-method
 #' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param risk_model object of class "VirtualRiskModel"
 #' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
@@ -106,7 +106,7 @@ setMethod("setRiskModelObject",
 #' Public method to set portfolio slot with "StrategyPortfolio"
 #' class object
 #'
-#' @rdname setPortfolioDataObject-PortfolioFactorExposuresAnalysisBlock-method
+#' @rdname setPortfolioDataObject-PortfolioInstrumentCoreFactorsMCTR-method
 #' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param portfolio object of class "StrategyPortfolio"
 #' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
@@ -125,7 +125,7 @@ setMethod("setPortfolioDataObject",
 #' Public method to set instrument_betas slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setInstrumentBetasDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @rdname setInstrumentBetasDataObject-PortfolioInstrumentCoreFactorsMCTR-method
 #' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param instrument_betas object of class "InstrumentBetasData"
 #' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
@@ -144,7 +144,7 @@ setMethod("setInstrumentBetasDataObject",
 #' Public method to set factor_correlation slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setFactorCorrelationDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @rdname setFactorCorrelationDataObject-PortfolioInstrumentCoreFactorsMCTR-method
 #' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param factor_correlation object of class "FactorCorrelationData"
 #' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
@@ -163,7 +163,7 @@ setMethod("setFactorCorrelationDataObject",
 #' Public method to set factor_variance slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setFactorVarianceDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @rdname setFactorVarianceDataObject-PortfolioInstrumentCoreFactorsMCTR-method
 #' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param factor_variance object of class "FactorVarianceData"
 #' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
@@ -178,6 +178,7 @@ setMethod("setFactorVarianceDataObject",
 
 #' Request data from data source
 #'
+#' @rdname dataRequest-PortfolioInstrumentCoreFactorsMCTR-method
 #' @param object object of class 'PortfolioInstrumentCoreFactorsMCTRAnalysisBlock'.
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'PortfolioInstrumentCoreFactorsMCTRAnalysisBlock'.
@@ -192,6 +193,7 @@ setMethod("dataRequest",
 
             start <- max(key_values$start)
             end <- max(key_values$end)
+            id <- unique(key_values$id)[1]
 
             portf_data <- getPortfolioDataObject(object)
 
@@ -420,7 +422,7 @@ setMethod("Process",
 
             mctv_fg_df <- mctv_fg_df[mctv_fg_df$ACV != 0.0 & mctv_fg_df$MCV != 0,]
 
-            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(ACV))
+            mctr_df.top10 <- arrange_(mctv_fg_df, "Date", "RiskType", "desc(ACV)")
 
 
             mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
@@ -507,7 +509,7 @@ setMethod("Process",
 #'
 #' @export
 setClass(
-  Class             = "IndexPortfolioInstrumentMCTRAnalysisBlock",
+  Class             = "IndexPortfolioInstrumentCoreFactorsMCTRAnalysisBlock",
   prototype         = list(
     key_cols        = c("IndexTicker", "start", "end"),
     key_values      = data.frame(IndexTicker = character(),
@@ -527,13 +529,13 @@ setClass(
 #' Public method to set portfolio slot with "VirtualIndexPortfolio"
 #' class object
 #'
-#' @rdname setPortfolioDataObject-IndexPortfolioInstrumentMCTR-method
-#' @param object object of class "IndexPortfolioInstrumentMCTRAnalysisBlock"
+#' @rdname setPortfolioDataObject-IndexPortfolioInstrumentCoreFactorsMCTR-method
+#' @param object object of class "IndexPortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioInstrumentMCTRAnalysisBlock""
+#' @return \code{object} object of class "IndexPortfolioInstrumentCoreFactorsMCTRAnalysisBlock""
 #' @export
 setMethod("setPortfolioDataObject",
-          signature(object = "IndexPortfolioInstrumentMCTRAnalysisBlock",
+          signature(object = "IndexPortfolioInstrumentCoreFactorsMCTRAnalysisBlock",
                     portfolio = "VirtualIndexPortfolio"),
           function(object, portfolio){
             object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)

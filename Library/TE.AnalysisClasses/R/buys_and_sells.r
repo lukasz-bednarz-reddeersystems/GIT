@@ -40,7 +40,7 @@ setClass(
 #' Public method to set trade_data slot with "ExtendedTradeData"
 #' class object
 #'
-#' @rdname setTradeDataObject-BuysAndSellsAnalysisBlock-method
+#' @rdname setTradeDataObject-BuysAndSells-method
 #' @param object object of class "BuysAndSellsAnalysisBlock"
 #' @param trade_data object of class "ExtendedTradeData"
 #' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
@@ -101,7 +101,7 @@ setMethod("dataRequest",
 #' Public method to set market_data slot with "MarketData"
 #' class object
 #'
-#' @rdname setMarketDataObject-BuysAndSellsAnalysisBlock-method
+#' @rdname setMarketDataObject-BuysAndSells-method
 #' @param object object of class "BuysAndSellsAnalysisBlock"
 #' @param market_data object of class "MarketData"
 #' @return \code{object} object of class "BuysAndSellsAnalysisBlock"

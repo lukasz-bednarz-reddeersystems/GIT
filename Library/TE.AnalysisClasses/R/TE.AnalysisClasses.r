@@ -12,12 +12,12 @@
 #' @import quantmod
 #' @import lubridate
 #' @import ggplot2
-#' @importFrom dplyr arrange
+#' @importFrom dplyr arrange_
 #' @importFrom hash hash values names.hash keys
 #' @importFrom DMwR lofactor
 #' @importFrom graphics barplot frame text
-#' @importFrom stats aggregate cor.test fitted loess median cor reorder start na.omit
-#' @importFrom utils head tail stack
+#' @importFrom stats aggregate cor.test fitted loess median cor reorder start na.omit var cov
+#' @importFrom utils head tail stack unstack
 #' @importFrom plotly plot_ly add_trace layout subplot
 #' @importFrom RColorBrewer brewer.pal brewer.pal.info
 #' @importClassesFrom hash hash

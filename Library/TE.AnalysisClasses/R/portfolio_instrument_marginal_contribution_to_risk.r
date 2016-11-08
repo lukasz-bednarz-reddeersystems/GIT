@@ -428,7 +428,7 @@ setMethod("Process",
 
             mctv_fg_df <- mctv_fg_df[mctv_fg_df$ACV != 0.0 & mctv_fg_df$MCV != 0,]
 
-            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(ACV))
+            mctr_df.top10 <- arrange_(mctv_fg_df, "Date", "RiskType", "desc(ACV)")
 
 
             mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
@@ -450,7 +450,7 @@ setMethod("Process",
                               )
 
 
-            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(MCV))
+            mctr_df.top10 <- arrange_(mctv_fg_df, "Date", "RiskType", "desc(MCV)")
             mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
 
             mctr_df.top10 <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
