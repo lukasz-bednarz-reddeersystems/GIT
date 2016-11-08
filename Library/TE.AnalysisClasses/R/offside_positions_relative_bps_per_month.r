@@ -56,15 +56,14 @@ setClass(
                         )
 )
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionData"
-#' class object
-#'
-#' @rdname setPositionDataObject-OffsidePositionsBpsPerMonthAnalysisBlock-method
-#' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
-#' @param position_data object of class "OffsidePositionData"
-#' @return \code{object} object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+# ' @rdname setPositionDataObject-OffsidePositionsBpsPerMonthAnalysisBlock-method
+# ' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionData"
+# ' @return \code{object} object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -76,10 +75,14 @@ setMethod("setPositionDataObject",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
-#' @return \code{object} object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+# ' @return \code{object} object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
 #' @export
 
 setMethod("Process",

@@ -48,15 +48,14 @@ setClass(
   )
 )
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
-#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
+# ' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
@@ -68,11 +67,15 @@ setMethod("setRiskModelObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'MarketStyleFactorStatisticAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -110,10 +113,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
-#' @return \code{object} object object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @return \code{object} object object of class "MarketStyleFactorStatisticAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "MarketStyleFactorStatisticAnalysisBlock"),

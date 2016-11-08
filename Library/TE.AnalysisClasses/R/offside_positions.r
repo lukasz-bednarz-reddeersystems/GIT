@@ -62,11 +62,15 @@ setClass(
                         )
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'OffsidePositionsAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'OffsidePositionsAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'OffsidePositionsAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'OffsidePositionsAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -126,11 +130,15 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
+#' @inheritParams Process
 #'
-#' @param object object of class "OffsidePositionsAnalysisBlock"
-#' @return \code{object} object object of class "OffsidePositionsAnalysisBlock"
+#'
+# ' @param object object of class "OffsidePositionsAnalysisBlock"
+# ' @return \code{object} object object of class "OffsidePositionsAnalysisBlock"
 #' @export
 
 setMethod("Process",

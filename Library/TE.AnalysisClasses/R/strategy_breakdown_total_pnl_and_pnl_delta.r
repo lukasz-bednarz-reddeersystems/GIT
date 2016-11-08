@@ -31,15 +31,14 @@ setClass(
                         )
 )
 
+#' @describeIn setStrategyDataObject
 #' Set strategy_data object in object slot
+#' @inheritParams setStrategyDataObject
 #'
-#' Public method to set strategy_data slot with "StrategyBreakDownData"
-#' class object
-#'
-#' @rdname setStrategyDataObject-StrategyBreakdownTotalAndDeltaPnL-method
-#' @param object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
-#' @param strategy_data object of class "StrategyBreakDownData"
-#' @return \code{object} object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+# ' @rdname setStrategyDataObject-StrategyBreakdownTotalAndDeltaPnL-method
+# ' @param object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+# ' @param strategy_data object of class "StrategyBreakDownData"
+# ' @return \code{object} object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
 #' @export
 setMethod("setStrategyDataObject",
           signature(object = "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock", strategy_data = "StrategyBreakDownData"),
@@ -50,10 +49,14 @@ setMethod("setStrategyDataObject",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "StrategyBreakdownTotalAndDeltaPnLAnalysisBlock"),

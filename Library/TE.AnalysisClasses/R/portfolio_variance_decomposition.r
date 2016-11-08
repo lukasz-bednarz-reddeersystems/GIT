@@ -76,15 +76,14 @@ setClass(
 
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-PortfolioVarianceDecompositionAnalysisBlock-method
-#' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @rdname setRiskModelObject-PortfolioVarianceDecompositionAnalysisBlock-method
+# ' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "PortfolioVarianceDecompositionAnalysisBlock"
 #' @export
 setMethod("setRiskModelObject",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock",
@@ -107,11 +106,15 @@ setMethod("setRiskModelObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -205,10 +208,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @return \code{object} object object of class "PortfolioVarianceDecompositionAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock"),
@@ -358,15 +365,14 @@ setClass(
   contains          = c("PortfolioVarianceDecompositionAnalysisBlock")
 )
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "VirtualIndexPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-IndexPortfolioVarianceDecomposition-method
-#' @param object object of class "IndexPortfolioVarianceDecompositionAnalysisBlock"
-#' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioVarianceDecompositionAnalysisBlock""
+# ' @rdname setPortfolioDataObject-IndexPortfolioVarianceDecomposition-method
+# ' @param object object of class "IndexPortfolioVarianceDecompositionAnalysisBlock"
+# ' @param portfolio object of class "VirtualIndexPortfolio"
+# ' @return \code{object} object of class "IndexPortfolioVarianceDecompositionAnalysisBlock""
 #' @export
 setMethod("setPortfolioDataObject",
           signature(object = "IndexPortfolioVarianceDecompositionAnalysisBlock",

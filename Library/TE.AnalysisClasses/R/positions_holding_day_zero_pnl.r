@@ -36,15 +36,14 @@ setClass(
 )
 
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionData"
-#' class object
-#'
-#' @rdname setPositionDataObject-PositionsHoldingDayZeroPnL-method
-#' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
-#' @param position_data object of class "OffsidePositionData"
-#' @return \code{object} object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+# ' @rdname setPositionDataObject-PositionsHoldingDayZeroPnL-method
+# ' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionData"
+# ' @return \code{object} object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -54,15 +53,14 @@ setMethod("setPositionDataObject",
           }
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-PositionsHoldingDayZeroPnLAnalysisBlock-method
-#' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+# ' @rdname setTradeDataObject-PositionsHoldingDayZeroPnLAnalysisBlock-method
+# ' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -73,12 +71,15 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PositionsHoldingDayZeroPnL-method
-#' @param object object of class 'PositionsHoldingDayZeroPnLAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PositionsHoldingDayZeroPnLAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PositionsHoldingDayZeroPnLAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PositionsHoldingDayZeroPnLAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -129,11 +130,15 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PositionsHoldingDayZeroPnL-method
-#' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
-#' @return \code{object} object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PositionsHoldingDayZeroPnL-method
+# ' @param object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
+# ' @return \code{object} object object of class "PositionsHoldingDayZeroPnLAnalysisBlock"
 #' @export
 
 setMethod("Process",

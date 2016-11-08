@@ -35,14 +35,13 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @param object object of class "PositionRevisitsAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "PositionRevisitsAnalysisBlock"
+# ' @param object object of class "PositionRevisitsAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "PositionRevisitsAnalysisBlock"
 #' @export
 setMethod("setTradeDataObject",
           signature(object = "PositionRevisitsAnalysisBlock", trade_data = "TradeData"),
@@ -52,11 +51,15 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'PositionRevisitsAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PositionRevisitsAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PositionRevisitsAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PositionRevisitsAnalysisBlock'.
 #' @export
 setMethod("dataRequest",
           signature(object = "PositionRevisitsAnalysisBlock", key_values = "data.frame"),
@@ -89,10 +92,14 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PositionRevisitsAnalysisBlock"
-#' @return \code{object} object object of class "PositionRevisitsAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "PositionRevisitsAnalysisBlock"
+# ' @return \code{object} object object of class "PositionRevisitsAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "PositionRevisitsAnalysisBlock"),

@@ -74,15 +74,14 @@ setClass(
 )
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @rdname setRiskModelObject-PortfolioCoreFactorReturnsAnalysisBlock-method
+# ' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
@@ -101,15 +100,14 @@ setMethod("setRiskModelObject",
           }
 )
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "StrategyPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
-#' @param portfolio object of class "StrategyPortfolio"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @rdname setPortfolioDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
+# ' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @param portfolio object of class "StrategyPortfolio"
+# ' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("setPortfolioDataObject",
@@ -122,15 +120,14 @@ setMethod("setPortfolioDataObject",
 
 
 
-#' Set instrument_betas object in object slot
+#' @describeIn setInstrumentBetasDataObject
+#' Set portfolio object in object slot
+#' @inheritParams setInstrumentBetasDataObject
 #'
-#' Public method to set instrument_betas slot with "InstrumentBetasData"
-#' class object
-#'
-#' @rdname setInstrumentBetasDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
-#' @param instrument_betas object of class "InstrumentBetasData"
-#' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @rdname setInstrumentBetasDataObject-PortfolioCoreFactorReturnsAnalysisBlock-method
+# ' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @param instrument_betas object of class "InstrumentBetasData"
+# ' @return \code{object} object of class "PortfolioCoreFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("setInstrumentBetasDataObject",
@@ -143,12 +140,15 @@ setMethod("setInstrumentBetasDataObject",
 
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PortfolioCoreFactorReturns-method
-#' @param object object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PortfolioCoreFactorReturnsAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -226,11 +226,15 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PortfolioCoreFactorReturns-method
-#' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PortfolioCoreFactorReturns-method
+# ' @param object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
+# ' @return \code{object} object object of class "PortfolioCoreFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("Process",
@@ -389,15 +393,14 @@ setClass(
 )
 
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "VirtualIndexPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-IndexPortfolioCoreFactorReturnsAnalysisBlock-method
-#' @param object object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
-#' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
+# ' @rdname setPortfolioDataObject-IndexPortfolioCoreFactorReturnsAnalysisBlock-method
+# ' @param object object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
+# ' @param portfolio object of class "VirtualIndexPortfolio"
+# ' @return \code{object} object of class "IndexPortfolioCoreFactorReturnsAnalysisBlock"
 #' @export
 setMethod("setPortfolioDataObject",
           signature(object = "IndexPortfolioCoreFactorReturnsAnalysisBlock", portfolio = "VirtualIndexPortfolio"),

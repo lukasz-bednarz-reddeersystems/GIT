@@ -32,14 +32,13 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-PnLTradedInLongShortHedge-method
-#' @param object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
-#' @param trade_data object of class "TradeData"
+# ' @rdname setTradeDataObject-PnLTradedInLongShortHedge-method
+# ' @param object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
 #' @return \code{object} object of class "PnLTradedInLongShortHedgeAnalysisBlock"
 #' @export
 
@@ -50,11 +49,15 @@ setMethod("setTradeDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PnLTradedInLongShortHedgeAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -86,11 +89,15 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PnLTradedInLongShortHedge-method
-#' @param object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
-#' @return \code{object} object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PnLTradedInLongShortHedge-method
+# ' @param object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
+# ' @return \code{object} object object of class "PnLTradedInLongShortHedgeAnalysisBlock"
 #' @export
 
 setMethod("Process",

@@ -53,15 +53,14 @@ setClass(
   )
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "ExtendedTradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-MarketReturnAnalysisBlock-method
-#' @param object object of class "MarketReturnAnalysisBlock"
-#' @param trade_data object of class "ExtendedTradeData"
-#' @return \code{object} object of class "MarketReturnAnalysisBlock"
+# ' @rdname setTradeDataObject-MarketReturnAnalysisBlock-method
+# ' @param object object of class "MarketReturnAnalysisBlock"
+# ' @param trade_data object of class "ExtendedTradeData"
+# ' @return \code{object} object of class "MarketReturnAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -92,11 +91,15 @@ setMethod("setMarketDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'MarketReturnAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'MarketReturnAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'MarketReturnAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'MarketReturnAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -135,10 +138,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "MarketReturnAnalysisBlock"
-#' @return \code{object} object object of class "MarketReturnAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "MarketReturnAnalysisBlock"
+# ' @return \code{object} object object of class "MarketReturnAnalysisBlock"
 #' @export
 
 setMethod("Process",

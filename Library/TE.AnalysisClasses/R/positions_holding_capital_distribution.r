@@ -36,15 +36,14 @@ setClass(
 )
 
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionData"
-#' class object
-#'
-#' @rdname setPositionDataObject-PositionsHoldingCapitalDistribution-method
-#' @param object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
-#' @param position_data object of class "OffsidePositionData"
-#' @return \code{object} object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
+# ' @rdname setPositionDataObject-PositionsHoldingCapitalDistribution-method
+# ' @param object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionData"
+# ' @return \code{object} object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -55,12 +54,15 @@ setMethod("setPositionDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PositionsHoldingCapitalDistribution-method
-#' @param object object of class 'PositionsHoldingCapitalDistributionAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PositionsHoldingCapitalDistributionAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PositionsHoldingCapitalDistributionAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PositionsHoldingCapitalDistributionAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -94,11 +96,15 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PositionsHoldingCapitalDistribution-method
-#' @param object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
-#' @return \code{object} object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PositionsHoldingCapitalDistribution-method
+# ' @param object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
+# ' @return \code{object} object object of class "PositionsHoldingCapitalDistributionAnalysisBlock"
 #' @export
 
 setMethod("Process",

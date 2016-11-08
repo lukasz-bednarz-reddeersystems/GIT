@@ -7,12 +7,12 @@
 .setOutputFrontendData(object, frontend_data)
 }
 \arguments{
-\item{object}{object of class "VirtualAnalysisBlock"}
+\item{object}{object of class derived from "VirtualAnalysisBlock"}
 
 \item{frontend_data}{object of class "data.frame"}
 }
 \value{
-\code{object} object object of class "VirtualAnalysisBlock"
+\code{object} object object of class derived "VirtualAnalysisBlock"
 }
 \description{
 Private method to set frontend_data slot with data.frame used to provide to frontend services object

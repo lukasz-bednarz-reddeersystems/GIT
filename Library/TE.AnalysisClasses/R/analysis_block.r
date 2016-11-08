@@ -242,9 +242,9 @@ setMethod("getOutputFrontendData",
 #' Private method to set frontend_data slot with data.frame used to provide to frontend services object
 #'
 #' @rdname private_setOutputFrontendData
-#' @param object object of class "VirtualAnalysisBlock"
+#' @param object object of class derived from "VirtualAnalysisBlock"
 #' @param frontend_data object of class "data.frame"
-#' @return \code{object} object object of class "VirtualAnalysisBlock"
+#' @return \code{object} object object of class derived "VirtualAnalysisBlock"
 
 setGeneric(".setOutputFrontendData", function(object, frontend_data){standardGeneric(".setOutputFrontendData")})
 
@@ -258,7 +258,8 @@ setMethod(".setOutputFrontendData",
 
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "VirtualAnalysisBlock"
+#' @param object object of class derived from "VirtualAnalysisBlock"
+#' @return \code{object} object of class derived from "VirtualAnalysisBlock"
 #' @export
 
 setGeneric("Process", function(object){standardGeneric("Process")})

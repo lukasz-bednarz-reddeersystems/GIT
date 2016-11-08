@@ -34,15 +34,14 @@ setClass(
                         )
 )
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionData"
-#' class object
-#'
-#' @rdname setPositionDataObject-PositionsHoldingPeriod-method
-#' @param object object of class "PositionsHoldingPeriodAnalysisBlock"
-#' @param position_data object of class "OffsidePositionData"
-#' @return \code{object} object of class "PositionsHoldingPeriodAnalysisBlock"
+# ' @rdname setPositionDataObject-PositionsHoldingPeriod-method
+# ' @param object object of class "PositionsHoldingPeriodAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionData"
+# ' @return \code{object} object of class "PositionsHoldingPeriodAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -53,12 +52,15 @@ setMethod("setPositionDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PositionsHoldingPeriod-method
-#' @param object object of class 'PositionsHoldingPeriodAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PositionsHoldingPeriodAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PositionsHoldingPeriodAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PositionsHoldingPeriodAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -91,11 +93,15 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PositionsHoldingPeriod-method
-#' @param object object of class "PositionsHoldingPeriodAnalysisBlock"
-#' @return \code{object} object object of class "PositionsHoldingPeriodAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PositionsHoldingPeriod-method
+# ' @param object object of class "PositionsHoldingPeriodAnalysisBlock"
+# ' @return \code{object} object object of class "PositionsHoldingPeriodAnalysisBlock"
 #' @export
 
 setMethod("Process",

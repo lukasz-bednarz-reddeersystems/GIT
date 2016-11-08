@@ -36,8 +36,8 @@ setClass(
 #' @param object object of class "VirtualAggregateAnalysisBlock".
 #' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'VirtualAggregateAnalysisBlock'.
+#' @rdname dataRequest-VirtualAggregate-method
 #' @export
-
 setMethod("dataRequest",
           signature(object = "VirtualAggregateAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){

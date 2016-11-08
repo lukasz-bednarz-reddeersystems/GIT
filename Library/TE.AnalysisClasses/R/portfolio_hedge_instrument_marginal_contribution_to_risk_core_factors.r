@@ -78,15 +78,14 @@ setClass(
 )
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @rdname setRiskModelObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setRiskModelObject",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock",
@@ -101,15 +100,14 @@ setMethod("setRiskModelObject",
 )
 
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "StrategyPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param portfolio object of class "StrategyPortfolio"
-#' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @rdname setPortfolioDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param portfolio object of class "StrategyPortfolio"
+# ' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setPortfolioDataObject",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock", portfolio = "StrategyPortfolio"),
@@ -120,15 +118,14 @@ setMethod("setPortfolioDataObject",
 )
 
 
-#' Set instrument_betas object in object slot
+#' @describeIn setInstrumentBetasDataObject
+#' Set portfolio object in object slot
+#' @inheritParams setInstrumentBetasDataObject
 #'
-#' Public method to set instrument_betas slot with "InstrumentBetasData"
-#' class object
-#'
-#' @rdname setInstrumentBetasDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param instrument_betas object of class "InstrumentBetasData"
-#' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @rdname setInstrumentBetasDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param instrument_betas object of class "InstrumentBetasData"
+# ' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setInstrumentBetasDataObject",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock", instrument_betas = "InstrumentBetasData"),
@@ -139,15 +136,14 @@ setMethod("setInstrumentBetasDataObject",
 )
 
 
-#' Set factor_correlation object in object slot
+#' @describeIn setFactorCorrelationDataObject
+#' Set factor correlation data in object slot
+#' @inheritParams setFactorCorrelationDataObject
 #'
-#' Public method to set factor_correlation slot with "InstrumentBetasData"
-#' class object
-#'
-#' @rdname setFactorCorrelationDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param factor_correlation object of class "FactorCorrelationData"
-#' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @rdname setFactorCorrelationDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param factor_correlation object of class "FactorCorrelationData"
+# ' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setFactorCorrelationDataObject",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock", factor_correlation = "FactorCorrelationData"),
@@ -158,15 +154,14 @@ setMethod("setFactorCorrelationDataObject",
 )
 
 
-#' Set factor_variance object in object slot
+#' @describeIn setFactorVarianceDataObject
+#' Set factor variance data in object slot
+#' @inheritParams setFactorVarianceDataObject
 #'
-#' Public method to set factor_variance slot with "InstrumentBetasData"
-#' class object
-#'
-#' @rdname setFactorVarianceDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param factor_variance object of class "FactorVarianceData"
-#' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @rdname setFactorVarianceDataObject-PortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param factor_variance object of class "FactorVarianceData"
+# ' @return \code{object} object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setFactorVarianceDataObject",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock", factor_variance = "FactorVarianceData"),
@@ -176,12 +171,15 @@ setMethod("setFactorVarianceDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class 'PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock'.
 #' @export
 setMethod("dataRequest",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock", key_values = "data.frame"),
@@ -313,10 +311,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @return \code{object} object object of class "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"),
@@ -532,15 +534,14 @@ setClass(
   contains          = c("PortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock")
 )
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "VirtualIndexPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-IndexPortfolioHedgeInstrumentCoreFactorsMCTR-method
-#' @param object object of class "IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
-#' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock""
+# ' @rdname setPortfolioDataObject-IndexPortfolioHedgeInstrumentCoreFactorsMCTR-method
+# ' @param object object of class "IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock"
+# ' @param portfolio object of class "VirtualIndexPortfolio"
+# ' @return \code{object} object of class "IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock""
 #' @export
 setMethod("setPortfolioDataObject",
           signature(object = "IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock",

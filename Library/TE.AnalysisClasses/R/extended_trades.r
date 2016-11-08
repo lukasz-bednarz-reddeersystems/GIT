@@ -38,11 +38,15 @@ setClass(
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'ExtendedTradesAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'ExtendedTradesAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'ExtendedTradesAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'ExtendedTradesAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -79,10 +83,14 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "ExtendedTradesAnalysisBlock"
-#' @return \code{object} object object of class "ExtendedTradesAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "ExtendedTradesAnalysisBlock"
+# ' @return \code{object} object object of class "ExtendedTradesAnalysisBlock"
 #' @export
 
 setMethod("Process",

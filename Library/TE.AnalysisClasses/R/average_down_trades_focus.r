@@ -35,15 +35,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "AverageDownTradesData"
-#' class object
-#'
-#' @rdname setTradeDataObject-AverageDownTradesFocus-method
-#' @param object object of class "AverageDownTradesFocusAnalysisBlock"
-#' @param trade_data object of class "AverageDownTradesData"
-#' @return \code{object} object of class "AverageDownTradesFocusAnalysisBlock"
+# ' @rdname setTradeDataObject-AverageDownTradesFocus-method
+# ' @param object object of class "AverageDownTradesFocusAnalysisBlock"
+# ' @param trade_data object of class "AverageDownTradesData"
+# ' @return \code{object} object of class "AverageDownTradesFocusAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -55,11 +54,14 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn dataRequest
 #' Request data from data source
 #'
-#' @param object object of class 'AverageDownTradesFocusAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'AverageDownTradesFocusAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'AverageDownTradesFocusAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'AverageDownTradesFocusAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -89,10 +91,14 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
-#' @return \code{object} object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
+# ' @return \code{object} object object of class "OffsidePositionsBpsPerMonthAnalysisBlock"
 #' @export
 
 setMethod("Process",

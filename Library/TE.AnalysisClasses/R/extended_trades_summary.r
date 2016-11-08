@@ -29,15 +29,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-ExtendedTradesSummary-method
-#' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"
+# ' @rdname setTradeDataObject-ExtendedTradesSummary-method
+# ' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"
 #' @export
 setMethod("setTradeDataObject",
           signature(object = "ExtendedTradesSummaryAnalysisBlock", trade_data = "TradeData"),
@@ -48,15 +47,14 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn setExtendedTradeDataObject
 #' Set ex_trade_data object in object slot
+#' @inheritParams setExtendedTradeDataObject
 #'
-#' Public method to set ex_trade_data slot with "ExtendedTradeData"
-#' class object
-#'
-#' @rdname setExtendedTradeDataObject-ExtendedTradesSummary-method
-#' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
-#' @param ex_trade_data object of class "ExtendedTradeData"
-#' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"
+# ' @rdname setExtendedTradeDataObject-ExtendedTradesSummary-method
+# ' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
+# ' @param ex_trade_data object of class "ExtendedTradeData"
+# ' @return \code{object} object of class "ExtendedTradesSummaryAnalysisBlock"
 #' @export
 setMethod("setExtendedTradeDataObject",
           signature(object = "ExtendedTradesSummaryAnalysisBlock", ex_trade_data = "ExtendedTradeData"),
@@ -67,10 +65,14 @@ setMethod("setExtendedTradeDataObject",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
-#' @return \code{object} object object of class "ExtendedTradesSummaryAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "ExtendedTradesSummaryAnalysisBlock"
+# ' @return \code{object} object object of class "ExtendedTradesSummaryAnalysisBlock"
 #' @export
 
 setMethod("Process",

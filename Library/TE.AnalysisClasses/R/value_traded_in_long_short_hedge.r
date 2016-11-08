@@ -59,15 +59,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-ValueTradedInLongShortHedgeAnalysisBlock-method
-#' @param object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "ValueTradedInLongShortHedgeAnalysisBlock"
+# ' @rdname setTradeDataObject-ValueTradedInLongShortHedgeAnalysisBlock-method
+# ' @param object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "ValueTradedInLongShortHedgeAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -78,12 +77,15 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-ValueTradedInLongShortHedge-method
-#' @param object object of class 'ValueTradedInLongShortHedgeAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'ValueTradedInLongShortHedgeAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'ValueTradedInLongShortHedgeAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'ValueTradedInLongShortHedgeAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -122,11 +124,15 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-ValueTradedInLongShortHedge-method
-#' @param object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
-#' @return \code{object} object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-ValueTradedInLongShortHedge-method
+# ' @param object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
+# ' @return \code{object} object object of class "ValueTradedInLongShortHedgeAnalysisBlock"
 #' @export
 
 setMethod("Process",

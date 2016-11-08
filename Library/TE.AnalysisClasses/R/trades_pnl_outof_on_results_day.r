@@ -42,15 +42,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradesOnResultsDayData"
-#' class object
-#'
-#' @rdname setTradeDataObject-TradesPnLOutOfOnResultsDay-method
-#' @param object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
-#' @param trade_data object of class "TradesOnResultsDayData"
-#' @return \code{object} object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
+# ' @rdname setTradeDataObject-TradesPnLOutOfOnResultsDay-method
+# ' @param object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
+# ' @param trade_data object of class "TradesOnResultsDayData"
+# ' @return \code{object} object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -60,10 +59,14 @@ setMethod("setTradeDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'TradesPnLOutOfOnResultsDayAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'TradesPnLOutOfOnResultsDayAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'TradesPnLOutOfOnResultsDayAnalysisBlock'.
 
 setMethod("dataRequest",
@@ -95,10 +98,14 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
-#' @return \code{object} object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
+# ' @return \code{object} object object of class "TradesPnLOutOfOnResultsDayAnalysisBlock"
 #' @export
 
 setMethod("Process",

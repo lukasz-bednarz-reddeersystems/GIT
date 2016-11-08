@@ -73,15 +73,14 @@ setClass(
 )
 
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionData"
-#' class object
-#'
-#' @rdname setPositionDataObject-TradesPerformanceOnResultsDayAnalysisBlock-method
-#' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
-#' @param position_data object of class "OffsidePositionData"
-#' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @rdname setPositionDataObject-TradesPerformanceOnResultsDayAnalysisBlock-method
+# ' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionData"
+# ' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -92,15 +91,14 @@ setMethod("setPositionDataObject",
           }
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-TradesPerformanceOnResultsDay-method
-#' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @rdname setTradeDataObject-TradesPerformanceOnResultsDay-method
+# ' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -110,14 +108,13 @@ setMethod("setTradeDataObject",
           }
 )
 
+#' @describeIn setPriceDataObject
 #' Set price_data object in object slot
+#' @inheritParams setPriceDataObject
 #'
-#' Public method to set price_data slot with "PriceData"
-#' class object
-#'
-#' @rdname setPriceDataObject-TradesPerformanceOnResultsDay-method
-#' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
-#' @param price_data object of class "PriceData"
+# ' @rdname setPriceDataObject-TradesPerformanceOnResultsDay-method
+# ' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @param price_data object of class "PriceData"
 #' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
 
 setMethod("setPriceDataObject",
@@ -127,14 +124,13 @@ setMethod("setPriceDataObject",
           }
 )
 
+#' @describeIn setEventDataObject
 #' Set event_data object in object slot
+#' @inheritParams setEventDataObject
 #'
-#' Public method to set event_data slot with "EventData"
-#' class object
-#'
-#' @rdname setEventDataObject-TradesPerformanceOnResultsDay-method
-#' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
-#' @param event_data object of class "EventData"
+# ' @rdname setEventDataObject-TradesPerformanceOnResultsDay-method
+# ' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @param event_data object of class "EventData"
 #' @return \code{object} object of class "TradesPerformanceOnResultsDayAnalysisBlock"
 
 setMethod("setEventDataObject",
@@ -144,10 +140,14 @@ setMethod("setEventDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'TradesPerformanceOnResultsDayAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'TradesPerformanceOnResultsDayAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
 #' @return \code{object} object of class 'TradesPerformanceOnResultsDayAnalysisBlock'.
 
 setMethod("dataRequest",
@@ -246,10 +246,14 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
-#' @return \code{object} object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
+# ' @return \code{object} object object of class "TradesPerformanceOnResultsDayAnalysisBlock"
 #' @export
 
 setMethod("Process",

@@ -42,11 +42,15 @@ setClass(
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'PortfolioFactorExposureAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioFactorExposureAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PortfolioFactorExposureAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PortfolioFactorExposureAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -101,10 +105,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PortfolioFactorExposureAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioFactorExposureAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "PortfolioFactorExposureAnalysisBlock"
+# ' @return \code{object} object object of class "PortfolioFactorExposureAnalysisBlock"
 #' @export
 
 setMethod("Process",

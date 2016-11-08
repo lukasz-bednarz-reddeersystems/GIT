@@ -43,15 +43,14 @@ setClass(
                         )
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradedSignalsData"
-#' class object
-#'
-#' @rdname setTradeDataObject-StrategyBreakdownSignalCharacteristicAndEff-method
-#' @param object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
-#' @param trade_data object of class "TradedSignalsData"
-#' @return \code{object} object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
+# ' @rdname setTradeDataObject-StrategyBreakdownSignalCharacteristicAndEff-method
+# ' @param object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
+# ' @param trade_data object of class "TradedSignalsData"
+# ' @return \code{object} object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
 #' @export
 setMethod("setTradeDataObject",
           signature(object = "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock", trade_data = "TradedSignalsData"),
@@ -62,11 +61,15 @@ setMethod("setTradeDataObject",
 
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname dataRequest-StrategyBreakdownSignalCharacteristicAndEff-method
-#' @param object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname dataRequest-StrategyBreakdownSignalCharacteristicAndEff-method
+# ' @param object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "StrategyBreakdownSignalCharacteristicAndEffectivenessAnalysisBlock"),
