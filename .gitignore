@@ -3,6 +3,7 @@ R/scripts/**
 **/*.Rhistory
 **/*.RData
 **/*.docx
+**/*.xlsx
 **/*.html
 **/*.md
 **/*.png
