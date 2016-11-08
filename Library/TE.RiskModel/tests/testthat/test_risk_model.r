@@ -192,5 +192,15 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
 })
 
+test_that(paste("Can getRiskModelFactorGroups"), {
 
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+  ret <- getRiskModelFactorGroups(object)
+
+  expect_is(ret, list())
+
+
+})
 

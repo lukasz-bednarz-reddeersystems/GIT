@@ -19,5 +19,9 @@ Virtual S4 class for handling Risk Model Properties.
 \item{\code{model_factors}}{"character"}
 
 \item{\code{beta_estimator}}{"VirtualBetaEstimator"}
+
+\item{\code{factor_groups}}{"list"}
+
+\item{\code{user_factor_groups}}{"list"}
 }}
 

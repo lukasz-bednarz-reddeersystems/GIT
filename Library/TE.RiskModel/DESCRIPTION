@@ -23,11 +23,11 @@ Imports:
     utils,
 Collate:
     'TE.RiskModel.r'
+    'risk_model_functions.r'
+    'risk_model_load.r'
     'risk_model.r'
     'risk_model_handler.r'
     'risk_model_builder.r'
-    'risk_model_functions.r'
-    'risk_model_load.r'
     'risk_model_update_functions.r'
 RoxygenNote: 5.0.1
 Suggests:
