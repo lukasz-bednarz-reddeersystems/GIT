@@ -16,5 +16,6 @@
 #' @importFrom RODBC odbcConnect sqlQuery odbcClose sqlColumns sqlSave
 #' @importFrom matrixcalc is.positive.definite
 #' @importFrom utils write.table
+#' @importFrom stats aggregate
 NULL
 ## NULL

@@ -115,7 +115,7 @@ setClass(
 #' Get Risk Model Factor Groups
 #'
 #' Returns list of factor groups
-#'
+#' @rdname private_getRiskModelFactorGroups
 #' @param object object of class 'VirtualRiskModel'.
 setGeneric(".getRiskModelFactorGroups", function(object){standardGeneric(".getRiskModelFactorGroups")})
 
@@ -171,6 +171,7 @@ setMethod(".setRiskModelFactorGroups",
 
 
 #' initialize method for VirtualRiskModel
+#' @param .Object object of class "VirtualRiskModel" or derived
 #' @export
 setMethod("initialize",
           signature(.Object = "VirtualRiskModel"),

@@ -7,6 +7,9 @@
 \usage{
 \S4method{initialize}{VirtualRiskModel}(.Object)
 }
+\arguments{
+\item{.Object}{object of class "VirtualRiskModel" or derived}
+}
 \description{
 initialize method for VirtualRiskModel
 }

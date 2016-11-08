@@ -199,7 +199,7 @@ test_that(paste("Can getRiskModelFactorGroups"), {
 
   ret <- getRiskModelFactorGroups(object)
 
-  expect_is(ret, list())
+  expect_is(ret, "list")
 
 
 })
