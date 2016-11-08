@@ -36,7 +36,7 @@ position_composite_factory <- function(user,start,end,source = .__DEFAULT_POSITI
     pos_data <- executeSQLQuery(sql_query, key)
 
     colnames(pos_data) <- TE.SQLQuery:::.translateSQLQueryColumnNames(sql_query, colnames(pos_data))
-    pos_data <- pos_data[c("InstrumentID","StrategyID","Date","TodayPL","MarketValue")]
+    pos_data <- pos_data[c("InstrumentID","StrategyID","Date","TodayPL","MarketValue", "Ticker")]
 
     # converting Date class
     pos_data$Date <- as.Date(pos_data$Date)

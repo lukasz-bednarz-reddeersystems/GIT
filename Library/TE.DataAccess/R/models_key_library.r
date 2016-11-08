@@ -393,7 +393,7 @@ range_years_lookback <- function(trader, start, end){
   tryCatch({
     edate <- as.Date(end)
   }, error = function(cond){
-    stop(paste("Error when setting dated_three_day_lookback module key function for date value",start,":",end))
+    stop(paste("Error when setting dated_three_day_lookback module key function for date value",end,":",cond))
   })
 
   end <- edate
@@ -425,7 +425,7 @@ range_months_lookback <- function(trader, start, end){
   tryCatch({
     edate <- as.Date(end)
   }, error = function(cond){
-    stop(paste("Error when setting dated_three_day_lookback module key function for date value",start,":",end))
+    stop(paste("Error when setting dated_three_day_lookback module key function for date value",end,":",cond))
   })
 
   end <- edate
@@ -452,4 +452,32 @@ two_year_monthly_lookback <- function(){
   num <- 24
   df <- key_generator(11,end,1,num,lookback_unit='months',cols=c('id','start','end'))
   return(df[c('start','end')])
+}
+
+
+#' Generate key for date range
+#'
+#' Generate key for range of dates
+#'
+#' @param trader integer, the user id
+#' @param start  Date, the most distant time (included, i.e. not upto this date, but inclusive)
+#' @param end  Date, the most recent time (included, i.e. not upto this date, but inclusive)
+#' @return \code{keys} data.frame with generated keys.
+#' @export
+
+date_range <- function(trader, start, end){
+  tryCatch({
+    sdate <- as.Date(start)
+  }, error = function(cond){
+    stop(paste("Error when setting date_range module key function for date value",start,":",cond))
+  })
+  tryCatch({
+    edate <- as.Date(end)
+  }, error = function(cond){
+    stop(paste("Error when setting date_range module key function for date value",end,":",end))
+  })
+
+  rv <- data.frame(id = trader, start = sdate, end = edate )
+
+  return(rv)
 }
