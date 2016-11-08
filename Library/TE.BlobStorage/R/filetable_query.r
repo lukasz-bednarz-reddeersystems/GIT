@@ -114,8 +114,9 @@ generate_filetable_is_stored_query <- function(keys) {
 setClass(
   Class     = "BlobStorage.SQLQuery.FileStoredInFileTable",
   prototype = list(
-    key_cols   = c("TableName"),
-    key_values = data.frame(TableName = character()),
+    key_cols   = c("TableName", "FileName"),
+    key_values = data.frame(TableName = character(),
+                            FileName = character()),
     query_parser   = generate_filetable_is_stored_query
   ),
   contains  = c("BlobStorage.VirtualSQLQuery")
