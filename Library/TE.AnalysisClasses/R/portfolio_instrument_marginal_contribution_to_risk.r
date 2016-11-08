@@ -118,9 +118,9 @@ setMethod("setPortfolioDataObject",
 )
 
 
-#' @describeIn setPortfolioDataObject
-#' Set portfolio object in object slot
-#' @inheritParams setPortfolioDataObject
+#' @describeIn setInstrumentBetasDataObject
+#' Set instrument betas object in object slot
+#' @inheritParams setInstrumentBetasDataObject
 #'
 # ' @rdname setInstrumentBetasDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
 # ' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
@@ -191,6 +191,7 @@ setMethod("dataRequest",
 
             start <- max(key_values$start)
             end <- max(key_values$end)
+            id <- unique(key_values$id)[1]
 
             portf_data <- getPortfolioDataObject(object)
 

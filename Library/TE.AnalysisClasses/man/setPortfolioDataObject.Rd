@@ -2,7 +2,6 @@
 % Please edit documentation in R/TE.AnalysisClasses.r, R/portfolio_variance_decomposition.r, R/portfolio_core_factor_exposures.r, R/portfolio_core_factor_hedge_exposures.r, R/portfolio_core_factor_hedge_returns.r, R/portfolio_core_factor_returns.r, R/portfolio_factor_exposures.r, R/portfolio_factor_returns.r, R/portfolio_hedge_instrument_marginal_contribution_to_risk_core_factors.r, R/portfolio_instrument_marginal_contribution_to_risk.r, R/portfolio_instrument_marginal_contribution_to_risk_core_factors.r
 \docType{methods}
 \name{setPortfolioDataObject}
-\alias{setInstrumentBetasDataObject,PortfolioInstrumentMCTRAnalysisBlock,InstrumentBetasData-method}
 \alias{setPortfolioDataObject}
 \alias{setPortfolioDataObject,IndexPortfolioCoreFactorExposuresAnalysisBlock,VirtualIndexPortfolio-method}
 \alias{setPortfolioDataObject,IndexPortfolioCoreFactorHedgeExposuresAnalysisBlock,VirtualIndexPortfolio-method}
@@ -91,10 +90,6 @@
   portfolio)
 
 
-  \S4method{setInstrumentBetasDataObject}{PortfolioInstrumentMCTRAnalysisBlock,InstrumentBetasData}(object,
-  instrument_betas)
-
-
   \S4method{setPortfolioDataObject}{IndexPortfolioInstrumentMCTRAnalysisBlock,VirtualIndexPortfolio}(object,
   portfolio)
 
@@ -151,8 +146,6 @@ class object
 \item \code{object = IndexPortfolioHedgeInstrumentCoreFactorsMCTRAnalysisBlock,portfolio = VirtualIndexPortfolio}: Set portfolio object in object slot
 
 \item \code{object = PortfolioInstrumentMCTRAnalysisBlock,portfolio = StrategyPortfolio}: Set portfolio object in object slot
-
-\item \code{object = PortfolioInstrumentMCTRAnalysisBlock,instrument_betas = InstrumentBetasData}: Set portfolio object in object slot
 
 \item \code{object = IndexPortfolioInstrumentMCTRAnalysisBlock,portfolio = VirtualIndexPortfolio}: Set portfolio object in object slot
 

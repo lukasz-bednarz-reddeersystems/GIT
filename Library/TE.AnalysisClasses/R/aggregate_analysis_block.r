@@ -53,7 +53,6 @@ setMethod("dataRequest",
 #' @param object object of class "VirtualAggregateAnalysisBlock"
 #' @return \code{object} object object of class "VirtualAggregateAnalysisBlock"
 #' @export
-
 setMethod("Process",
           signature(object = "VirtualAggregateAnalysisBlock"),
           function(object){
@@ -62,15 +61,21 @@ setMethod("Process",
           }
 )
 
+
 #' Aggregate data into the block
 #'
 #' @param object object of class "VirtualAggregateAnalysisBlock"
-#' @param object data of class "data.frame"
-#' @param object with_id of class "data.frame"
+#' @param data data of class "data.frame"
+#' @param with_id with_id of class "data.frame"
+#' @export
+setGeneric("aggregateAnalysisData", function(object,data,with_id){standardGeneric("aggregateAnalysisData")})
+
+#' @describeIn aggregateAnalysisData
+#' Aggregate data into the block
+#' @inheritParams aggregateAnalysisData
+#'
 #' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
 #' @export
-
-setGeneric("aggregateAnalysisData", function(object,data,with_id){standardGeneric("aggregateAnalysisData")})
 setMethod("aggregateAnalysisData",
           signature(object = "VirtualAggregateAnalysisBlock", data = "data.frame", with_id = "data.frame"),
           function(object,data,with_id){
@@ -92,10 +97,17 @@ setMethod("aggregateAnalysisData",
 #' the ggplot
 #'
 #' @param object object of class "VirtualAggregateAnalysisBlock"
-#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
 #' @export
 
 setGeneric("modifyGGPlotObject", function(object){standardGeneric("modifyGGPlotObject")})
+
+#' @describeIn modifyGGPlotObject
+#' Modify the plot object: i.e. reassign to fields internal to
+#' the ggplot
+#'
+#' @inheritParams modifyGGPlotObject
+#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
+#' @export
 setMethod("modifyGGPlotObject",
           signature(object = "VirtualAggregateAnalysisBlock"),
           function(object){
@@ -114,10 +126,16 @@ setMethod("modifyGGPlotObject",
 #' Modify the plot format: i.e. add gg functions the plot stream
 #'
 #' @param object object of class "VirtualAggregateAnalysisBlock"
-#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
 #' @export
 
 setGeneric("modifyGGPlotFormat", function(object){standardGeneric("modifyGGPlotFormat")})
+
+#' @describeIn modifyGGPlotFormat
+#' Modify the plot format: i.e. add gg functions the plot stream
+#'
+#' @inheritParams modifyGGPlotFormat
+#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
+#' @export
 setMethod("modifyGGPlotFormat",
           signature(object = "VirtualAggregateAnalysisBlock"),
           function(object){
@@ -136,10 +154,16 @@ setMethod("modifyGGPlotFormat",
 #' Modify the ui options list
 #'
 #' @param object object of class "VirtualAggregateAnalysisBlock"
-#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
 #' @export
 
 setGeneric("modifyUIOptions", function(object){standardGeneric("modifyUIOptions")})
+
+#' @describeIn modifyUIOptions
+#' Modify the ui options list
+#'
+#' @inheritParams modifyUIOptions
+#' @return \code{object} object of class "VirtualAggregateAnalysisBlock"
+#' @export
 setMethod("modifyUIOptions",
           signature(object = "VirtualAggregateAnalysisBlock"),
           function(object){

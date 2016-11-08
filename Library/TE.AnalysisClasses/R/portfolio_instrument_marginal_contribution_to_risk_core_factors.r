@@ -495,7 +495,7 @@ setMethod("Process",
 
 ################################################################################
 #
-# IndexPortfolioInstrumentMCTRAnalysisBlock Class
+# IndexPortfolioInstrumentCoreFactorsMCTRAnalysisBlock Class
 #
 # Computation block class to pull data required for index portfolio variance
 # decomposition. Pulls data required for computation and adds required columns.

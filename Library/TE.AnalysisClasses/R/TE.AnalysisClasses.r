@@ -145,7 +145,6 @@ NULL
 
 
 
-
 #' Set position_data object in object slot
 #'
 #' Public method to set position_data slot with
@@ -162,6 +161,8 @@ NULL
 #' @export
 NULL
 #> NULL
+
+
 
 #' Set event_data object in object slot
 #'
