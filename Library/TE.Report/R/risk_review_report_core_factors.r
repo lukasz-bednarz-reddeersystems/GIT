@@ -15,8 +15,10 @@ risk_review_analysis_blocks <- c(
                                              "PortfolioVarianceDecomposition",
                                              "PortfolioInstrumentCoreFactorsMCTR",
                                              "PortfolioHedgeInstrumentCoreFactorsMCTR",
-                                             "PortfolioFactorReturns",
-                                             "PortfolioFactorExposures"
+                                             "PortfolioCoreFactorReturns",
+                                             "PortfolioCoreFactorHedgeReturns",
+                                             "PortfolioCoreFactorExposures",
+                                             "PortfolioCoreFactorHedgeExposures"
 )
 
 
@@ -171,6 +173,28 @@ setMethod("Process",
             # set processed result
             object <- .copyAnalyzerOutputData(object, portf.ret.an)
 
+            ######################################################
+            #
+            # "PortfolioFactorHedgeReturnsAnalysisBlock" xx
+            #
+            ######################################################
+            # create analyzer
+            portf.ret.an <- new("PortfolioCoreFactorHedgeReturnsAnalysisBlock")
+
+            # set data
+            portf.ret.an <- setPortfolioDataObject(portf.ret.an, portf_data)
+            portf.ret.an <- setInstrumentBetasDataObject(portf.ret.an, betas_data)
+
+            # gets position and price data
+            portf.ret.an <- dataRequest(portf.ret.an, key_values)
+
+            # process
+            portf.ret.an <- Process(portf.ret.an)
+
+            # set processed result
+            object <- .copyAnalyzerOutputData(object, portf.ret.an)
+
+
 
             ######################################################
             #
@@ -178,17 +202,35 @@ setMethod("Process",
             #
             ######################################################
             # create analyzer
-            portf.betas.an <- new("PortfolioCoreFactorExposuresAnalysisBlock")
+            portf.exp.an <- new("PortfolioCoreFactorExposuresAnalysisBlock")
 
             # set data
-            portf.betas.an <- setPortfolioDataObject(portf.betas.an, portf_data)
-            portf.betas.an <- setInstrumentBetasDataObject(portf.betas.an, betas_data)
+            portf.exp.an <- setPortfolioDataObject(portf.exp.an, portf_data)
+            portf.exp.an <- setInstrumentBetasDataObject(portf.exp.an, betas_data)
 
             # process
-            portf.betas.an <- Process(portf.betas.an)
+            portf.exp.an <- Process(portf.exp.an)
 
             # set processed result
-            object <- .copyAnalyzerOutputData(object, portf.betas.an)
+            object <- .copyAnalyzerOutputData(object, portf.exp.an)
+
+            ######################################################
+            #
+            # "PortfolioFactorHedgeExposuresAnalysisBlock" xx
+            #
+            ######################################################
+            # create analyzer
+            portf.exp.an <- new("PortfolioCoreFactorHedgeExposuresAnalysisBlock")
+
+            # set data
+            portf.exp.an <- setPortfolioDataObject(portf.exp.an, portf_data)
+            portf.exp.an <- setInstrumentBetasDataObject(portf.exp.an, betas_data)
+
+            # process
+            portf.exp.an <- Process(portf.exp.an)
+
+            # set processed result
+            object <- .copyAnalyzerOutputData(object, portf.exp.an)
 
             return(object)
           }

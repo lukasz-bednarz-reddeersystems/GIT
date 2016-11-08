@@ -4,7 +4,7 @@
 \name{risk_review_analysis_blocks}
 \alias{risk_review_analysis_blocks}
 \title{List of Analysis modules used by RiskReviewReport Class}
-\format{An object of class \code{character} of length 5.}
+\format{An object of class \code{character} of length 7.}
 \usage{
 risk_review_analysis_blocks
 
