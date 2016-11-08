@@ -9,8 +9,8 @@ context("Test DataPlex")
 tested.data_store = "factor_datastore"
 valid.data_columns = "rDailyN"
 valid.key_vals     = data.frame(lInstrumentID= 4454L,
-                                dtDateTime   = seq(as.Date("2016-01-01"),
-                                                   as.Date("2016-12-31"),
+                                dtDateTime   = seq(as.Date(today()-30),
+                                                   as.Date(today()),
                                                    1)
                                 )
 

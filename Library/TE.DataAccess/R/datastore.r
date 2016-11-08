@@ -135,15 +135,13 @@ setMethod("updateStore",
               })
               url_data <- getURLData(object@urlparser,1)
 
-              # merging with original keys to avoid unnecessary querrries for weekends
-              if (nrow(url_data) > 0) {
-                url_data <- merge(url_data, values, all = TRUE)
-              }
-
-
               cn <- getColnames(object@urlparser)
               if(length(cn)==0)cn <- colnames(data)
               if(length(url_data)==0 && length(cn)>0){
+                if (nrow(url_data) > 0) {
+                  url_data <- merge(url_data, values, all = TRUE)
+                }
+
                 diff <- setdiff(cn,colnames(values))
 
                 # URL query has reduced number of keys after field mapping therefore we need to set all rows of URL data
