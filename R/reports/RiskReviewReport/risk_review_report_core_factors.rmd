@@ -1,0 +1,105 @@
+---
+title: "Risk Review Report"
+author: "Lukasz Bednarz"
+date: "21 July 2016"
+output:
+  word_document:
+    keep_md: yes
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(TE.Report)
+library(devEMF)
+
+library(lubridate)
+library(xlsx)
+
+fig_type <- 'png'
+
+```
+
+
+## Define Queries
+
+```{r data_range, results='hide', warning=FALSE, message=FALSE}
+
+key_fun <- date_range
+#key_fun <- dated_three_monthly_lookback
+
+trader   <- 11
+query.js <- key_fun(trader, as.Date('2016-10-01'), today())
+colnames(query.js) <- c("TraderID", "start", "end")
+
+trader   <- 70
+query.ba <- key_fun(trader, as.Date('2016-10-01'), today())
+colnames(query.ba) <- c("TraderID", "start", "end")
+
+
+trader   <- 101
+query.dk <- key_fun(trader, as.Date('2016-10-01'), today())
+colnames(query.dk) <- c("TraderID", "start", "end")
+
+```
+
+
+## Trigger Report Computation
+
+```{r extended_trades, results="hide", message=FALSE, warning=FALSE}
+report.js <- new("RiskReviewReportCoreFactors")
+report.js <- dataRequest(report.js, query.js)
+report.js <- Process(report.js)
+
+report.ba <- new("RiskReviewReportCoreFactors")
+report.ba <- dataRequest(report.ba, query.ba)
+report.ba <- Process(report.ba)
+
+report.dk <- new("RiskReviewReportCoreFactors")
+report.dk <- dataRequest(report.dk, query.dk)
+report.dk <- Process(report.dk)
+
+```
+
+
+## Risk Plots
+#BA
+```{r plot_focus_ba, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=13, fig.height=15}
+plt_list <- getOutputGGPlotList(report.ba)
+
+for (plot in plt_list) {
+  plot(plot)
+}
+
+analyzer <- getOutputObjectList(report.ba)[["PortfolioInstrumentCoreFactorsMCTR"]]
+data <- getReferenceData(analyzer)
+write.xlsx2(data, "BA.Factor_MCTR.xlsx")
+```
+
+#DK
+```{r plot_focus_dk, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=13, fig.height=15}
+plt_list <- getOutputGGPlotList(report.dk)
+
+for (plot in plt_list) {
+  plot(plot)
+}
+
+analyzer <- getOutputObjectList(report.dk)[["PortfolioInstrumentCoreFactorsMCTR"]]
+data <- getReferenceData(analyzer)
+write.xlsx2(data, "DK.Factor_MCTR.xlsx")
+```
+
+#JS
+```{r plot_focus_js, dev=fig_type, fig.ext=fig_type, dpi = 300, fig.width=13, fig.height=15}
+plt_list <- getOutputGGPlotList(report.js)
+
+for (plot in plt_list) {
+  plot(plot)
+}
+
+analyzer <- getOutputObjectList(report.js)[["PortfolioInstrumentCoreFactorsMCTR"]]
+data <- getReferenceData(analyzer)
+write.xlsx2(data, "JS.Factor_MCTR.xlsx")
+```
+
+

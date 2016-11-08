@@ -3,7 +3,7 @@ NULL
 
 ################################################################################
 #
-# PortfolioInstrumentMCTRAnalysisBlock Class
+# PortfolioInstrumentCoreFactorsMCTRAnalysisBlock Class
 #
 # Computation block class to pull data required for portfolio variance decomposition
 # Pulls data required for computation and adds required columns.
@@ -13,14 +13,14 @@ NULL
 #' PortfolioVarianceFactorDecompositionData Reference Data class.
 #'
 #' Concrete S4 class storing data Portfolio Variance Decomposition
-#' Data. Generated only within PortfolioInstrumentMCTRAnalysisBlock
+#' Data. Generated only within PortfolioInstrumentCoreFactorsMCTRAnalysisBlock
 #'
 #' Inherits from "VirtualFactorVarianceData"
 #'
 #' @export
 
 setClass(
-  Class             = "PortfolioInstrumentMCTRData",
+  Class             = "PortfolioInstrumentCoreFactorsMCTRData",
   prototype         = list(
     required_colnms = c("Date")
   ),
@@ -43,14 +43,14 @@ setClass(
 #' @export
 
 setClass(
-  Class             = "PortfolioInstrumentMCTRAnalysisBlock",
+  Class             = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock",
   slots             = c(
     portfolio          = "Portfolio",
     instrument_betas   = "InstrumentBetasData",
     factor_correlation = "FactorCorrelationData",
     factor_variance    = "FactorVarianceData",
     instrument_residual_returns = "InstrumentResidualReturnsData",
-    output             = "PortfolioInstrumentMCTRData"
+    output             = "PortfolioInstrumentCoreFactorsMCTRData"
   ),
   prototype         = list(
     key_cols        = c("TraderID", "start", "end"),
@@ -65,7 +65,7 @@ setClass(
     factor_correlation = new("FactorCorrelationData"),
     factor_variance = new("FactorVarianceData"),
     instrument_residual_returns = new("InstrumentResidualReturnsData"),
-    output          = new("PortfolioInstrumentMCTRData")
+    output          = new("PortfolioInstrumentCoreFactorsMCTRData")
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualPortfolioDataHandler",
@@ -83,13 +83,13 @@ setClass(
 #' Public method to set trade_data slot with "VirtualRiskModel"
 #' class object
 #'
-#' @rdname setRiskModelObject-PortfolioInstrumentMCTRAnalysisBlock-method
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @rdname setRiskModelObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setRiskModelObject",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock",
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock",
                     risk_model = "VirtualRiskModel"),
           function(object, risk_model){
             object <- TE.RiskModel:::.setRiskModelObject(object, risk_model)
@@ -107,12 +107,12 @@ setMethod("setRiskModelObject",
 #' class object
 #'
 #' @rdname setPortfolioDataObject-PortfolioFactorExposuresAnalysisBlock-method
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param portfolio object of class "StrategyPortfolio"
-#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setPortfolioDataObject",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", portfolio = "StrategyPortfolio"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock", portfolio = "StrategyPortfolio"),
           function(object, portfolio){
             object <- TE.RefClasses:::.setPortfolioDataObject(object, portfolio)
             return(object)
@@ -125,13 +125,13 @@ setMethod("setPortfolioDataObject",
 #' Public method to set instrument_betas slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setInstrumentBetasDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @rdname setInstrumentBetasDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param instrument_betas object of class "InstrumentBetasData"
-#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setInstrumentBetasDataObject",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", instrument_betas = "InstrumentBetasData"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock", instrument_betas = "InstrumentBetasData"),
           function(object, instrument_betas){
             object <- TE.RefClasses:::.setInstrumentBetasDataObject(object, instrument_betas)
             return(object)
@@ -144,13 +144,13 @@ setMethod("setInstrumentBetasDataObject",
 #' Public method to set factor_correlation slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setFactorCorrelationDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @rdname setFactorCorrelationDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param factor_correlation object of class "FactorCorrelationData"
-#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setFactorCorrelationDataObject",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", factor_correlation = "FactorCorrelationData"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock", factor_correlation = "FactorCorrelationData"),
           function(object, factor_correlation){
             object <- TE.RefClasses:::.setFactorCorrelationDataObject(object, factor_correlation)
             return(object)
@@ -163,13 +163,13 @@ setMethod("setFactorCorrelationDataObject",
 #' Public method to set factor_variance slot with "InstrumentBetasData"
 #' class object
 #'
-#' @rdname setFactorVarianceDataObject-PortfolioInstrumentMCTRAnalysisBlock-method
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @rdname setFactorVarianceDataObject-PortfolioInstrumentCoreFactorsMCTRAnalysisBlock-method
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @param factor_variance object of class "FactorVarianceData"
-#' @return \code{object} object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @return \code{object} object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("setFactorVarianceDataObject",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", factor_variance = "FactorVarianceData"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock", factor_variance = "FactorVarianceData"),
           function(object, factor_variance){
             object <- TE.RefClasses:::.setFactorVarianceDataObject(object, factor_variance)
             return(object)
@@ -178,12 +178,12 @@ setMethod("setFactorVarianceDataObject",
 
 #' Request data from data source
 #'
-#' @param object object of class 'PortfolioInstrumentMCTRAnalysisBlock'.
+#' @param object object of class 'PortfolioInstrumentCoreFactorsMCTRAnalysisBlock'.
 #' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioInstrumentMCTRAnalysisBlock'.
+#' @return \code{object} object of class 'PortfolioInstrumentCoreFactorsMCTRAnalysisBlock'.
 #' @export
 setMethod("dataRequest",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock", key_values = "data.frame"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock", key_values = "data.frame"),
           function(object, key_values){
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
@@ -312,23 +312,31 @@ setMethod("dataRequest",
 
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PortfolioInstrumentMCTRAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioInstrumentMCTRAnalysisBlock"
+#' @param object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
+#' @return \code{object} object object of class "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #' @export
 setMethod("Process",
-          signature(object = "PortfolioInstrumentMCTRAnalysisBlock"),
+          signature(object = "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"),
           function(object){
 
             # risk model
             lookback <- getRiskModelLookback(object)
-            risk_model <- getRiskModelObject(object)
+            # risk_model <- getRiskModelObject(object)
 
-            factor_groups <- list(Currency = getRiskModelCurrencyFactorNames(risk_model),
-                                  Commodity = getRiskModelCommodityFactorNames(risk_model),
-                                  Sector    = getRiskModelSectorFactorNames(risk_model),
-                                  Market    = getRiskModelMarketFactorNames(risk_model))
+            # factor_groups <- list(Currency = getRiskModelCurrencyFactorNames(risk_model),
+            #                       Commodity = getRiskModelCommodityFactorNames(risk_model),
+            #                       Sector    = getRiskModelSectorFactorNames(risk_model),
+            #                       Market    = getRiskModelMarketFactorNames(risk_model))
 
-            # Lists for factor names
+            core_factors <- c("CHF", "EUR", "JPY",
+                              "PriceMomentum12M",
+                              "PriceMomentum1M",
+                              "Size",
+                              "Value",
+                              "Volatility")
+
+            names(core_factors) <- core_factors
+            factor_groups <- as.list(core_factors)
 
             # retrieve data
             portf_data <- getPortfolioDataObject(object)
@@ -408,22 +416,6 @@ setMethod("Process",
               }
             }
 
-            ## Possibly for future use
-            # ggobj <-  filter(vd.tot, RiskAggregate == "Factor Group") %>%
-            #   ggvis(y = ~ Variance,
-            #         x = ~ Date,
-            #         stroke = ~ factor(RiskType),
-            #         key  := ~ id)%>%
-            #   layer_lines() %>%
-            #   layer_points() %>%
-            #   add_tooltip(tip, on = "hover")
-                      # %>%
-            # scale_numeric("x", domain = input_slider(min(vd.tot$Date), max(vd.tot$Date),
-            #               c(min(vd.tot$Date), max(vd.tot$Date))))
-
-
-
-
             mctv_fg_df <- merge(mctv_fg_df, unique(port[c("Date", "InstrumentID", "Weight")]))
 
             mctv_fg_df <- mctv_fg_df[mctv_fg_df$ACV != 0.0 & mctv_fg_df$MCV != 0,]
@@ -433,46 +425,59 @@ setMethod("Process",
 
             mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
 
-            mctr_df.top10 <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
 
-            plt_data <- rbind(data.frame(Date        = vd_df$Date,
-                                         RiskMeasure = "Risk (%/Year)",
-                                         RiskType    = vd_df$RiskType,
-                                         Value       = 1600 * abs_sqrt(vd_df$Variance) ),
-                              data.frame(Date        = mctr_df.top10$Date,
-                                         RiskMeasure = "T10 ACR by ACV (%/Year)",
-                                         RiskType    = mctr_df.top10$RiskType,
-                                         Value       = 1600 * abs_sqrt(mctr_df.top10$ACV)),
-                              data.frame(Date        = mctr_df.top10$Date,
-                                         RiskMeasure = "T10 PMCR by ACV (%)",
-                                         RiskType    = mctr_df.top10$RiskType,
-                                         Value       = abs_sqrt(mctr_df.top10$PMCR))
+            mctr_df.top10$RiskAggregate = "Systematic"
+
+            mctr_df_tot.top10 <- merge(mctr_df.top10[c("Date", "InstrumentID", "RiskType", "Weight")],
+                                       mctr_df[setdiff(colnames(mctr_df), "RiskType")])
+
+            mctr_df_tot.top10$RiskAggregate = "Total"
+
+            mctr_df_tot.top10.aggr <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df_tot.top10, sum)
+
+            mctr_df.top10.aggr <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
+
+            mctr_df.out <- rbind(mctr_df.top10, mctr_df_tot.top10)
+            mctr_df.out <- merge(mctr_df.out, unique(port[c("InstrumentID", "Ticker")]))
+
+
+            cf_vd_df <- vd_df[vd_df$RiskAggregate == "Factor Group",]
+
+
+
+            plt_data <- rbind(data.frame(Date        = cf_vd_df$Date,
+                                         RiskMeasure = "Factor Risk (ACR) (%/Year)",
+                                         RiskType    = cf_vd_df$RiskType,
+                                         Value       = 1600 * abs_sqrt(cf_vd_df$Variance) ),
+
+                              data.frame(Date        = mctr_df.top10.aggr$Date,
+                                         RiskMeasure = "T10 Sys.ACR by ACV (%/Year)",
+                                         RiskType    = mctr_df.top10.aggr$RiskType,
+                                         Value       = 1600 * abs_sqrt(mctr_df.top10.aggr$ACV)),
+
+                              data.frame(Date        = mctr_df_tot.top10.aggr$Date,
+                                         RiskMeasure = "T10  Tot.ACR by ACV (%/Year)",
+                                         RiskType    = mctr_df_tot.top10.aggr$RiskType,
+                                         Value       = 1600 * abs_sqrt(mctr_df_tot.top10.aggr$ACV)),
+
+                              data.frame(Date        = mctr_df_tot.top10.aggr$Date,
+                                         RiskMeasure = "T10 total PMCR by ACV (%)",
+                                         RiskType    = mctr_df_tot.top10.aggr$RiskType,
+                                         Value       = abs_sqrt(mctr_df_tot.top10.aggr$PMCR))
                               )
 
-
-            mctr_df.top10 <- arrange(mctv_fg_df, Date, RiskType, desc(MCV))
-            mctr_df.top10 <- Reduce(rbind,by(mctr_df.top10, mctr_df.top10[c("Date", "RiskType")], function(x){head(x, 10)}))
-
-            mctr_df.top10 <- aggregate( cbind(ACV, MCR, PMCR) ~ Date + RiskType, data = mctr_df.top10, sum)
-
-
-
-            plt_data <- rbind(plt_data,
-                              data.frame(Date        = mctr_df.top10$Date,
-                                         RiskMeasure = "T10 PMCR by MCV (%)",
-                                         RiskType    = mctr_df.top10$RiskType,
-                                         Value       = abs_sqrt(mctr_df.top10$PMCR))
-            )
 
             plt_risk <- ggplot(data=plt_data,aes_string(x="Date",y="Value",colour="RiskType")) +
               geom_line(size = 1) +
               facet_grid( RiskMeasure ~ ., scales = "free_y") +
               xlab("Date") +
-              labs(fill="Risk type")
+              labs(fill="Risk type") +
+              ggtitle("Risk Contribution by Core factors")
+
 
 
             outp_object <- getOutputObject(object)
-            outp_object <- setReferenceData(outp_object, mctv_fg_df)
+            outp_object <- setReferenceData(outp_object, mctr_df.out)
             object <- .setOutputObject(object, outp_object)
 
             object <- .setOutputGGPlotData(object, plt_data)
@@ -498,7 +503,7 @@ setMethod("Process",
 #' variance decomposition. Pulls data required for computation
 #' and adds required columns.
 #'
-#' Inherits from "PortfolioInstrumentMCTRAnalysisBlock"
+#' Inherits from "PortfolioInstrumentCoreFactorsMCTRAnalysisBlock"
 #'
 #' @export
 setClass(
@@ -514,7 +519,7 @@ setClass(
     risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
 
   ),
-  contains          = c("PortfolioInstrumentMCTRAnalysisBlock")
+  contains          = c("PortfolioInstrumentCoreFactorsMCTRAnalysisBlock")
 )
 
 #' Set portfolio object in object slot

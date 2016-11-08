@@ -260,7 +260,7 @@ setMethod("Process",
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
                   fct_cov <- tryCatch({
-                    365*3/5*factor_covariance(fct_cor,fct_sd)
+                    factor_covariance(fct_cor,fct_sd)
                   }, error = function(cond){
 
                     message(paste("I have encountered an error in cov_matrix on", rm_date, ". Skipping this date."))
@@ -292,24 +292,25 @@ setMethod("Process",
 
             risk_plot_data <- rbind(data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'TotalSystematic',
-                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'MarketRiskFactor',
-                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Commodity',
-                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Sector',
-                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1e2))
+                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1600))
             plt_risk <- ggplot(data=risk_plot_data,aes_string(x="Date",y="Value",colour="RiskType")) +
-              geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type")
+              geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type") +
+              ggtitle("Risk Contribution by Factor Groups")
 
             outp_object <- getOutputObject(object)
             outp_object <- setReferenceData(outp_object, variance_decomposition.tot)
