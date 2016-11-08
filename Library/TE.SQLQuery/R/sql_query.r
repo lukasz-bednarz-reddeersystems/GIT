@@ -186,6 +186,7 @@ setGeneric("getSQLQueryKeyValues", function(object){standardGeneric("getSQLQuery
 setMethod("getSQLQueryKeyValues",
           signature(object = "VirtualSQLQuery"),
           function(object){
+
             key_values <- object@key_values[getSQLQueryKeyColumnNames(object)]
 
             return(key_values)

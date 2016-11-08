@@ -11,8 +11,8 @@ test.parser  <- TE.SQLQuery:::parse_instrument_date_keys
 
 valid.key_cols <- c("InstrumentID", "Date")
 
-valid.key_vals <-data.frame(lInstrumentID = integer(),
-                             dtDateTime = as.Date(character()))
+valid.key_vals <-data.frame(InstrumentID = integer(),
+                             Date = as.Date(character()))
 test.key_vals  <- data.frame(InstrumentID = 4454, Date = as.Date("2016-08-01"))
 
 valid.parsed.key_vals <- data.frame(InstrumentIDs = 4454,
@@ -33,8 +33,8 @@ test_that(sprintf("Can inherit from %s class", tested.class),{
       db_name        = "RAIDLIVEDB",
       db_schema      = "Razor",
       key_cols       = valid.key_cols,
-      key_values     = data.frame(lInstrumentID = integer(),
-                                  dtDateTime = as.Date(character())),
+      key_values     = data.frame(InstrumentID = integer(),
+                                  Date = as.Date(character())),
       query_parser   = test.parser,
       arguments    = c("@sInstrumentIDs", "@dtStart", "@dtEnd"),
       procedure    = "prFactorRisk_GetScores_TraderAnalytics_InstrumentList"
