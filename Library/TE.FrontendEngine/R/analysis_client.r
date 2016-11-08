@@ -27,7 +27,7 @@ setClass(
     analysis_block = "VirtualAnalysisBlock",
     aggregate_type = "character"),
   prototype = list(
-    key_cols = c("analysis_class", "id", "start", "end"),
+    key_cols = c("analysis_class", "TraderID", "start", "end"),
     aggregate_type = "AggregateAnalysisBlock"
   ),
   contains = c("VirtualDataSourceClient",
@@ -202,9 +202,13 @@ setMethod(".updateAndAggregate",
             #Take visualisations settings from final block, which should be the same class as the others
             ggplot <- getOutputGGPlot(analysis_block)
             existing_analysis_block <- getAnalysisBlock(object)
-            existing_analysis_block <- TE.AnalysisClasses:::.setOutputGGPlot(existing_analysis_block,ggplot)
+            if(length(ggplot)>0){
+              existing_analysis_block <- TE.AnalysisClasses:::.setOutputGGPlot(existing_analysis_block,ggplot)  
+            }
             ui_options <- getOutputFrontendData(analysis_block)
-            existing_analysis_block <- TE.AnalysisClasses:::.setOutputFrontendData(existing_analysis_block,ui_options)
+            if(length(ui_options)>0){
+              existing_analysis_block <- TE.AnalysisClasses:::.setOutputFrontendData(existing_analysis_block,ui_options)  
+            }
             object <- .setAnalysisBlock(object,existing_analysis_block)
 
             query_data <- getOutputGGPlotData(analysis_block)

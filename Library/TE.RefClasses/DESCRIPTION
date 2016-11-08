@@ -20,10 +20,12 @@ Imports:
     hash,
     quantmod,
     stats,
-    ggplot2,
     plyr,
+    ggplot2,
+    zoo,
 Suggests:
     testthat,
+
     knitr,
     rmarkdown,
 Collate:
@@ -58,7 +60,13 @@ Collate:
     'factor_exposure_data_handler.r'
     'factor_variance_data.r'
     'factor_variance_data_handler.r'
+    'transformation_functions.r'
+    'virtual_transformation.r'
+    'implied_factor_returns_transformations.r'
+    'referencedata_transformation.r'
+    'transformations_handler.r'
     'implied_factor_returns_data.r'
+    'implied_factor_return_state.r'
     'implied_factor_returns_data_handler.r'
     'portfolio.r'
     'index_portfolio.r'

@@ -31,4 +31,6 @@ Collate:
     'risk_review_report_core_factors.r'
     'strategy_tactics_report.r'
     'trading_review_2016.2_report.r'
+    'pmfocus_report.r'
+    'pmstyle_report.r'
 RoxygenNote: 5.0.1

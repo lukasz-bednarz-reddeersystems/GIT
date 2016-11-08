@@ -178,7 +178,7 @@ setMethod("dataRequest",
             query_key_vals <- .generateQueryKeyValues(object, key_values)
 
             first <- TRUE
-
+  
             for(key_idx in seq(nrow(query_key_vals))) {
 
               start        <- as.Date(query_key_vals$start[key_idx])

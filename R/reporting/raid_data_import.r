@@ -1,4 +1,4 @@
-sourceTo("../common/trading_analysis_datastore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
+#sourceTo("../common/trading_analysis_datastore.r", modifiedOnly = getOption("modifiedOnlySource"), local = FALSE)
 
 get_from_new_store <- function(store_type,get_keys,get){
 	datastore <- new(store_type)
