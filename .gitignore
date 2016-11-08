@@ -15,6 +15,7 @@ R/scripts/**
 **/*.pdf
 **/*.bak
 **/*.tar.gz
+**/*.zip
 **/*.RData*
 .Rproj.user
 /Library/*.Rcheck
