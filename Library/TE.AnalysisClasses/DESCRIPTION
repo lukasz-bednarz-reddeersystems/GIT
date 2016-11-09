@@ -38,6 +38,8 @@ Collate:
     'extended_trades.r'
     'buys_and_sells.r'
     'extended_trades_summary.r'
+    'implied_factor_returns.r'
+    'implied_factor_returns_state.r'
     'market_return.r'
     'portfolio_variance_decomposition.r'
     'market_style_factor_stat.r'
@@ -74,6 +76,4 @@ Collate:
     'strategy_breakdown_total_pnl_and_pnl_delta.r'
     'trades_performance_on_results_day.r'
     'trades_pnl_outof_on_results_day.r'
-    'implied_factor_returns.r'
-    'implied_factor_returns_state.r'
 RoxygenNote: 5.0.1

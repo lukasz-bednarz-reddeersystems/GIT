@@ -154,7 +154,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, plt_data)
 
-            plt_risk <- ggplot(data=plt_data,aes(x=Date,y=Value,color=Factor)) +
+            plt_risk <- ggplot(data=plt_data,aes_string(x="Date",y="Value",color="Factor")) +
                                geom_line(size=1) +
                                facet_grid(RiskType~.,scales="free_y")
 

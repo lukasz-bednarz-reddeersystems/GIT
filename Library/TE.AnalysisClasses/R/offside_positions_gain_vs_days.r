@@ -119,7 +119,7 @@ setMethod("Process",
             rank_plt_data <- with(rank_offside,rbind(cbind(Type='Absolute Offside',data.frame(DaysOffside=OffsideCnt,PcntOffside=Offside,Size=MarketValue,WinLoss=Gain)),
                                                      cbind(Type='Relative Offside',data.frame(DaysOffside=OffsideCnt,PcntOffside=OffsideRel,Size=MarketValue,WinLoss=RelGain))))
             off_rank <- ggplot(data=rank_plt_data,aes_string(x="DaysOffside",y="PcntOffside",size="Size")) +
-              geom_point(aes(colour="WinLoss")) +
+              geom_point(aes_string(colour="WinLoss")) +
               ylim(c(-200,200)) +
               labs(size='Av. Size $',colour='Positive PL') +
               theme(text = element_text(size=15)) +

@@ -10,7 +10,5 @@ extended trades.
 }
 \details{
 Inherits from "VirtualAnalysisBlock",
-              "VirtualTradeDataHandler",
-              "VirtualKeyExpander"
 }
 
