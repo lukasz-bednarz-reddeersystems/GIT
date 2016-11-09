@@ -36,14 +36,14 @@ test_that("Can use basic accessors of  TestDataStoreClient object", {
 })
 
 
-test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
+test_that("Cannot setDataSourceQueryKeyValues with invalid data", {
 
   dsc <- new("TestDataStoreClient")
-  expect_error(.setDataSourceQueryKeyValues(dsc,
+  expect_error(setDataSourceQueryKeyValues(dsc,
                                           data.frame(lA = numeric(), dtB = as.Date(character()))),
                regexp = "Zero row query keys data.frame passed")
 
-  expect_error(.setDataSourceQueryKeyValues(dsc,
+  expect_error(setDataSourceQueryKeyValues(dsc,
                                           data.frame(lC = numeric(), dtD = as.Date(character()))),
                regexp = "Invalid column names of query keys passed")
 
@@ -52,13 +52,13 @@ test_that("Cannot .setDataSourceQueryKeyValues with invalid data", {
 })
 
 
-test_that("Can .setDataSourceQueryKeyValues with valid data", {
+test_that("Can setDataSourceQueryKeyValues with valid data", {
 
   dsc <- new("TestDataStoreClient")
 
   key_vals <- data.frame(lA = 1:2, dtB = c(today() -1, today()))
 
-  dsc <- .setDataSourceQueryKeyValues(dsc, key_vals)
+  dsc <- setDataSourceQueryKeyValues(dsc, key_vals)
 
   expect_equal(getDataSourceQueryKeyValues(dsc), key_vals)
 

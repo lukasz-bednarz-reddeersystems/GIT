@@ -181,6 +181,7 @@ test_that("Can dataRequest() with valid key_values", {
   # create valid return data.frame
 
   valid.ret_data <- data_request(datastore ,valid.store_keys,values)
+  valid.ret_data <- data_request(datastore ,valid.store_keys,values)
   valid.ret_data <- getData(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
   valid.ret_data <- valid.ret_data[values]
@@ -213,7 +214,7 @@ test_that("Can dataRequest() with valid key_values", {
 
   expect_equal(Map(class, ret_data), Map(class, valid.ret_data))
 
-  expect_equal(arrange(ret_data, Date, InstrumentID, Rationale), plyr:::arrange(valid.ret_data, Date, InstrumentID, Rationale))
+  expect_equal(arrange(ret_data, Date, InstrumentID, Rationale), arrange(valid.ret_data, Date, InstrumentID, Rationale))
   expect_equal(ret_data[with(ret_data, order(Date, InstrumentID, Rationale)),],
                valid.ret_data[with(valid.ret_data, order(Date, InstrumentID, Rationale)),])
 

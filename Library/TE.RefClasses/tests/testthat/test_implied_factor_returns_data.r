@@ -164,8 +164,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-01'),
-                                               to = as.Date('2016-09-30'),
+  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-10-01'),
+                                               to = as.Date('2016-10-30'),
                                                by = "1 day"))
 
   values <- getDataSourceReturnColumnNames(object)
@@ -204,9 +204,11 @@ test_that("Can dataRequest() with valid key_values", {
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
 
+  valid.ret_data <- merge(ret_data, valid.ret_data)
+
   expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
 
-  expect_equal(, valid.ret_data)
+  expect_equal(ret_data, valid.ret_data)
 
 })
 

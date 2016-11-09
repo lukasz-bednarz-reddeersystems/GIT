@@ -25,7 +25,6 @@ Imports:
     zoo,
 Suggests:
     testthat,
-
     knitr,
     rmarkdown,
 Collate:
@@ -79,10 +78,6 @@ Collate:
     'market_data_handler.r'
     'market_style_data.r'
     'market_style_data_handler.r'
-    'transformation_functions.r'
-    'virtual_transformation.r'
-    'referencedata_transformation.r'
-    'transformations_handler.r'
     'strategy_portfolio.r'
     'portfolio_data_handler.r'
     'warehouse_client_functions.r'
