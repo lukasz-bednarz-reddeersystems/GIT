@@ -58,6 +58,7 @@ Collate:
     'portfolio_factor_exposure.r'
     'portfolio_factor_exposures.r'
     'portfolio_factor_returns.r'
+    'portfolio_factor_state_prob_cond_loss.r'
     'portfolio_hedge_instrument_marginal_contribution_to_risk_core_factors.r'
     'portfolio_instrument_marginal_contribution_to_risk.r'
     'portfolio_instrument_marginal_contribution_to_risk_core_factors.r'

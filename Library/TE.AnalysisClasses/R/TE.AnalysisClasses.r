@@ -221,6 +221,25 @@ NULL
 #> NULL
 
 
+#' Set implied_factor_returns object in object slot
+#'
+#' Public method to set implied_factor_returns slot with
+#' class derived from  "VirtualImpliedFactorReturnsData"
+#' class object
+#'
+#' @docType methods
+#' @name setImpliedFactorReturnsDataObject
+#' @rdname setImpliedFactorReturnsDataObject
+#'
+#' @aliases setImpliedFactorReturnsDataObject,VirtualAnalysisBlock,VirtualImpliedFactorReturnsData-method
+#' @param object object of class derived from"VirtualAnalysisBlock"
+#' @param implied_factor_returns object of class derived from "VirtualImpliedFactorReturnsData"
+#' @return \code{object} object of class derived from "VirtualAnalysisBlock"
+#' @export
+NULL
+#> NULL
+
+
 
 #' Set factor_variance object in object slot
 #'

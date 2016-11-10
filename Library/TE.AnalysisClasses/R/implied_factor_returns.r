@@ -36,15 +36,14 @@ setClass(
 )
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-ImpliedFactorReturnsAnalysisBlock-method
-#' @param object object of class "ImpliedFactorReturnsAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "ImpliedFactorReturnsAnalysisBlock"
+# ' @rdname setRiskModelObject-ImpliedFactorReturnsAnalysisBlock-method
+# ' @param object object of class "ImpliedFactorReturnsAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "ImpliedFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
