@@ -149,6 +149,7 @@ setClass(
 
 #' get specific SQL query for given risk component name
 #'
+#' @rdname private_getSQLQueryObjectForRiskComponent
 #' @param object object of class 'VirtualDataSourceClient'.
 #' @return \code{sql_query} object of class "RiskModel.VirtualSQLProcedureCall"
 setGeneric(".getSQLQueryObjectForRiskComponent",
