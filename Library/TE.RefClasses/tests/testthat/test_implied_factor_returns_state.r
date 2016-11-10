@@ -159,69 +159,14 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
 
 
 
-
-test_that("Can dataRequest() with valid key_values", {
-
-  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
-
-  object <- new(tested.class)
-
-  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-10-01'),
-                                           to = as.Date('2016-10-30'),
-                                           by = "1 day"))
-
-  values <- getDataSourceReturnColumnNames(object)
-
-  # create valid return data.frameret_data
-  start        <- min(valid.key_vals$Date)
-  end          <- max(valid.key_vals$Date)
-  rm_str       <- get_most_recent_model_objectstore(valid.model_prefix, end, valid.lookback)
-  name         <- getID(rm_str)
-  query_data   <- queryDailyRiskModelObjectStore(rm_str,name,valid.lookback,valid.component)
-  query_data   <- getData(query_data)
-  query_data   <- query_data[query_data$Date >= start & query_data$Date <= end, ]
-
-  merge_keys   <- valid.key_vals
-
-  colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
-
-  query_data$Index <- seq(nrow(query_data))
-
-  valid.ret_data <- merge(query_data,
-                          merge_keys[merge_keys$Date >= start & merge_keys$Date <= end,, drop = FALSE],
-                          all.y = TRUE)
-
-  query_data <- query_data[order(query_data$Index), setdiff(colnames(query_data), "Index")]
-
-  colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
-
-  rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
-
-  object <- dataRequest(object, valid.key_vals)
-
-  expect_true(setequal(getDataSourceQueryKeyColumnNames(object), colnames(valid.key_vals)))
-  expect_true(setequal(getDataSourceQueryKeyValues(object), valid.key_vals))
-
-  ret_data <- getReferenceData(object)
-
-  valid.ret_data <- valid.ret_data[colnames(ret_data)]
-
-  valid.ret_data <- merge(ret_data, valid.ret_data)
-
-  expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
-
-  expect_equal(ret_data, valid.ret_data)
-
-})
-
-
 #########################
 # attachTransformations
 #########################
 
 
-test_that("Can computeImpliedFactorReturnsState()", {
+test_that("Can attachTransformations()", {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+  skip_if_not(FALSE)
 
   object <- new(tested.class)
 
@@ -236,16 +181,14 @@ test_that("Can computeImpliedFactorReturnsState()", {
 
   object <- attachTransformations(object, transf)
 
-
-
 })
 
 #########################
-# attachTransformations
+# dataRequest
 #########################
 
 
-test_that("Can computeImpliedFactorReturnsState", {
+test_that("Can dataRequest()", {
   skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
 
   object <- new(tested.class)

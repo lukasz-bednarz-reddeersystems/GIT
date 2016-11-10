@@ -43,7 +43,6 @@ setClass(
 #'
 #' @param object object of class 'ImpliedFactorReturnsState'.
 #' @return \code{object} object of class 'ImpliedFactorReturnsState'.
-#' @export
 
 setGeneric("computeImpliedFactorReturnsState", function(object){standardGeneric("computeImpliedFactorReturnsState")})
 
@@ -54,7 +53,6 @@ setGeneric("computeImpliedFactorReturnsState", function(object){standardGeneric(
 #'
 #' @inheritParams computeImpliedFactorReturnsState
 #' @return \code{object} object of class 'ImpliedFactorReturnsState'.
-#' @export
 setMethod("computeImpliedFactorReturnsState",
           signature(object = "ImpliedFactorReturnsState"),
           function(object){
@@ -87,7 +85,6 @@ setMethod("computeImpliedFactorReturnsState",
             data <- getComputationOutput(transformation)
             all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),orig_cols))],by=c("Date"))
 
-            browser()
             transformation <- transformations[[6]]
             df <- all_data[c('Date',
                              paste(setdiff(orig_cols,'Date'),'_ti',sep=""),
@@ -104,7 +101,25 @@ setMethod("computeImpliedFactorReturnsState",
 )
 
 
+#' Request data from data source
+#'
+#' Generic method to request data from data source.
+#' Needs to be implemented in derived classes to work
+#'
+#' @param object object of class 'ImpliedFactorReturnsState'.
+#' @param key_values data.frame with keys specifying data query.
+#' @return \code{object} object of class 'ImpliedFactorReturnsState'.
+#' @export
+setMethod("dataRequest",
+          signature(object = "ImpliedFactorReturnsState", key_values = "data.frame"),
+          function(object, key_values){
 
+            object <- callNextMethod()
 
+            object <- computeImpliedFactorReturnsState(object)
+
+            return(object)
+          }
+)
 
 
