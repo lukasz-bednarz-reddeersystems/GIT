@@ -27,10 +27,12 @@ NULL
 setClass(
   Class          = "ImpliedFactorReturnsState",
   prototype      = list(
-    transformations = list(new("CompoundImpliedFactorReturnsTransformation"),
-                           new("ImpliedFactorReturnsMAVGTransformation"),
-                           new("ImpliedFactorReturnsMAVGSpreadTransformation"),
-                           new("ImpliedFactorReturnsQuartileTransformation"))
+    transformations = list(new("CompoundImpliedFactorReturnsTransformation", NULL),
+                           new("ImpliedFactorReturnsMAVGTransformation", NULL),
+                           new("ImpliedFactorReturnsMAVGSpreadTransformation", NULL),
+                           new("ImpliedFactorReturnsTrendIndicatorTransformation", NULL),
+                           new("ImpliedFactorReturnsQuartileTransformation", NULL),
+                           new("ImpliedFactorReturnsStateEncoderTransformation", NULL))
   ),
   contains = c("ImpliedFactorReturnsData",
                "VirtualTransformationsHandler")
@@ -69,10 +71,27 @@ setMethod("computeImpliedFactorReturnsState",
               data <- getComputationOutput(transformation)
               all_data <- merge(all_data,data[setdiff(colnames(data),compd_cols)],by=c("Date"))
             }
-            #browser()
             transformation <- transformations[[4]]
             df <- all_data[c('Date',paste(setdiff(orig_cols,'Date'),'_cmpnd',sep=""))]
+            transformation <- setComputationInput(transformation,df)
+            transformation <- triggerComputation(transformation)
+            data <- getComputationOutput(transformation)
+            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),colnames(all_data)))],by=c("Date"))
+
+
+            transformation <- transformations[[5]]
+            df <- all_data[c('Date',paste(setdiff(orig_cols,'Date'),'_cmpnd',sep=""))]
             names(df) <- orig_cols
+            transformation <- setComputationInput(transformation,df)
+            transformation <- triggerComputation(transformation)
+            data <- getComputationOutput(transformation)
+            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),orig_cols))],by=c("Date"))
+
+            browser()
+            transformation <- transformations[[6]]
+            df <- all_data[c('Date',
+                             paste(setdiff(orig_cols,'Date'),'_ti',sep=""),
+                             paste(setdiff(orig_cols,'Date'),'_ftile',sep=""))]
             transformation <- setComputationInput(transformation,df)
             transformation <- triggerComputation(transformation)
             data <- getComputationOutput(transformation)

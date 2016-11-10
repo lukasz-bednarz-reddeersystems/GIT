@@ -1,4 +1,4 @@
-#' @include virtual_transformation.r
+#' @include referencedata_transformation.r
 NULL
 
 ################################################
@@ -39,7 +39,7 @@ setClass(
     #computed_colnms = c(),
     computation = new("CompoundImpliedFactorReturnsTransformationComputation")
   ),
-  contains = c("VirtualTransformation")
+  contains = c("VirtualReferenceDataTransformation")
 )
 
 ################################################
@@ -69,8 +69,8 @@ setClass(
 #' Adds columns for the compound return for each
 #' factor.
 #'
-#' Inherits from "VirtualTransformation"
-#' uses "CompoundImpliedFactorReturnsTransformationComputation"
+#' Inherits from "VirtualReferenceDataTransformation"
+#' uses "ImpliedFactorReturnsMAVGTransformationComputation"
 #' @export
 
 setClass(
@@ -80,7 +80,7 @@ setClass(
     #computed_colnms = c(),
     computation = new("ImpliedFactorReturnsMAVGTransformationComputation")
   ),
-  contains = c("VirtualTransformation")
+  contains = c("VirtualReferenceDataTransformation")
 )
 
 ################################################
@@ -110,8 +110,8 @@ setClass(
 #' Adds columns for the spread and spread diff
 #' for each factor
 #'
-#' Inherits from "VirtualTransformation"
-#' uses "CompoundImpliedFactorReturnsMAVGSpreadTransformationComputation"
+#' Inherits from "VirtualReferenceDataTransformation"
+#' uses "ImpliedFactorReturnsMAVGSpreadTransformationComputation"
 #' @export
 
 setClass(
@@ -121,7 +121,7 @@ setClass(
     #computed_colnms = c(),
     computation = new("ImpliedFactorReturnsMAVGSpreadTransformationComputation")
   ),
-  contains = c("VirtualTransformation")
+  contains = c("VirtualReferenceDataTransformation")
 )
 
 ################################################
@@ -151,8 +151,8 @@ setClass(
 #' Adds columns for the quantile of compounded return
 #' for each factor
 #'
-#' Inherits from "VirtualTransformation"
-#' uses "CompoundImpliedFactorReturnsQuartileTransformationComputation"
+#' Inherits from "VirtualReferenceDataTransformation"
+#' uses "ImpliedFactorReturnsQuartileTransformationComputation"
 #' @export
 
 setClass(
@@ -162,7 +162,90 @@ setClass(
     #computed_colnms = c(),
     computation = new("ImpliedFactorReturnsQuartileTransformationComputation")
   ),
-  contains = c("VirtualTransformation")
+  contains = c("VirtualReferenceDataTransformation")
 )
+
+################################################
+#
+# ImpliedFactorReturnsTrendIndicatorTransformationComputation Class
+#
+################################################
+
+#' computes trend indicator quantifier
+#'
+#' Adds columns holding trend indication category for each factor
+#'
+#' Inherits from "VirtualTransformationComputation"
+
+setClass(
+  Class = "ImpliedFactorReturnsTrendIndicatorTransformationComputation",
+  prototype      = list(
+    required_colnms= c('Date'),
+    #computed_colnms = c(),
+    compute = rsquared_trend_ind
+  ),
+  contains = c( "VirtualTransformationComputation")
+)
+
+#' computes return quantile
+#'
+#' Adds columns for the quantile of compounded return
+#' for each factor
+#'
+#' Inherits from "VirtualReferenceDataTransformation"
+#' uses "ImpliedFactorReturnsTrendIndicatorTransformationComputation"
+#' @export
+
+setClass(
+  Class          = "ImpliedFactorReturnsTrendIndicatorTransformation",
+  prototype = prototype(
+    required_colnms = c('Date'),
+    #computed_colnms = c(),
+    computation = new("ImpliedFactorReturnsTrendIndicatorTransformationComputation")
+  ),
+  contains = c("VirtualReferenceDataTransformation")
+)
+
+
+################################################
+#
+# ImpliedFactorReturnsStateEncoderTransformationComputation Class
+#
+################################################
+
+#' computes factor state based on substates space
+#'
+#' Adds columns holding factor state
+#'
+#' Inherits from "VirtualTransformationComputation"
+
+setClass(
+  Class = "ImpliedFactorReturnsStateEncoderTransformationComputation",
+  prototype      = list(
+    required_colnms= c('Date'),
+    #computed_colnms = c(),
+    compute = factor_space_encoder
+  ),
+  contains = c( "VirtualTransformationComputation")
+)
+
+#' computes factor state based on substates space
+#'
+#' Adds columns holding factor state
+#'
+#' Inherits from "VirtualReferenceDataTransformation"
+#' uses "ImpliedFactorReturnsStateEncoderTransformationComputation"
+#' @export
+
+setClass(
+  Class          = "ImpliedFactorReturnsStateEncoderTransformation",
+  prototype = prototype(
+    required_colnms = c('Date'),
+    #computed_colnms = c(),
+    computation = new("ImpliedFactorReturnsStateEncoderTransformationComputation")
+  ),
+  contains = c("VirtualReferenceDataTransformation")
+)
+
 
 

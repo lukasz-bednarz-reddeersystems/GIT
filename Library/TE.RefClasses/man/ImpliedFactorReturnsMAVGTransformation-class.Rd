@@ -9,7 +9,7 @@ Adds columns for the compound return for each
 factor.
 }
 \details{
-Inherits from "VirtualTransformation"
-uses "CompoundImpliedFactorReturnsTransformationComputation"
+Inherits from "VirtualReferenceDataTransformation"
+uses "ImpliedFactorReturnsMAVGTransformationComputation"
 }
 

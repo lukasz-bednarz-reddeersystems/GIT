@@ -79,6 +79,7 @@ setMethod("dataRequest",
 
             start <- min(key_values$start)
             end <- max(key_values$end)
+            id <- unique(key_values$id)[1]
             query_keys <- data.frame(Date=seq(ymd(start),ymd(end),by='days'))
 
             # getting Implied Factor Returns data
@@ -92,7 +93,7 @@ setMethod("dataRequest",
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(factor_ret)))
-              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", trader, start, end))
+              message(sprintf("Querried for keys: id = %s, start = %s, end = %s", id, start, end))
               end(sprintf("Error when calling %s on %s class : \n %s", "dataRequest()", class(factor_ret), cond))
             })
 
@@ -105,11 +106,13 @@ setMethod("dataRequest",
 
 
 
+#' @describeIn Process
 #' Trigger computation of analysis data.
+#' @inheritParams Process
 #'
-#' @rdname Process-ImpliedFactorReturns-method
-#' @param object object of class "ImpliedFactorReturnsAnalysisBlock"
-#' @return \code{object} object object of class "ImpliedFactorReturnsAnalysisBlock"
+# ' @rdname Process-ImpliedFactorReturns-method
+# ' @param object object of class "ImpliedFactorReturnsAnalysisBlock"
+# ' @return \code{object} object object of class "ImpliedFactorReturnsAnalysisBlock"
 #' @export
 
 setMethod("Process",

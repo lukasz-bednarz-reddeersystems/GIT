@@ -19,6 +19,7 @@
 #' @importFrom RODBC odbcConnect sqlQuery
 #' @importFrom stats aggregate
 #' @importFrom plyr rbind.fill
+#' @importFrom zoo rollapplyr
 NULL
 ## NULL
 

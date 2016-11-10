@@ -9,7 +9,7 @@ Adds columns for the spread and spread diff
 for each factor
 }
 \details{
-Inherits from "VirtualTransformation"
-uses "CompoundImpliedFactorReturnsMAVGSpreadTransformationComputation"
+Inherits from "VirtualReferenceDataTransformation"
+uses "ImpliedFactorReturnsMAVGSpreadTransformationComputation"
 }
 

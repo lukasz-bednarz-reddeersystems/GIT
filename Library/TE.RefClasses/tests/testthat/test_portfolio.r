@@ -311,7 +311,7 @@ test_that("Can attachTransformations", {
 
   expect_length(intersect(stored.vars,transf.vars), length(transf.vars) )
   expect_equal(getStoredNRows(portf), nrow(portf.data))
-  expect_equal(getReferenceData(portf), days_since_last_flat(prev.data))
+  expect_equal(getReferenceData(portf), TE.RefClasses:::days_since_last_flat(prev.data))
   expect_equal(colnames(getReferenceData(portf)), colnames(TE.RefClasses:::days_since_last_flat(prev.data)))
 
 })
