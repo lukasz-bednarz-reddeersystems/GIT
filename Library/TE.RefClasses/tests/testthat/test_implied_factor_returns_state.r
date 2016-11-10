@@ -164,7 +164,7 @@ test_that("Can dataRequest()", {
 
   expect_is(ret, "data.frame")
 
-  expect_gt(getStoredNRows(ret), 0)
+  expect_gt(getStoredNRows(object), 0)
 
 })
 

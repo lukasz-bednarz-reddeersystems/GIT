@@ -83,7 +83,7 @@ setMethod("computeImpliedFactorReturnsState",
             transformation <- setComputationInput(transformation,df)
             transformation <- triggerComputation(transformation)
             data <- getComputationOutput(transformation)
-            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),orig_cols))],by=c("Date"))
+            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),colnames(all_data)))],by=c("Date"))
 
             transformation <- transformations[[6]]
             df <- all_data[c('Date',
@@ -92,7 +92,7 @@ setMethod("computeImpliedFactorReturnsState",
             transformation <- setComputationInput(transformation,df)
             transformation <- triggerComputation(transformation)
             data <- getComputationOutput(transformation)
-            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),orig_cols))],by=c("Date"))
+            all_data <- merge(all_data,data[c("Date",setdiff(colnames(data),colnames(all_data)))],by=c("Date"))
 
             object <- setReferenceData(object,all_data)
 
