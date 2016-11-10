@@ -17,7 +17,7 @@
 #' @importFrom hash hash values names.hash keys
 #' @importClassesFrom hash hash
 #' @importFrom RODBC odbcConnect sqlQuery
-#' @importFrom stats aggregate
+#' @importFrom stats aggregate lm
 #' @importFrom plyr rbind.fill
 #' @importFrom zoo rollapplyr
 NULL

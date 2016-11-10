@@ -119,45 +119,6 @@ test_that("Cannot dataRequest() with invalid key_values", {
 })
 
 
-test_that("Generates empty data.frame when dataRequest() with nonexistent key_values", {
-
-  object <- new(tested.class)
-
-  nexist.key_vals <- data.frame(Date = seq(from = today() +1,
-                                           to = today() + 5,
-                                           by = "1 day"))
-  diff <- setdiff(valid.required_colnms,valid.key_cols)
-
-  valid.ret_data <- cbind(nexist.key_vals,data.frame(t(rep(NA,length(diff)))))
-
-  colnames(valid.ret_data) <- c(colnames(nexist.key_vals), diff)
-
-
-  object <- dataRequest(object, nexist.key_vals)
-
-  var_names <- intersect(getRequiredVariablesNames(object), valid.required_colnms)
-
-  expect_equal(var_names , valid.required_colnms)
-
-  ret_data <- getReferenceData(object)
-
-  valid.ret_data <- valid.ret_data[colnames(ret_data)]
-
-  class_names <- Map(class, ret_data)
-
-  setAs("numeric", "Date", function(from){as.Date(from)})
-
-  cols <- colnames(valid.ret_data)
-  valid.ret_data <- as.data.frame(lapply(seq(length(class_names)),
-                                         function(x) {as(valid.ret_data[,x], class_names[[x]])}), stringsAsFactors = FALSE)
-
-  colnames(valid.ret_data) <- cols
-
-  expect_equivalent(ret_data, valid.ret_data)
-
-})
-
-
 
 #########################
 # attachTransformations
@@ -199,7 +160,11 @@ test_that("Can dataRequest()", {
 
   object <- dataRequest(object, valid.key_vals)
 
-  object <- computeImpliedFactorReturnsState(object)
+  ret <- getReferenceData(object)
+
+  expect_is(ret, "data.frame")
+
+  expect_gt(getStoredNRows(ret), 0)
 
 })
 
