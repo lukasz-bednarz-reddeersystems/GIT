@@ -413,6 +413,40 @@ setClass(
   contains = c("VirtualAnalysisObjectstoreClient")
 )
 
+#' Class wrapping access to ImpliedFactorReturnsAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for ImpliedFactorReturnsAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
 
+setClass(
+  Class                = "ImpliedFactorReturnsAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "ImpliedFactorReturnsAnalysisBlock"
+
+  ),
+  contains = c("VirtualAnalysisObjectstoreClient")
+)
+
+#' Class wrapping access to ImpliedFactorReturnsStateAnalysisBlock
+#'
+#' Implements methods to access analysis objectstore
+#' for ImpliedFactorReturnsStateAnalysisBlock class
+#'
+#' Inherits from: "VirtualAnalysisObjectstoreClient"
+#'
+#' @export
+
+setClass(
+  Class                = "ImpliedFactorReturnsStateAnalysisBlockClient",
+  prototype = prototype(
+    analysis_class = "ImpliedFactorReturnsStateAnalysisBlock"
+
+  ),
+  contains = c("VirtualAnalysisObjectstoreClient")
+)
 
 

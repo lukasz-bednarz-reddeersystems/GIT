@@ -33,9 +33,9 @@ setClass(
     key_values         = data.frame(TraderID = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character())),
-    values             = c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue', 'TodayPL'), # columns that neeed to be returned from datastore
-    column_name_map    = hash::hash(c('Name','Trader','UserID','Direction','InstrumentID','Date','MarketValue', 'TodayPL'),
-                              c('Strategy','Trader','TraderID','Direction','InstrumentID','Date','MarketValue', 'TodayPL')),
+    values             = c('Name','Trader','UserID','Direction','InstrumentID','Ticker','Date','MarketValue', 'TodayPL'), # columns that neeed to be returned from datastore
+    column_name_map    = hash('Name' = 'Strategy',
+                              'UserID' = 'TraderID'),
     required_colnms = c('Strategy','TraderID','InstrumentID','Date','Weight')
   ),
   contains = c("Portfolio",
@@ -103,7 +103,12 @@ setMethod("dataRequest",
               end <- req_key_vals$end[row_idx]
 
               holdings_data <- position_composite_factory(as.integer(trader),as.Date(start),as.Date(end))
+
               holdings_data <- holdings_data@data@data[datastore_cols]
+
+
+              holdings_data <- aggregate(TodayPL ~ ., data = holdings_data, sum)
+
 
               colnames(holdings_data) <- data_colnames
 
@@ -124,10 +129,16 @@ setMethod("dataRequest",
             # aggregating due to issue with Middleware where for some days position MarketValue can be zero
             # and non-zero in the same day
             aggregate_data <- aggregate(MarketValue ~ TraderID + InstrumentID + Date, FUN = sum, data = ret_data)
-            ret_data <- merge(ret_data[, !(colnames(ret_data) %in% "MarketValue")],
+            ret_data <- merge(unique(ret_data[, !(colnames(ret_data) %in% "MarketValue")]),
                                    aggregate_data,
                                    by = c("TraderID", "InstrumentID", "Date"),
                                    all.y = TRUE)
+
+            aggregate_data <- aggregate(TodayPL ~ TraderID + InstrumentID + Date, FUN = sum, data = ret_data)
+            ret_data <- merge(unique(ret_data[, !(colnames(ret_data) %in% "TodayPL")]),
+                              aggregate_data,
+                              by = c("TraderID", "InstrumentID", "Date"),
+                              all.y = TRUE)
 
             allocation$Month <- format(allocation$Date,'%Y-%m')
             ret_data$Month <- format(ret_data$Date,'%Y-%m')

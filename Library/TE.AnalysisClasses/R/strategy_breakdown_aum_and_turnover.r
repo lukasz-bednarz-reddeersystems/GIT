@@ -34,15 +34,14 @@ setClass(
 )
 
 
+#' @describeIn setStrategyDataObject
 #' Set strategy_data object in object slot
+#' @inheritParams setStrategyDataObject
 #'
-#' Public method to set strategy_data slot with "StrategyBreakDownData"
-#' class object
-#'
-#' @rdname setStrategyDataObject-StrategyBreakdownAUMAndTurnoverAnalysisBlock-method
-#' @param object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
-#' @param strategy_data object of class "StrategyBreakDownData"
-#' @return \code{object} object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
+# ' @rdname setStrategyDataObject-StrategyBreakdownAUMAndTurnoverAnalysisBlock-method
+# ' @param object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
+# ' @param strategy_data object of class "StrategyBreakDownData"
+# ' @return \code{object} object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
 #' @export
 
 setMethod("setStrategyDataObject",
@@ -53,10 +52,14 @@ setMethod("setStrategyDataObject",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownAUMAndTurnoverAnalysisBlock"
 #' @export
 
 setMethod("Process",

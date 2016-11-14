@@ -36,7 +36,11 @@ setClass(
     column_name_map = hash(c("start", "end"),
                            c("start", "end")),
     market_style    = new("MarketStyleData"),
-    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1")
+    risk_model      = new("RiskModel.DevelopedEuropePrototype150.1.1"),
+    frontend_data   = list(omit=c('Value','PL'),
+                           row_layout=list(list('Date','RiskGroup'),list('RiskType')),
+                           Date=list(animate=TRUE),
+                           group_by=list(RiskType='RiskGroup'))
   ),
   contains          = c("VirtualAnalysisBlock",
                         "VirtualRiskModelHandler",
@@ -44,15 +48,14 @@ setClass(
   )
 )
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
-#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @rdname setRiskModelObject-MarketStyleFactorStatisticAnalysisBlock-method
+# ' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "MarketStyleFactorStatisticAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
@@ -64,11 +67,15 @@ setMethod("setRiskModelObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'MarketStyleFactorStatisticAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'MarketStyleFactorStatisticAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -106,10 +113,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
-#' @return \code{object} object object of class "MarketStyleFactorStatisticAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "MarketStyleFactorStatisticAnalysisBlock"
+# ' @return \code{object} object object of class "MarketStyleFactorStatisticAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "MarketStyleFactorStatisticAnalysisBlock"),
@@ -178,7 +189,6 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, mrkt_plot_data)
             object <- .setOutputGGPlot(object, plt_risk)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Value")))
 
             return(object)
           }

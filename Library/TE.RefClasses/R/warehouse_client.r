@@ -41,7 +41,6 @@ setMethod("dataRequest",
             object <- .setDataSourceQueryKeyValues(object,key_values)
 
             values <- getDataSourceReturnColumnNames(object)
-            colnames_map <- getDataSourceClientColumnNameMap(object)
 
             first <- TRUE
 

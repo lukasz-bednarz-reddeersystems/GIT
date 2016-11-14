@@ -37,15 +37,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "VirtualTradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-PositionRevisitsDeltaPrevQuarter-TradeData-method
-#' @param object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
-#' @param trade_data object of class "VirtualTradeData"
-#' @return \code{object} object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
+# ' @rdname setTradeDataObject-PositionRevisitsDeltaPrevQuarter-TradeData-method
+# ' @param object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
+# ' @param trade_data object of class "VirtualTradeData"
+# ' @return \code{object} object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -56,12 +55,15 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-PositionRevisitsDeltaPrevQuarter-method
-#' @param object object of class 'PositionRevisitsDeltaPrevQuarterAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PositionRevisitsDeltaPrevQuarterAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PositionRevisitsDeltaPrevQuarterAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PositionRevisitsDeltaPrevQuarterAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -96,11 +98,15 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @rdname Process-PositionRevisitsDeltaPrevQuarter-method
-#' @param object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
-#' @return \code{object} object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @rdname Process-PositionRevisitsDeltaPrevQuarter-method
+# ' @param object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
+# ' @return \code{object} object object of class "PositionRevisitsDeltaPrevQuarterAnalysisBlock"
 #' @export
 
 setMethod("Process",

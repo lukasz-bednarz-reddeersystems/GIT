@@ -31,7 +31,7 @@ setMethod("updateDistanceToEvent","DistanceToEvent",
 setClass(
   Class      = "DistanceToEarnings",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceLastResults",
                      "rDaysToNextResults"),
     computation  = new("DistanceToEarningsComputation")
@@ -50,7 +50,7 @@ setMethod("updateDistanceToEarnings","DistanceToEarnings",
 setClass(
   Class      = "DaysSinceLastResults",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceLastResults"),
     computation  = new("PassThruComputation")
   ),
@@ -70,7 +70,7 @@ setMethod("updateDaysSinceLastResults","DaysSinceLastResults",
 setClass(
   Class      = "DaysToNextResults",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysToNextResults"),
     computation  = new("PassThruComputation")
   ),
@@ -90,7 +90,7 @@ setMethod("updateDaysToNextResults","DaysToNextResults",
 setClass(
   Class      = "DaysSinceSecondaryPlacing",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceLastSecondaryPlacing"),
     computation  = new("PassThruComputation")
   ),
@@ -110,7 +110,7 @@ setMethod("updateDaysSinceSecondaryPlacing","DaysSinceSecondaryPlacing",
 setClass(
   Class      = "DaysToSecondaryPlacing",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysToNextSecondaryPlacing"),
     computation  = new("PassThruComputation")
   ),
@@ -130,7 +130,7 @@ setMethod("updateDaysToSecondaryPlacing","DaysToSecondaryPlacing",
 setClass(
   Class      = "DaysSincePrimaryPlacing",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceLastPrimaryPlacing"),
     computation  = new("PassThruComputation")
   ),
@@ -150,7 +150,7 @@ setMethod("updateDaysSincePrimaryPlacing","DaysSincePrimaryPlacing",
 setClass(
   Class      = "DaysToPrimaryPlacing",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysToNextPrimaryPlacing"),
     computation  = new("PassThruComputation")
   ),
@@ -178,7 +178,7 @@ setClass(
 setClass(
   Class          = "EPSRevision",
   prototype      = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rNumberOfEPSUpgradesSinceNumbersFY1",
                      "rNumberOfEPSDowngradesSinceNumbersFY1"),
     computation  = new("EPSRevisionComputation")
@@ -283,7 +283,7 @@ setClass(
   Class      = "AvgDailyValTraded5Day",
   prototype  = prototype(
     data_store   = "dynamic_factor_datastore",
-    data_columns = c("rAvgDailyValTraded5Day"),
+    data_columns = c("r20DayAverageValueTradedUSD"),
     computation  = new("PassThruComputation")
   ),
   contains = c("ContextFeature")
@@ -401,7 +401,7 @@ setMethod("updateClosePosition","ClosePosition",
 setClass(
   Class      = "RSI14",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rRSI14Day1DaysAgo"),
     computation  = new("PassThruComputation")
   ),
@@ -419,7 +419,7 @@ setMethod("updateRSI14","RSI14",
 setClass(
   Class      = "RelativeRSI14",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rRSIRelative14Day1DaysAgo"),
     computation  = new("PassThruComputation")
   ),
@@ -437,8 +437,8 @@ setMethod("updateRelativeRSI14","RelativeRSI14",
 setClass(
   Class      = "SectorRelativeRSI14",
   prototype  = prototype(
-    data_store   = "factor_datastore",
-    data_columns = c("rRSISectorRelative14Day1DaysAgo"),
+    data_store   = "features_factor_datastore",
+    data_columns = c("rRSIRelativeSector14Day1DaysAgo"),
     computation  = new("PassThruComputation")
   ),
   contains = c("ContextFeature")
@@ -455,7 +455,7 @@ setMethod("updateSectorRelativeRSI14","SectorRelativeRSI14",
 setClass(
   Class      = "PriorRSI14",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rRSI14Day2DaysAgo"),
     computation  = new("PassThruComputation")
   ),
@@ -508,7 +508,7 @@ setMethod("updateLegOpenClose","LegOpenClose",
 setClass(
   Class      = "MavgPrice50",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("r50DayMovingAverage"),
     computation  = new("PassThruComputation")
   ),
@@ -528,7 +528,7 @@ setMethod("updateMavgPrice50","MavgPrice50",
 setClass(
   Class      = "DailyN",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDailyN"),
     computation  = new("PassThruComputation")
   ),
@@ -548,7 +548,7 @@ setMethod("updateDailyN","DailyN",
 setClass(
   Class      = "DaysSinceRelLow3m",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceRel3MLow"),
     computation  = new("PassThruComputation")
   ),
@@ -568,7 +568,7 @@ setMethod("updateDaysSinceRelLow3m","DaysSinceRelLow3m",
 setClass(
   Class      = "DaysSinceRelLow6m",
   prototype  = prototype(
-    data_store   = "factor_datastore",
+    data_store   = "features_factor_datastore",
     data_columns = c("rDaysSinceRel6MLow"),
     computation  = new("PassThruComputation")
   ),

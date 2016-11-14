@@ -36,7 +36,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getTradeDataObject(object), "TradeData")
   expect_is(getExtendedTradeDataObject(object), "ExtendedTradeData")
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
 
 })
 

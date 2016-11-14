@@ -31,7 +31,6 @@ setGeneric("resetMemory",function(object){standardGeneric("resetMemory")})
 setMethod("resetMemory","DataPlex",
           function(object){
             rm(list = ls(object@warehouse))
-            object@warehouse <- new.env()
             return(object)
           }
 )
@@ -75,17 +74,6 @@ setMethod("isDataPlexInitialized","DataPlex",
           }
 )
 
-# setGeneric(".setDataPlexInitialized",function(object, store, value){standardGeneric(".setDataPlexInitialized")})
-# setMethod(".setDataPlexInitialized",
-#           signature(object = "DataPlex", is_initialized = "logical"),
-#           function(object, is_initialized){
-#             wh <- getDataPlexWarehouse(object)
-#             wh$is_initialized <- is_initialized
-#
-#             return(object)
-#           }
-# )
-
 
 setGeneric("initializeDataPlex",function(object){standardGeneric("initializeDataPlex")})
 setMethod("initializeDataPlex","DataPlex",
@@ -93,6 +81,8 @@ setMethod("initializeDataPlex","DataPlex",
             data_map <- getDataPlexWarehouse(object)
 
             data_map[["factor_datastore"]] <- new("StaticFactorDataStore")
+
+            data_map[["features_factor_datastore"]] <- new("StaticFeaturesFactorsDataStore")
 
             data_map[["dynamic_factor_datastore"]] <- new("DynamicFactorDataStore")
 
@@ -165,6 +155,7 @@ initialise_data_store <- function(){
 data_request <- function(store,keys,variables){
   rval <- NULL
   dataplex <- new("DataPlex")
+
   str_obj <- getDataPlexStore(dataplex, store)
 
   str_obj <- queryStore(str_obj,keys,variables)

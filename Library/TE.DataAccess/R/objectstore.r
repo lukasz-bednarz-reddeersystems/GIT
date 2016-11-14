@@ -1,3 +1,8 @@
+#' @include query.r
+NULL
+
+
+
 #' helper function to generate key from objectstore name
 #'
 #' @param name "character" name of the objectstore
@@ -22,11 +27,9 @@ key_from_name <- function(name) {
 setClass(
 	Class = "ObjectQuery",
 	representation = representation(
-		fields     = "character",
-		values     = "character",
 		known_keys = "data.frame"
 	),
-	contains = c("VIRTUAL")
+	contains = c("VirtualQuery", "VIRTUAL")
 )
 
 
@@ -39,53 +42,6 @@ setMethod("getKnownKeys","ObjectQuery",
             return(object@known_keys)
           }
 )
-
-
-setGeneric("getQueryKeyColumnNames",function(object,key){standardGeneric("getQueryKeyColumnNames")})
-setMethod("getQueryKeyColumnNames","ObjectQuery",
-          function(object,key){
-            return(object@fields)
-          }
-)
-
-
-setGeneric("getQueryKeyValues",function(object,key){standardGeneric("getQueryKeyValues")})
-setMethod("getQueryKeyValues","ObjectQuery",
-          function(object,key){
-            return(object@values)
-          }
-)
-
-
-setGeneric("setQueryValuesFromKey",function(object,key){standardGeneric("setQueryValuesFromKey")})
-setMethod("setQueryValuesFromKey","ObjectQuery",
-          function(object,key){
-            if(class(key)[[1]]!='data.frame')stop("Key must be data.frame with colnames matching fields.")
-            if(nrow(key)!=1)stop("key must be exactly one row")
-            fill_fields <- colnames(key)
-            for(field in fill_fields){
-              object <- setQueryValueByField(object,field,key[[field]])
-            }
-            return(object)
-          }
-)
-
-setGeneric("getQueryValueByField",function(object,field){standardGeneric("getQueryValueByField")})
-setMethod("getQueryValueByField","ObjectQuery",
-          function(object,field){
-          	return(object@values[object@fields==field])
-          }
-)
-
-
-setGeneric("setQueryValueByField",function(object,field,value){standardGeneric("setQueryValueByField")})
-setMethod("setQueryValueByField","ObjectQuery",
-          function(object,field,value){
-            object@values[object@fields==field] <- as.character(value)
-            return(object)
-          }
-)
-
 
 
 setGeneric("getIdentifier",function(object){standardGeneric("getIdentifier")})
@@ -148,28 +104,18 @@ setMethod("isKeyKnownInLocalStore",
 setClass(
 	Class           = "VirtualObjectStore",
 	representation	= representation(
-		stored      = "environment",
-		id          = "character",
-		data_path   = "character",
-		objectstore_q = "ObjectQuery"
+		stored         = "environment",
+		id             = "character",
+		data_path       = "character",
+		objectstore_q   = "ObjectQuery",
+		objectstore_key = "data.frame"
 	),
 	contains = c("VIRTUAL")
 
 )
 
-#' Initialize method for "VirtualObjectStore" class
-#'
-#' @param .Object, object of class "VirtualObjectStore"
-#' @param id "character" name of the objectstore
-#' @return \code{.Object} object of class "VirtualObjectStore"
 
-setMethod("initialize", "VirtualObjectStore",
-          function(.Object,id){
-            .Object@stored <- new.env(parent = emptyenv())
-            .Object@id <- id
-            .Object
-          }
-)
+
 
 #' Get ID of the objectstore
 #'
@@ -190,6 +136,81 @@ setMethod("getID","VirtualObjectStore",
             return(object@id)
           }
 )
+
+#' Initialize method for "VirtualObjectStore" class
+#'
+#' @param .Object, object of class "VirtualObjectStore"
+#' @param id "character" name of the objectstore
+#' @return \code{.Object} object of class "VirtualObjectStore"
+
+setMethod("initialize", "VirtualObjectStore",
+          function(.Object,id){
+            .Object@stored <- new.env(parent = emptyenv())
+            .Object@id <- id
+            .Object
+          }
+)
+
+
+
+
+setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
+setMethod(".generateKeyFromID",
+          signature( object = "VirtualObjectStore"),
+          function(object){
+
+            id <- getID(object)
+
+            name <- key_from_name(id)
+
+            return(name)
+          }
+)
+
+
+#' Get key of the objectstore
+#'
+#' @param object object of class "VirtualObjectStore"
+
+setGeneric("getObjectstoreKey",function(object){standardGeneric("getObjectstoreKey")})
+
+#' @describeIn getObjectstoreKey Get ID of the objectstore
+#'
+#' @inheritParams getObjectstoreKey
+#'
+#' @return \code{key} "data.frame" with query defining store
+setMethod("getObjectstoreKey","VirtualObjectStore",
+          function(object){
+            slot_names <- slotNames(object)
+            if ("objectstore_key" %in% slot_names && nrow(object@objectstore_key) > 0) {
+              return(object@objectstore_key)
+            }
+            else {
+              return(.generateKeyFromID(object))
+            }
+
+          }
+)
+
+
+#' Set objectstore key
+#'
+#' Private method to store object key
+#'
+#' @rdname private_setObjectStoreKey
+#' @param object object of class "VirtualObjectStore"
+#' @param objectstore_key "data.frame" with key defining objectstore
+
+setGeneric(".setObjectStoreKey",function(object, objectstore_key){standardGeneric(".setObjectStoreKey")})
+setMethod(".setObjectStoreKey",
+          signature( object = "VirtualObjectStore",
+                     objectstore_key = "data.frame"),
+          function(object, objectstore_key){
+            object@objectstore_key <- objectstore_key
+            return(object)
+          }
+)
+
 
 #' Get objectstore query object
 #'
@@ -231,23 +252,10 @@ setMethod(".setObjectStoreQuery",
 )
 
 
-setGeneric(".generateKeyFromID",function(object, objectstore_q){standardGeneric(".generateKeyFromID")})
-setMethod(".generateKeyFromID",
-          signature( object = "VirtualObjectStore"),
-          function(object){
-
-            id <- getID(object)
-
-            name <- key_from_name(id)
-
-            return(name)
-          }
-)
-
 setGeneric("getPath",function(object){standardGeneric("getPath")})
 setMethod("getPath","VirtualObjectStore",
 		  function(object){
-		  	return(paste(object@data_path,"/",object@id,"_objectstore.rds",sep=""))
+		  	return(gsub(" ","",paste(object@data_path,"/",object@id,"_objectstore.rds",sep="")))
 		  }
 )
 
@@ -279,6 +287,26 @@ setMethod("placeInObjectStore","VirtualObjectStore",
 	      	object@stored[[name]] <- item
 	      	return(object)
 	      }
+)
+
+setGeneric("removeFromObjectStore",function(object,name){standardGeneric("removeFromObjectStore")})
+setMethod("removeFromObjectStore",
+          signature(object = "VirtualObjectStore",
+                    name = "character"),
+          function(object, name){
+
+            if(name %in% ls(object@stored)){
+              remove(list = name, envir = object@stored)
+              message(sprintf("Removed object %s from objectstore %s",
+                              name, getID(object)))
+            } else {
+              message(sprintf("Requested to remove nonexistent object %s from objectstore %s",
+                              name, getID(object)))
+            }
+
+            return(object)
+
+          }
 )
 
 setGeneric("getFromObjectStore",function(object,name){standardGeneric("getFromObjectStore")})

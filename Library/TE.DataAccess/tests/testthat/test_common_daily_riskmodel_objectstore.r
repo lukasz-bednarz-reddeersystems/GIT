@@ -7,13 +7,12 @@ context("Test Daily Risk Model Objectstore")
 #############################
 
 valid.component       <- "FactorCorrelation"
-valid.model_prefix    <- "developed_europe_prototype"
+valid.model_prefix    <- "developed_europe_prototype.1.1"
 valid.lookback        <- 150L
 
 
 
 test_that("Can get_most_recent_model_objectstore() with valid key_values", {
-
   valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-20'),
                                            to = as.Date('2016-06-23'),
                                            by = "1 day"))

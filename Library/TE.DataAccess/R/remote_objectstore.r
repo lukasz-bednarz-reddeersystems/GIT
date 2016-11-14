@@ -1,11 +1,6 @@
 #' @include objectstore.r
 NULL
 
-.__DEFAULT_OBJECTSTORE_ODBC_DB_NAME__.   <- "RAIDSTAGEDB"
-.__DEFAULT_OBJECTSTORE_DB_USER__.        <- Sys.info()["user"]
-.__DEFAULT_OBJECTSTORE_FILE_DB_SCHEMA__. <- "FileTableDB"
-
-
 #' An S4 class implementing handling queries to objectstores derived from VirtualRemoteObjectStore.
 #'
 #' Inherits from "ObjectQuery"
@@ -200,14 +195,27 @@ setMethod(".generateRemoteQueryKey",
           }
 )
 
+
+
+setGeneric(".generateRemoteInsertKey",function(object,key){standardGeneric(".generateRemoteInsertKey")})
+setMethod(".generateRemoteInsertKey",
+          signature(object = "RemoteObjectQuery",
+                    key = "data.frame"),
+          function(object,key){
+
+            key <- .generateRemoteQueryKey(object,key)
+
+            return(key)
+          }
+)
+
 setGeneric("isKeyKnownInRemoteStore",function(object,key){standardGeneric("isKeyKnownInRemoteStore")})
 setMethod("isKeyKnownInRemoteStore",
           signature(object = "RemoteObjectQuery",
                     key = "data.frame"),
           function(object,key){
-            rval <- FALSE
 
-            #key <- .generateRemoteQueryKey(object, key)
+            rval <- FALSE
 
             test <- getKnownRemoteKeys(object, key)
 
@@ -238,7 +246,6 @@ setMethod("updateKnownRemoteKeys","RemoteObjectQuery",
             sql_insert <- getSQLInsertObject(object)
 
             tb_name <- .getObjectQueryTableName(object)
-
 
             ret <- tryCatch({
               executeSQLQuery(sql_insert, key)
@@ -366,7 +373,6 @@ setMethod("saveObjectInRemoteStore",
           signature(object = "VirtualRemoteObjectStore"),
           function(object){
 
-
             filename <- paste0(getID(object),
                                "_objectstore_",
                                today(),
@@ -388,9 +394,16 @@ setMethod("saveObjectInRemoteStore",
             table  <- .getObjectQueryTableName(query)
 
             message(paste("Object store saving to path:",pth))
-            rsp    <- store_file_in_referenced_filetable(pth, table, db, schema, overwrite = TRUE)
+            rsp    <- tryCatch({
+              store_file_in_referenced_filetable(pth, table, db, schema, overwrite = TRUE)
+            }, error = function(cond){
+              message(sprintf("Error occured when trying to save object of class %s in table referenced by %s",
+                              class(object),
+                              table))
+              rsp <- (-1)
+            })
 
-            if (rsp != 0) {
+            if (rsp < 0) {
               message(sprintf("Object hasn't been saved in remote path: %s, code : %s",
                               get_referenced_filetable_path(table, db, schema),
                               rsp))
@@ -406,14 +419,14 @@ setMethod("saveObjectInRemoteStore",
               stop(sprintf("Object isn't stored in remote path: %s, code",pth))
             }
             else {
-              key <- .generateKeyFromID(object)
+              key <- getObjectstoreKey(object)
 
-              key <- .generateRemoteQueryKey(query, key)
+              key <- .generateRemoteInsertKey(query, key)
 
               key <- cbind(data.frame(TableName = table),
                            key,
                            data.frame(CreatedDate = today(),
-                                      CreatedBy = .__DEFAULT_OBJECTSTORE_DB_USER__. ,
+                                      CreatedByUserID = tolower(.__DEFAULT_OBJECTSTORE_DB_USER__.) ,
                                       FileName = filename))
 
               ret <- updateKnownRemoteKeys(query, key)
@@ -437,7 +450,7 @@ setMethod("removeObjectFromRemoteStore",
           function(object){
 
 
-            key <- .generateKeyFromID(object)
+            key <- getObjectstoreKey(object)
 
             rsp <- (-1)
 

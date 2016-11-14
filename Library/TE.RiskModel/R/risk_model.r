@@ -1,3 +1,6 @@
+#' @include risk_model_load.r
+NULL
+
 ####################################
 #
 # VirtualBetaEstimator Class
@@ -79,22 +82,26 @@ setClass(
 #' Virtual S4 class for handling Risk Model Properties.
 #'
 #'
-#' @slot model_prefix    "character"
-#' @slot lookback        "integer"
-#' @slot model_universe  "character"
-#' @slot model_factors   "character"
-#' @slot beta_estimator  "VirtualBetaEstimator"
+#' @slot model_prefix         "character"
+#' @slot lookback             "integer"
+#' @slot model_universe       "character"
+#' @slot model_factors        "character"
+#' @slot beta_estimator       "VirtualBetaEstimator"
+#' @slot factor_groups        "list"
+#' @slot user_factor_groups   "list"
 #'
 #' @export
 
 setClass(
   Class     = "VirtualRiskModel",
   slots     = c(
-    model_prefix    = "character",
-    lookback        = "integer",
-    model_universe  = "character",
-    model_factors   = "character",
-    beta_estimator  = "VirtualBetaEstimator"
+    model_prefix        = "character",
+    lookback            = "integer",
+    model_universe      = "character",
+    model_factors       = "character",
+    beta_estimator      = "VirtualBetaEstimator",
+    factor_groups       = "list",
+    user_factor_groups  = "list"
   ),
   prototype = list(
     beta_estimator  = new("BetaEstimator.OLS")
@@ -103,9 +110,169 @@ setClass(
 )
 
 
-#' Get Risk Model Name
+
+
+#' Get Risk Model Factor Groups
 #'
-#' Returns name of Risk Model
+#' Returns list of factor groups
+#' @rdname private_getRiskModelFactorGroups
+#' @param object object of class 'VirtualRiskModel'.
+setGeneric(".getRiskModelFactorGroups", function(object){standardGeneric(".getRiskModelFactorGroups")})
+
+setMethod(".getRiskModelFactorGroups",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+            factor_info <- get_factors()
+            factors <- getRiskModelFactorNames(object)
+
+            factor_info <- factor_info[factor_info$sFactorName %in% factors, ]
+
+            model_factors <- aggregate(sFactorName ~ sFactorTypeName,
+                                       data = factor_info,
+                                       function(s){c(as.character(s))})
+            factor_groups <- as.character(model_factors$sFactorTypeName)
+
+            model_factors <- as.list(model_factors$sFactorName)
+
+            names(model_factors) <- factor_groups
+
+            return(model_factors)
+          }
+)
+
+
+setGeneric(".setRiskModelFactorGroups", function(object, factor_groups){standardGeneric(".setRiskModelFactorGroups")})
+setMethod(".setRiskModelFactorGroups",
+          signature(object = "VirtualRiskModel",
+                    factor_groups  = "list"),
+          function(object, factor_groups){
+
+            if(!all(sapply(factor_groups, function(x){class(x) == "character"}))){
+              stop("risk Model factor group list elements have to be character class" )
+            }
+
+            model_factors <- getRiskModelFactorNames(object)
+
+            if(!all(sapply(factor_groups, function(x){length(intersect(model_factors, x)) > 0}))){
+
+              message(sprintf("Group factors %s do not intersect with model factors %s",
+                              factor_groups, model_factors))
+
+              stop("risk Model factor group list elements have be present in the model" )
+            }
+
+
+            object@factor_groups <- factor_groups
+
+            return(object)
+          }
+)
+
+
+
+#' initialize method for VirtualRiskModel
+#' @param .Object object of class "VirtualRiskModel" or derived
+#' @export
+setMethod("initialize",
+          signature(.Object = "VirtualRiskModel"),
+          function(.Object){
+
+            factor_groups <- .getRiskModelFactorGroups(.Object)
+
+            .Object <- .setRiskModelFactorGroups(.Object, factor_groups)
+            .Object <- setRiskModelUserFactorGroups(.Object, factor_groups)
+
+            return(.Object)
+          }
+)
+
+
+
+#' Set Risk Model User defined Factor Groups
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+setGeneric("getRiskModelFactorGroups", function(object){standardGeneric("getRiskModelFactorGroups")})
+
+#' @describeIn getRiskModelFactorGroups
+#' get Risk Model User defined Factor Groups
+#'
+#' @inheritParams getRiskModelFactorGroups
+#' @return \code{factor_groups} list with character objects specifying factor grouppings
+#' @export
+setMethod("getRiskModelFactorGroups",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            return(object@factor_groups)
+          }
+)
+
+
+#' Set Risk Model User defined Factor Groups
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @export
+setGeneric("getRiskModelUserFactorGroups", function(object){standardGeneric("getRiskModelUserFactorGroups")})
+
+#' @describeIn getRiskModelUserFactorGroups
+#' Set Risk Model User defined Factor Groups
+#'
+#' @inheritParams getRiskModelUserFactorGroups
+#' @return \code{factor_groups} list with character objects specifying user factor grouppings
+#' @export
+setMethod("getRiskModelUserFactorGroups",
+          signature(object = "VirtualRiskModel"),
+          function(object){
+
+            return(object@user_factor_groups)
+          }
+)
+
+#' Set Risk Model User defined Factor Groups
+#'
+#' @param object object of class 'VirtualRiskModel'.
+#' @param factor_groups list with character objects specifying factor grouppings
+#' @export
+
+setGeneric("setRiskModelUserFactorGroups", function(object, factor_groups){standardGeneric("setRiskModelUserFactorGroups")})
+
+
+#' @describeIn setRiskModelUserFactorGroups
+#' Set Risk Model User defined Factor Groups
+#'
+#' @inheritParams setRiskModelUserFactorGroups
+#' @return \code{object} object of class 'VirtualRiskModel'
+#' @export
+setMethod("setRiskModelUserFactorGroups",
+          signature(object = "VirtualRiskModel",
+                    factor_groups  = "list"),
+          function(object, factor_groups){
+
+            if(!all(sapply(factor_groups, function(x){class(x) == "character"}))){
+              stop("risk Model factor group list elements have to be character class" )
+            }
+
+            model_factors <- getRiskModelFactorNames(object)
+
+            if(!all(sapply(factor_groups, function(x){length(intersect(model_factors, x)) > 0}))){
+
+              message(sprintf("Group factors %s do not intersect with model factors %s",
+                              factor_groups, model_factors))
+
+              stop("risk Model factor group list elements have be present in the model" )
+            }
+
+
+            object@user_factor_groups <- factor_groups
+
+            return(object)
+          }
+)
+
+#' Get Risk Model Beta Estimator
+#'
+#' Returns name of Risk Model Beta Estimator
 #'
 #' @param object object of class 'VirtualRiskModel'.
 #' @export
@@ -113,9 +280,9 @@ setClass(
 setGeneric("getRiskModellBetaEstimator", function(object){standardGeneric("getRiskModellBetaEstimator")})
 
 #' @describeIn getRiskModellBetaEstimator
-#' Get Risk Model Name
+#' Get Risk Model Beta Estimator Name
 #'
-#' Returns name of Risk Model
+#' Returns name of Risk Model Beta Estimator
 #'
 #' @inheritParams getRiskModellBetaEstimator
 #' @return \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
@@ -251,7 +418,8 @@ setGeneric("getRiskModelFactorNames", function(object){standardGeneric("getRiskM
 setMethod("getRiskModelFactorNames",
           signature(object = "VirtualRiskModel"),
           function(object){
-            return(object@model_factors)
+            model_factors <- sort(object@model_factors)
+            return(model_factors)
           }
 )
 
@@ -346,7 +514,7 @@ setMethod("getRiskModelCommodityFactorNames",
             factor_info <- get_factors()
             factors <- getRiskModelFactorNames(object)
 
-            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Oil"]
+            sector_factors <- factor_info$sFactorName[factor_info$sFactorTypeName == "Commodity"]
 
             model_factors <- intersect(sector_factors, factors)
 
@@ -385,6 +553,8 @@ setMethod("getRiskModelMarketFactorNames",
             return(model_factors)
           }
 )
+
+
 
 
 #' Get Risk Model Commodity Factor returns

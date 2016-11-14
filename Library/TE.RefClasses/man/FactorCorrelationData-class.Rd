@@ -9,6 +9,6 @@ Implements storage for Factor Correlation and access
 to Factor Correlation data via Risk Model Objectstore
 }
 \details{
-Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelObjectstoreClient"
+Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelFactorDependentClientSelector"
 }
 

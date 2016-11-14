@@ -31,6 +31,44 @@ setMethod("initialize",
 
 
 
+
+#' VirtualBlobStorageSQLProcedureCall class
+#'
+#' Implements handling querries for BLOB storage
+#' procedure Calls
+#'
+#' Inherits from "VirtualSQLProcedureCall"
+setClass(
+  Class     = "BlobStorage.JunctionTable.VirtualSQLProcedureCall",
+  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+)
+
+#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID"
+#'
+#' @rdname initialize-BlobStorage.JunctionTable.VirtualSQLProcedureCall-method
+#' @param .Object object of class derived from BlobStorage.JunctionTable.VirtualSQLProcedureCall
+#' @param db_name "character" database name
+#' @param db_schema "character" database schema
+#' @param tb_name "character" table name to be querried
+#' @param keys "data.frame" with columns corresponding to procedure parameters
+#'
+#' @export
+setMethod("initialize",
+          signature(.Object = "BlobStorage.JunctionTable.VirtualSQLProcedureCall"),
+          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
+
+            .Object <- callNextMethod(.Object, db_name, db_schema )
+
+            if (!is.null(keys) && is.data.frame(keys)) {
+
+              keys <- cbind(data.frame(TableName = tb_name), keys)
+
+              .Object <- prepareSQLQuery(.Object, keys)
+            }
+
+            return(.Object)
+          })
+
 #################################################################################
 #
 # BlobStorage.SQLProcedureCall.ReferencedFileTable_SelectByParentTableName class
@@ -116,35 +154,11 @@ setClass(
                             "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_QueryByHashID"
   ),
-  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
 )
 
 
-#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID"
-#'
-#' @rdname initialize-JointFileTable_QueryByHashID-method
-#' @param .Object object of class derived from FileTableSQLQuerry
-#' @param db_name "character" database name
-#' @param db_schema "character" database schema
-#' @param tb_name "character" table name to be querried
-#' @param keys "data.frame" with columns 'JointTableName' 'HashID'
-#'
-#' @export
-setMethod("initialize",
-          signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_QueryByHashID"),
-          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
 
-            .Object <- callNextMethod(.Object, db_name, db_schema )
-
-            if (!is.null(keys) && is.data.frame(keys)) {
-
-              keys <- cbind(data.frame(TableName = tb_name), keys)
-
-              .Object <- prepareSQLQuery(.Object, keys)
-            }
-
-            return(.Object)
-          })
 
 
 #################################################################################
@@ -156,9 +170,9 @@ setMethod("initialize",
 
 #' BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID class
 #'
-#' Implements handling querries for joint table that
-#' stores keys of associated file table. Returns file name column that
-#' is associated with given key
+#' Implements handling update for joint table that
+#' stores keys of associated file table. Returns number of stored and
+#' insertet keys
 #'
 #' Inherits from "BlobStorage.VirtualSQLProcedureCall"
 #'
@@ -167,7 +181,7 @@ setMethod("initialize",
 setClass(
   Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID",
   prototype = list(
-    key_cols   = c("TableName", "HashID", "CreatedDate", "CreatedBy", "FileName"),
+    key_cols   = c("TableName", "HashID", "CreatedDate", "CreatedByUserID", "FileName"),
     key_values = data.frame(TableName = character()),
     arguments  = c("@sJointTableName",
                    "@sHashID",
@@ -188,37 +202,8 @@ setClass(
       "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_UpdateByHashID"
   ),
-  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
 )
-
-
-#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID"
-#'
-#' @rdname initialize-JointFileTable_UpdateByHashID-method
-#' @param .Object object of class derived from FileTableSQLQuerry
-#' @param db_name "character" database name
-#' @param db_schema "character" database schema
-#' @param tb_name "character" table name to be querried
-#' @param keys "data.frame" with columns
-#' 'JointTableName' 'HashID', 'CreatedDate', 'CreatedByUserID', 'FileName'
-#'
-#' @export
-setMethod("initialize",
-          signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID"),
-          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
-
-            .Object <- callNextMethod(.Object, db_name, db_schema )
-
-            if (!is.null(keys) && is.data.frame(keys)) {
-
-              keys <- cbind(data.frame(TableName = tb_name), keys)
-
-              .Object <- prepareSQLQuery(.Object, keys)
-            }
-
-            return(.Object)
-          })
-
 
 
 #################################################################################
@@ -265,35 +250,8 @@ setClass(
                              "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
   ),
-  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
 )
-
-
-#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"
-#'
-#' @rdname initialize-JointFileTable_QueryByTbNameTraderIDStartDateEndDate-method
-#' @param .Object object of class derived from FileTableSQLQuerry
-#' @param db_name "character" database name
-#' @param db_schema "character" database schema
-#' @param tb_name "character" table name to be querried
-#' @param keys "data.frame" with columns 'JointTableName' 'TraderID', 'StartDate', 'EndDate'
-#'
-#' @export
-setMethod("initialize",
-          signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDStartDateEndDate"),
-          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
-
-            .Object <- callNextMethod(.Object, db_name, db_schema )
-
-            if (!is.null(keys) && is.data.frame(keys)) {
-
-              keys <- cbind(data.frame(TableName = tb_name), keys)
-
-              .Object <- prepareSQLQuery(.Object, keys)
-            }
-
-            return(.Object)
-          })
 
 
 #################################################################################
@@ -305,9 +263,9 @@ setMethod("initialize",
 
 #' BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate class
 #'
-#' Implements handling querries for joint table that
-#' stores keys of associated file table. Returns file name column that
-#' is associated with given key
+#' Implements handling update for joint table that
+#' stores keys of associated file table. Returns number of stored and
+#' insertet keys
 #'
 #' Inherits from "BlobStorage.VirtualSQLProcedureCall"
 #'
@@ -316,7 +274,8 @@ setMethod("initialize",
 setClass(
   Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate",
   prototype = list(
-    key_cols   = c("TableName", "TraderID", "StartDate", "EndDate", "CreatedDate", "CreatedBy", "FileName"),
+    key_cols   = c("TableName", "TraderID", "StartDate", "EndDate",
+                   "CreatedDate", "CreatedByUserID", "FileName"),
     key_values = data.frame(TableName = character()),
     arguments  = c("@sJointTableName",
                    "@lTraderID",
@@ -343,33 +302,184 @@ setClass(
                              "FileName")),
     procedure    = "prMultiFactorRisk_JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
   ),
-  contains  = c("BlobStorage.VirtualSQLProcedureCall")
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
+)
+
+#################################################################################
+#
+# BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate class
+#
+#################################################################################
+
+
+#' BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate class
+#'
+#' Implements handling querries for joint table that
+#' stores keys of associated file table. Returns file name column that
+#' is associated with given key
+#'
+#' Inherits from "BlobStorage.VirtualSQLProcedureCall"
+#'
+#' @rdname JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate-class
+#' @export
+setClass(
+  Class     = "BlobStorage.SQLProcedureCall.JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate",
+  prototype = list(
+    key_cols   = c("TableName",
+                   "TraderID",
+                   "InstrumentID",
+                   "Direction",
+                   "Strategy",
+                   "LegStartDate",
+                   "LegEndDate"),
+    key_values = data.frame(TableName = character()),
+    arguments  = c("@sJointTableName",
+                   "@lTraderID",
+                   "@lInstrumentID",
+                   "@sDirection",
+                   "@sStrategy",
+                   "@dtLegStartDate",
+                   "@dtLegEndDate"),
+    column_name_map = hash(c("sJointTableName",
+                            "lTraderID",
+                            "lInstrumentID",
+                            "sDirection",
+                            "sStrategy",
+                            "dtLegStartDate",
+                            "dtLegEndDate",
+                            "sLegStatus",
+                            "dtCreatedDate",
+                            "sCreatedByUserID",
+                            "sFileName",
+                            "hash",
+                            "id",
+                            "instrument",
+                            "buysell",
+                            "strategy",
+                            "start",
+                            "end",
+                            "leg_start",
+                            "leg_end",
+                            "status"),
+                            c("JointTableName",
+                              "TraderID",
+                              "InstrumentID",
+                              "Direction",
+                              "Strategy",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStatus",
+                              "CreatedDate",
+                              "CreatedByUserID",
+                              "FileName",
+                              "HashID",
+                              "TraderID",
+                              "InstrumentID",
+                              "Direction",
+                              "Strategy",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStatus")),
+    procedure    = "prMultiFactorRisk_JointFileTable_QueryByTbNameTraderIDInstrumentIDLegStartDateLegEndDate"
+  ),
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
 )
 
 
-#' Initialize method for "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"
+#################################################################################
+#
+# BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate class
+#
+#################################################################################
+
+
+#' BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate class
 #'
-#' @rdname initialize-JointFileTable_UpdateByTbNameTraderIDStartDateEndDate-method
-#' @param .Object object of class derived from FileTableSQLQuerry
-#' @param db_name "character" database name
-#' @param db_schema "character" database schema
-#' @param tb_name "character" table name to be querried
-#' @param keys "data.frame" with columns
-#' 'JointTableName' 'TraderID', 'StartDate', 'EndDate', 'CreatedDate', 'CreatedByUserID', 'FileName'
+#' Implements handling update for joint table that
+#' stores keys of associated file table. Returns number of stored and
+#' insertet keys
 #'
+#' Inherits from "BlobStorage.VirtualSQLProcedureCall"
+#'
+#' @rdname JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate-class
 #' @export
-setMethod("initialize",
-          signature(.Object = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate"),
-          function(.Object, db_name, db_schema,tb_name, keys = NULL) {
+setClass(
+  Class     = "BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate",
+  prototype = list(
+    key_cols   = c("TableName",
+                   "HashID",
+                   "TraderID",
+                   "InstrumentID",
+                   "Direction",
+                   "Strategy",
+                   "LegStartDate",
+                   "LegEndDate",
+                   "LegStatus",
+                   "CreatedDate",
+                   "CreatedByUserID",
+                   "FileName"),
+    key_values = data.frame(TableName = character()),
+    arguments  = c("@sJointTableName",
+                   "@sHashID",
+                   "@lTraderID",
+                   "@lInstrumentID",
+                   "@sDirection",
+                   "@sStrategy",
+                   "@dtLegStartDate",
+                   "@dtLegEndDate",
+                   "@sLegStatus",
+                   "@dtCreatedDate",
+                   "@sCreatedByUserID",
+                   "@sFileName"),
+    column_name_map = hash(c("sJointTableName",
+                             "sHashID",
+                             "lTraderID",
+                             "lInstrumentID",
+                             "sDirection",
+                             "sStrategy",
+                             "dtLegStartDate",
+                             "dtLegEndDate",
+                             "sLegStatus",
+                             "dtCreatedDate",
+                             "sCreatedByUserID",
+                             "sFileName",
+                             "hash",
+                             "id",
+                             "instrument",
+                             "buysell",
+                             "strategy",
+                             "start",
+                             "end",
+                             "leg_start",
+                             "leg_end",
+                             "status"),
+                            c("JointTableName",
+                              "HashID" ,
+                              "TraderID",
+                              "InstrumentID",
+                              "Direction",
+                              "Strategy",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStatus",
+                              "CreatedDate",
+                              "CreatedByUserID",
+                              "FileName",
+                              "HashID",
+                              "TraderID",
+                              "InstrumentID",
+                              "Direction",
+                              "Strategy",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStartDate",
+                              "LegEndDate",
+                              "LegStatus"
+                            )),
+    procedure    = "prMultiFactorRisk_JointFileTable_UpdateByTbNameTraderIDInstrumentIDLegStartDateLegEndDate"
+  ),
+  contains  = c("BlobStorage.JunctionTable.VirtualSQLProcedureCall")
+)
 
-            .Object <- callNextMethod(.Object, db_name, db_schema )
-
-            if (!is.null(keys) && is.data.frame(keys)) {
-
-              keys <- cbind(data.frame(TableName = tb_name), keys)
-
-              .Object <- prepareSQLQuery(.Object, keys)
-            }
-
-            return(.Object)
-          })

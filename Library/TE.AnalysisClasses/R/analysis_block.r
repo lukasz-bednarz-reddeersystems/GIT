@@ -16,7 +16,7 @@ NULL
 #'
 #' @slot ggplot object of class "ggplot"
 #' @slot ggplot_data    "data.frame",
-#' @slot frontend_data  "data.frame",
+#' @slot frontend_data  "list",
 #' @slot output         "NullableReferenceData"
 
 setClass(
@@ -24,7 +24,7 @@ setClass(
   slots = c(
     ggplot       = "ANY",
     ggplot_data  = "data.frame",
-    frontend_data    = "data.frame",
+    frontend_data    = "list",
     output      = "NullableReferenceData"
   ),
   contains = c("VirtualDataSourceClient", "VIRTUAL")
@@ -242,25 +242,24 @@ setMethod("getOutputFrontendData",
 #' Private method to set frontend_data slot with data.frame used to provide to frontend services object
 #'
 #' @rdname private_setOutputFrontendData
-#' @param object object of class "VirtualAnalysisBlock"
+#' @param object object of class derived from "VirtualAnalysisBlock"
 #' @param frontend_data object of class "data.frame"
-#' @return \code{object} object object of class "VirtualAnalysisBlock"
+#' @return \code{object} object object of class derived "VirtualAnalysisBlock"
 
 setGeneric(".setOutputFrontendData", function(object, frontend_data){standardGeneric(".setOutputFrontendData")})
 
 setMethod(".setOutputFrontendData",
-          signature(object = "VirtualAnalysisBlock", frontend_data = "data.frame"),
+          signature(object = "VirtualAnalysisBlock", frontend_data = "list"),
           function(object, frontend_data){
             object@frontend_data <- frontend_data
             return(object)
           }
 )
 
-
-
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "VirtualAnalysisBlock"
+#' @param object object of class derived from "VirtualAnalysisBlock"
+#' @return \code{object} object of class derived from "VirtualAnalysisBlock"
 #' @export
 
 setGeneric("Process", function(object){standardGeneric("Process")})

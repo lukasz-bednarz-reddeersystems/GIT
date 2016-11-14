@@ -9,7 +9,7 @@ This is handler class that is to be inherited
 by other classes handling Risk Model Objects
 }
 \details{
-Inherits from "VirtualDataSourceClient" and "VirtualRiskModelHandler"
+Inherits from "VirtualRiskModelDataSourceClient" and "VirtualRiskModelFactorDependentComponent"
 }
 \section{Slots}{
 

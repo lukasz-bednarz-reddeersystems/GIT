@@ -76,15 +76,14 @@ setClass(
 
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-PortfolioVarianceDecompositionAnalysisBlock-method
-#' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @rdname setRiskModelObject-PortfolioVarianceDecompositionAnalysisBlock-method
+# ' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "PortfolioVarianceDecompositionAnalysisBlock"
 #' @export
 setMethod("setRiskModelObject",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock",
@@ -107,11 +106,15 @@ setMethod("setRiskModelObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'PortfolioVarianceDecompositionAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -149,7 +152,13 @@ setMethod("dataRequest",
             betas_data <- setRiskModelObject(betas_data, risk_model)
 
             betas_data <- tryCatch({
-              dataRequest(betas_data, query_keys)
+
+              bt <- dataRequest(betas_data, query_keys)
+
+              betas <- getReferenceData(bt)
+              betas <- adjust_ipo_betas(betas)
+              bt <- setReferenceData(bt, betas)
+              bt
 
             },error = function(cond){
               message(sprintf("Error when calling %s on %s class", "dataRequest()", class(betas_data)))
@@ -199,10 +208,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
-#' @return \code{object} object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "PortfolioVarianceDecompositionAnalysisBlock"
+# ' @return \code{object} object object of class "PortfolioVarianceDecompositionAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "PortfolioVarianceDecompositionAnalysisBlock"),
@@ -254,7 +267,7 @@ setMethod("Process",
                   # The variance of log returns is equal to the variance of returns upto second order.
                   # 3/5 adjustment factor is derived from 3rd order term of the Taylor series expansion of log(1+x)^2
                   fct_cov <- tryCatch({
-                    365*3/5*factor_covariance(fct_cor,fct_sd)
+                    factor_covariance(fct_cor,fct_sd)
                   }, error = function(cond){
 
                     message(paste("I have encountered an error in cov_matrix on", rm_date, ". Skipping this date."))
@@ -286,24 +299,25 @@ setMethod("Process",
 
             risk_plot_data <- rbind(data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'TotalSystematic',
-                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$TotalSystematicVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'MarketRiskFactor',
-                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$MarketFactorVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Commodity',
-                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CommodityVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Currency',
-                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1e2),
+                                               Value    = abs_sqrt(variance_decomposition$CurrencyVar)*1600),
                                     data.frame(Date     = variance_decomposition$Date,
                                                RiskType = 'Sector',
-                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1e2))
+                                               Value    = abs_sqrt(variance_decomposition$SectorVar)*1600))
             plt_risk <- ggplot(data=risk_plot_data,aes_string(x="Date",y="Value",colour="RiskType")) +
-              geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type")
+              geom_line(size=1) + ylab("Daily risk attribution (bps)") + xlab("Date") + labs(fill="Risk type") +
+              ggtitle("Risk Contribution by Factor Groups")
 
             outp_object <- getOutputObject(object)
             outp_object <- setReferenceData(outp_object, variance_decomposition.tot)
@@ -351,15 +365,14 @@ setClass(
   contains          = c("PortfolioVarianceDecompositionAnalysisBlock")
 )
 
+#' @describeIn setPortfolioDataObject
 #' Set portfolio object in object slot
+#' @inheritParams setPortfolioDataObject
 #'
-#' Public method to set portfolio slot with "VirtualIndexPortfolio"
-#' class object
-#'
-#' @rdname setPortfolioDataObject-IndexPortfolioVarianceDecomposition-method
-#' @param object object of class "IndexPortfolioVarianceDecompositionAnalysisBlock"
-#' @param portfolio object of class "VirtualIndexPortfolio"
-#' @return \code{object} object of class "IndexPortfolioVarianceDecompositionAnalysisBlock""
+# ' @rdname setPortfolioDataObject-IndexPortfolioVarianceDecomposition-method
+# ' @param object object of class "IndexPortfolioVarianceDecompositionAnalysisBlock"
+# ' @param portfolio object of class "VirtualIndexPortfolio"
+# ' @return \code{object} object of class "IndexPortfolioVarianceDecompositionAnalysisBlock""
 #' @export
 setMethod("setPortfolioDataObject",
           signature(object = "IndexPortfolioVarianceDecompositionAnalysisBlock",

@@ -69,7 +69,7 @@ setClass(
   Class             = "EventData",
   prototype      = list(
     key_cols        = c("InstrumentID","Date"),
-    values          = c("lInstrumentID","dtDateTime", "sEventType"),
+    values          = c("InstrumentID","Date", "EventType"),
     factorized_cols = c("EventType"),
     factorization_keys = c("Date","InstrumentID"),
     non_na_cols     = character(),

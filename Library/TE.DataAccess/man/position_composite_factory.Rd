@@ -4,7 +4,8 @@
 \alias{position_composite_factory}
 \title{Create and fill PositionComposite object}
 \usage{
-position_composite_factory(user, start, end, use_db = TRUE)
+position_composite_factory(user, start, end,
+  source = .__DEFAULT_POSITION_HISTORY_DATA_SOURCE__.)
 }
 \arguments{
 \item{user}{integer, trader ID.}
@@ -13,7 +14,7 @@ position_composite_factory(user, start, end, use_db = TRUE)
 
 \item{end}{Date end date}
 
-\item{use_db}{logical, pool data from Database or via Middleware}
+\item{source}{"character", where the data should be pulled from}
 }
 \value{
 \code{posn_comp_obj} object of class 'PositionComposite'.

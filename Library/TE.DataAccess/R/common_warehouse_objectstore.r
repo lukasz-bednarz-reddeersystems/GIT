@@ -277,7 +277,8 @@ setMethod("updateWarehouseStore","WarehouseObjectStore",
 		  	      		message(paste("Error building trade warehouse during object store query:",cond))
 		  	      		stop("Could not create required TradeWarehouse object.")
 		  	      	})
-              object <- updateWarehouseStoreForKey(object,new_warehouse)
+
+		  	      object <- updateWarehouseStoreForKey(object,new_warehouse)
               key_map <- advanceCurrentKey(key_map)
               object <- .setObjectStoreKeyMap(object, key_map)
 		    }
@@ -352,23 +353,35 @@ setMethod("commitWarehouseStore","WarehouseObjectStore",
 		  	object <- placeInObjectStore(object,
 		  	                             getObjectStoreQuery(object),
 		  	                             getQueryID(object))
+
+		  	ret <- updateTradesObjectStores(object)
+
+		  	if (!ret) {
+		  	  message("Some trades were not saved when updating trades objectstore")
+		  	}
+
 		  	saveObject(object)
 		  }
 )
 
-# !!! Comented unused method with missing dependency tearDownFeatures !!!
-#
-# setGeneric("tearDownAllFeatures",function(object,trader_id,start,end){standardGeneric("tearDownAllFeatures")})
-# setMethod("tearDownAllFeatures","WarehouseObjectStore",
-# 			function(object,trader_id,start,end){
-# 			  wh <- getWarehouseFromStore(object,trader_id,start,end)
-# 			  if(length(wh)>0){
-# 			  	wh <- tearDownFeatures(wh,wh@features)
-# 			  	object <- placeInObjectStore(object,wh,object@id)
-# 			  }
-# 			  return(object)
-# 			}
-# )
+
+
+setGeneric("updateTradesObjectStores",function(object){standardGeneric("updateTradesObjectStores")})
+setMethod("updateTradesObjectStores","WarehouseObjectStore",
+          function(object){
+
+            wh <- getFromObjectStore(object,object@id)
+
+            trades <- listTrades(wh)
+            message(paste("Resetting features for",length(trades),"trades..."))
+            for(trd_id in trades){
+              trade <- getTrade(wh,trd_id)
+              ret <- saveTradeInRemoteStore(trade)
+            }
+            return(ret)
+          }
+)
+
 
 setGeneric("pushFeatures",function(object,warehouse,keep_old=TRUE){standardGeneric("pushFeatures")})
 setMethod("pushFeatures","WarehouseObjectStore",
@@ -445,6 +458,29 @@ warehouse_objectstore_factory <- function(name){
 	query <- getObjectStoreQuery(whstr)
 	pth <- getPath(whstr)
 
+	if(file.exists(pth)){
+	  message(paste("Found warehouse store at",pth))
+	  whstr <- loadObject(whstr)
+
+
+	  whstr <- tryCatch({
+  	  whstr <- .setObjectStoreKeyMap(whstr,
+  	                                 getFromObjectStore(whstr,getKeyMapID(whstr))
+  	                                 )
+  	  whstr <- .setObjectStoreQuery(whstr,
+  	                                getFromObjectStore(whstr,getQueryID(whstr)))
+  	  whstr
+	  }, error =  function(cond){
+	    message(sprintf("Error: %s occured in warehouse_objectstore_factory()",
+	                    cond))
+	    message(sprintf("When extracting object from warehouse %s",
+	                    name))
+
+	    file.remove(pth)
+	  })
+
+	}
+
 	if (!file.exists(pth)) {
 	  message(sprintf("File initially not found in local path %s. Checking remote store",pth))
 	  key <- key_from_name(basename(pth))
@@ -453,22 +489,26 @@ warehouse_objectstore_factory <- function(name){
 	  if (is_known) {
 	    whstr <- updateLocalStoreFile(whstr,key)
 	  }
+
+	  if(file.exists(pth)){
+	    message(paste("Found warehouse store at",pth))
+	    whstr <- loadObject(whstr)
+	    whstr <- .setObjectStoreKeyMap(whstr,
+	                                   getFromObjectStore(whstr,getKeyMapID(whstr))
+	    )
+	    whstr <- .setObjectStoreQuery(whstr,
+	                                  getFromObjectStore(whstr,getQueryID(whstr)))
+
+	  }
+
+	  else{
+	    message(paste("No previous store data found at",pth,"new store created."))
+	  }
+
+
 	}
 
-	if(file.exists(pth)){
-		message(paste("Found warehouse store at",pth))
-		whstr <- loadObject(whstr)
-		whstr <- .setObjectStoreKeyMap(whstr,
-		                               getFromObjectStore(whstr,getKeyMapID(whstr))
-		                               )
-		whstr <- .setObjectStoreQuery(whstr,
-		                              getFromObjectStore(whstr,getQueryID(whstr)))
 
-	}
-
-	else{
-		message(paste("No previous store data found at",pth,"new store created."))
-	}
 	return(whstr)
 }
 

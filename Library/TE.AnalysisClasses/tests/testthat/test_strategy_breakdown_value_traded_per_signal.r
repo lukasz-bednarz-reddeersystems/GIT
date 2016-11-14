@@ -40,7 +40,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getEventDataObject(object), "EventData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
 
   expect_is(getOutputObject(object), "TradedSignalsData")
 

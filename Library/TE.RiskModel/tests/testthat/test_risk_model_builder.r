@@ -22,10 +22,10 @@ valid.model_prefix    <- "developed_europe_prototype"
 valid.model_name      <- "developed_europe_prototype"
 valid.model_universe  <- "developed_europe"
 valid.lookback        <- 150L
-valid.factor_names    <-  c(risk_model_market_factors,
-                            risk_model_currency_factors,
-                            risk_model_commodity_factors,
-                            risk_model_sector_factors)
+valid.factor_names    <-  sort(c(risk_model_market_factors,
+                                  risk_model_currency_factors,
+                                  risk_model_commodity_factors,
+                                  risk_model_sector_factors))
 
 test_that(paste("Can create", tested.class, "object"), {
   expect_is(new(tested.class), tested.class)

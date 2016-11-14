@@ -8,7 +8,7 @@ context("Testing Instrument Betas Data")
 
 tested.class          <-  "InstrumentBetasData"
 valid.component       <- "Betas"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
@@ -20,8 +20,15 @@ valid.values          <- c("Date", "InstrumentID",
 valid.required_colnms <- c('Date', "InstrumentID",
                            valid.model_factors)
 
-valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
-                              c("InstrumentID","Instrument"))
+# valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
+#                               c("InstrumentID","Instrument"))
+
+valid.column_name_map <- hash("dtDateTime"    = "Date",
+                              "dtDate"        = "Date",
+                              "lInstrumentID" = "InstrumentID",
+                              "sFactorName"   = "FactorName",
+                              "Instrument"    = "InstrumentID",
+                              "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()),
                                      InstrumentID = integer())
 
@@ -37,7 +44,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_equal(getRiskModelName(object), valid.model_prefix)
 
@@ -122,8 +129,8 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
   object <- new(tested.class)
 
   nexist.key_vals <- data.frame(InstrumentID = 1984,
-                                Date = seq(from = as.Date('2016-06-01'),
-                                                  to = as.Date('2016-06-03'),
+                                Date = seq(from = today(),
+                                                  today() + 5,
                                                   by = "1 day"))
   diff <- setdiff(valid.required_colnms,valid.key_cols)
 
@@ -186,7 +193,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   merge_keys   <- valid.key_vals
 
-  colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  #colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  colnames(merge_keys) <- c("Instrument", "Date")
 
   valid.ret_data <- merge(query_data,
                         merge_keys[merge_keys$Date >= start & merge_keys$Date <= end, ], all.y = TRUE)
@@ -194,6 +202,8 @@ test_that("Can dataRequest() with valid key_values", {
   colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
+
+  valid.ret_data <- arrange(valid.ret_data, InstrumentID, Date)
 
   object <- dataRequest(object, valid.key_vals)
 
@@ -216,7 +226,7 @@ test_that("Can dataRequest() with valid key_values", {
 #
 #########################################################
 
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
 
 context(sprintf("Testing Instrument Betas Data with %s risk model", valid.risk_model))
 
@@ -227,8 +237,8 @@ valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
 valid.model_prefix    <- getRiskModelPrefix(valid.risk_model_obj)
 valid.lookback        <- getRiskModelLookback(valid.risk_model_obj)
-valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
-                              c("InstrumentID","Instrument"))
+# valid.column_name_map <- hash(c("Instrument", "InstrumentID"),
+#                               c("InstrumentID","Instrument"))
 
 valid.key_cols        <- c(risk_model_objectstore_keys, "InstrumentID")
 valid.values          <- c("Date", "InstrumentID",
@@ -257,7 +267,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
   expect_is(object, tested.class)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_equal(getRiskModelName(object), valid.model_prefix)
 
@@ -304,8 +314,8 @@ test_that("Can .setDataSourceQueryKeyValues with valid data", {
   object <- new(tested.class)
   object <- setRiskModelObject(object, valid.risk_model_obj)
 
-  valid.key_vals <- data.frame(Date = seq(from = as.Date('2016-06-01'),
-                                          to = as.Date('2016-06-03'),
+  valid.key_vals <- data.frame(Date = seq(from = as.Date('2016-10-01'),
+                                          to = as.Date('2016-10-03'),
                                           by = "1 day"),
                                InstrumentID = 4454
   )
@@ -410,7 +420,8 @@ test_that("Can dataRequest() with valid key_values", {
 
   merge_keys   <- valid.key_vals
 
-  colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  # colnames(merge_keys) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(merge_keys))
+  colnames(merge_keys) <- c("Instrument", "Date")
 
   valid.ret_data <- merge(query_data,
                           merge_keys[merge_keys$Date >= start & merge_keys$Date <= end, ], all.y = TRUE)
@@ -418,6 +429,8 @@ test_that("Can dataRequest() with valid key_values", {
   colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
 
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
+
+  valid.ret_data <- arrange(valid.ret_data, InstrumentID, Date)
 
   object <- dataRequest(object, valid.key_vals)
 

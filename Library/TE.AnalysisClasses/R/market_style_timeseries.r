@@ -45,15 +45,14 @@ setClass(
 )
 
 
+#' @describeIn setRiskModelObject
 #' Set risk_model object in object slot
+#' @inheritParams setRiskModelObject
 #'
-#' Public method to set trade_data slot with "VirtualRiskModel"
-#' class object
-#'
-#' @rdname setRiskModelObject-MarketStyleAnalysisBlock-method
-#' @param object object of class "MarketStyleAnalysisBlock"
-#' @param risk_model object of class "VirtualRiskModel"
-#' @return \code{object} object of class "MarketStyleAnalysisBlock"
+# ' @rdname setRiskModelObject-MarketStyleAnalysisBlock-method
+# ' @param object object of class "MarketStyleAnalysisBlock"
+# ' @param risk_model object of class "VirtualRiskModel"
+# ' @return \code{object} object of class "MarketStyleAnalysisBlock"
 #' @export
 
 setMethod("setRiskModelObject",
@@ -66,11 +65,15 @@ setMethod("setRiskModelObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'MarketStyleAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'MarketStyleAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'MarketStyleAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'MarketStyleAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -107,10 +110,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "MarketStyleAnalysisBlock"
-#' @return \code{object} object object of class "MarketStyleAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "MarketStyleAnalysisBlock"
+# ' @return \code{object} object object of class "MarketStyleAnalysisBlock"
 #' @export
 
 setMethod("Process",

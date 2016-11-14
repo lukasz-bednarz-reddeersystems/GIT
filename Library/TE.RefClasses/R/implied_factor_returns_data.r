@@ -1,6 +1,5 @@
 #' @include referencedata.r
-#' @include risk_model_component.r
-#' @include risk_model_objectstore_client.r
+#' @include risk_model_rodbc_client.r
 NULL
 
 ####################################
@@ -23,13 +22,12 @@ setClass(
   contains = c("VirtualReferenceData", "VIRTUAL")
 )
 
-
 #' Concrtete S4 class handling Implied Factor Returns data.
 #'
 #' Implements storage for Implied Factor Returns and access
 #' to Implied Factor Returns data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualImpliedFactorReturnsData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -38,11 +36,9 @@ setClass(
     component          = "ImpliedFactorReturns", # name of component
     key_cols        = c(risk_model_objectstore_keys),
     key_values      = data.frame(Date = as.Date(character())),
-    values             = c("Date"), # columns that neeed to be returned from datastore
-    column_name_map = hash()
-
+    values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualImpliedFactorReturnsData", "VirtualRiskModelObjectstoreClient")
+  contains = c("VirtualImpliedFactorReturnsData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

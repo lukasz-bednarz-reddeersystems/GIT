@@ -18,7 +18,7 @@ Inherits from "VirtualDataSourceClient"
 
 \item{\code{ggplot_data}}{"data.frame",}
 
-\item{\code{frontend_data}}{"data.frame",}
+\item{\code{frontend_data}}{"list",}
 
 \item{\code{output}}{"NullableReferenceData"}
 }}

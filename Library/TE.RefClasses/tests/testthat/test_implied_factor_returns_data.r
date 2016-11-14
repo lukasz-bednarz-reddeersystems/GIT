@@ -8,7 +8,7 @@ context("Testing ImpliedFactorReturnsData")
 
 tested.class          <-  "ImpliedFactorReturnsData"
 valid.component       <- "ImpliedFactorReturns"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
@@ -20,7 +20,12 @@ valid.values          <- c("Date",
                            valid.model_factors)
 valid.required_colnms <- c('Date',
                            valid.model_factors)
-valid.column_name_map <- hash()
+valid.column_name_map <- hash("dtDateTime"    = "Date",
+                              "dtDate"        = "Date",
+                              "lInstrumentID" = "InstrumentID",
+                              "sFactorName"   = "FactorName",
+                              "Instrument"    = "InstrumentID",
+                              "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 
@@ -35,7 +40,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_is(getRiskModelObject(object), valid.risk_model)
 
@@ -159,13 +164,13 @@ test_that("Can dataRequest() with valid key_values", {
 
   object <- new(tested.class)
 
-  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-06-20'),
-                                               to = as.Date('2016-06-23'),
+  valid.key_vals <- expand.grid(Date = seq(from = as.Date('2016-10-01'),
+                                               to = as.Date('2016-10-30'),
                                                by = "1 day"))
 
   values <- getDataSourceReturnColumnNames(object)
 
-  # create valid return data.frame
+  # create valid return data.frameret_data
   start        <- min(valid.key_vals$Date)
   end          <- max(valid.key_vals$Date)
   rm_str       <- get_most_recent_model_objectstore(valid.model_prefix, end, valid.lookback)
@@ -198,6 +203,8 @@ test_that("Can dataRequest() with valid key_values", {
   ret_data <- getReferenceData(object)
 
   valid.ret_data <- valid.ret_data[colnames(ret_data)]
+
+  valid.ret_data <- merge(ret_data, valid.ret_data)
 
   expect_equal(unlist(Map(class, ret_data)), unlist(Map(class, valid.ret_data)))
 

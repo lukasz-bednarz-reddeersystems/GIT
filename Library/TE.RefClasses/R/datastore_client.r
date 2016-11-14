@@ -63,26 +63,29 @@ setMethod("dataRequest",
           signature(object = "VirtualDataStoreClient", key_values = "data.frame"),
           function(object, key_values){
 
-            colnames_map <- getDataSourceClientColumnNameMap(object)
             object <- .setDataSourceQueryKeyValues(object,key_values)
             datastore <- getDataStoreName(object)
             values <- getDataSourceReturnColumnNames(object)
-            factor_cols <- getFactorColumnNames(object)
 
+            colnames(key_values) <- .translateDataSourceColumnNames(object,
+                                                                    colnames(key_values))
 
             # data request sent to dataplex
             query_data <- data_request(datastore ,key_values,values)
             query_data <- getData(query_data)
-            query_data <- query_data[values]
+
 
             if (0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
               message(paste("Query sent to", datastore, "returned zero row data.frame"))
               stop(paste("Query sent to", datastore, "returned zero row data.frame"))
             }
+            query_data <- query_data[values]
 
             # translating column names
-            colnames(query_data) <- values(colnames_map[values])[values]
+            colnames(query_data) <- .translateDataSourceColumnNames(object,
+                                                                    colnames(query_data))
+
 
             # storing Reference data internaly
             object <- setReferenceData(object, query_data)

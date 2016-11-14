@@ -11,5 +11,7 @@ implements handling of transformations
 
 \describe{
 \item{\code{transformations}}{"list"}
+
+\item{\code{attached_transformations}}{"character"}
 }}
 

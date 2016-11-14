@@ -41,15 +41,14 @@ setClass(
                         )
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradedSignalsData"
-#' class object
-#'
-#' @rdname setTradeDataObject-StrategyBreakdownPnLAndTurnoverPerEvent-method
-#' @param object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
-#' @param trade_data object of class "TradedSignalsData"
-#' @return \code{object} object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
+# ' @rdname setTradeDataObject-StrategyBreakdownPnLAndTurnoverPerEvent-method
+# ' @param object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
+# ' @param trade_data object of class "TradedSignalsData"
+# ' @return \code{object} object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -60,10 +59,14 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "StrategyBreakdownPnLAndTurnoverPerEventAnalysisBlock"),

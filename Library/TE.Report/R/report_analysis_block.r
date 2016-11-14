@@ -41,7 +41,6 @@ setClass(
 
 
 
-
 #' check if slot class is as required
 #'
 #' Private method to check if given value has correct class for the slot
@@ -233,7 +232,7 @@ setMethod(".setOutputGGPlotDataList",
           signature(object = "VirtualReportAnalysisBlock", list = "list"),
           function(object, list){
             for (df in list) {
-              object <- .checkSlotClass(object, "OutputGGPlotDataList", class(df), "data.frame")
+              object <- .checkSlotClass(object, "OutputGGPlotDataList", class(df), c("data.frame", "list"))
             }
             object@ggplot_data_list <- list
             return(object)

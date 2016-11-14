@@ -1,16 +1,16 @@
 Package: TE.RefClasses
 Type: Package
 Title: Reference Classes for RedDeer Trading Enhancement Engine
-Version: 0.1.1
+Version: 0.1.3
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing Reference Classes for handling,
     of various data needed for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RiskModel (>= 0.1.1),
-    TE.DataAccess (>= 0.1.1),
-    TE.SQLQuery (>= 0.1.1),
+    TE.RiskModel (>= 0.1.3),
+    TE.DataAccess (>= 0.1.3),
+    TE.SQLQuery (>= 0.1.2),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -20,17 +20,24 @@ Imports:
     hash,
     quantmod,
     stats,
+    plyr,
+    ggplot2,
+    zoo,
 Suggests:
     testthat,
-    plyr,
     knitr,
     rmarkdown,
 Collate:
     'TE.RefClasses.r'
+    'data_validator.r'
     'datasource_client_functions.r'
     'referenceobject.r'
     'referencedata.r'
     'datasource_client.r'
+    'available_values.r'
+    'available_values_data_handler.r'
+    'available_traders.r'
+    'data_validation_functions.r'
     'datastore_client_functions.r'
     'datastore_client.r'
     'datastore_client_test_class.r'
@@ -45,26 +52,32 @@ Collate:
     'extended_trade_data_handler.r'
     'risk_model_component.r'
     'risk_model_objectstore_client.r'
+    'risk_model_rodbc_client.r'
     'factor_correlation_data.r'
     'factor_correlation_data_handler.r'
     'factor_exposure_data.r'
     'factor_exposure_data_handler.r'
     'factor_variance_data.r'
     'factor_variance_data_handler.r'
+    'transformation_functions.r'
+    'virtual_transformation.r'
+    'referencedata_transformation.r'
+    'implied_factor_returns_transformations.r'
+    'transformations_handler.r'
     'implied_factor_returns_data.r'
+    'implied_factor_return_state.r'
     'implied_factor_returns_data_handler.r'
     'portfolio.r'
     'index_portfolio.r'
     'instrument_betas_data.r'
     'instrument_betas_data_handler.r'
+    'instrument_residual_returns_data.r'
+    'instrument_residual_returns_data_handler.r'
+    'key_expander.r'
     'market_data.r'
     'market_data_handler.r'
     'market_style_data.r'
     'market_style_data_handler.r'
-    'transformation_functions.r'
-    'virtual_transformation.r'
-    'referencedata_transformation.r'
-    'transformations_handler.r'
     'strategy_portfolio.r'
     'portfolio_data_handler.r'
     'warehouse_client_functions.r'
@@ -79,5 +92,6 @@ Collate:
     'strategy_portfolio_transformations.r'
     'trade_data_handler.r'
     'trade_data_simple.r'
+    'traderid_key_expander.r'
 RoxygenNote: 5.0.1
 VignetteBuilder: knitr

@@ -2,7 +2,7 @@
 % Please edit documentation in R/transformations_handler.r
 \name{getTransformations}
 \alias{getTransformations}
-\title{Get list of transformations attached to the Object}
+\title{Get list of transformations that are stored to be attached to the Object}
 \usage{
 getTransformations(object)
 }

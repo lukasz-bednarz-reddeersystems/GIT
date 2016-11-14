@@ -3,6 +3,7 @@ R/scripts/**
 **/*.Rhistory
 **/*.RData
 **/*.docx
+**/*.xlsx
 **/*.html
 **/*.md
 **/*.png
@@ -14,6 +15,8 @@ R/scripts/**
 **/*.pdf
 **/*.bak
 **/*.tar.gz
+**/*.zip
+**/*.orig
 **/*.RData*
 .Rproj.user
 /Library/*.Rcheck

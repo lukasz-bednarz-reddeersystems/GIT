@@ -11,17 +11,19 @@ NULL
 #'
 #' implements handling of transformations
 #'
-#' @slot transformations        "list"
+#' @slot transformations          "list"
+#' @slot attached_transformations "character"
 
 setClass(
   Class = "VirtualTransformationsHandler",
   slots = c(
+    attached_transformations = "character",
     transformations = "list"
   ),
   contains = c("VIRTUAL")
 )
 
-#' Get list of transformations attached to the Object
+#' Get list of transformations that are stored to be attached to the Object
 #'
 #' Returns list of names of classes of transformations that
 #' have been attached to object
@@ -34,6 +36,23 @@ setMethod("getTransformations",
           signature(object = "VirtualTransformationsHandler"),
           function(object){
             return(object@transformations)
+          }
+)
+
+
+#' Get list of attached transformations to the Object
+#'
+#' Returns list of names of classes of transformations that
+#' have been attached to object
+#'
+#' @param object object of class 'VirtualTransformationHandler'.
+#' @return \code{transformations} list of "VirtualReferenceDataTransformation" objects attached.
+
+setGeneric("getAttachedTransformations",function(object){standardGeneric("getAttachedTransformations")})
+setMethod("getAttachedTransformations",
+          signature(object = "VirtualTransformationsHandler"),
+          function(object){
+            return(object@attached_transformations)
           }
 )
 
@@ -52,11 +71,12 @@ setMethod(".addTransformation",
                     transformation = "VirtualReferenceDataTransformation"),
           function(object, transformation){
             transf.name <- class(transformation)[[1]]
-            transf.present <- getTransformations(object)
-            object <- .setTransformations(object, union(transf.present, transf.name))
+            transf.present <- getAttachedTransformations(object)
+            object <- .setAttachedTransformations(object, union(transf.present, transf.name))
             return(object)
           }
 )
+
 
 #' Set transformation list
 #'
@@ -68,16 +88,29 @@ setMethod(".addTransformation",
 #' @return \code{object} object of class 'VirtualTransformationHandler'.
 
 setGeneric(".setTransformations",function(object, transformations){standardGeneric(".setTransformations")})
-# returns list of VirtualReferenceDataTransformation attached to VirtualTransformationHandler (data computed from existing VirtualTransformationHandler data).
-#
-# Args:
-#   object : object of type VirtualTransformationHandler
-# Returns:
-#   transformations : list with transformations attached to the object.
 setMethod(".setTransformations",
           signature(object = "VirtualTransformationsHandler", transformations = "list"),
           function(object, transformations){
             object@transformations <- transformations
+            return(object)
+          }
+)
+
+
+#' Set transformation list
+#'
+#' Private method to set transformation list of attached transformations
+#'
+#' @rdname private_setAttachedTransformations
+#' @param object object of class 'VirtualTransformationHandler'.
+#' @param transformations character vector of list of attached transformations
+#' @return \code{object} object of class 'VirtualTransformationHandler'.
+
+setGeneric(".setAttachedTransformations",function(object, transformations){standardGeneric(".setAttachedTransformations")})
+setMethod(".setAttachedTransformations",
+          signature(object = "VirtualTransformationsHandler", transformations = "character"),
+          function(object, transformations){
+            object@attached_transformations <- transformations
             return(object)
           }
 )
@@ -108,7 +141,7 @@ setMethod("isTransformationAttached",
           signature(object = "VirtualTransformationsHandler", transformation = "VirtualReferenceDataTransformation"),
           function(object, transformation){
             nme <- class(transformation)[[1]]
-            if(nme %in% getTransformations(object)){
+            if(nme %in% getAttachedTransformations(object)){
               return(TRUE)
             }
             else{

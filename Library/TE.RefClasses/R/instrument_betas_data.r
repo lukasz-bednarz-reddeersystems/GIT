@@ -1,5 +1,5 @@
 #' @include referencedata.r
-#' @include risk_model_objectstore_client.r
+#' @include risk_model_rodbc_client.r
 NULL
 
 ####################################
@@ -28,7 +28,7 @@ setClass(
 #' Implements storage for Instrument Betas and access
 #' to Factor Correlation data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorCorrelationData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualInstrumentBetasData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -38,12 +38,10 @@ setClass(
     key_cols        = c(risk_model_objectstore_keys, "InstrumentID"),
     key_values      = data.frame(Date = as.Date(character()),
                                  InstrumentID = integer()),
-    values             = c("Date", "InstrumentID"), # columns that neeed to be returned from datastore
-    column_name_map = hash(c("Instrument", "InstrumentID"),
-                           c("InstrumentID","Instrument"))
-
+    values             = c("Date", "InstrumentID") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualInstrumentBetasData", "VirtualRiskModelObjectstoreClient")
+  contains = c("VirtualInstrumentBetasData",
+               "VirtualRiskModelFactorDependentClientSelector")
 )
 

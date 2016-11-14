@@ -10,8 +10,19 @@ event_prox <- function(compute_object,event){
   cnames <- c(paste("rDaysSinceLast",event,sep=""),paste("rDaysToNext",event,sep=""))
   input <- compute_object@input
   ep <- input[cnames[2]]/unlist(Map(rm_zero_null,input[cnames[1]]))
-  compute_object@output <- data.frame(dtDateTime=input$dtDateTime,DistanceToEvent=ep)
-  colnames(compute_object@output) <- c("dtDateTime",paste("DistanceTo",event,sep=""))
+
+  output <- data.frame(dtDateTime=input$dtDateTime,DistanceToEvent=ep)
+  colnames(output) <- c("dtDateTime",paste("DistanceTo",event,sep=""))
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+      message(sprintf("Error in event_prox() when computing %s : %s",
+                      class(compute_object),
+                      cond))
+  })
+
+
   return(compute_object)
 }
 
@@ -28,13 +39,23 @@ eps_rev <-  function(compute_object){
   #EPS upgrades to downgrades for that row
   input <- compute_object@input
   eps_rev <- input$rNumberOfEPSUpgradesSinceNumbersFY1/unlist(Map(rm_zero_null,input$rNumberOfEPSDowngradesSinceNumbersFY1))
-  compute_object@output <- data.frame(dtDateTime=input$dtDateTime,EPSRevision=eps_rev)
+  output <- data.frame(dtDateTime=input$dtDateTime,EPSRevision=eps_rev)
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in eps_rev() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
   return(compute_object)
 }
 
 trade_accumulator <-  function(compute_object,dir_in,acc_fn,column,na.rm=TRUE){
   #Accumlator function to compute short term accumulations around a trade
   #the callback acc_fn actually computes the value in each case.
+
   if(length(compute_object@window)==0)stop("Attempt to accumulate feature with no window property.")
   input <- compute_object@input
   if(dir_in==TRUE){
@@ -44,33 +65,56 @@ trade_accumulator <-  function(compute_object,dir_in,acc_fn,column,na.rm=TRUE){
     limit <- max(input$DateTime)
   }
 
+
   cml_in_out <- c()
+
+
   for(trade in compute_object@dates){
     if(dir_in==TRUE){
       prc    <- input[input$DateTime<trade,]
       wdow   <- max(limit,trade-compute_object@window)
       prc_win<- prc[prc$DateTime>=wdow,c(column)]
+
     }
     else{
       prc    <- input[input$DateTime>=trade,]
       wdow   <- min(limit,trade+compute_object@window)
       prc_win<- prc[prc$DateTime<=wdow,c(column)]
+
     }
-    if(length(prc_win)>1){
+    if(length(prc_win) == 1){
+      #Multiplicative quantities such as compound averages will require
+      #zeros to be removed.
+      if(na.rm==TRUE)prc_win <- unlist(Map(rm_zero_null,prc_win))
+      cml_in_out <- c(cml_in_out,acc_fn(prc_win))
+    }
+    else if(length(prc_win) > 1){
       #Multiplicative quantities such as compound averages will require
       #zeros to be removed.
       if(na.rm==TRUE)prc_win <- unlist(Map(rm_zero_null,prc_win))
       cml_in_out <- c(cml_in_out,acc_fn(prc_win))
     }
     else{
-      cml_in_out <- c(cml_in_out,NULL)
+      cml_in_out <- c(cml_in_out,NA)
     }
   }
-  compute_object@output <- tryCatch({
+
+
+  output <- tryCatch({
+
       unique(data.frame(dtDateTime=compute_object@dates,WindowValue=unlist(Map(rm_inf,cml_in_out))))
       }, error = function(cond){
         message(paste("Failed to set accumulated value near trade:",cond))
-      })
+        unique(data.frame(dtDateTime=compute_object@dates,WindowValue = NA))
+  })
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in trade_accumulator() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
   return(compute_object)
 }
 
@@ -83,7 +127,15 @@ date_marker <- function(compute_object,on_dates,tokens){
   for(i in 1:length(on_dates)){
     output[output$dtDateTime==on_dates[i],'Token'] <- tokens[i]
   }
-  compute_object@output <- output
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in date_marker() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
   return(compute_object)
 }
 
@@ -97,13 +149,36 @@ rtn_accumulator <- function(prc_win){prod(prc_win[2:(length(prc_win))]/prc_win[1
 
 rtn_in <- function(compute_object){
   co <- trade_accumulator(compute_object,TRUE,rtn_accumulator,'ClosePrice')
-  co@output$WindowValue <- (co@output$WindowValue - 1)*10000
+
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- (output$WindowValue - 1)*10000
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in rtn_in() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
+
   return(co)
 }
 
 rtn_out <- function(compute_object){
   co <- trade_accumulator(compute_object,FALSE,rtn_accumulator,'ClosePrice')
-  co@output$WindowValue <- (co@output$WindowValue - 1)*10000
+
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- (output$WindowValue - 1)*10000
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in rtn_out() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
   return(co)
 }
 
@@ -128,7 +203,17 @@ ptv_pnl_out <- function(compute_object){
 prc_inf <- function(compute_object){
   input <- compute_object@input
   data  <- data.frame(x=input$ClosePrice,y=input$MarketValue/input$ClosePrice)
-  if(nrow(data)>0 && ncol(data)==2)compute_object@output  <- data.frame(DateTime=input$DateTime,Influence=cor(as.matrix(data))[1,2])
+  if(nrow(data)>0 && ncol(data)==2){
+    output  <- data.frame(DateTime=input$DateTime,Influence=cor(as.matrix(data))[1,2])
+
+    compute_object <- tryCatch({
+      .setFeatureComputationOutput(compute_object, output)
+    }, error = function(cond){
+      message(sprintf("Error in prc_inf() when computing %s : %s",
+                      class(compute_object),
+                      cond))
+    })
+  }
   return(compute_object)
 }
 
@@ -164,8 +249,17 @@ p_size <- function(object,trade_dates,instrument,strategy,daily_data){
 dly_dtr_colm_fn <- function(compute_object,columns,fn){
   res <- apply(compute_object@input[columns],1,fn)
   res <- data.frame(DateTime=compute_object@input$DateTime,Result=res)
-  res <- subset(res,res$DateTime %in% compute_object@dates)
-  compute_object@output <- res
+
+  output <- subset(res,res$DateTime %in% compute_object@dates)
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in prc_inf() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
   return(compute_object)
 }
 
@@ -175,13 +269,48 @@ mkt_cap <- function(compute_object){
 
 psn_rtn_in <- function(compute_object){
   co <- trade_accumulator(compute_object,TRUE,prod,'Rtn')
-  co@output$WindowValue <- (co@output$WindowValue - 1)*10000
+
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- tryCatch({
+    (output$WindowValue - 1)*10000
+  }, error = function(cond){
+    message(sprintf("Error when computing psn_rtn_out() for object of class %s",
+                    class(compute_object)))
+  })
+
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in psn_rtn_in() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
+
   return(co)
 }
 
 psn_rtn_out <- function(compute_object){
   co <- trade_accumulator(compute_object,FALSE,prod,'Rtn')
-  co@output$WindowValue <- (co@output$WindowValue - 1)*10000
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- tryCatch({
+    (output$WindowValue - 1)*10000
+  }, error = function(cond){
+    message(sprintf("Error when computing psn_rtn_out() for object of class %s",
+                    class(compute_object)))
+  })
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in psn_rtn_out() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
+
+
   return(co)
 }
 
@@ -212,13 +341,37 @@ rtn_vol <- function(prc_win){sd(prc_win[2:(length(prc_win))]/prc_win[1:(length(p
 
 vol_in <- function(compute_object){
   co <- trade_accumulator(compute_object,TRUE,rtn_vol,'ClosePrice')
-  co@output$WindowValue <- co@output$WindowValue*10000
+
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- output$WindowValue*10000
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in vol_in() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
+
   return(co)
 }
 
 vol_out <- function(compute_object){
   co <- trade_accumulator(compute_object,FALSE,rtn_vol,'ClosePrice')
-  co@output$WindowValue <- co@output$WindowValue*10000
+
+  output <- getFeatureComputationOutput(co)
+
+  output$WindowValue <- output$WindowValue*10000
+
+  co <- tryCatch({
+    .setFeatureComputationOutput(co, output)
+  }, error = function(cond){
+    message(sprintf("Error in vol_in() when computing %s : %s",
+                    class(co),
+                    cond))
+  })
+
   return(co)
 }
 
@@ -237,24 +390,49 @@ mavg_price <- function(compute_object){
 }
 
 trade_comparison <- function(compute_object,column,fn,prev_trade=TRUE){
-    if(nrow(compute_object@input)>1){
-      for(d in 1:length(compute_object@dates)){
-        dex <- which(compute_object@input$DateTime==compute_object@dates[d],TRUE)
-        if(prev_trade){
-          rw <- data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex-1,column],compute_object@input[dex,column]))
-        } else
+
+  rval <- NULL
+
+  dates <- unique(compute_object@dates)
+
+  if(nrow(compute_object@input)>1){
+    for(d in 1:length(dates)){
+      dex <- which(compute_object@input$DateTime == dates[d],TRUE)
+
+      rw <- data.frame(DateTime=compute_object@dates[d],Comparison = NA)
+      if (length(dex > 0)){
+        if(prev_trade && dex > 0){
+          rw <- tryCatch({
+            data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex-1,column],compute_object@input[dex,column]))
+          }, error = function(cond){
+            message(sprintf("error when computing trade_comparison for object of class %s", class(compute_object)))
+          })
+        } else if (!prev_trade && (dex + 1) <= nrow(compute_object@input) )
         {
           rw <- data.frame(DateTime=compute_object@dates[d],Comparison=fn(compute_object@input[dex,column],compute_object@input[dex+1,column]))
-        }
-        if(d==1){
-          rval <- rw
-        }
-        else{
-          rval <- rbind(rval,rw)
+        } else {
+          rw <- data.frame(DateTime=compute_object@dates[d],Comparison = NA)
         }
       }
+      if(d==1){
+        rval <- rw
+      }
+      else{
+        rval <- rbind(rval,rw)
+      }
     }
-  compute_object@output <- rval
+  }
+
+  output <- rval
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in trade_comparison() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
   return(compute_object)
 }
 
@@ -296,6 +474,24 @@ close_psn <- function(compute_object){
 
 pl_hit <- function(compute_object){
   input <- merge(compute_object@input,data.frame(DateTime=compute_object@dates),by='DateTime')
-  compute_object@output <- data.frame(DateTime=input$DateTime,Hit1D=input$TodayPL>0)
+
+  output <- tryCatch({
+    data.frame(DateTime=input$DateTime,Hit1D=input$TodayPL>0)
+  }, error = function(cond){
+    browser
+    message(sprintf("Error in pl_hit() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond){
+    message(sprintf("Error in pl_hit() when computing %s : %s",
+                    class(compute_object),
+                    cond))
+  })
+
+
   return(compute_object)
 }

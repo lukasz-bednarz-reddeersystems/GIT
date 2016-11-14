@@ -1,5 +1,5 @@
 #' @include referencedata.r
-#' @include risk_model_objectstore_client.r
+#' @include risk_model_rodbc_client.r
 NULL
 
 ####################################
@@ -27,7 +27,7 @@ setClass(
 #' Implements storage for Factor Variance and access
 #' to Factor Variance data via Risk Model Objectstore
 #'
-#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelObjectstoreClient"
+#' Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelFactorDependentClientSelector"
 #' @export
 
 setClass(
@@ -36,11 +36,9 @@ setClass(
     component          = "FactorVariance", # name of component
     key_cols        = c(risk_model_objectstore_keys),
     key_values      = data.frame(Date = as.Date(character())),
-    values             = c("Date"), # columns that neeed to be returned from datastore
-    column_name_map = hash()
-
+    values             = c("Date") # columns that neeed to be returned from datastore
     ),
 
-  contains = c("VirtualFactorVarianceData", "VirtualRiskModelObjectstoreClient")
+  contains = c("VirtualFactorVarianceData", "VirtualRiskModelFactorDependentClientSelector")
 )
 

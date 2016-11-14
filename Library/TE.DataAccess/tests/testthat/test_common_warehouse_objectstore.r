@@ -6,7 +6,7 @@ context("Test Trade Warehouse Objectstore")
 #
 #############################
 tested.class <- "WarehouseObjectStore"
-valid.name <- "11_2016-03-29_2016-04-01"
+valid.name <- "11_2015-03-29_2015-04-01"
 valid.key  <- TE.DataAccess:::key_from_name(valid.name)
 
 test_that("Can move local objectstore files to Blob Objectstore", {
@@ -27,8 +27,36 @@ test_that("Can call warehouse_objectstore_factory() with locally existing file",
 
 })
 
+test_that("Can updateWarehouseStore() and commitWarehouseStore()", {
+
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
+  skip_if_not(FALSE)
+
+  object <- warehouse_objectstore_factory(valid.name)
+
+  expect_is(object, tested.class)
+
+  local.key <- TE.DataAccess:::generateKey(object,
+                                     valid.key$id,
+                                     as.Date(valid.key$start),
+                                     as.Date(valid.key$end))
+
+  object <- TE.DataAccess:::removeFromObjectStore(object, valid.name)
+
+  object <- TE.DataAccess:::updateWarehouseStore(object, local.key)
+
+  expect_is(object, tested.class)
+
+  ret <- TE.DataAccess:::commitWarehouseStore(object)
+
+  expect_true(ret)
+
+})
+
+
 test_that("Can check for keys in remote store() ", {
 
+  skip_if_not(as.logical(Sys.getenv("R_TESTTHAT_RUN_LONG_TESTS", unset = "FALSE")))
   object <- warehouse_objectstore_factory(valid.name)
 
   expect_is(object, tested.class)

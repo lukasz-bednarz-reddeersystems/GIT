@@ -9,7 +9,7 @@ context("Testing MarketStyleData")
 
 tested.class          <-  "MarketStyleData"
 valid.component       <- "MarketStyle"
-valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150"
+valid.risk_model      <- "RiskModel.DevelopedEuropePrototype150.1.1"
 valid.model_prefix    <- "developed_europe_prototype"
 valid.risk_model_obj  <- new(valid.risk_model)
 valid.model_factors   <- getRiskModelFactorNames(valid.risk_model_obj)
@@ -21,7 +21,12 @@ valid.values          <- c("Date",
                            valid.model_factors)
 valid.required_colnms <- c('Date',
                            valid.model_factors)
-valid.column_name_map <- hash()
+valid.column_name_map <-  hash("dtDateTime"    = "Date",
+                               "dtDate"        = "Date",
+                               "lInstrumentID" = "InstrumentID",
+                               "sFactorName"   = "FactorName",
+                               "Instrument"    = "InstrumentID",
+                               "dblLogReturn"  = "Return")
 init.key_values       <-  data.frame(Date = as.Date(character()))
 
 
@@ -36,7 +41,7 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   object <- new(tested.class)
   expect_is(object, tested.class)
 
-  expect_equal(getRiskModelObjectstoreComponentName(object), valid.component)
+  expect_equal(getRiskModelComponentName(object), valid.component)
 
   expect_is(getRiskModelObject(object), valid.risk_model)
 

@@ -35,15 +35,14 @@ setClass(
                         )
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "ExtendedTradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-BuysAndSellsAnalysisBlock-method
-#' @param object object of class "BuysAndSellsAnalysisBlock"
-#' @param trade_data object of class "ExtendedTradeData"
-#' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
+# ' @rdname setTradeDataObject-BuysAndSells-method
+# ' @param object object of class "BuysAndSellsAnalysisBlock"
+# ' @param trade_data object of class "ExtendedTradeData"
+# ' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -54,12 +53,14 @@ setMethod("setTradeDataObject",
           }
 )
 
-
+#' @describeIn dataRequest
 #' Request data from data source
 #'
-#' @param object object of class 'BuysAndSellsAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'BuysAndSellsAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'BuysAndSellsAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'BuysAndSellsAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -68,7 +69,6 @@ setMethod("dataRequest",
 
             object <- TE.RefClasses:::.setDataSourceQueryKeyValues(object,key_values)
 
-            #
             trade_data <- getTradeDataObject(object)
 
             if (getStoredNRows(trade_data) == 0) {
@@ -102,7 +102,7 @@ setMethod("dataRequest",
 #' Public method to set market_data slot with "MarketData"
 #' class object
 #'
-#' @rdname setMarketDataObject-BuysAndSellsAnalysisBlock-method
+#' @rdname setMarketDataObject-BuysAndSells-method
 #' @param object object of class "BuysAndSellsAnalysisBlock"
 #' @param market_data object of class "MarketData"
 #' @return \code{object} object of class "BuysAndSellsAnalysisBlock"
@@ -116,10 +116,14 @@ setMethod("setMarketDataObject",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "BuysAndSellsAnalysisBlock"
-#' @return \code{object} object object of class "BuysAndSellsAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "BuysAndSellsAnalysisBlock"
+# ' @return \code{object} object object of class "BuysAndSellsAnalysisBlock"
 #' @export
 
 setMethod("Process",
@@ -169,7 +173,7 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object,buy_sells)
             object <- .setOutputGGPlot(object, n_buys_sells)
-            object <- .setOutputFrontendData(object, data.frame(omit = c("Count")))
+            #object <- .setOutputFrontendData(object, data.frame(omit = c("Count")))
 
 
             return(object)

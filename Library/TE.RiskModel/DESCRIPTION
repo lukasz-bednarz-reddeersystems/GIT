@@ -1,14 +1,14 @@
 Package: TE.RiskModel
 Type: Package
 Title: Risk model code for RedDeer Trading Enhancement Engine
-Version: 0.1.1
+Version: 0.1.3
 Authors@R: person("Lukasz", "Bednarz", email = "lukasz.bednarz@reddeersystems.com",
                   role = c("aut", "cre"))
 Description: Pakckage is implementing functions for computing risk model for Red
     Deer Trading Enhancement Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.DataAccess (>= 0.1.1),
+    TE.DataAccess (>= 0.1.3),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -23,11 +23,11 @@ Imports:
     utils,
 Collate:
     'TE.RiskModel.r'
+    'risk_model_functions.r'
+    'risk_model_load.r'
     'risk_model.r'
     'risk_model_handler.r'
     'risk_model_builder.r'
-    'risk_model_functions.r'
-    'risk_model_load.r'
     'risk_model_update_functions.r'
 RoxygenNote: 5.0.1
 Suggests:

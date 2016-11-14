@@ -9,6 +9,6 @@ Implements storage for Factor Variance and access
 to Factor Variance data via Risk Model Objectstore
 }
 \details{
-Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelObjectstoreClient"
+Inherits from "VirtualFactorVarianceData" and "VirtualRiskModelFactorDependentClientSelector"
 }
 

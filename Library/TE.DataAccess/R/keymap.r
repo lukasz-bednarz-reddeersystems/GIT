@@ -177,20 +177,27 @@ setMethod("advanceCurrentKey","KeyMap",
           }
 
 )
+
+
+
 setGeneric("getCurrentKeyQuery", function(object,query_obj){standardGeneric("getCurrentKeyQuery")})
-setMethod("getCurrentKeyQuery","KeyMap",
+setMethod("getCurrentKeyQuery",
+          signature("KeyMap",
+                    "VirtualBaseQuery"),
           function(object,query_obj){
             values = c()
-            if(length(query_obj@fields)==0)stop("KeyMap: No fields set within query object.")
-            if(length(intersect(query_obj@fields,object@fields))!=length(object@fields))stop("KeyMap: Query object requests unknown fields.")
-            for(field in query_obj@fields){
+            query_fields <- getQueryKeyColumnNames(query_obj)
+
+            if(length(query_fields)==0)stop("KeyMap: No fields set within query object.")
+            if(length(intersect(query_fields,object@fields))!=length(object@fields))stop("KeyMap: Query object requests unknown fields.")
+            for(field in query_fields){
               values <- tryCatch({
                                   c(values,as.character(object@current_key[field][[1]]))
                                  },error=function(cond){
                                   stop(paste("Error when getting key for field",field,"in",class(object)[[1]],":",cond))
                                  })
             }
-            query_obj@values <- values
+            query_obj <- .setQueryKeyValues(query_obj, values)
             return(query_obj)
           }
 )

@@ -6,9 +6,10 @@
 \alias{prepareSQLQuery,VirtualSQLQuery,data.frame-method}
 \title{Prepare SQL query strings}
 \usage{
-prepareSQLQuery(object, key_values)
+prepareSQLQuery(object, key_values = NA)
 
-\S4method{prepareSQLQuery}{VirtualSQLQuery,data.frame}(object, key_values)
+\S4method{prepareSQLQuery}{VirtualSQLQuery,data.frame}(object,
+  key_values = NA)
 }
 \arguments{
 \item{object}{object of class 'VirtualSQLQuery'.}

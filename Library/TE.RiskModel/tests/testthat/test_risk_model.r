@@ -23,10 +23,10 @@ valid.model_prefix    <- "developed_europe_prototype"
 valid.model_name      <- "developed_europe_prototype"
 valid.model_universe  <- "developed_europe"
 valid.lookback        <- 150L
-valid.factor_names    <-  c(risk_model_market_factors,
-                            risk_model_currency_factors,
-                            risk_model_commodity_factors,
-                            risk_model_sector_factors)
+valid.factor_names    <-  sort(c(risk_model_market_factors,
+                                 risk_model_currency_factors,
+                                 risk_model_commodity_factors,
+                                 risk_model_sector_factors))
 
 valid.risk_model_market_factors    <- risk_model_market_factors
 valid.risk_model_currency_factors  <- risk_model_currency_factors
@@ -151,10 +151,10 @@ valid.model_prefix    <- "developed_europe_prototype.1.1"
 valid.model_name      <- "developed_europe_prototype.1.1"
 valid.model_universe  <- "developed_europe"
 valid.lookback        <- 150L
-valid.factor_names    <-  c(risk_model_market_factors,
-                            setdiff(risk_model_currency_factors, c("HKD", "DKK")),
-                            risk_model_commodity_factors,
-                            risk_model_sector_factors)
+valid.factor_names    <-  sort(c(risk_model_market_factors,
+                                 setdiff(risk_model_currency_factors, c("HKD", "DKK")),
+                                 risk_model_commodity_factors,
+                                 risk_model_sector_factors))
 
 valid.risk_model_market_factors    <- risk_model_market_factors
 valid.risk_model_currency_factors  <- setdiff(risk_model_currency_factors, c("HKD", "DKK"))
@@ -192,5 +192,15 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
 
 })
 
+test_that(paste("Can getRiskModelFactorGroups"), {
 
+  object <- new(tested.class)
+  expect_is(object, tested.class)
+
+  ret <- getRiskModelFactorGroups(object)
+
+  expect_is(ret, "list")
+
+
+})
 

@@ -8,16 +8,20 @@ context("Testing PriceData")
 
 tested.class          <-  "PriceData"
 valid.key_cols        <- c("InstrumentID", "Date")
-valid.values          <- c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
-                           ,"dblHigh","dblLow","dblPreviousClosePrice",
-                           "dblVolume", "lOutstandingShares","dbl30DayAvgVol" )
+valid.values          <- c("InstrumentID", "Date","ClosePrice","OpenPrice"
+                           ,"High","Low","PreviousClosePrice",
+                           "Volume", "OutstandingShares","AvgVol30Day" )
 valid.required_colnms <- c('InstrumentID','Date','ClosePrice')
-valid.column_name_map <- hash(c("lInstrumentID", "dtDateTime","dblClosePrice","dblOpenPrice"
-                                ,"dblHigh","dblLow","dblPreviousClosePrice",
-                                "dblVolume", "lOutstandingShares","dbl30DayAvgVol" ),
-                              c('InstrumentID','Date','ClosePrice',"OpenPrice"
-                                ,"High","Low","PreviousClosePrice",
-                                "Volume", "OutstandingShares","AvgVol30Day"))
+valid.column_name_map <-hash("lInstrumentID"         = 'InstrumentID',
+                             "dtDateTime"            = 'Date',
+                             "dblClosePrice"         = 'ClosePrice',
+                             "dblOpenPrice"          = "OpenPrice",
+                             "dblHigh"               = "High",
+                             "dblLow"                = "Low",
+                             "dblPreviousClosePrice" = "PreviousClosePrice",
+                             "dblVolume"             = "Volume",
+                             "lOutstandingShares"    = "OutstandingShares",
+                             "dbl30DayAvgVol"        = "AvgVol30Day")
 init.key_values       <-  data.frame(InstrumentID = integer(),
                                      Date = as.Date(character()))
 
@@ -165,15 +169,18 @@ test_that("Can dataRequest() with valid key_values", {
   values <- getDataSourceReturnColumnNames(object)
 
   # create valid return data.frame
-  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
-  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(getSQLQueryObject(object))
+  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(getSQLQueryObject(object))
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
   query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
   valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string)
   valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
+  colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object,
+                                                                              colnames(valid.ret_data))
   valid.ret_data <- valid.ret_data[values]
-  colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]
+
+
   valid.ret_data           <- arrange(valid.ret_data, Date, InstrumentID)
   rownames(valid.ret_data) <- seq(nrow(valid.ret_data))
 

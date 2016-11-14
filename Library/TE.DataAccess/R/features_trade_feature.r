@@ -25,6 +25,7 @@ setMethod("updateData","TradeFeature",
           function(object,trade_dates,instrument){
             get_keys <- data.frame(a=c(instrument),b=trade_dates)
             colnames(get_keys) <- object@key_columns
+
             message(paste("Requesting feature data from store",object@data_store))
             object@data_set <- data_request(object@data_store,get_keys,object@data_columns)
             return(object)
@@ -36,12 +37,35 @@ setMethod("tearDownTradeFeature","TradeFeature",
           function(object){
             object <- tearDown(object)
             object@data_set <- NULL
+            object@computation@compute <- NULL
+            return(object)
+          }
+)
+
+
+
+
+setGeneric(".updteFeatureDataStore",function(object,data){standardGeneric(".updteFeatureDataStore")})
+setMethod(".updteFeatureDataStore",
+          signature(object  = "TradeFeature"),
+          function(object){
+
+            nf <- new(class(object))
+            data_store <- nf@data_store
+
+            object@data_store <- data_store
+
             return(object)
           }
 )
 
 pass_thru <- function(compute_object){
-  compute_object@output <- compute_object@input
+  output <- getFeatureComputationInput(compute_object)
+  compute_object <- tryCatch({
+    .setFeatureComputationOutput(compute_object, output)
+  }, error = function(cond) {
+
+  })
   return(compute_object)
 }
 

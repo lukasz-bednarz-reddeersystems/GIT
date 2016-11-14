@@ -1,4 +1,6 @@
 ^packrat/
 ^\.Rprofile$
 ^.*\.Rproj$
+^.*\.orig$
 ^\.Rproj\.user$
+

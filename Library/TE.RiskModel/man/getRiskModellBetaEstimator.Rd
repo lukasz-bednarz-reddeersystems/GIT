@@ -5,7 +5,7 @@
 \alias{getRiskModelBetaEstimatorType,VirtualBetaEstimator-method}
 \alias{getRiskModellBetaEstimator}
 \alias{getRiskModellBetaEstimator,VirtualRiskModel-method}
-\title{Get Risk Model Name}
+\title{Get Risk Model Beta Estimator}
 \usage{
 \S4method{getRiskModelBetaEstimatorType}{VirtualBetaEstimator}(object)
 
@@ -22,7 +22,7 @@ getRiskModellBetaEstimator(object)
 \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
 }
 \description{
-Returns name of Risk Model
+Returns name of Risk Model Beta Estimator
 }
 \section{Methods (by class)}{
 \itemize{
@@ -30,8 +30,8 @@ Returns name of Risk Model
 
 Returns name of Risk Model
 
-\item \code{VirtualRiskModel}: Get Risk Model Name
+\item \code{VirtualRiskModel}: Get Risk Model Beta Estimator Name
 
-Returns name of Risk Model
+Returns name of Risk Model Beta Estimator
 }}
 

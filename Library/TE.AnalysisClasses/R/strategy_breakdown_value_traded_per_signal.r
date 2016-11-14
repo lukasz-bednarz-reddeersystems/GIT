@@ -78,15 +78,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-StrategyBreakdownValueTradedPerSignal-method
-#' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+# ' @rdname setTradeDataObject-StrategyBreakdownValueTradedPerSignal-method
+# ' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -97,15 +96,14 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn setEventDataObject
 #' Set event_data object in object slot
+#' @inheritParams setEventDataObject
 #'
-#' Public method to set event_data slot with "EventData"
-#' class object
-#'
-#' @rdname setEventDataObject-StrategyBreakdownValueTradedPerSignal-method
-#' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
-#' @param event_data object of class "EventData"
-#' @return \code{object} object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+# ' @rdname setEventDataObject-StrategyBreakdownValueTradedPerSignal-method
+# ' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+# ' @param event_data object of class "EventData"
+# ' @return \code{object} object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
 #' @export
 
 setMethod("setEventDataObject",
@@ -115,12 +113,15 @@ setMethod("setEventDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @rdname dataRequest-StrategyBreakdownValueTradedPerSignal-method
-#' @param object object of class 'StrategyBreakdownValueTradedPerSignalAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'StrategyBreakdownValueTradedPerSignalAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'StrategyBreakdownValueTradedPerSignalAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'StrategyBreakdownValueTradedPerSignalAnalysisBlock'.
 #' @export
 setMethod("dataRequest",
           signature(object = "StrategyBreakdownValueTradedPerSignalAnalysisBlock", key_values = "data.frame"),
@@ -180,10 +181,14 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownValueTradedPerSignalAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "StrategyBreakdownValueTradedPerSignalAnalysisBlock"),

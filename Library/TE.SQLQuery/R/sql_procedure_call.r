@@ -72,6 +72,8 @@ setMethod("prepareSQLQuery",
           function(object, key_values){
 
             object <- .setSQLQueryKeyValues(object, key_values)
+            key_values <- getSQLQueryKeyValues(object)
+
             parser <- .getSQLQueryKeyValuesParser(object)
             proc_n <- .getSQLProcedureName(object)
             args   <- .getSQLProcedureArgumentNames(object)

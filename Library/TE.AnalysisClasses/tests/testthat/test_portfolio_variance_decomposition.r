@@ -31,7 +31,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getFactorVarianceDataObject(object), "FactorVarianceData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
   expect_is(getOutputObject(object), "PortfolioVarianceFactorDecompositionData")
 
   expect_equal(getDataSourceClientColumnNameMap(object), valid.column_name_map)
@@ -108,8 +109,8 @@ test_that(paste("Can Process() on", tested.class), {
   object <- new(tested.class)
 
   #valid.key_values <- dated_three_monthly_lookback(11, "2016-08-30")
-  #valid.key_values <- dated_full_month(11, "2016-05-30")
-  valid.key_values <- dated_eighteen_monthly_lookback(11, '2016-07-01')
+  valid.key_values <- dated_full_month(11, "2016-10-30")
+  #valid.key_values <- dated_eighteen_monthly_lookback(11, '2016-07-01')
 
   colnames(valid.key_values) <- c("TraderID", "start", "end")
 

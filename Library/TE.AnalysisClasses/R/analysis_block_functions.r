@@ -666,6 +666,39 @@ position_activity <- function(position_history,tau){
   return(new_history)
 }
 
+adjust_ipo_betas <- function(betas){
+
+
+  min_dates <- aggregate(Date ~ InstrumentID, data = betas, function(x){Find(Negate(is.na), x)})
+
+  rownames(min_dates) <- min_dates$InstrumentID
+
+
+  lambda <- 1/21
+
+  w <- seq(120 ,1)
+  w <- exp(-1*lambda * w)
+
+
+  instruments <- unique(min_dates$InstrumentID[min_dates$Date > min(min_dates$Date)])
+
+  for(instr in instruments){
+    idxs <- (betas$InstrumentID == instr) & (betas$Date >= min_dates[as.character(instr), "Date"])
+
+    idxs <- seq(nrow(betas))[idxs]
+    idxs <- head(idxs, 120)
+
+    betas[idxs[is.na(betas[idxs, "EUR"])], -1] <- 0
+
+
+    betas[idxs,-1] <- head(w, length(idxs))*betas[idxs,-1]
+  }
+
+  return(betas)
+
+}
+
+
 pl_timescales <- function(history_data,data=FALSE){
   psn_hstry <- categorise_psn_ages(history_data)
   position_history <- psn_hstry[[1]]
@@ -853,6 +886,153 @@ market_day_age <- function(data){
   return(out_data[setdiff(colnames(out_data),'Nmd')])
 }
 
+portfolio_instrument_mctv <- function(weight,
+                                      betas,
+                                      factor_covariance,
+                                      res_ret,
+                                      factor_groups,
+                                      corr_residuals = FALSE){
+
+
+  wtbt <- merge(weight,betas,by='InstrumentID', all.x = TRUE)
+
+
+  if (!corr_residuals){
+    ins_var <- res_ret
+    ins_var <- aggregate(Return ~ InstrumentID,
+                         data = ins_var,
+                         function(x){var(x, na.rm = TRUE)})
+
+    ins_var <- merge(weight["InstrumentID"], ins_var, all.x = TRUE)
+
+    ins_var$Return[is.na(ins_var$Return)] <- 0.0
+
+    ins_sp_cov <- matrix(0.0, nrow = nrow(ins_var), ncol = nrow(ins_var))
+
+    diag(ins_sp_cov) <- ins_var[,"Return"]
+
+
+  } else {
+
+    dates <- unique(res_ret["Date"])
+    dates <- dates[!is.na(dates),, drop = FALSE]
+
+    res_ret.u <- cbind(dates, unstack(res_ret, Return ~ InstrumentID))
+
+    res_ret.u[is.na(res_ret.u)] <- NA_real_
+
+    ins_sp_cov <- cov(as.matrix(res_ret.u[,-1]), use = "pairwise.complete.obs")
+
+    ins_sp_cov[is.na(ins_sp_cov)] <- 0.0
+  }
+
+  weight_matrix <- as.matrix(wtbt['Weight'])
+  beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
+  beta_matrix[is.na(beta_matrix)] <- 0.0
+  fct <- factor_covariance
+
+  fct_columns <- colnames(fct)
+  beta_matrix <- beta_matrix[,fct_columns]
+
+  # Sigma_hat = B' Omega_hat B + Phi_hat
+
+  ins_sys_cov <- beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)
+
+
+
+  sys_variance <- as.numeric(t(weight_matrix)%*%ins_sys_cov%*%weight_matrix)
+
+  ins_tot_cov <- ins_sys_cov + ins_sp_cov
+
+  instr_acv <- weight_matrix*(beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix)
+
+  instr_mtcv <- 2*(ins_tot_cov%*%weight_matrix)
+
+  total_variance <- as.numeric(t(weight_matrix)%*%ins_tot_cov%*%weight_matrix)
+
+  instr_risk = data.frame(InstrumentID = wtbt$InstrumentID,
+                          RiskType = "Total",
+                          MCV  = instr_mtcv[,],
+                          RMCV = 1,
+                          MCR  = instr_mtcv[,]/2/sqrt(total_variance),
+                          PMCR = instr_mtcv[,]/2/total_variance,
+                          ACV   = instr_acv[,],
+                          PCV  = instr_acv[,]/total_variance*100)
+
+  # factor loading matrix
+  bw_matrix <- t(beta_matrix)%*%weight_matrix
+  rownames(bw_matrix) <- colnames(beta_matrix)
+
+
+  # beta matrix times factor covariance
+  bf_matrix <- beta_matrix%*%as.matrix(fct)
+
+  summary_risk <- data.frame(RiskAggregate = c("Total"),
+                             RiskType     = c("Total", "Systematic", "Residual"),
+                             Variance      = c(total_variance,
+                                               sys_variance,
+                                               total_variance - sys_variance))
+
+  first <- TRUE
+  for (group in ls(factor_groups)){
+
+    unused_factors <- setdiff(rownames(bw_matrix), factor_groups[[group]])
+
+    bwf_matrix <- bw_matrix
+    bwf_matrix[unused_factors, ] <- 0.0
+    #
+
+    # instrument marginal contribution to variance via factor group
+    instr_mtcv_pfg <- 2*(bf_matrix%*%bwf_matrix)
+    instr_acv_pfg <- weight_matrix * bf_matrix%*%bwf_matrix
+
+    total_gr_variance <- as.numeric(t(weight_matrix)%*%bf_matrix%*%bwf_matrix)
+
+    summary_risk <- rbind(summary_risk,
+                          data.frame(RiskAggregate = "Factor Group",
+                                     RiskType      = group,
+                                     Variance      = total_gr_variance))
+
+    # relative instrument marginal contribution to variance via factor group
+    # metric to asses potential of instrument to adjust exposure to factor
+    # group without much affecting the portfolio total variance
+    instr_mctv_pfgr <- instr_mtcv_pfg/instr_mtcv
+
+    instr_mctv_pfgr[is.na(instr_mctv_pfgr) | is.nan(instr_mctv_pfgr)] <- 0
+
+    group_risk <- data.frame(InstrumentID = wtbt$InstrumentID,
+                             RiskType    = group,
+                             MCV = instr_mtcv_pfg[,],
+                             RMCV = instr_mctv_pfgr[,],
+                             MCR = instr_mtcv_pfg[,]/2/sqrt(total_variance),
+                             PMCR = instr_mtcv_pfg[,]/2/total_variance,
+                             ACV   = instr_acv_pfg[,],
+                             PCV  = instr_acv_pfg[,]/total_variance*100)
+
+    if (first) {
+      instr_group_risk <- group_risk
+      first <- FALSE
+    }
+    else {
+      instr_group_risk <- rbind(instr_group_risk,
+                                group_risk)
+    }
+  }
+
+
+  ret <- list(instr_risk       = instr_risk,
+              instr_group_risk = instr_group_risk,
+              summary_risk     = summary_risk)
+
+
+
+  return(ret)
+}
+
+
+
+
+
 portfolio_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
 
   wtbt <- merge(betas,weight,by='InstrumentID')
@@ -874,6 +1054,7 @@ portfolio_variance_decomposition <- function(weight,betas,factor_covariance,colu
 
   return(market_risk)
 }
+
 
 portfolio_returns_decomposition <- function(weight,betas,factor_returns){
 
@@ -901,18 +1082,139 @@ portfolio_factor_exposure <- function(weight,betas){
   return(market_ret)
 }
 
-# portfolio_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
-#   wtbt <- merge(betas,weight,by='InstrumentID')
-#   weight_matrix <- as.matrix(wtbt['Weight'])
-#   if(length(columns)>0){
-#     beta_matrix <- as.matrix(wtbt[intersect(setdiff(colnames(wtbt),c('InstrumentID','Weight')),columns)])
-#     fct <- factor_covariance[columns,columns]
-#   }
-#   else{
-#     beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
-#     fct <- factor_covariance
-#   }
-#   market_risk <- t(weight_matrix)%*%beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix
-#   return(market_risk)
-# }
+
+#compute probabilities of factor states adding 1 to missing observations
+# to avoid zero probabilities and normalizing
+factor_state_probs <- function(data, p_loss, fct_levels = NULL){
+
+  # all observarions
+  x <- data[setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+
+  strat <- unique(data$Strategy)[1]
+
+  p_loss <- p_loss$PLoss[p_loss$Strategy == strat]
+
+  if (is.null(fct_levels)){
+    fct_levels <- levels(x[,1])
+  }
+
+  fill <- 1
+
+  # + 2 to fill missing data
+  sp <- (sapply(x, summary)+ fill)/(nrow(x)+length(fct_levels))
+
+  # conditioned on loss
+  x <- data[data$Loss, setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+  sp_gl <- (sapply(x, summary)+p_loss*fill)/(nrow(x)+length(fct_levels))
+
+  # conditioned on no-loss
+  x <- data[!data$Loss, setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+  sp_gnl <- (sapply(x, summary)+(1-p_loss)*fill)/(nrow(x)+length(fct_levels))
+
+  # normalizing to achieve correct marginal probabilities
+  # P(S,i) = P(S|L,i)P(L) + P(S|NL,i)P(NL)
+  # SUM(P(S, i), i = 1..n) = 1
+  # SUM(P(S|L, i), i = 1..n) = 1
+  # SUM(P(S|NL, i), i = 1..n) = 1
+  sp_gl <- sp_gl*sp/(sp_gl*p_loss+sp_gnl*(1-p_loss))
+  sp_gl <- sweep(sp_gl, 2, colSums(sp_gl), '/')
+
+  sp_gnl <- sp_gnl*sp/(sp_gl*p_loss+sp_gnl*(1-p_loss))
+  sp_gnl <- sweep(sp_gnl, 2, colSums(sp_gnl), '/')
+
+  sp <- sp_gl*p_loss+sp_gnl*(1-p_loss)
+
+
+  ret <- cbind(data.frame(Strategy      = strat,
+                          FactorState   = fct_levels,
+                          Condition     = "None"),
+               sp)
+
+
+  ret <- rbind(ret, cbind(data.frame(Strategy      = strat,
+                               FactorState   = fct_levels,
+                               Condition     = "Loss"),
+                          sp_gl))
+
+  ret <- rbind(ret, cbind(data.frame(Strategy      = strat,
+                                 FactorState   = fct_levels,
+                                 Condition     = "NoLoss"),
+                          sp_gnl))
+
+
+
+  return(ret)
+}
+
+
+portfolio_factor_exposure <- function(weight,betas){
+
+  wtbt <- merge(betas,weight,by='InstrumentID')
+  weight_matrix <- as.matrix(wtbt['Weight'])
+  beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
+
+  market_ret <- t(beta_matrix)%*%weight_matrix
+
+  return(market_ret)
+}
+
+state_prob <- function(state, state_prob_dist){
+
+  prob <- prod(sapply(colnames(state), function(x){state_prob_dist[as.integer(state[[x]]), x]} ))
+
+  return(prob)
+}
+
+prob_of_loss_given_state <- function(state,
+                                     p_loss,
+                                     fct_state_prob,
+                                     fct_state_prob_gl,
+                                     fct_state_prob_gnl){
+
+
+  foo <- function(x, colname = "PState"){
+    ret <-  data.frame(Strategy = unique(x$Strategy),
+                       Ploss = state_prob(state,x))
+    colnames(ret)[2] <- colname
+    return(ret)
+  }
+
+  p_state <- by(fct_state_prob, fct_state_prob$Strategy,foo)
+  p_state <- Reduce(rbind, p_state)
+
+  p_loss <- merge(p_loss, p_state)
+
+  p_state_gl <- tryCatch({
+    by(fct_state_prob_gl, fct_state_prob_gl$Strategy,foo, "PStateGL")
+  }, error = function(cond){
+    browser()
+    message(sprintf("Error in prob_of_loss_given_state()"))
+  })
+  p_state_gl <- Reduce(rbind, p_state_gl)
+  p_loss <- merge(p_loss, p_state_gl)
+
+  p_state_gnl <- tryCatch({
+    by(fct_state_prob_gnl, fct_state_prob_gnl$Strategy,foo, "PStateGNL")
+  }, error = function(cond){
+    browser()
+    message(sprintf("Error in prob_of_loss_given_state()"))
+  })
+  p_state_gnl <- Reduce(rbind, p_state_gnl)
+
+  p_loss <- merge(p_loss, p_state_gnl)
+
+  # normalize again
+  p_loss <- transform(p_loss,
+                      PStateGL = PStateGL*PState/(PStateGL*PLoss + PStateGNL*(1-PLoss)),
+                      PStateGNL = PStateGNL*PState/(PStateGL*PLoss + PStateGNL*(1-PLoss)))
+
+  p_loss <- transform(p_loss,
+                      PState = PStateGL*PLoss + PStateGNL*(1-PLoss))
+
+
+  p_loss$PLossGS <- p_loss$PStateGL*p_loss$PLoss/p_loss$PState
+
+  return(p_loss)
+
+}
 

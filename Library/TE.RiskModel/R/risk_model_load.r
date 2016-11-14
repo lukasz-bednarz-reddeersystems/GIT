@@ -153,14 +153,22 @@ insert_model_definition <- function(model_date,computation_date,lookback,model_n
 
 
 
-query_model_id <- function(model_type,model_date,computation_date){
+query_model_id <- function(model_type,model_date,computation_date = NULL){
 
   cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
   on.exit(odbcClose(cn))
-  SQL <- paste0("EXEC [dbo].[prMultiFactorRisk_ModelID_SelectByModelTypeModelDateComputationDate]",
-		           "@lModelTypeID = ", model_type,
-               ", @dtModelDate = '", model_date, "'",
-               ", @dtComputationDate = '", computation_date, "'")
+
+  if (is.null(computation_date)) {
+    SQL <- paste0("EXEC [dbo].[prMultiFactorRisk_ModelID_SelectByModelTypeModelDateComputationDate]",
+                  "@lModelTypeID = ", model_type,
+                  ", @dtModelDate = '", model_date, "'")
+  }
+  else {
+    SQL <- paste0("EXEC [dbo].[prMultiFactorRisk_ModelID_SelectByModelTypeModelDateComputationDate]",
+  		           "@lModelTypeID = ", model_type,
+                 ", @dtModelDate = '", model_date, "'",
+                 ", @dtComputationDate = '", computation_date, "'")
+  }
   ret <- sqlQuery(cn, SQL, as.is = FALSE)
   return(ret)
 }
@@ -398,7 +406,9 @@ query_existing_data <- function(table_name, unique_keys){
 
   cn <- odbcConnect(.__DEFAULT_RISK_MODEL_DB__,uid=.__DEFAULT_RAID_DB_USER__ )
   on.exit(odbcClose(cn))
-  SQL <- paste0("SELECT *  FROM ", table_name, " WHERE ")
+  SQL <- paste0("SELECT DISTINCT ",
+                paste(colnames(unique_keys), collapse = ", "),
+                " FROM ", table_name, " WHERE ")
 
   next_statement <- FALSE
   for (col in colnames(unique_keys)) {
@@ -442,6 +452,8 @@ bulk_load_data <- function(table_name, data, unique_keys, index_key_names) {
   old_data <- query_existing_data(table_name, unique_keys)
   # cure date time issue with date comming from database
   old_data <- format_datetime(old_data)
+
+  old_data <- merge(data, old_data)
 
   insert_data <- rbind(old_data, data)
   insert_data <- insert_data[! duplicated(insert_data[index_key_names]) & seq(nrow(insert_data)) > nrow(old_data), ]
@@ -510,7 +522,7 @@ bulk_load_factor_betas <- function(betas, rm_type){
   col_names <- as.character(sqlColumns(cn, table_name)[4L][,1L])
 
   for (date in unique(betas$Date)) {
-    first = TRUE
+    first <-  TRUE
     for (factor in setdiff(colnames(betas), c("Date", "Instrument"))) {
 
       row <- betas[betas$Date == date,c("Date", "Instrument", factor)]
@@ -553,8 +565,9 @@ bulk_load_implied_factor_returns <- function(returns, rm_type){
   table_name <- "dbo.tMultiFactorRiskImpliedReturns"
   col_names <- as.character(sqlColumns(cn, table_name)[4L][,1L])
 
-  first <-  TRUE
+
   for (date in unique(returns$Date)) {
+    first <-  TRUE
     for (factor in setdiff(colnames(returns), c("Date", "Instrument"))) {
 
       row <- returns[returns$Date  == date ,c("Date", factor)]
@@ -576,7 +589,7 @@ bulk_load_implied_factor_returns <- function(returns, rm_type){
     }
 
     index_key_names <- c("lModelTypeID", "dtDate", "lFactorID" )
-    bulk_load_data(table_name, data, data.frame(dtDate = as_date(date)), index_key_names )
+    bulk_load_data(table_name, data, data.frame(lModelTypeID = rm_type, dtDate = as_date(date)), index_key_names )
   }
 }
 
@@ -864,8 +877,8 @@ bulk_load_residual_returns <- function(returns, rm_id){
   model_date <- ymd(model_info$dtModelDate[1])
 
   if (diff(range(unique(returns$Date))) > lookback) {
-    message("Invalid Market Style data frame passed to bulk_load_market_style")
-    message("Market Style data.frame contains dates that span over lookback period indicated by model.")
+    message("Invalid Market Style data frame passed to bulk_load_residual_returns")
+    message("Residual Returns data.frame contains dates that span over lookback period indicated by model.")
     message(paste("Date range :", range(returns$Date)))
     stop("Invalid returns data frame passed to bulk_load_residual_returns")
   } else if (model_date < max(returns$Date)) {

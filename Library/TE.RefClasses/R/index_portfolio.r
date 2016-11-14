@@ -48,7 +48,7 @@ setClass(
     key_values         = data.frame(IndexTicker = character(),
                                     start    = as.Date(character()),
                                     end    = as.Date(character())),
-    values             = c('dtDate','lInstrumentID', 'sInstrumentName', 'dblWeight'), # columns that neeed to be returned from datastore
+    values             = c('Date','InstrumentID', 'InstrumentName', 'Weight'), # columns that neeed to be returned from datastore
     column_name_map    = hash::hash(c('dtDate','lInstrumentID', 'sInstrumentName', 'dblWeight'),
                                     c('Date','InstrumentID', 'InstrumentName', 'Weight')),
     required_colnms = c('Date','InstrumentID', 'InstrumentName', 'Weight'),

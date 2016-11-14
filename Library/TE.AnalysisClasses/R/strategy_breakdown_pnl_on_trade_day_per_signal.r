@@ -43,15 +43,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradedSignalsData"
-#' class object
-#'
-#' @rdname setTradeDataObject-StrategyBreakdownPnLOnTradeDayPerSignal-method
-#' @param object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
-#' @param trade_data object of class "TradedSignalsData"
-#' @return \code{object} object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
+# ' @rdname setTradeDataObject-StrategyBreakdownPnLOnTradeDayPerSignal-method
+# ' @param object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
+# ' @param trade_data object of class "TradedSignalsData"
+# ' @return \code{object} object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -62,10 +61,14 @@ setMethod("setTradeDataObject",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"
 #' @export
 setMethod("Process",
           signature(object = "StrategyBreakdownPnLOnTradeDayPerSignalAnalysisBlock"),

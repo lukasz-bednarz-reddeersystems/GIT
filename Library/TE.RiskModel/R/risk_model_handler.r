@@ -25,7 +25,7 @@ setClass(
     risk_model = "VirtualRiskModel"
   ),
   prototype = list(
-    risk_model = new("RiskModel.DevelopedEuropePrototype150")
+    risk_model = new("RiskModel.DevelopedEuropePrototype150.1.1")
   ),
   contains  = c("VIRTUAL")
 )
@@ -61,20 +61,12 @@ setMethod("getRiskModelObject",
 #'
 #' Private method to set risk_model object slot value
 #'
+#' @rdname private_setRiskModelObject
 #' @param object object of class 'VirtualRiskModelHandler'.
 #' @param risk_model object of class "VirtualRiskModel".
 #' @return \code{object} object of class 'VirtualRiskModelHandler'.
 
 setGeneric(".setRiskModelObject", function(object, risk_model){standardGeneric(".setRiskModelObject")})
-
-#' @describeIn .setRiskModelObject
-#' Set Risk Model Object
-#'
-#' Private method to set risk_model object slot value
-#'
-#' @inheritParams .setRiskModelObject
-#' @return \code{object} object of class 'VirtualRiskModelHandler'.
-
 setMethod(".setRiskModelObject",
           signature(object = "VirtualRiskModelHandler",
                     risk_model = "VirtualRiskModel"),

@@ -54,15 +54,14 @@ setClass(
 )
 
 
+#' @describeIn setPositionDataObject
 #' Set position_data object in object slot
+#' @inheritParams setPositionDataObject
 #'
-#' Public method to set position_data slot with "OffsidePositionGainData"
-#' class object
-#'
-#' @rdname setPositionDataObject-OffsidePositionsCumulativePnLAnalysisBlock-method
-#' @param object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
-#' @param position_data object of class "OffsidePositionGainData"
-#' @return \code{object} object of class "OffsidePositionsCumulativePnLAnalysisBlock"
+# ' @rdname setPositionDataObject-OffsidePositionsCumulativePnLAnalysisBlock-method
+# ' @param object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
+# ' @param position_data object of class "OffsidePositionGainData"
+# ' @return \code{object} object of class "OffsidePositionsCumulativePnLAnalysisBlock"
 #' @export
 
 setMethod("setPositionDataObject",
@@ -74,11 +73,15 @@ setMethod("setPositionDataObject",
 )
 
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'OffsidePositionsCumulativePnLAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -118,11 +121,15 @@ setMethod("dataRequest",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
+#' @inheritParams Process
 #'
-#' @param object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
-#' @return \code{object} object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
+#'
+# ' @param object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
+# ' @return \code{object} object object of class "OffsidePositionsCumulativePnLAnalysisBlock"
 #' @export
 
 setMethod("Process",

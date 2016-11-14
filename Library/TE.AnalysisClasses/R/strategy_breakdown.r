@@ -57,15 +57,14 @@ setClass(
 )
 
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-StrategyBreakdownAnalysisBlock-method
-#' @param object object of class "StrategyBreakdownAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "StrategyBreakdownAnalysisBlock"
+# ' @rdname setTradeDataObject-StrategyBreakdownAnalysisBlock-method
+# ' @param object object of class "StrategyBreakdownAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "StrategyBreakdownAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -75,11 +74,15 @@ setMethod("setTradeDataObject",
           }
 )
 
+#' @describeIn dataRequest
+#'
 #' Request data from data source
 #'
-#' @param object object of class 'StrategyBreakdownAnalysisBlock'.
-#' @param key_values data.frame with keys specifying data query.
-#' @return \code{object} object of class 'StrategyBreakdownAnalysisBlock'.
+#' @inheritParams dataRequest
+#'
+# ' @param object object of class 'StrategyBreakdownAnalysisBlock'.
+# ' @param key_values data.frame with keys specifying data query.
+# ' @return \code{object} object of class 'StrategyBreakdownAnalysisBlock'.
 #' @export
 
 setMethod("dataRequest",
@@ -113,10 +116,14 @@ setMethod("dataRequest",
 )
 
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "StrategyBreakdownAnalysisBlock"
-#' @return \code{object} object object of class "StrategyBreakdownAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "StrategyBreakdownAnalysisBlock"
+# ' @return \code{object} object object of class "StrategyBreakdownAnalysisBlock"
 #' @export
 
 setMethod("Process",

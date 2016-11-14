@@ -7,23 +7,79 @@ setClassUnion("FeatureOutput",c("data.frame","NULL"))
 #Features should return a frame of scalars for each trade indexed with trade date.
 # @exportClass FeatureInput
 setClassUnion("FeatureInput",c("data.frame","NULL"))
+
+setClassUnion("FeatureComputationFunction", c("function", "NULL"))
+
 setClass(
   Class      = "FeatureComputation",
   representation = representation(
     input    = "FeatureInput",
-    compute  = "function",
+    compute  = "FeatureComputationFunction",
     output   = "FeatureOutput",
     output_colnms= "character"
   )
 )
-setGeneric("setComputationData",function(object,data){standardGeneric("setComputationData")})
-setMethod("setComputationData", "FeatureComputation",
+
+setGeneric("getFeatureComputationInput",function(object){standardGeneric("getFeatureComputationInput")})
+setMethod("getFeatureComputationInput",
+          signature(object  = "FeatureComputation"),
+          function(object){
+            return(object@input)
+          }
+)
+
+setGeneric(".setFeatureComputationInput",function(object,data){standardGeneric(".setFeatureComputationInput")})
+setMethod(".setFeatureComputationInput",
+          signature(object  = "FeatureComputation",
+                    data    = "FeatureInput"),
           function(object,data){
-            object@output_colnms <- c('DateTime',class(object)[[1]])
+
+            if (is(data, "data.frame") && length(data) > 1 && nrow(data) > 1) {
+              data <- aggregate( . ~ DateTime, data = data, function(x){unique(x)[1]}, na.action = NULL)
+            }
+
             object@input <- data
             return(object)
           }
 )
+
+
+setGeneric("getFeatureComputationOutput",function(object){standardGeneric("getFeatureComputationOutput")})
+setMethod("getFeatureComputationOutput",
+          signature(object  = "FeatureComputation"),
+          function(object){
+            return(object@output)
+          }
+)
+
+setGeneric(".setFeatureComputationOutput",function(object,data){standardGeneric(".setFeatureComputationOutput")})
+setMethod(".setFeatureComputationOutput",
+          signature(object  = "FeatureComputation",
+                    data    = "FeatureOutput"),
+          function(object,data){
+            object@output <- unique(data)
+
+            if (is(data, "data.frame") && length(data) > 1 && nrow(data) > 1) {
+              data <- aggregate( . ~ DateTime, data = data, function(x){unique(x)[1]}, na.action = NULL)
+            }
+            return(object)
+          }
+)
+
+
+setGeneric("setComputationData",function(object,data){standardGeneric("setComputationData")})
+setMethod("setComputationData",
+          signature(object  = "FeatureComputation",
+                    data    = "data.frame"),
+          function(object,data){
+            object@output_colnms <- c('DateTime',class(object)[[1]])
+            object <- .setFeatureComputationInput(object, data)
+            return(object)
+          }
+)
+
+
+
 
 # @exportClass FeatureComputations
 setClassUnion("FeatureComputations",c("FeatureComputation"))
@@ -33,6 +89,7 @@ setClass(
     computation  = "FeatureComputations"
   )
 )
+
 
 setGeneric("tearDown",function(object){standardGeneric("tearDown")})
 setMethod("tearDown","VirtualFeature",
@@ -48,10 +105,17 @@ setMethod("updateCompute","VirtualFeature",
             #Need to have updated the FeatureComputation data first if this is relevant
             #Not implemented in the virtual function because it could adopt various forms
             message(paste("Triggering feature computation:",class(object)[[1]]))
+
             cmpt <- tryCatch({
+                # restoring computation function if it was removed
+                if (is.null(object@computation@compute)){
+                  tmp <- new(class(object))
+                  object@computation@compute <- tmp@computation@compute
+                }
                 object@computation@compute(object@computation)
               }, error = function(cond){
                 message(paste("Error when computing feature",class(object)[[1]],":",cond))
+
                 if(inherits(object,"Preprocessor"))
                 {
                   stop("Object is a preprocessor, halting.")
@@ -60,6 +124,7 @@ setMethod("updateCompute","VirtualFeature",
             if(length(cmpt)>0){
               object@computation <- cmpt
               if(length(object@computation@output_colnms)>0 && class(cmpt@output)[[1]]=="data.frame"){
+                # __LB__ here handling should be addedd to rename pass-thru computation name
                 colnames(object@computation@output)<-object@computation@output_colnms
               }
             }
@@ -73,7 +138,15 @@ setMethod("updateCompute","VirtualFeature",
 setGeneric("getOutPut",function(object){standardGeneric("getOutPut")})
 setMethod("getOutPut","VirtualFeature",
           function(object){
-            return(object@computation@output)
+
+            output <- object@computation@output
+
+            if (is(output, "data.frame")){
+              output <- unique(output)
+            }
+
+            return(output)
           }
 )
+
 

@@ -38,7 +38,8 @@ test_that(paste("Can use basic accessors of ", tested.class, "object"), {
   expect_is(getStrategyDataObject(object), "StrategyBreakDownData")
 
   expect_is(getOutputGGPlotData(object), "data.frame")
-  expect_is(getOutputFrontendData(object), "data.frame")
+  expect_is(getOutputFrontendData(object), "list")
+
 
   expect_equal(getRequiredVariablesNames(object), valid.required_cols)
 

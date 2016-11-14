@@ -18,49 +18,10 @@ NULL
 
 setClass(
   Class    = "VirtualRODBCClient",
-  slots    = c(
-    sql_query    = "VirtualSQLQuery"
-  ),
-  contains = c("VirtualDataSourceClient", "VIRTUAL")
+  contains = c("VirtualDataSourceClient",
+               "VirtualSQLQueryHandler",
+                "VIRTUAL")
 )
-
-#' Get SQL query Object
-#'
-#' Returns stored SQL query object that encapsulates query to DB
-#'
-#' @rdname private_getSQLQueryObject
-#' @param object object of class 'VirtualRODBCClient'.
-#' @return \code{sql_query} object of type "VirtualSQLQuery"
-
-setGeneric(".getSQLQueryObject", function(object){standardGeneric(".getSQLQueryObject")})
-setMethod(".getSQLQueryObject",
-          signature(object = "VirtualRODBCClient"),
-          function(object){
-            return(object@sql_query)
-          }
-)
-
-
-#' Set SQL query Object
-#'
-#' Sets stored SQL query object that encapsulates query to DB
-#'
-#' @rdname private_setSQLQueryObject
-#' @param object object of class 'VirtualRODBCClient'.
-#' @param sql_query bject of type "VirtualSQLQuery"
-#' @return \code{object} object of class 'VirtualRODBCClient'.
-
-setGeneric(".setSQLQueryObject", function(object, sql_query){standardGeneric(".setSQLQueryObject")})
-setMethod(".setSQLQueryObject",
-          signature(object = "VirtualRODBCClient", sql_query = "VirtualSQLQuery"),
-          function(object, sql_query){
-
-            object@sql_query <- sql_query
-
-            return(object)
-          }
-)
-
 
 setMethod(".generateDataFilledWithNA",
           signature(object = "VirtualRODBCClient"),
@@ -94,9 +55,11 @@ setMethod("dataRequest",
           signature(object = "VirtualRODBCClient", key_values = "data.frame"),
           function(object, key_values){
 
+
             object <- .setDataSourceQueryKeyValues(object,key_values)
             values <- getDataSourceReturnColumnNames(object)
-            sql_query <- .getSQLQueryObject(object)
+            sql_query <- getSQLQueryObject(object)
+
             sql_query <- prepareSQLQuery(sql_query, key_values)
 
             # data request sent to dataplex
@@ -108,9 +71,7 @@ setMethod("dataRequest",
                            class(sql_query), class(object), cond))
             })
 
-            query_data <- query_data[values]
-
-            if (0 == nrow(query_data)) {
+            if (is.null(query_data) || 0 == nrow(query_data)) {
               message(paste("Object", class(object), "in dataRequest()"))
               message(paste("Query sent via", class(sql_query), "returned zero row data.frame"))
               query_data <- .generateDataFilledWithNA(object)
@@ -118,7 +79,12 @@ setMethod("dataRequest",
             }
 
             # translating column names
-            colnames(query_data) <- .translateDataSourceColumnNames(object, values)
+            colnames(query_data) <- .translateDataSourceColumnNames(object, colnames(query_data))
+
+
+            if (!is.null(query_data)){
+              query_data <- query_data[values]
+            }
 
             # storing Reference data internaly
             object <- setReferenceData(object, query_data)

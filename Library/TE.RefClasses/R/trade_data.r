@@ -1,4 +1,5 @@
 #' @include ppmodel_client.r
+#' @include data_validation_functions.r
 NULL
 
 ####################################
@@ -17,11 +18,11 @@ trade_history_features <- c('MarketValue','TodayPL')
 trade_delta_features <- c('DeltaSwing','DeltaSkew','DeltaPL')
 
 #' List of trade history basic features names
-trade_basic_features <- c("TradeDate", "TradeID", "Long", "Instrument", "Trader", "ValueUSD", "Strategy",
+trade_basic_features <- c("TradeDate", "TradeID", "OrderID", "Long", "Instrument", "Trader", "ValueUSD", "Strategy",
                          "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
 
 #' List of translated trade history basic features names
-trade_basic_features_transl <- c("Date", "TradeID", "Long", "InstrumentID", "TraderName", "ValueUSD", "Strategy",
+trade_basic_features_transl <- c("Date", "TradeID", "OrderID", "Long", "InstrumentID", "TraderName", "ValueUSD", "Strategy",
                           "StrategyID", "PsnLong", "ProfitTarget", "StopLoss")
 
 devtools::use_data(position_summary_features,
@@ -39,7 +40,8 @@ setClass(
                           context_price_features,
                           position_summary_features,
                           trade_history_features ,
-                          trade_delta_features)
+                          trade_delta_features),
+    unique_rows       =  TRUE
   ),
 
   contains = c("VirtualReferenceData")
@@ -78,12 +80,12 @@ setClass(
                                    start = as.Date(character()),
                                    end = as.Date(character())),
     model_class       = "TradeHistorySimpleWithSummary",
-    unique_rows       = FALSE
+    unique_rows       = TRUE,
+    validation_function = basic_unique_data_validator,
+    argument_list = list(unique_on=c('Date','Strategy','ValueUSD','InstrumentID'))
     ),
-
   contains = c("VirtualTradeData", "VirtualPPModelClient")
 )
-
 
 setMethod(".generateDataFilledWithNA",
           signature(object = "TradeData"),

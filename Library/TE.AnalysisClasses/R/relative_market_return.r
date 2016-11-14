@@ -37,15 +37,14 @@ setClass(
                         )
 )
 
+#' @describeIn setTradeDataObject
 #' Set trade_data object in object slot
+#' @inheritParams setTradeDataObject
 #'
-#' Public method to set trade_data slot with "TradeData"
-#' class object
-#'
-#' @rdname setTradeDataObject-RelativeMarketReturnAnalysisBlock-method
-#' @param object object of class "RelativeMarketReturnAnalysisBlock"
-#' @param trade_data object of class "TradeData"
-#' @return \code{object} object of class "RelativeMarketReturnAnalysisBlock"
+# ' @rdname setTradeDataObject-RelativeMarketReturnAnalysisBlock-method
+# ' @param object object of class "RelativeMarketReturnAnalysisBlock"
+# ' @param trade_data object of class "TradeData"
+# ' @return \code{object} object of class "RelativeMarketReturnAnalysisBlock"
 #' @export
 
 setMethod("setTradeDataObject",
@@ -75,15 +74,14 @@ setMethod("setMarketDataObject",
           }
 )
 
+#' @describeIn setExtendedTradeDataObject
 #' Set ex_trade_data object in object slot
+#' @inheritParams setExtendedTradeDataObject
 #'
-#' Public method to set ex_trade_data slot with "TradesExtendedReturnPerMonth"
-#' class object
-#'
-#' @rdname setExtendedTradeDataObject-RelativeMarketReturnAnalysisBlock-method
-#' @param object object of class "RelativeMarketReturnAnalysisBlock"
-#' @param ex_trade_data object of class "TradesExtendedReturnPerMonth"
-#' @return \code{object} object of class "RelativeMarketReturnAnalysisBlock"
+# ' @rdname setExtendedTradeDataObject-RelativeMarketReturnAnalysisBlock-method
+# ' @param object object of class "RelativeMarketReturnAnalysisBlock"
+# ' @param ex_trade_data object of class "TradesExtendedReturnPerMonth"
+# ' @return \code{object} object of class "RelativeMarketReturnAnalysisBlock"
 #' @export
 setMethod("setExtendedTradeDataObject",
           signature(object = "RelativeMarketReturnAnalysisBlock", ex_trade_data = "TradesExtendedReturnPerMonth"),
@@ -93,10 +91,14 @@ setMethod("setExtendedTradeDataObject",
           }
 )
 
+#' @describeIn Process
+#'
 #' Trigger computation of analysis data.
 #'
-#' @param object object of class "RelativeMarketReturnAnalysisBlock"
-#' @return \code{object} object object of class "RelativeMarketReturnAnalysisBlock"
+#' @inheritParams Process
+#'
+# ' @param object object of class "RelativeMarketReturnAnalysisBlock"
+# ' @return \code{object} object object of class "RelativeMarketReturnAnalysisBlock"
 #' @export
 
 setMethod("Process",

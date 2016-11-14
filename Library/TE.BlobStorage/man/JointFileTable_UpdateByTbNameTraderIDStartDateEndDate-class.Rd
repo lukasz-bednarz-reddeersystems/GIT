@@ -6,13 +6,13 @@
 \alias{BlobStorage.SQLProcedureCall.JointFileTable_UpdateByTbNameTraderIDStartDateEndDate-class}
 \title{BlobStorage.SQLProcedureCall.JointFileTable_UpdateByHashID class}
 \description{
-Implements handling querries for joint table that
-stores keys of associated file table. Returns file name column that
-is associated with given key
+Implements handling update for joint table that
+stores keys of associated file table. Returns number of stored and
+insertet keys
 
-Implements handling querries for joint table that
-stores keys of associated file table. Returns file name column that
-is associated with given key
+Implements handling update for joint table that
+stores keys of associated file table. Returns number of stored and
+insertet keys
 }
 \details{
 Inherits from "BlobStorage.VirtualSQLProcedureCall"

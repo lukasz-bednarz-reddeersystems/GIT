@@ -8,8 +8,8 @@ Description: Package is implementing Analysis and Report Classes for creating
     reports with data and graphs for Trading Analytics Engine.
 Depends:
     R (>= 3.3.0),
-    TE.RefClasses (>= 0.1.1),
-    TE.RiskModel (>= 0.1.1),
+    TE.RefClasses (>= 0.1.3),
+    TE.RiskModel (>= 0.1.3),
 License: file LICENSE
 LazyData: TRUE
 Imports:
@@ -22,7 +22,9 @@ Imports:
     stats,
     utils,
     plotly,
+    dplyr,
     RColorBrewer,
+    zoo,
 Suggests:
     testthat,
     plyr,
@@ -30,12 +32,15 @@ Collate:
     'TE.AnalysisClasses.r'
     'analysis_block_functions.r'
     'analysis_block.r'
+    'aggregate_analysis_block.r'
     'offside_positions.r'
     'average_down_trades.r'
     'average_down_trades_focus.r'
     'extended_trades.r'
     'buys_and_sells.r'
     'extended_trades_summary.r'
+    'implied_factor_returns.r'
+    'implied_factor_returns_state.r'
     'market_return.r'
     'portfolio_variance_decomposition.r'
     'market_style_factor_stat.r'
@@ -46,10 +51,18 @@ Collate:
     'offside_positions_relative_bps_per_month.r'
     'value_traded_in_long_short_hedge.r'
     'pnl_traded_in_long_short_hedge.r'
+    'portfolio_core_factor_exposures.r'
+    'portfolio_core_factor_hedge_exposures.r'
+    'portfolio_variance_decomposition_functions.r'
+    'portfolio_core_factor_hedge_returns.r'
+    'portfolio_core_factor_returns.r'
     'portfolio_factor_exposure.r'
     'portfolio_factor_exposures.r'
-    'portfolio_variance_decomposition_functions.r'
     'portfolio_factor_returns.r'
+    'portfolio_factor_state_prob_cond_loss.r'
+    'portfolio_hedge_instrument_marginal_contribution_to_risk_core_factors.r'
+    'portfolio_instrument_marginal_contribution_to_risk.r'
+    'portfolio_instrument_marginal_contribution_to_risk_core_factors.r'
     'position_revisits.r'
     'position_revisits_delta_prev_quarter.r'
     'positions_holding_capital_distribution.r'

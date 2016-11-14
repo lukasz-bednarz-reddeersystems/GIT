@@ -7,7 +7,7 @@ context("Testing EventData")
 #########################
 tested.class          <-  "EventData"
 valid.key_cols        <- c("InstrumentID","Date")
-valid.values          <- c("lInstrumentID","dtDateTime", "sEventType")
+valid.values          <- c("InstrumentID","Date", "EventType")
 valid.required_colnms <- c("InstrumentID","Date","EventType")
 valid.factor_cols     <- c("EventType")
 valid.factor_keys     <- c("Date", "InstrumentID")
@@ -118,7 +118,7 @@ test_that("Generates empty data.frame when dataRequest() with nonexistent key_va
                                 Date = seq(from = as.Date('2016-06-01'),
                                                   to = as.Date('2016-06-03'),
                                                   by = "1 day"))
-  cols <- TE.RefClasses:::.translateDataSourceColumnNames(object, valid.values)
+  cols <- valid.values
 
   diff <- setdiff(cols ,valid.key_cols)
 
@@ -171,15 +171,16 @@ test_that("Can dataRequest() with valid key_values", {
 
   # create valid return data.frame
   # create valid return data.frame
-  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(TE.RefClasses:::.getSQLQueryObject(object))
-  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(TE.RefClasses:::.getSQLQueryObject(object))
+  proc_name      <- TE.SQLQuery:::.getSQLProcedureName(getSQLQueryObject(object))
+  proc_args      <- TE.SQLQuery:::.getSQLProcedureArgumentNames(getSQLQueryObject(object))
   query_key_vals <- TE.RefClasses:::parse_instrument_date_keys(valid.key_vals)
   query_string   <- TE.SQLQuery:::generate_procedure_call_strings(proc_name, proc_args, query_key_vals)
   valid.ret_data <- TE.SQLQuery:::execute_sql_query(query_string)
   valid.ret_data <- TE.SQLQuery:::convert_column_class(valid.ret_data)
   valid.ret_data <- unique(valid.ret_data)
+
+  colnames(valid.ret_data) <- TE.RefClasses:::.translateDataSourceColumnNames(object, colnames(valid.ret_data))
   valid.ret_data <- valid.ret_data[values]
-  colnames(valid.ret_data) <- values(valid.column_name_map[values])[values]
 
   valid.fact_transf <- TE.RefClasses:::factor_transform(valid.ret_data[c(valid.factor_keys,valid.factor_cols)], valid.factor_keys, valid.factor_cols)
 

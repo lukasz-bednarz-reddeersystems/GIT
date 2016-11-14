@@ -15,6 +15,31 @@ parse_instrument_date_keys <- function(key_values) {
   return (ret_val)
 }
 
+parse_riskmodel_instrument_date_keys <- function(key_values) {
+  risk_model <- unique(key_values[,1])
+  instruments <- unique(key_values[,2])
+  start <- min(key_values[,3])
+  end <- max(key_values[,3])
+
+  ret_val <- data.frame(RiskModelName = risk_model,
+                        InstrumentIDs = paste0(instruments, collapse = ","),
+                        start = start,
+                        end = end)
+
+  return (ret_val)
+}
+
+parse_riskmodel_date_keys <- function(key_values) {
+  risk_model <- unique(key_values[,1])
+  start <- min(key_values[,2])
+  end <- max(key_values[,2])
+
+  ret_val <- data.frame(RiskModelName = risk_model,
+                        start = start,
+                        end = end)
+
+  return (ret_val)
+}
 
 parse_start_date_keys <- function(key_values) {
   start <- min(key_values[,2])
@@ -22,5 +47,3 @@ parse_start_date_keys <- function(key_values) {
 
   return (ret_val)
 }
-
-

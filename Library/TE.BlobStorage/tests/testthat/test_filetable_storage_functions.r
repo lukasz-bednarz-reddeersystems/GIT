@@ -9,7 +9,7 @@ context("Test blob storage functions")
 # test vectors
 valid.db            <- TE.BlobStorage:::.__DEFAULT_ODBC_DB_NAME__.
 valid.schema        <- TE.BlobStorage:::.__DEFAULT_FILE_DB_SCHEMA__.
-valid.path          <- "\\\\RAIDSTAGEDB\\MSSQLSERVER_STAGEDB\\FileTableDB\\BlobTest"
+valid.path          <- "\\\\RAIDLIVEDB\\MSSQLSERVER\\FileTableDB\\BlobTest"
 valid.junct.table   <- "tMultiFactorRiskBlobTest"
 valid.table         <- "ftMultiFactorRiskBlobTest"
 valid.testfilename  <- "temp.txt"

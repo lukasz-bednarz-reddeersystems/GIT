@@ -143,7 +143,7 @@ setMethod("generateMap","CompositeWarehouse",
 		  	object@map <- list()
 		  	instruments <- ls(object@trades)
 		  	for(instrument in instruments){
-		  		trade_list <- object@trades[[instrument]]
+		  		trade_list <- getInstrumentTrades(object, instrument)
 		  		dex <- 1
 		  		for(trade in trade_list){
 		  			object <- tryCatch({
@@ -182,7 +182,8 @@ setMethod("addWarehouse","CompositeWarehouse",
 setGeneric("getWarehouse", function(object,name){standardGeneric("getWarehouse")})
 setMethod("getWarehouse","CompositeWarehouse",
 	      function(object,name){
-	      	message(paste("Getting warehouse",name,"..."))
+
+	        message(paste("Getting warehouse",name,"..."))
 	      	tw <- new("TradeWarehouse")
 	      	get_trades <- object@orig_trade_ids[[name]]
 	      	instruments <- object@orig_instruments[[name]]
@@ -204,7 +205,8 @@ setMethod("getWarehouse","CompositeWarehouse",
 	      	}
 	      	message(paste("Got",length(get_trades),"trades."))
 	      	tw@trades <- trd
-	      	message(paste("Restoring warehouse variables ..."))
+	      	message(sprintf("Restoring warehouse variables started %s",
+	      				     now()))
 	      	tw@trader_id <- as.integer(object@orig_trader_ids[[name]])
 	      	tw@instruments <- object@orig_instruments[[name]]
 	      	tw@positions <- object@orig_positions[[name]]
@@ -215,6 +217,8 @@ setMethod("getWarehouse","CompositeWarehouse",
 	      	tw@map <- object@orig_maps[[name]]
 	      	tw@fctr_datstr <- object@orig_dtr_stores[[name]]
 	      	tw <- buildFeatureList(tw)
+	      	message(sprintf("Restoring warehouse variables finished %s",
+	      				     now()))
 	      	return(tw)
 	      }
 )
@@ -312,7 +316,8 @@ setMethod("addDailyData","CompositeWarehouse",
 	      				original_data<-new_data
 	      			}
 	      		}
-	      		original_trade@daily_data <- original_data
+
+	      		original_trade <- .setTradeDailyData(original_trade, original_data)
 	      		object<-setTrade(object,original_trade)
 	      	}
 	      	message("Daily data update complete.")
