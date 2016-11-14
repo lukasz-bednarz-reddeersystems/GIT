@@ -187,7 +187,6 @@ setMethod("Process",
           signature(object = "PortfolioFactorStateProbCondLossAnalysisBlock"),
           function(object){
 
-            browser()
             # retrieve data
             factor_rd <- getImpliedFactorReturnsDataObject(object)
             factor_data <- getReferenceData(factor_rd)
@@ -198,103 +197,120 @@ setMethod("Process",
                                   value = TRUE))
 
 
-            # risk_model <- getRiskModelObject(object)
-            # market_factors    <- getRiskModelMarketFactorNames(risk_model)
-            # currency_factors  <- getRiskModelCurrencyFactorNames(risk_model)
-            # commodity_factors <- getRiskModelCommodityFactorNames(risk_model)
-            # sector_factors    <- getRiskModelSectorFactorNames(risk_model)
-
             portf_rd <- getPortfolioDataObject(object)
             portf <- getReferenceData(portf_rd)
+
+
+            # cumulative entries for all strategies
+            portf_tot <- portf
+            portf_tot$Strategy <- "ALL"
+
+            portf <- rbind(portf, portf_tot)
 
             # compute potfolio daily returns per strategy
             portf_ret <- aggregate(cbind(TodayPL, MarketValue) ~ Date + Strategy, data = portf, sum)
             portf_ret <- portf_ret[portf_ret$MarketValue != 0,]
             portf_ret$Return <- portf_ret$TodayPL/abs(portf_ret$MarketValue)
 
-            # compute loss state (loss is TRUE when Return < 0.5%)
-            portf_ret$Loss <- portf_ret$Return < -0.0005
-
-            foo <- function(x){ x$PLoss    = sum(x$Loss)/nrow(x);x}
-
-            portf_ret <- by(portf_ret, portf_ret$Strategy, foo)
-            portf_ret <- Reduce(rbind, portf_ret)
-
-            # merge factor states with portfolio returns
-            fct_state <- portf_ret[portf_ret$Loss, c("Date", "Strategy", "PLoss")]
-            fct_state <- merge(fct_state,factor_data[factor_cols], by = "Date")
-
-            # compute factor state probability given loss
-            fct_levels <- levels(fct_state$AUD_state)
-            bar <- function(x){ ret <- data.frame(Strategy      = unique(x$Strategy),
-                                                  FactorState   = fct_levels)
-
-                                obs <- (sapply(x[factor_cols[-1]], summary)+1)/(nrow(x)+length(fct_levels))
-
-                                ret <- cbind(ret, obs)
+            bar <- function(x){
+              x$Loss <- rollapplyr(x$Return,
+                                   3,
+                                   function(x){ sum(x) < -0.005},
+                                   partial = TRUE)
+              x
             }
 
-            fct_state_prob <- by(fct_state, fct_state$Strategy, bar)
-            fct_state_prob <- Reduce(rbind, fct_state_prob)
+            portf_ret <- by(portf_ret, portf_ret$Strategy, bar)
+            portf_ret <- Reduce(rbind, portf_ret)
 
+            # helper functions to compute probabilities
+            # compute loss probability
+            foo <- function(x){ data.frame(Strategy = unique(x$Strategy),
+                                           PLoss    = sum(x$Loss)/nrow(x))}
 
-            cn <- colnames(factor_data)
-            factors <- intersect(getRiskModelFactorNames(object),cn)
+            # merge factor states with portfolio returns
+            fct_state <- portf_ret[c("Date", "Strategy", "Loss")]
+            fct_state <- merge(fct_state,factor_data[factor_cols], by = "Date")
+
+            fct_state_gl <- portf_ret[portf_ret$Loss, c("Date", "Strategy")]
+            fct_state_gl <- merge(fct_state_gl,factor_data[factor_cols], by = "Date")
+
+            fct_state_gn <- portf_ret[!portf_ret$Loss, c("Date", "Strategy")]
+            fct_state_gn <- merge(fct_state_gn,factor_data[factor_cols], by = "Date")
+
+            # factor levels
+            fct_levels <- levels(fct_state$AUD_state)
+
+            # computation dates
+            days <- sort(unique(fct_state$Date))
+            window <- 65 # three month sliding window
+            indxs <- seq(window, length(days))
+
             first <- TRUE
-            for(fct in factors){
-              if(fct%in%market_factors){
-                rt <- "Market"
-              } else if(fct%in%currency_factors){
-                rt <- "FX"
-              } else if(fct%in%commodity_factors){
-                rt <- "Commodity"
-              } else if(fct%in%sector_factors){
-                rt <- "Sector"
-              } else {
-                rt <- NA
-              }
-              #browser()
+            for(ii in indxs){
+
+              start <- ii -window +1
+              #start <- 1
+              end <- ii
+
+              fct_state_loc <- fct_state[fct_state$Date >= days[start] & fct_state$Date <= days[end],]
+
+              strat_ploss <- by(fct_state_loc[c("Strategy", "Loss")], fct_state_loc$Strategy, foo)
+              strat_ploss <- Reduce(rbind, strat_ploss)
+
+              # fct_state_gl_loc <- fct_state_gl[fct_state_gl$Date >= days[start] & fct_state_gl$Date <= days[end],]
+              # fct_state_gn_loc <- fct_state_gn[fct_state_gn$Date >= days[start] & fct_state_gn$Date <= days[end],]
+
+              # compute factor state probability
+              fct_state_prob_all <- by(fct_state_loc,
+                                       fct_state_loc$Strategy,
+                                       factor_state_probs,
+                                       strat_ploss,
+                                       fct_levels)
+
+              fct_state_prob_all <- Reduce(rbind, fct_state_prob_all)
+
+              fct_state_prob     <- fct_state_prob_all[fct_state_prob_all$Condition == "None",
+                                                       setdiff(colnames(fct_state_prob_all), "Condition")]
+
+              # compute factor state probability given loss
+              # fct_state_prob_gl <- by(fct_state_gl_loc,
+              #                         fct_state_gl_loc$Strategy, bar)
+              # fct_state_prob_gl <- Reduce(rbind, fct_state_prob_gl)
+              fct_state_prob_gl     <- fct_state_prob_all[fct_state_prob_all$Condition == "Loss",
+                                                          setdiff(colnames(fct_state_prob_all), "Condition")]
+
+
+              #fct_state_prob_gl <- merge(fct_state_prob["Strategy"])
+
+              # compute factor state probability given loss
+              # fct_state_prob_gn <- by(fct_state_gn_loc,
+              #                         fct_state_gn_loc$Strategy, bar)
+              # fct_state_prob_gn <- Reduce(rbind, fct_state_prob_gn)
+              fct_state_prob_gnl     <- fct_state_prob_all[fct_state_prob_all$Condition == "NoLoss",
+                                                          setdiff(colnames(fct_state_prob_all), "Condition")]
+
+              # normalize probablities
+
+              #compute probability of loss given state
+              state <- fct_state[end,factor_cols[-1]]
+              p_loss_gs <- prob_of_loss_given_state(state,
+                                                    strat_ploss,
+                                                    fct_state_prob,
+                                                    fct_state_prob_gl,
+                                                    fct_state_prob_gnl)
+
 
               if(first){
-                plt_data <- rbind(data.frame(Date=factor_data$Date,
-                                             Value=factor_data[[paste(fct,"_cmpnd",sep="")]],
-                                             RiskType=rt,
-                                             Factor=fct,
-                                             Quantity='Cmpd. Return'),
 
-                                  data.frame(Date=factor_data$Date,
-                                             Value=factor_data[[paste(fct,"_cmpnd_20_mavg",sep="")]],
-                                             RiskType=rt,
-                                             Factor=fct,
-                                             Quantity='MAVG'),
-                                  #data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_50_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
-
-                                  data.frame(Date=factor_data$Date,
-                                             Value=factor_data[[paste(fct,"_ftile",sep="")]],
-                                             RiskType=rt,
-                                             Factor=fct,
-                                             Quantity='Quartile'))
                 first <- FALSE
+
+                plt_data <- cbind(data.frame(Date = days[ii]), p_loss_gs)
+
               } else {
                 plt_data <- tryCatch({
-                  rbind(plt_data,rbind(data.frame(Date=factor_data$Date,
-                                                  Value=factor_data[[paste(fct,"_cmpnd",sep="")]],
-                                                  RiskType=rt,
-                                                  Factor=fct,
-                                                  Quantity='Cmpd. Return'),
 
-                                       data.frame(Date=factor_data$Date,
-                                                  Value=factor_data[[paste(fct,"_cmpnd_20_mavg",sep="")]],
-                                                  RiskType=rt,
-                                                  Factor=fct,
-                                                  Quantity='MAVG'),
-                                       #data.frame(Date=factor_data$Date,Value=factor_data[[paste(fct,"_cmpnd_50_mavg",sep="")]],RiskType=rt,Factor=fct,Quantity='MAVG'),
-
-                                       data.frame(Date=factor_data$Date,
-                                                  Value=factor_data[[paste(fct,"_ftile",sep="")]],
-                                                  RiskType=rt,
-                                                  Factor=fct,
-                                                  Quantity='Quartile')))
+                  rbind(plt_data, cbind(data.frame(Date = days[ii]), p_loss_gs))
                 }, error = function(cond){
                   browser()
                   message(sprintf("Error occured when computing plot data for factor %s",
@@ -305,9 +321,11 @@ setMethod("Process",
 
             object <- .setOutputGGPlotData(object, plt_data)
 
-            plt_risk <- ggplot(data=plt_data,aes_string(x="Date",y="Value",color="Factor")) +
+            plt_data <- plt_data[!is.na(plt_data$PLossGS), ]
+
+            plt_risk <- ggplot(data=plt_data,aes_string(x="Date",y="PLossGS",color="Strategy")) +
                                geom_line(size=1) +
-                               facet_grid(RiskType~Quantity,scales="free_y")
+                               facet_grid(Strategy~.,scales="free_y")
 
             object <- .setOutputGGPlot(object, plt_risk)
 

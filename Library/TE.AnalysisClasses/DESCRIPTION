@@ -24,6 +24,7 @@ Imports:
     plotly,
     dplyr,
     RColorBrewer,
+    zoo,
 Suggests:
     testthat,
     plyr,

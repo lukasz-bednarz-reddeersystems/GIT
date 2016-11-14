@@ -1083,6 +1083,69 @@ portfolio_factor_exposure <- function(weight,betas){
 }
 
 
+#compute probabilities of factor states adding 1 to missing observations
+# to avoid zero probabilities and normalizing
+factor_state_probs <- function(data, p_loss, fct_levels = NULL){
+
+  # all observarions
+  x <- data[setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+
+  strat <- unique(data$Strategy)[1]
+
+  p_loss <- p_loss$PLoss[p_loss$Strategy == strat]
+
+  if (is.null(fct_levels)){
+    fct_levels <- levels(x[,1])
+  }
+
+  fill <- 1
+
+  # + 2 to fill missing data
+  sp <- (sapply(x, summary)+ fill)/(nrow(x)+length(fct_levels))
+
+  # conditioned on loss
+  x <- data[data$Loss, setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+  sp_gl <- (sapply(x, summary)+p_loss*fill)/(nrow(x)+length(fct_levels))
+
+  # conditioned on no-loss
+  x <- data[!data$Loss, setdiff(colnames(data), c("Date", "Loss", "Strategy"))]
+  sp_gnl <- (sapply(x, summary)+(1-p_loss)*fill)/(nrow(x)+length(fct_levels))
+
+  # normalizing to achieve correct marginal probabilities
+  # P(S,i) = P(S|L,i)P(L) + P(S|NL,i)P(NL)
+  # SUM(P(S, i), i = 1..n) = 1
+  # SUM(P(S|L, i), i = 1..n) = 1
+  # SUM(P(S|NL, i), i = 1..n) = 1
+  sp_gl <- sp_gl*sp/(sp_gl*p_loss+sp_gnl*(1-p_loss))
+  sp_gl <- sweep(sp_gl, 2, colSums(sp_gl), '/')
+
+  sp_gnl <- sp_gnl*sp/(sp_gl*p_loss+sp_gnl*(1-p_loss))
+  sp_gnl <- sweep(sp_gnl, 2, colSums(sp_gnl), '/')
+
+  sp <- sp_gl*p_loss+sp_gnl*(1-p_loss)
+
+
+  ret <- cbind(data.frame(Strategy      = strat,
+                          FactorState   = fct_levels,
+                          Condition     = "None"),
+               sp)
+
+
+  ret <- rbind(ret, cbind(data.frame(Strategy      = strat,
+                               FactorState   = fct_levels,
+                               Condition     = "Loss"),
+                          sp_gl))
+
+  ret <- rbind(ret, cbind(data.frame(Strategy      = strat,
+                                 FactorState   = fct_levels,
+                                 Condition     = "NoLoss"),
+                          sp_gnl))
+
+
+
+  return(ret)
+}
+
 
 portfolio_factor_exposure <- function(weight,betas){
 
@@ -1095,18 +1158,63 @@ portfolio_factor_exposure <- function(weight,betas){
   return(market_ret)
 }
 
-# portfolio_variance_decomposition <- function(weight,betas,factor_covariance,columns=NULL){
-#   wtbt <- merge(betas,weight,by='InstrumentID')
-#   weight_matrix <- as.matrix(wtbt['Weight'])
-#   if(length(columns)>0){
-#     beta_matrix <- as.matrix(wtbt[intersect(setdiff(colnames(wtbt),c('InstrumentID','Weight')),columns)])
-#     fct <- factor_covariance[columns,columns]
-#   }
-#   else{
-#     beta_matrix <- as.matrix(wtbt[setdiff(colnames(wtbt),c('InstrumentID','Weight'))])
-#     fct <- factor_covariance
-#   }
-#   market_risk <- t(weight_matrix)%*%beta_matrix%*%as.matrix(fct)%*%t(beta_matrix)%*%weight_matrix
-#   return(market_risk)
-# }
+state_prob <- function(state, state_prob_dist){
+
+  prob <- prod(sapply(colnames(state), function(x){state_prob_dist[as.integer(state[[x]]), x]} ))
+
+  return(prob)
+}
+
+prob_of_loss_given_state <- function(state,
+                                     p_loss,
+                                     fct_state_prob,
+                                     fct_state_prob_gl,
+                                     fct_state_prob_gnl){
+
+
+  foo <- function(x, colname = "PState"){
+    ret <-  data.frame(Strategy = unique(x$Strategy),
+                       Ploss = state_prob(state,x))
+    colnames(ret)[2] <- colname
+    return(ret)
+  }
+
+  p_state <- by(fct_state_prob, fct_state_prob$Strategy,foo)
+  p_state <- Reduce(rbind, p_state)
+
+  p_loss <- merge(p_loss, p_state)
+
+  p_state_gl <- tryCatch({
+    by(fct_state_prob_gl, fct_state_prob_gl$Strategy,foo, "PStateGL")
+  }, error = function(cond){
+    browser()
+    message(sprintf("Error in prob_of_loss_given_state()"))
+  })
+  p_state_gl <- Reduce(rbind, p_state_gl)
+  p_loss <- merge(p_loss, p_state_gl)
+
+  p_state_gnl <- tryCatch({
+    by(fct_state_prob_gnl, fct_state_prob_gnl$Strategy,foo, "PStateGNL")
+  }, error = function(cond){
+    browser()
+    message(sprintf("Error in prob_of_loss_given_state()"))
+  })
+  p_state_gnl <- Reduce(rbind, p_state_gnl)
+
+  p_loss <- merge(p_loss, p_state_gnl)
+
+  # normalize again
+  p_loss <- transform(p_loss,
+                      PStateGL = PStateGL*PState/(PStateGL*PLoss + PStateGNL*(1-PLoss)),
+                      PStateGNL = PStateGNL*PState/(PStateGL*PLoss + PStateGNL*(1-PLoss)))
+
+  p_loss <- transform(p_loss,
+                      PState = PStateGL*PLoss + PStateGNL*(1-PLoss))
+
+
+  p_loss$PLossGS <- p_loss$PStateGL*p_loss$PLoss/p_loss$PState
+
+  return(p_loss)
+
+}
 

@@ -12,6 +12,7 @@
 #' @import quantmod
 #' @import lubridate
 #' @import ggplot2
+#' @importFrom zoo rollapplyr
 #' @importFrom dplyr arrange_
 #' @importFrom hash hash values names.hash keys
 #' @importFrom DMwR lofactor
