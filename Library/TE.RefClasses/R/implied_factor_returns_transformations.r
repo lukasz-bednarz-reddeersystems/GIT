@@ -141,7 +141,7 @@ setClass(
   prototype      = list(
     required_colnms= c('Date'),
     #computed_colnms = c(),
-    compute = ftiler
+    compute = rolling_ftiler
   ),
   contains = c( "VirtualTransformationComputation")
 )

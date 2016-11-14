@@ -282,6 +282,43 @@ ftiler <- function(data,ntiles=4){
   return(data)
 }
 
+
+########################################################################
+#
+# compute quantiles of timeseries
+#
+########################################################################
+rolling_ftiler <- function(data,ntiles=4, lookback = 50){
+
+  required_colnms <- c('Date')
+  if(!has_required_columns(data, required_colnms)) {
+    stop(paste("tseries_mavgs requires following columns :", required_colnms))
+  }
+
+  # accumulating function
+  foo <- function(dates, data. = data, ntiles. = ntiles){
+    ret <- ftiler(data.[data.$Date >= dates$Start  & data.$Date <= dates$End,], ntiles.)
+
+    if (dates$Start > min(data.$Date)){
+      ret <- ret[ret$Date == dates$End,]
+    }
+
+    return(ret)
+  }
+
+  dates <- unique(data$Date)
+
+  dates_df <- data.frame(Start = dates[seq(length(dates) - lookback +1)],
+                         End = dates[seq(lookback, length(dates), 1)])
+
+  ret <- by(dates_df, dates_df$Start, foo)
+
+  ret <- Reduce(rbind, ret)
+
+
+  return(ret)
+}
+
 ########################################################################
 #
 # encode factor states
