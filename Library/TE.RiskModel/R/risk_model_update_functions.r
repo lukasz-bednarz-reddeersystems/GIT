@@ -91,7 +91,7 @@ update_risk_model_db <- function(risk_model,
                                  rmstr,
                                  date_start,
                                  date_end,
-                                 force_new_model_id  = TRUE,
+                                 force_new_model_id  = FALSE,
                                  components = c('Betas',
                                                 'ImpliedFactorReturns',
                                                 'FactorVariance',
@@ -202,6 +202,7 @@ update_risk_model_db <- function(risk_model,
 
     if ("ResidualReturns" %in% components){
       data <- getRiskModelComponentOnDate(rmstr,store_name, 'ResidualReturns', day, lookback)
+      data <- data[data$Date == day,]
       if (nrow(data) > 0) {
         tryCatch({
           bulk_load_residual_returns(data, model_id)
@@ -275,7 +276,7 @@ get_betas_composite <- function(universe_betas){
 
   factor_info <- get_factors()
 
-  factor_types <- c("Currency", "Oil", "Market", "Sector")
+  factor_types <- c("Currency", "Commodity", "Market", "Sector")
 
   betas_composite <- list()
 
@@ -300,6 +301,7 @@ compute_risk_model_on_dates <- function(risk_model,
                                         force = TRUE) {
 
   lookback <- getRiskModelLookback(risk_model)
+  beta_estimator <- getRiskModelBetaEstimator(risk_model)
 
   rm_name       <- getID(rm_store)
 
@@ -404,7 +406,7 @@ compute_risk_model_on_dates <- function(risk_model,
         cl <- declare_local_cluster(.__DEFAULT_RISK_MODEL_NCORES__)
         prepare_cluster(cl)
         on.exit(function(){ if(nrow(showConnections())> 0) { stopCluster(cl); closeAllConnections();cl = NULL} } )
-        universe_betas <- stock_betas(stk,beta_fct_frame,cl)
+        universe_betas <- stock_betas(stk,beta_fct_frame,cl, beta_estimator)
         stopCluster(cl)
         cl = NULL
         gc()

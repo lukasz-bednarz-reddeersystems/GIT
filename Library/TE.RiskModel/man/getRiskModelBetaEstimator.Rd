@@ -2,16 +2,16 @@
 % Please edit documentation in R/risk_model.r
 \docType{methods}
 \name{getRiskModelBetaEstimatorType,VirtualBetaEstimator-method}
+\alias{getRiskModelBetaEstimator}
+\alias{getRiskModelBetaEstimator,VirtualRiskModel-method}
 \alias{getRiskModelBetaEstimatorType,VirtualBetaEstimator-method}
-\alias{getRiskModellBetaEstimator}
-\alias{getRiskModellBetaEstimator,VirtualRiskModel-method}
 \title{Get Risk Model Beta Estimator}
 \usage{
 \S4method{getRiskModelBetaEstimatorType}{VirtualBetaEstimator}(object)
 
-getRiskModellBetaEstimator(object)
+getRiskModelBetaEstimator(object)
 
-\S4method{getRiskModellBetaEstimator}{VirtualRiskModel}(object)
+\S4method{getRiskModelBetaEstimator}{VirtualRiskModel}(object)
 }
 \arguments{
 \item{object}{object of class 'VirtualRiskModel'.}
@@ -19,10 +19,10 @@ getRiskModellBetaEstimator(object)
 \value{
 \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
 
-\code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
+\code{beta_estimator} 'VirtualBetaEstimator', object capturing beta model properties
 }
 \description{
-Returns name of Risk Model Beta Estimator
+Returns name of Risk Model Beta Estimator object
 }
 \section{Methods (by class)}{
 \itemize{
@@ -30,8 +30,8 @@ Returns name of Risk Model Beta Estimator
 
 Returns name of Risk Model
 
-\item \code{VirtualRiskModel}: Get Risk Model Beta Estimator Name
+\item \code{VirtualRiskModel}: Get Risk Model Beta Estimator Object
 
-Returns name of Risk Model Beta Estimator
+Returns Risk Model Beta Estimator Object
 }}
 

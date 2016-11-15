@@ -14,7 +14,10 @@ declare_local_cluster <- function(ncores){
 prepare_cluster <- function(cl){
   clusterEvalQ(cl,library(functional))
   clusterExport(cl,
-                list('omit_value','rgr_kernel','instrument_regression'),
+                list('omit_value',
+                     'rgr_kernel',
+                     'rlm_rgr_kernel',
+                     'instrument_regression'),
                 envir  = as.environment("package:TE.RiskModel"))
   return(cl)
 }
@@ -91,8 +94,8 @@ get_bulk_stock_returns <- function(start,end){
 get_region_stock_returns <- function(start,end,regions){
   rtn <- get_bulk_price_data_by_regions(start,end,regions)
   rtn$Return <- (rtn$dblClosePrice/rtn$dblPreviousClosePrice)-1
-  rtn <- rtn[c('lInstrumentID','dtDateTime','Return')]
-  colnames(rtn) <- c('Instrument','Date','Return')
+  rtn <- rtn[c('lInstrumentID','dtDateTime','dblClosePrice','Return')]
+  colnames(rtn) <- c('Instrument','Date','ClosePrice','Return')
   rtn$Date <- as.Date(rtn$Date)
   return(rtn)
 }
@@ -222,14 +225,22 @@ pivot_frame <- function(frame,pivot_on,value_col,date_col){
 #' @export
 omit_value <- function(values_arr){
   values_arr <- unlist(values_arr)
-  return(is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr))
+
+  ret <- tryCatch({
+    is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr)|values_arr==0
+  }, error = function(cond){
+    browser()
+    stop(cond)
+  })
+
+  return(is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr)|values_arr==0)
 }
 
 #' kernel function to run regression
 #'
 #' function to apply regression, but also to remove values that
 #' will cause regression to fail.
-#' using lm.fit because it is faster
+#' using .lm.fit because it is faster
 #'
 #' @param xi array with x values
 #' @param data array with values to be regressed
@@ -239,10 +250,31 @@ omit_value <- function(values_arr){
 rgr_kernel <- function(xi,data){
   omit_rows <- omit_value(xi)|omit_value(data$Return)
   rval <- tryCatch({
-                lm.fit(x=cbind(1,xi[!omit_rows]), y=data$Return[!omit_rows])
+                .lm.fit(x=cbind(1,xi[!omit_rows]), y=data$Return[!omit_rows])
               },error=function(cond){
                 message(paste("Beta timeseries regression failed:",cond))
               })
+  return(rval)
+}
+
+#' kernel function to run regression
+#'
+#' function to apply robust linear regression, but also to remove values that
+#' will cause regression to fail.
+#' using rlm
+#'
+#' @param xi array with x values
+#' @param data array with values to be regressed
+#' @return \code{rval} list with components returned by lm.fit
+#'
+#' @export
+rlm_rgr_kernel <- function(xi,data){
+  omit_rows <- omit_value(xi)|omit_value(data$Return)
+  rval <- tryCatch({
+    rlm(x=cbind(1,xi[!omit_rows]), y=data$Return[!omit_rows])
+  },error=function(cond){
+    message(paste("Beta timeseries regression failed:",cond))
+  })
   return(rval)
 }
 
@@ -255,12 +287,20 @@ rgr_kernel <- function(xi,data){
 #' @return \code{rval} "data.frame" with all instruments betas in columns named after factor names
 #'
 #' @export
-instrument_regression <- function(ins,all_data){
+instrument_regression <- function(ins,all_data, beta_estimator = new("BetaEstimator.OLS")){
     data <- all_data[all_data$Instrument==ins,]
     data <- data[setdiff(colnames(data),'Date')]
-    rgr <- apply(data[setdiff(colnames(data),c('Instrument','Return'))], 2, Curry(rgr_kernel,data=data))
+
+    if (is(beta_estimator, "BetaEstimator.RLM")){
+      kernel <- Curry(rlm_rgr_kernel,data=data)
+    }
+    else {
+      kernel <- Curry(rgr_kernel,data=data)
+    }
+
+    rgr <- apply(data[setdiff(colnames(data),c('Instrument','Return'))], 2, kernel)
     if(length(rgr)>0){
-      rval <- unlist(Map(function(x)x[[1]][2],rgr))
+      rval <- unlist(Map(function(x)x[["coefficients"]][2],rgr))
       names(rval) <- gsub('.x2','',names(rval))
       rval <- cbind(Instrument=ins,as.data.frame(t(rval)))
     }
@@ -273,20 +313,32 @@ instrument_regression <- function(ins,all_data){
     return(rval)
 }
 
+
+
 #Computes betas of each stock to each factor via timeseries regression
 #Expects stock return frame with columns Instrument, Date and Return
 #Expects factor frame with column for each factor and Date.
-stock_betas <- function(stocks,factors,cl=NULL){
+stock_betas <- function(stocks,factors,cl=NULL, beta_estimator = new("BetaEstimator.OLS")){
+
   fnames <- setdiff(colnames(factors),'Date')
   all_data <- merge(stocks,factors,by='Date')
-  all_data[is.na(all_data)] <- 0
-  all_data <- cbind(all_data[c('Date','Instrument')],data.frame(Map(function(x)log(x+1),all_data[setdiff(colnames(all_data),c('Instrument','Date'))])))
-  instruments <- unique(stocks$Instrument)
+  #all_data[is.na(all_data)] <- 0
+  all_data <- cbind(all_data[c('Date','Instrument')],
+                    data.frame(Map(function(x)suppressWarnings(log1p(x)),
+                                   all_data[setdiff(colnames(all_data),
+                                                    c('Instrument','Date'))])))
+  # remove stock with zero returns and value below 1 USD
+  include <- aggregate(Return ~ Instrument, data = all_data, function(x){ !all(x == 0, na.rm = TRUE)})
+  include <- merge(include,
+                   aggregate(ClosePrice ~ Instrument, data = all_data, function(x){ !all(x < 1, na.rm = TRUE)}))
+
+  instruments <- unique(include$Instrument[include$Return &include$ClosePrice])
+
   if(length(cl)==0){
-    all_beta <- apply(data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data))
+    all_beta <- apply(data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data, beta_estimator))
   }
   else{
-    all_beta <- parApply(cl,data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data))
+    all_beta <- parApply(cl,data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data, beta_estimator))
   }
   all_beta <- Reduce(function(x,y)rbind(x,y),all_beta)
   return(all_beta)
@@ -308,7 +360,7 @@ stock_betas <- function(stocks,factors,cl=NULL){
 #' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of stock residual returns
 x_sectional_model <- function(stock_return,stock_betas){
   weighted_return <- merge(stock_return,stock_betas,by='Instrument')
-  weighted_return$PfoRtn <- log(weighted_return$Return+1)
+  weighted_return$PfoRtn <- log1p(weighted_return$Return)
   factors <- setdiff(colnames(stock_betas),'Instrument')
   omit_rows <- omit_value(weighted_return$PfoRtn)
   weighted_return <- weighted_return[!omit_rows,]

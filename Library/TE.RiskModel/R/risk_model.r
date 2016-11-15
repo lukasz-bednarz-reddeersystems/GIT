@@ -30,7 +30,7 @@ setClass(
 
 setGeneric("getRiskModelBetaEstimatorType", function(object){standardGeneric("getRiskModelBetaEstimatorType")})
 
-#' @describeIn getRiskModellBetaEstimator
+#' @describeIn getRiskModelBetaEstimator
 #' Get Risk Model Name
 #'
 #' Returns name of Risk Model
@@ -272,28 +272,27 @@ setMethod("setRiskModelUserFactorGroups",
 
 #' Get Risk Model Beta Estimator
 #'
-#' Returns name of Risk Model Beta Estimator
+#' Returns name of Risk Model Beta Estimator object
 #'
 #' @param object object of class 'VirtualRiskModel'.
 #' @export
 
-setGeneric("getRiskModellBetaEstimator", function(object){standardGeneric("getRiskModellBetaEstimator")})
+setGeneric("getRiskModelBetaEstimator", function(object){standardGeneric("getRiskModelBetaEstimator")})
 
-#' @describeIn getRiskModellBetaEstimator
-#' Get Risk Model Beta Estimator Name
+#' @describeIn getRiskModelBetaEstimator
+#' Get Risk Model Beta Estimator Object
 #'
-#' Returns name of Risk Model Beta Estimator
+#' Returns Risk Model Beta Estimator Object
 #'
-#' @inheritParams getRiskModellBetaEstimator
-#' @return \code{beta_model} 'VirtualBetaEstimator', object capturing beta model properties
+#' @inheritParams getRiskModelBetaEstimator
+#' @return \code{beta_estimator} 'VirtualBetaEstimator', object capturing beta model properties
 #' @export
-setMethod("getRiskModellBetaEstimator",
+setMethod("getRiskModelBetaEstimator",
           signature(object = "VirtualRiskModel"),
           function(object){
-            return(object@beta_model)
+            return(object@beta_estimator)
           }
 )
-
 
 
 #' Get Risk Model Name
@@ -779,6 +778,24 @@ setClass(
   contains  = c("VirtualRiskModel", "VIRTUAL")
 )
 
+
+
+#' Virtual S4 class for Developed Europe Risk Models.
+#'
+#' Class implementing parameters for family of Developed
+#' Europe Risk Models version 1.1 excluding HKD and DKK
+#' And robust linear model betas estimator
+#'
+#' Inherits from "VirtualRiskModel"
+
+setClass(
+  Class     = "RiskModel.DevelopedEurope.1.2",
+  prototype = list(
+    beta_estimator  = new("BetaEstimator.RLM")
+  ),
+  contains  = c("RiskModel.DevelopedEurope.1.1", "VIRTUAL")
+)
+
 #############################################
 #
 # RiskModel.DevelopedEuropePrototype150 Class
@@ -817,4 +834,22 @@ setClass(
     model_prefix    = "developed_europe_prototype.1.1"
   ),
   contains  = c("RiskModel.DevelopedEurope.1.1")
+)
+
+#' Concrete S4 class for Developed Europe Risk Model.
+#'
+#' Class implementing parameters for Prototype Developed
+#' Europe Risk Model with 150 days lookback
+#' and Robust Linear Model Beta estimator
+#'
+#' Inherits from "RiskModel.DevelopedEurope.1.1"
+#' @export
+
+setClass(
+  Class     = "RiskModel.DevelopedEuropePrototype150.1.2",
+  prototype = list(
+    lookback        = 150L,
+    model_prefix    = "developed_europe_prototype.1.2"
+  ),
+  contains  = c("RiskModel.DevelopedEurope.1.2")
 )

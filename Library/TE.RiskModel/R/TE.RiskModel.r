@@ -17,5 +17,6 @@
 #' @importFrom matrixcalc is.positive.definite
 #' @importFrom utils write.table
 #' @importFrom stats aggregate
+#' @importFrom MASS rlm
 NULL
 ## NULL

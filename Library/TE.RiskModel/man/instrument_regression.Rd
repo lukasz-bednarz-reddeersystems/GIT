@@ -4,7 +4,8 @@
 \alias{instrument_regression}
 \title{Perform regressions for one instrument}
 \usage{
-instrument_regression(ins, all_data)
+instrument_regression(ins, all_data,
+  beta_estimator = new("BetaEstimator.OLS"))
 }
 \arguments{
 \item{ins}{"integer" instrument id}

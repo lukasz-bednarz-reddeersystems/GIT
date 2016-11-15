@@ -893,13 +893,16 @@ bulk_load_residual_returns <- function(returns, rm_id){
 
   data <- returns[c("Date" ,"Instrument", "Return")]
   colnames(data) <- c("dtDate" ,"lInstrumentID","dblLogReturn")
-
   data <- cbind(data.frame(lModelID = rm_id), data)
-
   data <- data[,col_names]
   index_key_names <- c("dtDate", "lModelID",  "lInstrumentID" )
+  for (day in unique(data$Date)){
 
-  bulk_load_data(table_name, data, data.frame(lModelID = rm_id), index_key_names )
+    bulk_load_data(table_name,
+                   data[data$Date == day],
+                   data.frame(lModelID = rm_id, dtDate = as_date(day)),
+                   index_key_names )
+  }
 }
 
 query_residual_returns_on_model_id <- function(rm_id) {
