@@ -17,6 +17,6 @@ rgr_kernel(xi, data)
 \description{
 function to apply regression, but also to remove values that
 will cause regression to fail.
-using .lm.fit because it is faster
+using lm.fit because it is faster
 }
 

@@ -96,6 +96,17 @@ get_region_stock_returns <- function(start,end,regions){
   rtn$Return <- (rtn$dblClosePrice/rtn$dblPreviousClosePrice)-1
   rtn <- rtn[c('lInstrumentID','dtDateTime','dblClosePrice','Return')]
   colnames(rtn) <- c('Instrument','Date','ClosePrice','Return')
+
+  # remove stock with zero returns and value below 1 USD
+  include <- aggregate(Return ~ Instrument, data = rtn, function(x){ !all(x == 0, na.rm = TRUE)})
+  include <- merge(include,
+                   aggregate(ClosePrice ~ Instrument, data = rtn, function(x){ !all(x < 1, na.rm = TRUE)}))
+
+  rtn <- rtn[setdiff(colnames(rtn), "ClosePrice")]
+
+  rtn <- merge(rtn, include["Instrument"])
+
+
   rtn$Date <- as.Date(rtn$Date)
   return(rtn)
 }
@@ -227,20 +238,22 @@ omit_value <- function(values_arr){
   values_arr <- unlist(values_arr)
 
   ret <- tryCatch({
-    is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr)|values_arr==0
+    is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr)
   }, error = function(cond){
     browser()
+    message(sprintf("Error in omit_value, length of data %s",
+                    length(values_arr)))
     stop(cond)
   })
 
-  return(is.na(values_arr)|is.infinite(values_arr)|is.nan(values_arr)|values_arr==0)
+  return(ret)
 }
 
 #' kernel function to run regression
 #'
 #' function to apply regression, but also to remove values that
 #' will cause regression to fail.
-#' using .lm.fit because it is faster
+#' using lm.fit because it is faster
 #'
 #' @param xi array with x values
 #' @param data array with values to be regressed
@@ -250,7 +263,7 @@ omit_value <- function(values_arr){
 rgr_kernel <- function(xi,data){
   omit_rows <- omit_value(xi)|omit_value(data$Return)
   rval <- tryCatch({
-                .lm.fit(x=cbind(1,xi[!omit_rows]), y=data$Return[!omit_rows])
+                lm.fit(x=cbind(1,xi[!omit_rows]), y=data$Return[!omit_rows])
               },error=function(cond){
                 message(paste("Beta timeseries regression failed:",cond))
               })
@@ -322,23 +335,22 @@ stock_betas <- function(stocks,factors,cl=NULL, beta_estimator = new("BetaEstima
 
   fnames <- setdiff(colnames(factors),'Date')
   all_data <- merge(stocks,factors,by='Date')
-  #all_data[is.na(all_data)] <- 0
+  all_data[is.na(all_data)] <- 0
   all_data <- cbind(all_data[c('Date','Instrument')],
                     data.frame(Map(function(x)suppressWarnings(log1p(x)),
                                    all_data[setdiff(colnames(all_data),
                                                     c('Instrument','Date'))])))
-  # remove stock with zero returns and value below 1 USD
-  include <- aggregate(Return ~ Instrument, data = all_data, function(x){ !all(x == 0, na.rm = TRUE)})
-  include <- merge(include,
-                   aggregate(ClosePrice ~ Instrument, data = all_data, function(x){ !all(x < 1, na.rm = TRUE)}))
 
-  instruments <- unique(include$Instrument[include$Return &include$ClosePrice])
+  instruments <- unique(stocks$Instrument)
+
+  instr_regr_fun <- Curry(instrument_regression,all_data=all_data, beta_estimator)
+
 
   if(length(cl)==0){
-    all_beta <- apply(data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data, beta_estimator))
+    all_beta <- apply(data.frame(Instrument=instruments),1, instr_regr_fun)
   }
   else{
-    all_beta <- parApply(cl,data.frame(Instrument=instruments),1,Curry(instrument_regression,all_data=all_data, beta_estimator))
+    all_beta <- parApply(cl,data.frame(Instrument=instruments),1,instr_regr_fun)
   }
   all_beta <- Reduce(function(x,y)rbind(x,y),all_beta)
   return(all_beta)
@@ -360,7 +372,7 @@ stock_betas <- function(stocks,factors,cl=NULL, beta_estimator = new("BetaEstima
 #' \code{x_sectional_model$log_implied_rtn} - "data.frame" with log of stock residual returns
 x_sectional_model <- function(stock_return,stock_betas){
   weighted_return <- merge(stock_return,stock_betas,by='Instrument')
-  weighted_return$PfoRtn <- log1p(weighted_return$Return)
+  weighted_return$PfoRtn <- log(weighted_return$Return+1)
   factors <- setdiff(colnames(stock_betas),'Instrument')
   omit_rows <- omit_value(weighted_return$PfoRtn)
   weighted_return <- weighted_return[!omit_rows,]
